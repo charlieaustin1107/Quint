@@ -1256,6 +1256,9 @@ h2, h3, h4, .hmsec > h2, .sec h3, .q .qk, .nav h6, .event .tag, .rsec h4, .kpi s
 canvas.qcore { position: absolute; left: -35%; top: -35%; width: 170%; height: 170%; pointer-events: none; }
 .vmorb.has3d { overflow: visible; }
 .fxset { display: flex; flex-direction: column; gap: 8px; }
+
+.vsteps { margin: 6px 0 8px; padding-left: 20px; display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; line-height: 1.45; } .vsteps b { color: var(--ink-hi); }
+#qvn p { margin: 0 0 6px; }
 </style>
 </head>
 <body>
@@ -7489,7 +7492,20 @@ function voiceScore(v) {
   return (/en[-_]GB/i.test(v.lang) ? 30 : /en[-_](US|AU|IE)/i.test(v.lang) ? 20 : 10) + (/premium/i.test(n) ? 60 : /enhanced|natural|neural/i.test(n) ? 45 : 0) + (VOICE_GOOD.test(v.name) ? 20 : 0) + (/compact/i.test(n) ? -5 : 0) + (v.localService ? 2 : 0);
 }
 function voiceList() { try { return (window.speechSynthesis && speechSynthesis.getVoices()) || []; } catch (e) { return []; } }
-function voicePick() { const vs = voiceList(), want = HS().voice && vs.find(v => v.voiceURI === HS().voice || v.name === HS().voice); if (want) return want; return vs.filter(v => voiceScore(v) > 0).sort((a, b) => voiceScore(b) - voiceScore(a))[0] || null; }
+const VOICE_SYS = "__sys"; // "use my iPhone's own voice": the one chosen in iPhone Settings
+const voiceGood = v => !!v && /premium|enhanced|natural|neural/i.test(`${v.name} ${v.voiceURI || ""}`);
+function voiceAuto(vs) { // with no choice made: the best Premium or Enhanced voice the page can see, else the phone's own voice (never a basic voice over a better one set in Settings)
+  const best = vs.filter(v => voiceScore(v) > 0).sort((a, b) => voiceScore(b) - voiceScore(a))[0] || null; return voiceGood(best) ? best : null;
+}
+function voiceHelp(vs, cur) { // what Quint can see, and how to give him a human voice
+  const en = vs.filter(v => /^en/i.test(v.lang)), good = en.filter(voiceGood);
+  const steps = `<ol class="vsteps"><li>Open iPhone <b>Settings → Accessibility → Spoken Content</b> (on newer iPhones: <b>Read &amp; Speak</b>) <b>→ Voices → English</b>.</li><li>Pick a voice marked <b>Premium</b>: Jamie or Serena (UK), or Ava, Zoe or Evan (US). Tap the download cloud and wait for it to finish.</li><li>Tap that voice so it has a tick: it's now your iPhone's voice.</li><li>Close the Claude app fully (swipe it away), reopen it, and tap Listen.</li></ol><p class="small">Siri's own voice can't be used by apps, so a Premium voice is the most human option on iPhone.</p>`;
+  const now = cur ? `Quint is using <b>${esc(cur.name.replace(/\s*\(.*\)$/, ""))}</b>${voiceGood(cur) ? ", a Premium voice" : ""}.` : "Quint is using <b>your iPhone's own voice</b> (the one set in iPhone Settings).";
+  if (!en.length) return `<p>The Claude app doesn't show your iPhone's voices to web pages, so Quint can only use your iPhone's own voice. That's why it sounded the same: it's still your phone's default voice. Change it to a human-sounding one:</p>${steps}`;
+  if (!good.length) return `<p>${now} Quint can see ${en.length} English voice${en.length === 1 ? "" : "s"} here, but none are Premium or Enhanced, so the most human option is your iPhone's own voice set to a Premium one:</p>${steps}`;
+  return `<p>${now} For an even better voice, or a different accent:</p>${steps}`;
+}
+function voicePick() { if (HS().voice === VOICE_SYS) return null; const vs = voiceList(), want = HS().voice && vs.find(v => v.voiceURI === HS().voice || v.name === HS().voice); if (want) return want; return voiceAuto(vs); }
 if (window.speechSynthesis) { try { speechSynthesis.onvoiceschanged = () => { if ($("#qvl")) qtVoicePaint(); }; speechSynthesis.getVoices(); } catch (e) {} }
 function openVoice() {
   openSheet(`${shead("🔊 Voice, sounds &amp; haptics")}<p class="small" id="qvn"></p><div class="qvl" id="qvl"></div><label class="small" for="qvr" style="display:block;margin-top:10px">Speed: <b id="qvrv">${(+HS().vrate || 1).toFixed(2)}×</b></label><input type="range" id="qvr" min="0.7" max="1.5" step="0.05" value="${+HS().vrate || 1}" style="width:100%">${fxSetHTML()}`, fxSetWire);
@@ -7499,8 +7515,8 @@ function qtVoicePaint() {
   const el = $("#qvl"), note = $("#qvn"); if (!el) return; const test = () => { QT.speaking = false; qtSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); };
   if (QT.tts) { note.textContent = "Claude's own voices are available here. Tap one to hear it."; el.innerHTML = ["buttery", "airy", "glassy", "rounded"].map(v => `<button class="btn${(HS().tvoice || "buttery") === v ? " pri" : ""}" data-tv="${v}">${v[0].toUpperCase() + v.slice(1)}</button>`).join(""); $$("[data-tv]", el).forEach(b => b.onclick = () => { HS().tvoice = b.dataset.tv; save(); qtVoicePaint(); test(); }); return; }
   const vs = voiceList().filter(v => /^en/i.test(v.lang)).sort((a, b) => voiceScore(b) - voiceScore(a)), cur = voicePick();
-  note.innerHTML = `On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. <b>For a much more human voice, download a Premium one:</b> Settings → Accessibility → Spoken Content (Read &amp; Speak on newer iPhones) → Voices → English, then tap a voice marked Premium, such as Ava, Zoe or Evan (US) or Jamie or Serena (UK), and download it. Come back here and tap it. Robotic voices are marked at the bottom.`;
-  el.innerHTML = vs.length ? vs.map(v => `<button class="btn${cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name) ? " pri" : ""}" data-vu="${esc(v.voiceURI || v.name)}">${esc(v.name.replace(/\s*\(.*\)$/, ""))} <small>${esc(v.lang)}${voiceScore(v) < 0 ? " · robotic" : /premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : `<p class="small">No voices are listed yet. Tap 🔊 Listen on any answer, then come back.</p>`;
+  note.innerHTML = voiceHelp(voiceList(), cur);
+  el.innerHTML = `<button class="btn${cur ? "" : " pri"}" data-vu="${VOICE_SYS}">📱 My iPhone's voice <small>set in iPhone Settings</small></button>` + (vs.length ? vs.map(v => `<button class="btn${cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name) ? " pri" : ""}" data-vu="${esc(v.voiceURI || v.name)}">${esc(v.name.replace(/\s*\(.*\)$/, ""))} <small>${esc(v.lang)}${voiceScore(v) < 0 ? " · robotic" : /premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : "");
   $$("[data-vu]", el).forEach(b => b.onclick = () => { HS().voice = b.dataset.vu; save(); qtVoicePaint(); test(); });
 }
 /* ---------- sound effects, haptics and the 3D Quint core ---------- */
