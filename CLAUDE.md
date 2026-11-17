@@ -10,12 +10,31 @@ Read this first in every session. It says what this project is for and how to wo
 ## What's in the repo
 | Folder | What it is | Where it runs |
 |---|---|---|
-| `chart-wizard/` | **Chart Wizard**: the chart-reading game and learning simulator, with Quint built in as the coach | Artifact `76065a1d-9c56-4fd6-9cfd-7f1297225a0e` |
-| `quint-brain/` | **Quint Brain**: Quint's live market read, the 5-pillar checks, and the strategy backtester | Artifact `cd485103-4fb2-4d50-8aeb-2237b4ef142f` |
-| `quint/` | **Quint**: the standalone, futuristic Quint app | Artifact `41275d03-b425-4aa9-95ef-f85de223da67` (public) |
+| `chart-wizard/` | **Chart Wizard**: the chart-reading game and learning simulator, with Quint built in as the coach. Source in `chart-wizard/src/`, tests in `chart-wizard/src/t/` | Artifact `76065a1d-9c56-4fd6-9cfd-7f1297225a0e` |
+| `quint-brain/` | **Quint Brain**: Quint's own app: the 3D brain, live market read, matrix, 5-pillar check, record and alerts. Source and tests in `quint-brain/src/` | Artifact `cd485103-4fb2-4d50-8aeb-2237b4ef142f` |
+| `quint/` | **Quint**: the first standalone Quint app (no source here; superseded by Quint Brain) | Artifact `41275d03-b425-4aa9-95ef-f85de223da67` (public) |
 | `backtest/` | Code that backtests the strategies on real MNQ candles, outside the browser | Runs with `node` and `python3` |
 
-Each app is a single self-contained `index.html`. The artifacts are where the apps actually run, because Quint's AI chat and the TradingView/market connectors work there without an API key. **This repo is the master copy.** Change a file here, then publish that file to the matching artifact.
+Each app runs as a single self-contained `index.html`. The artifacts are where the apps actually run, because Quint's AI chat and the TradingView/market connectors work there without an API key. **This repo is the master copy.** Change it here, then publish the built `index.html` to the matching artifact.
+
+**Chart Wizard and Quint Brain are built from source: never hand-edit their `index.html`.** Edit the files in `src/`, rebuild, test, then publish. A build from unchanged source reproduces the published `index.html` byte for byte.
+
+## Building and testing
+- **Chart Wizard:** `cd chart-wizard/src && python3 build.py && python3 build.py --prod`. The plain build makes `test.html` (with the `window.__T` test hooks); `--prod` writes `chart-wizard/index.html` without them. The script order is in `build.py`; the game's built-in market data is `data3.json`.
+- **Quint Brain** reuses Chart Wizard's own functions (Quint's brief, rules, tools, the feed, the 5-pillar engine) instead of copies, so **rebuild it after changing Chart Wizard's `dock.js`, `live.js`, `quint.js`, `qlab.js` or `pillars.js`**: `cd quint-brain/src && python3 extract.py "$(cat roots.txt)" "$(cat mine.txt)" && python3 patch.py && python3 build.py && python3 build.py --prod`. `extract.py` copies every function `roots.txt` needs out of `chart-wizard/src` into `brain.js`; `patch.py` adapts them; `qa_core.js`, `qa_ui.js` and `qa_brainviz.js` are Quint Brain's own code.
+- **Tests** (need `pip install playwright` and `playwright install chromium` if Chrome isn't installed) are Playwright scripts with a mocked `window.claude` (fake TradingView, FMP and Claude replies), so they never spend real calls. Run them from anywhere, e.g. `python3 chart-wizard/src/t/dock.py m`, `python3 chart-wizard/src/t/feed.py`, `python3 quint-brain/src/t_qa.py`. The shared mocks live in `chart-wizard/src/t/dock.py`, `quint.py` and `news.py`. Before publishing run at least: `dock.py m`, `feed.py`, `prac_offline.py`, `t6.py`, `coach_prod2.py`, `prod_quint.py` (Chart Wizard) and `t_qa.py`, `t_brain.py`, `t_daily.py`, `t_prod.py` (Quint Brain). Check `errs` is empty and look at the phone-size screenshots they save in `/tmp`.
+
+## Publishing
+- Publish the built `index.html` with the artifact tools: read the artifact's current version first and pass it as `base_version`, so a newer version is never overwritten. Both artifacts are private to the owner.
+- The `quint/` artifact is public and can't be republished from a chat.
+
+## TradingView's daily call limit (most important technical rule)
+- TradingView's connector allows a fixed number of calls **per day** for the whole account (both apps and every Claude chat): 10 Essential, 20 Plus, 50 Premium, 150 Ultimate, or 500 a day and 50 a minute with TradingView's AI add-on. Polling burned through it in an afternoon, so:
+- **Never poll TradingView on a timer** except through `tvBgEvery()` (it only allows background refreshes on Ultimate or the AI add-on). The owner picks their plan in Settings; never guess it.
+- **The feed** (`dkFeed` in `dock.js`): ~17 days of 5-minute candles and the daily candles are fetched once a day and saved on the phone; after that a refresh asks only for the newest 1-minute candles and rebuilds every timeframe from them. A Quint answer should cost about one call.
+- **Practice never calls TradingView** (`pracBars` in `quint.js`): it uses the saved real candles, or built-in practice candles made from a year of real Nasdaq, S&P 500, gold and oil days.
+- When TradingView refuses, Quint still answers, from saved candles (saying how old they are) or from a chart screenshot the owner sends.
+- Quint's answers use the owner's Claude usage through the artifact (Fable for calls, Opus for simple questions).
 
 ## Product rules (from the owner)
 1. **Keep Chart Wizard simple.** Teach only the best 2–3 backtested strategies plus the owner's own **5-pillar playbook**. Quint is the powerhouse.

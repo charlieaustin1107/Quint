@@ -2,3 +2,10 @@ node_modules/
 __pycache__/
 *.pyc
 .DS_Store
+# built test pages and generated code (rebuild with the commands in CLAUDE.md)
+chart-wizard/src/test.html
+quint-brain/src/quint_test.html
+quint-brain/src/brain_raw.js
+quint-brain/src/brain.js
+*.png
+!chart-wizard/src/t/fixtures/*.png
