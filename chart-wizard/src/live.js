@@ -405,7 +405,7 @@ function mkBuildHome() {
   const root = $("#hmHome");
   root.innerHTML = `<header class="hmh"><button class="tbtn" id="hmNav" aria-label="Menu">☰</button><div class="hmbrand"><span>${hexIcon(rankOf(ST.xp) + 1, 30)}</span><span><b>Chart Wizard</b><small>Live markets</small></span></div><span class="spacer"></span><button class="tbtn" id="hmRef" aria-label="Refresh prices">⟳</button></header>
     <div class="hmwrap">
-      <div class="hmstat" id="hmStat"></div><div id="hmBan"></div><div id="hmAcct"></div><div id="hmQT"></div><div id="hmLT"></div><div id="hmHero"></div>
+      <div class="hmstat" id="hmStat"></div><div id="hmSess"></div><div id="hmBan"></div><div id="hmLucid"></div><div id="hmAcct"></div><div id="hmQT"></div><div id="hmLT"></div><div id="hmHero"></div>
       <section class="hmsec" aria-label="Futures"><h2>Futures <span class="mkst" id="hmFutSt"></span><span class="spacer"></span><span class="small dim" id="hmFutN"></span></h2><div class="chips fgrp" id="hmFutG" role="tablist" aria-label="Futures groups">${FUT_G.map(([k, l]) => `<button class="chip" data-fg="${k}" aria-pressed="${futGrp() === k}">${l}</button>`).join("")}</div><div class="mkgrid" id="hmFut"></div><p class="small dim" style="margin:0" id="hmFutNote">Tap a market for its live chart, Quint and paper trading.</p></section>
       <section class="hmsec" aria-label="News"><h2>News <span class="mkst" id="hmNewsSt">live headlines</span><span class="spacer"></span><button class="chip" id="hmNewsAll">All news ▸</button></h2><div id="hmNewsBox"></div></section>
       <section class="hmsec" aria-label="US stocks"><h2>US stocks <span class="mkst" id="hmStkSt"></span><span class="spacer"></span><button class="chip" id="hmEdit" aria-pressed="${MK.edit}">${MK.edit ? "Done" : "Edit"}</button></h2><div class="mkgrid" id="hmStk"></div><div id="hmAdd"></div></section>
@@ -439,7 +439,7 @@ function mkPaintHome() {
     ${MK.st === "none" ? "" : `<span class="budget" title="FMP calls this app has made today. The free plan allows 250 a day in total.">FMP <span class="bar"><i style="width:${clamp(n / 250 * 100, 0, 100)}%"></i></span> ~${n}/250 today</span>
     <button class="sw2" id="hmLive" aria-pressed="${live}"><span class="k"></span>Auto-refresh</button>`}`;
   $("#hmBan").innerHTML = mkBanner();
-  mkPaintAcct(); ltPaintHome(); qtPaintHome();
+  mkPaintAcct(); ltPaintHome(); qtPaintHome(); if (typeof hudPaint === "function") { hudPaint(); lgPaint(); }
   const hero = $("#hmHero"), mb = MKDEF[HERO_K];
   if (!hero.firstChild) hero.innerHTML = `<button class="hero" data-k="${HERO_K}" aria-label="${esc(mb.name)}: open the live chart"></button>`;
   const hb = hero.firstChild; hb.innerHTML = heroInner(mb); mkFlash(hb, HERO_K);

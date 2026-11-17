@@ -4,29 +4,37 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chart Wizard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Martian+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#02040a">
 <style>
 :root {
-  /* One trading terminal: toolbar + chart + coaching panel. Chart colours validated for colour-blind separation on the dark surface. */
-  --bg0: #060912;
-  --bg: #0b1020;
-  --panel: #0d1324;
-  --card: #111a2f;
-  --card2: #16213b;
-  --line: #1d2842;
-  --line2: #2a3758;
-  --grid: #131b30;
-  --ink: #c9d3e6;
-  --ink-hi: #f2f6ff;
-  --muted: #8691aa;
-  --up: #26a69a;
-  --down: #ef5350;
-  --ema: #2962ff;
+  /* NEON HUD: one futuristic trading cockpit shared with Quint Brain. Void-black glass, electric cyan and violet wiring,
+     mint for buys, rose for sells. Chart colours stay validated for colour-blind separation on the dark surface. */
+  --bg0: #02040a;
+  --bg: #050912;
+  --panel: #070c18;
+  --card: #0a1222;
+  --card2: #0f1a30;
+  --line: #15223a;
+  --line2: #233756;
+  --grid: #0d1628;
+  --ink: #cfdaec;
+  --ink-hi: #f4f8ff;
+  --muted: #7d90ad;
+  --up: #2fd9a8;
+  --down: #ff4f6e;
+  --ema: #4d7cff;
   --sma: #a8b0c2;
-  --rsi: #9575cd;
-  --amber: #c07c10;
-  --acc: #22d3ee;
-  --acc2: #8b5cf6;
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Ubuntu, sans-serif;
+  --rsi: #a98bff;
+  --amber: #ffb547;
+  --acc: #29d8ff;
+  --acc2: #9b6bff;
+  --glow: 0 0 18px rgba(41,216,255,.35);
+  --f-display: "Chakra Petch", "Rajdhani", system-ui, sans-serif;
+  --f-num: "Martian Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
   color-scheme: dark;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1092,6 +1100,132 @@ b.warn, .kpi b.warn, .ticket b.warn { color: #e7b35a; }
 .qalh { margin: 6px 0 0; font-size: 11.5px; font-weight: 750; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 .qalhow { border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; background: rgba(255,255,255,.02); } .qalhow summary { cursor: pointer; font-weight: 700; font-size: 13px; color: var(--ink-hi); } .qalhow ol { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
 @media (prefers-reduced-motion: reduce) { .qthink::before { animation: none; } }
+
+/* ================= NEON HUD THEME (layered last so it restyles everything above) ================= */
+html, body { background: var(--bg0); }
+body { font-family: var(--font); }
+/* faint blueprint grid and two slow aurora glows behind every screen */
+#app, .home { background:
+  radial-gradient(900px 460px at 88% -12%, rgba(155,107,255,.16), transparent 62%),
+  radial-gradient(800px 420px at -12% 0, rgba(41,216,255,.11), transparent 60%),
+  linear-gradient(rgba(125,144,173,.05) 1px, transparent 1px) 0 0 / 28px 28px,
+  linear-gradient(90deg, rgba(125,144,173,.05) 1px, transparent 1px) 0 0 / 28px 28px,
+  var(--bg0); }
+.num, .mpx, .mch, .pnl, .kpi b, .ticket div b, .hmacct b, .lvls b, #balv, .wallet b, .tiles b { font-family: var(--f-num); letter-spacing: -.02em; }
+.mpx, .hero .mpx { font-weight: 700; }
+h2, h3, h4, .hmsec > h2, .sec h3, .q .qk, .nav h6, .event .tag, .rsec h4, .kpi span, .ticket div, .hmbrand small, .hctitle small, .tabbar button, .btn, .chip, .seg button, .tbtn, .rank .rt small { font-family: var(--f-display); }
+.hmsec > h2 { letter-spacing: .22em; color: var(--muted); font-weight: 600; }
+.hmbrand b, .nav .nh .brand b { font-family: var(--f-display); font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--acc); text-shadow: 0 0 14px rgba(41,216,255,.45); }
+.hmbrand small { color: var(--acc2); letter-spacing: .3em; font-weight: 600; }
+
+/* glass top bars with a neon wire underneath */
+.tb, .hmh { background: linear-gradient(180deg, rgba(5,10,22,.92), rgba(3,6,14,.82)); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom-color: rgba(41,216,255,.16); }
+.tb::after, .hmh::after { background: linear-gradient(90deg, transparent, rgba(41,216,255,.8), rgba(155,107,255,.8), transparent); box-shadow: 0 0 10px rgba(41,216,255,.5); }
+.tbtn, .ibtn { background: rgba(10,18,34,.75); border-color: rgba(41,216,255,.18); border-radius: 6px; }
+.tbtn:hover { border-color: rgba(41,216,255,.5); color: var(--acc); box-shadow: var(--glow); }
+.rank { background: rgba(10,18,34,.75); border-color: rgba(155,107,255,.3); border-radius: 8px; }
+.xpbar i { box-shadow: 0 0 12px rgba(41,216,255,.9); }
+
+/* HUD cards: glass, hairline borders, cut corner brackets */
+.mtile, .hero, .hmacct, .q, .acct, .acard, details.strat, details.rules, .kpi, .rv, .mgr, .xpsum, .addform, .ticket div, .wallet > div, .recap details {
+  background: linear-gradient(180deg, rgba(14,24,44,.72), rgba(7,12,24,.78)); border: 1px solid rgba(41,216,255,.14); border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 12px 32px -22px rgba(0,0,0,.9); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.mtile, .hero, .hmacct { position: relative; }
+.mtile::before, .hero::before, .hmacct::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(var(--acc), var(--acc)) 0 0 / 14px 2px no-repeat, linear-gradient(var(--acc), var(--acc)) 0 0 / 2px 14px no-repeat,
+    linear-gradient(var(--acc2), var(--acc2)) 100% 100% / 14px 2px no-repeat, linear-gradient(var(--acc2), var(--acc2)) 100% 100% / 2px 14px no-repeat; opacity: .7; }
+.mtile:hover, .hero:hover, .hmacct:hover { border-color: rgba(41,216,255,.45); box-shadow: 0 0 0 1px rgba(41,216,255,.12), 0 0 26px -6px rgba(41,216,255,.45); }
+.hero { border-color: rgba(155,107,255,.3); background: radial-gradient(120% 90% at 100% 0, rgba(155,107,255,.16), transparent 55%), linear-gradient(180deg, rgba(14,24,44,.8), rgba(7,12,24,.85)); }
+.hero .mpx { text-shadow: 0 0 22px rgba(41,216,255,.35); }
+.mtile .tradeok { font-family: var(--f-display); letter-spacing: .16em; border-radius: 3px; color: var(--acc); border-color: rgba(41,216,255,.5); background: rgba(41,216,255,.06); }
+.mlogo { background: linear-gradient(135deg, var(--acc), var(--acc2)); box-shadow: 0 0 12px rgba(41,216,255,.35); }
+.pos, .mch.pos { color: var(--up); text-shadow: 0 0 12px rgba(47,217,168,.25); } .neg, .mch.neg { color: var(--down); text-shadow: 0 0 12px rgba(255,79,110,.25); }
+.mkst.open { color: var(--up); border-color: rgba(47,217,168,.45); background: rgba(47,217,168,.08); box-shadow: 0 0 12px -2px rgba(47,217,168,.4); }
+.drng .rb { background: linear-gradient(90deg, rgba(255,79,110,.6), rgba(47,217,168,.6)); } .drng .rb i { box-shadow: 0 0 10px #fff; }
+
+/* buttons and chips: crisp, uppercase, lit edges */
+.btn { border-radius: 6px; letter-spacing: .08em; background: rgba(12,22,40,.8); border-color: rgba(41,216,255,.22); }
+.btn:hover { border-color: rgba(41,216,255,.6); background: rgba(16,30,54,.9); box-shadow: var(--glow); }
+.btn.pri { color: #01131c; background: linear-gradient(135deg, var(--acc), var(--acc2)); box-shadow: 0 0 22px -4px rgba(41,216,255,.7); }
+.chip { border-radius: 4px; letter-spacing: .06em; background: rgba(8,14,28,.8); border-color: rgba(41,216,255,.2); }
+.chip[aria-pressed="true"] { color: var(--acc); border-color: var(--acc); background: rgba(41,216,255,.1); box-shadow: 0 0 14px -3px rgba(41,216,255,.6); }
+.seg { border-radius: 6px; border-color: rgba(41,216,255,.22); } .seg button[aria-pressed="true"] { color: var(--acc); background: rgba(41,216,255,.12); }
+.ord { border-radius: 8px; font-family: var(--f-display); }
+.ord.buy { background: linear-gradient(180deg, #33e6b4, #12a07a); box-shadow: 0 0 26px -6px rgba(47,217,168,.8); }
+.ord.sell { background: linear-gradient(180deg, #ff6680, #d42a4c); box-shadow: 0 0 26px -6px rgba(255,79,110,.8); }
+.ord b { letter-spacing: .2em; }
+.opt { border-radius: 8px; background: rgba(12,22,40,.7); border-color: rgba(41,216,255,.16); }
+.opt:hover:not(:disabled) { border-color: rgba(41,216,255,.6); box-shadow: var(--glow); }
+
+/* panels, sheets and the menu drawer */
+.panel, .tools { background: linear-gradient(180deg, rgba(6,10,20,.94), rgba(3,6,14,.96)); }
+.panel { border-top-color: rgba(41,216,255,.16); }
+.tool[aria-pressed="true"] { background: linear-gradient(135deg, var(--acc), var(--acc2)); box-shadow: 0 0 14px rgba(41,216,255,.6); }
+.nav { background: linear-gradient(180deg, rgba(5,9,20,.97), rgba(2,4,10,.98)); border-right-color: rgba(41,216,255,.2); box-shadow: 18px 0 50px rgba(0,0,0,.6), 1px 0 0 rgba(41,216,255,.25); }
+.nav .ni { border-radius: 8px; } .nav .ni.on { background: rgba(41,216,255,.08); border-color: rgba(41,216,255,.45); box-shadow: inset 3px 0 0 var(--acc); }
+.nav .ni .ic { border-radius: 6px; background: rgba(10,18,34,.8); border-color: rgba(41,216,255,.18); }
+.sheet { background: linear-gradient(180deg, rgba(7,12,24,.98), rgba(3,6,14,.99)); border-top: 1px solid rgba(41,216,255,.45); box-shadow: 0 -10px 40px rgba(41,216,255,.12); }
+
+/* the bottom tab bar: a glowing dock */
+.tabbar { background: rgba(3,6,14,.9); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-top: 1px solid rgba(41,216,255,.18); }
+.tabbar::before { content: ""; position: absolute; left: 10%; right: 10%; top: -1px; height: 1px; background: linear-gradient(90deg, transparent, var(--acc), var(--acc2), transparent); box-shadow: 0 0 8px var(--acc); }
+.tabbar button { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; border-radius: 8px; }
+.tabbar button[aria-current="page"] { color: var(--acc); background: rgba(41,216,255,.08); box-shadow: inset 0 -2px 0 var(--acc), 0 0 18px -6px rgba(41,216,255,.7); }
+.tabbar button[aria-current="page"] i { filter: drop-shadow(0 0 6px rgba(41,216,255,.7)); }
+
+.toast, .hmtoast { border-color: rgba(41,216,255,.5); background: rgba(4,9,20,.95); box-shadow: 0 0 24px -6px rgba(41,216,255,.6); font-family: var(--f-display); letter-spacing: .04em; }
+.hmban { border-radius: 8px; }
+::selection { background: rgba(41,216,255,.35); color: #fff; }
+* { scrollbar-color: rgba(41,216,255,.3) transparent; }
+@media (prefers-reduced-motion: reduce) { .tabbar::before { box-shadow: none; } }
+/* ---------- session HUD + Lucid guard ---------- */
+.hud, .lg { position: relative; display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left; color: var(--ink); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(41,216,255,.18);
+  background: linear-gradient(180deg, rgba(14,24,44,.75), rgba(6,10,20,.82)); box-shadow: inset 0 1px 0 rgba(255,255,255,.035); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.hud::before, .lg::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(var(--acc), var(--acc)) 0 0 / 14px 2px no-repeat, linear-gradient(var(--acc), var(--acc)) 0 0 / 2px 14px no-repeat,
+    linear-gradient(var(--acc2), var(--acc2)) 100% 100% / 14px 2px no-repeat, linear-gradient(var(--acc2), var(--acc2)) 100% 100% / 2px 14px no-repeat; opacity: .7; }
+.hudt { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.hudk, .lgk { font: 700 10.5px/1 var(--f-display); letter-spacing: .3em; color: var(--acc2); }
+.hudt b { font: 700 22px/1 var(--f-num); color: var(--ink-hi); text-shadow: 0 0 16px rgba(41,216,255,.45); }
+.hudph { font: 600 12px/1.3 var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.hud.hot .hudph { color: var(--acc); text-shadow: 0 0 10px rgba(41,216,255,.6); } .hud.on .hudph { color: var(--up); } .hud.off .hudph { color: var(--down); }
+.hudbar { position: relative; height: 6px; border-radius: 3px; background: rgba(41,216,255,.08); border: 1px solid rgba(41,216,255,.14); }
+.hudbar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: linear-gradient(90deg, var(--acc), var(--acc2)); box-shadow: 0 0 10px rgba(41,216,255,.6); }
+.hudbar > i { position: absolute; top: -4px; width: 1px; height: 12px; background: rgba(244,248,255,.55); }
+.hudbar .now { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%); box-shadow: 0 0 10px var(--acc), 0 0 2px #fff; }
+.hudlab { position: relative; height: 12px; font: 500 9.5px/1 var(--f-num); color: var(--muted); }
+.hudlab span { position: absolute; transform: translateX(-50%); } .hudlab span:nth-child(1) { left: 0; transform: none; } .hudlab span:nth-child(2) { left: 30.8%; } .hudlab span:nth-child(3) { right: 0; transform: none; }
+.hudnx { margin: 0; font-size: 13.5px; } .hudnx > span { font: 700 10px/1 var(--f-display); letter-spacing: .26em; color: var(--acc); margin-right: 4px; }
+.hudnx b { color: var(--ink-hi); } .hudnx small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.hudnw { margin: 0; font-size: 13px; padding: 7px 10px; border-radius: 6px; border: 1px solid rgba(255,181,71,.35); background: rgba(255,181,71,.07); color: #ffd9a0; }
+.hudnw.hot { border-color: rgba(255,79,110,.6); background: rgba(255,79,110,.1); color: #ffc2cd; box-shadow: 0 0 18px -6px rgba(255,79,110,.7); }
+.lg { cursor: pointer; font: inherit; } .lg:hover { border-color: rgba(41,216,255,.45); }
+.lg.set b { font: 700 16px/1.2 var(--f-display); letter-spacing: .06em; color: var(--ink-hi); } .lg.set small { color: var(--muted); font-size: 13px; line-height: 1.45; } .lggo { font: 700 12px/1 var(--f-display); letter-spacing: .14em; color: var(--acc); text-transform: uppercase; }
+.lgh { display: flex; align-items: center; justify-content: space-between; }
+.lgst { font: 700 10.5px/1 var(--f-display); letter-spacing: .2em; padding: 4px 8px; border-radius: 3px; color: #01131c; background: var(--up); box-shadow: 0 0 14px -2px var(--up); }
+.lg.warn .lgst { background: var(--amber); box-shadow: 0 0 14px -2px var(--amber); } .lg.bad .lgst { background: var(--down); color: #fff; box-shadow: 0 0 14px -2px var(--down); }
+.lg.warn { border-color: rgba(255,181,71,.4); } .lg.bad { border-color: rgba(255,79,110,.55); box-shadow: 0 0 24px -10px rgba(255,79,110,.8); }
+.lgrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } .lgrow.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lgrow > span { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.lgrow small { font: 600 9.5px/1.2 var(--f-display); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.lgrow b { font: 700 14px/1.1 var(--f-num); color: var(--ink-hi); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lgrow > span:first-child b { font-size: 18px; color: var(--acc); overflow: visible; } .lgrow.two > span:first-child b { font-size: 14px; color: inherit; text-shadow: none; }
+.lg.warn .lgrow > span:first-child b { color: var(--amber); } .lg.bad .lgrow > span:first-child b { color: var(--down); }
+.lgbar { height: 5px; border-radius: 3px; background: rgba(41,216,255,.08); overflow: hidden; } .lgbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--acc), var(--acc2)); }
+.lgbar.dd i { background: linear-gradient(90deg, var(--down), var(--amber) 35%, var(--up)); }
+.lgsz { font-size: 13px; line-height: 1.45; } .lgsz b { color: var(--ink-hi); }
+.lgw { font-size: 12.5px; color: #ffd9a0; } .lgu { font-size: 11.5px; color: var(--muted); }
+.lgform { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.lgf { display: flex; flex-direction: column; gap: 5px; min-width: 0; font-size: 12px; color: var(--muted); }
+.lgf span { font: 600 10.5px/1.25 var(--f-display); letter-spacing: .08em; text-transform: uppercase; min-height: 2.5em; display: flex; align-items: flex-end; }
+.lgf input { min-height: 44px; padding: 0 12px; border-radius: 6px; border: 1px solid rgba(41,216,255,.25); background: rgba(4,8,18,.85); color: var(--ink-hi); font: 500 16px var(--f-num); width: 100%; min-width: 0; box-sizing: border-box; }
+.lgf input:focus { outline: none; border-color: var(--acc); box-shadow: 0 0 0 3px rgba(41,216,255,.15); }
+.lgf small { font-size: 11px; }
+.lgtog { display: flex; align-items: center; gap: 12px; min-height: 44px; margin-top: 10px; padding: 0; border: 0; background: transparent; text-align: left; font-size: 13.5px; color: var(--ink); }
+.lgtog .k { flex: none; position: relative; width: 42px; height: 24px; border-radius: 12px; background: var(--line2); }
+.lgtog .k::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); transition: transform .2s; }
+.lgtog[aria-pressed="true"] .k { background: var(--acc); } .lgtog[aria-pressed="true"] .k::after { transform: translateX(18px); background: #01131c; }
+@media (max-width: 360px) { .lgform { grid-template-columns: 1fr; } .lgrow { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
 <body>
@@ -5828,7 +5962,7 @@ function mkBuildHome() {
   const root = $("#hmHome");
   root.innerHTML = `<header class="hmh"><button class="tbtn" id="hmNav" aria-label="Menu">☰</button><div class="hmbrand"><span>${hexIcon(rankOf(ST.xp) + 1, 30)}</span><span><b>Chart Wizard</b><small>Live markets</small></span></div><span class="spacer"></span><button class="tbtn" id="hmRef" aria-label="Refresh prices">⟳</button></header>
     <div class="hmwrap">
-      <div class="hmstat" id="hmStat"></div><div id="hmBan"></div><div id="hmAcct"></div><div id="hmQT"></div><div id="hmLT"></div><div id="hmHero"></div>
+      <div class="hmstat" id="hmStat"></div><div id="hmSess"></div><div id="hmBan"></div><div id="hmLucid"></div><div id="hmAcct"></div><div id="hmQT"></div><div id="hmLT"></div><div id="hmHero"></div>
       <section class="hmsec" aria-label="Futures"><h2>Futures <span class="mkst" id="hmFutSt"></span><span class="spacer"></span><span class="small dim" id="hmFutN"></span></h2><div class="chips fgrp" id="hmFutG" role="tablist" aria-label="Futures groups">${FUT_G.map(([k, l]) => `<button class="chip" data-fg="${k}" aria-pressed="${futGrp() === k}">${l}</button>`).join("")}</div><div class="mkgrid" id="hmFut"></div><p class="small dim" style="margin:0" id="hmFutNote">Tap a market for its live chart, Quint and paper trading.</p></section>
       <section class="hmsec" aria-label="News"><h2>News <span class="mkst" id="hmNewsSt">live headlines</span><span class="spacer"></span><button class="chip" id="hmNewsAll">All news ▸</button></h2><div id="hmNewsBox"></div></section>
       <section class="hmsec" aria-label="US stocks"><h2>US stocks <span class="mkst" id="hmStkSt"></span><span class="spacer"></span><button class="chip" id="hmEdit" aria-pressed="${MK.edit}">${MK.edit ? "Done" : "Edit"}</button></h2><div class="mkgrid" id="hmStk"></div><div id="hmAdd"></div></section>
@@ -5862,7 +5996,7 @@ function mkPaintHome() {
     ${MK.st === "none" ? "" : `<span class="budget" title="FMP calls this app has made today. The free plan allows 250 a day in total.">FMP <span class="bar"><i style="width:${clamp(n / 250 * 100, 0, 100)}%"></i></span> ~${n}/250 today</span>
     <button class="sw2" id="hmLive" aria-pressed="${live}"><span class="k"></span>Auto-refresh</button>`}`;
   $("#hmBan").innerHTML = mkBanner();
-  mkPaintAcct(); ltPaintHome(); qtPaintHome();
+  mkPaintAcct(); ltPaintHome(); qtPaintHome(); if (typeof hudPaint === "function") { hudPaint(); lgPaint(); }
   const hero = $("#hmHero"), mb = MKDEF[HERO_K];
   if (!hero.firstChild) hero.innerHTML = `<button class="hero" data-k="${HERO_K}" aria-label="${esc(mb.name)}: open the live chart"></button>`;
   const hb = hero.firstChild; hb.innerHTML = heroInner(mb); mkFlash(hb, HERO_K);
@@ -8240,6 +8374,7 @@ async function dkBrief(m, signal) { // everything Quint should know before he an
   L.push(P ? `OPEN POSITION: ${P.dir > 0 ? "LONG" : "SHORT"} ${lvSize(P, S)} at ${f(P.e)}, stop ${f(P.stop)}, target ${P.tgt != null ? f(P.tgt) : "none"}, open P&L ${fusd(lvUPL(P))}, opened ${fAgo(P.t0)}.` : "OPEN POSITION: none in this market.");
   if (others.length) L.push(`OTHER OPEN TRADES: ${others.map(x => `${x.dir > 0 ? "long" : "short"} ${x.name}`).join(", ")}.`);
   if (m.trade) { const room = typeof roomLeft === "function" ? roomLeft() : null; L.push(`PAPER ACCOUNT: ${acctLabel()}, balance ${fbal(ST.bal)}${room != null ? `, room to the loss limit ${fbal(room)}` : ""}, risk setting ${ST.riskPct || 1}% = ${fbal(riskBudget(ST.riskPct || 1))} a trade, at most ${AC().cap} micro contracts.`); }
+  if (m.cls === "fut" && typeof lgBrief === "function") { const lg = lgBrief(); if (lg) L.push(lg); }
   const ev = await dkEvents(); if (ev && ev.length) { const near = ev.filter(e => e.t > now - 36e5 && e.t < now + 8 * 36e5).slice(0, 10); if (near.length) L.push(`US EVENTS, last hour and next 8 hours (user's local time):\n${near.map(e => `  ${new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} ${e.title}${e.imp >= 1 ? " [HIGH importance]" : ""}${e.ac != null ? `, actual ${e.ac}${e.unit}` : ""}${e.fc != null ? `, forecast ${e.fc}${e.unit}` : ""}${e.pv != null ? `, previous ${e.pv}${e.unit}` : ""}`).join("\n")}`); else L.push("US EVENTS: nothing scheduled in the next 8 hours."); }
   const rc = dkRec(); if (rc.n) L.push(`YOUR RECORD SO FAR: ${rc.w} wins, ${rc.l} losses${rc.tm ? `, ${rc.tm} closed on time` : ""}, total ${rc.R >= 0 ? "+" : ""}${rc.R.toFixed(1)}R; average stated confidence ${rc.conf}% vs actual win rate ${rc.wr}%.`);
   return { text: "LIVE BRIEF\n" + L.join("\n"), meta };
@@ -8636,6 +8771,118 @@ async function dkSend(text, opt = {}) {
   } catch (e) { const c = e && e.code; if (e && e.text) A.t = e.text; A.err = c === "cancelled" ? (A.t ? null : "Stopped.") : c === "not_ready" ? "Live data isn't connected, so Quint can't read the charts. Reload to reconnect." : c === "image_rejected" ? "Claude couldn't take that image. Try a smaller or clearer screenshot." : NW_ERR[c] || "Something went wrong reaching Quint. Try again in a moment."; }
   finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); }
 }
+
+/* ================= SESSION HUD + LUCID GUARD =================
+   Two cockpit cards on the Markets home page. Neither makes a single TradingView or FMP call:
+   the session clock is worked out from the phone's clock, the news warning reads the economic
+   calendar Quint already saved, and the Lucid guard uses numbers the owner types in from their Lucid dashboard. */
+
+// The New York moments that matter for the strategies this app teaches (minutes after midnight, New York time).
+const HUD_MARKS = [
+  { m: 570, k: "open", lab: "New York open", tip: "The 15-minute opening range starts building." },
+  { m: 585, k: "orb", lab: "Opening range set", tip: "NY open breakout: entries allowed from now until 11:30." },
+  { m: 690, k: "orbx", lab: "Breakout entries close", tip: "No new NY open breakout entries after 11:30." },
+  { m: 960, k: "close", lab: "Stock market close", tip: "Cash session ends; futures liquidity thins out." },
+  { m: 1020, k: "brk", lab: "CME daily break", tip: "Futures pause 17:00 to 18:00 New York." },
+];
+const hudClock = ms => { const e = etNow(ms); return `${String(Math.floor(e.min / 60)).padStart(2, "0")}:${String(e.min % 60).padStart(2, "0")}:${String(new Date(ms).getSeconds()).padStart(2, "0")}`; };
+const hudLeft = ms => { const s = Math.max(0, Math.round(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return h ? `${h}h ${String(m).padStart(2, "0")}m` : `${m}:${String(x).padStart(2, "0")}`; };
+function hudPhase(ms) { // what part of the day it is, in plain words
+  const e = etNow(ms), m = e.min, wk = e.wd >= 1 && e.wd <= 5, st = mktStatus("fut", ms);
+  if (!st.open) return { lab: st.label === "Weekend" ? "Weekend: futures closed" : "CME daily break", cls: "off" };
+  if (!wk) return { lab: "Sunday evening session", cls: "dim" };
+  if (m < 180) return { lab: "Asia session", cls: "dim" };
+  if (m < 570) return { lab: m < 480 ? "London session" : "New York pre-market", cls: "dim" };
+  if (m < 690) return { lab: "New York morning: your playbook window", cls: "hot" };
+  if (m < 960) return { lab: "New York afternoon", cls: "on" };
+  return { lab: "Evening session", cls: "dim" };
+}
+function hudNext(ms) { // the next key moment, today or on the next weekday
+  const e = etNow(ms);
+  for (let dd = 0; dd < 5; dd++) { const wd = (e.wd + dd) % 7; if (wd === 0 || wd === 6) continue;
+    for (const k of HUD_MARKS) { const t = etAt(ms, dd, k.m); if (t > ms) return Object.assign({ t }, k); } }
+  return null;
+}
+function hudNews(ms) { // the next high-importance US event, from the calendar already saved on this phone
+  const c = (typeof DK !== "undefined" && DK.cal) || (HS().dkCal) || null; if (!c || !Array.isArray(c.list)) return null;
+  return c.list.filter(x => x.imp >= 1 && x.t > ms - 5 * 6e4 && x.t < ms + 12 * 36e5).sort((a, b) => a.t - b.t)[0] || null;
+}
+function hudPaint() {
+  const el = $("#hmSess"); if (!el) return; const now = Date.now(), e = etNow(now), ph = hudPhase(now), nx = hudNext(now), nw = hudNews(now);
+  const wk = e.wd >= 1 && e.wd <= 5, a = 570, b = 960, pct = wk ? clamp((e.min - a) / (b - a) * 100, 0, 100) : 0;
+  const ticks = HUD_MARKS.filter(k => k.m >= a && k.m <= b).map(k => `<i style="left:${(k.m - a) / (b - a) * 100}%" title="${esc(k.lab)}"></i>`).join("");
+  const soon = nw && nw.t - now < 15 * 6e4, past = nw && nw.t <= now;
+  el.innerHTML = `<div class="hud ${ph.cls}" role="group" aria-label="New York session clock">
+    <div class="hudt"><span class="hudk">NY</span><b class="num" id="hudClk">${hudClock(now)}</b><span class="hudph">${esc(ph.lab)}</span></div>
+    <div class="hudbar" aria-hidden="true"><span class="fill" style="width:${pct}%"></span>${ticks}<span class="now" style="left:${pct}%"></span></div>
+    <div class="hudlab" aria-hidden="true"><span>9:30</span><span>11:30</span><span>16:00</span></div>
+    ${nx ? `<p class="hudnx"><span>NEXT</span> <b>${esc(nx.lab)}</b> in <b class="num" id="hudLeft">${hudLeft(nx.t - now)}</b><small>${esc(nx.tip)}</small></p>` : ""}
+    ${nw ? `<p class="hudnw ${soon || past ? "hot" : ""}">⚠ <b>${esc(nw.title)}</b> ${past ? "just came out: expect fast, jumpy candles." : `in <b class="num">${hudLeft(nw.t - now)}</b> (${new Date(nw.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})${soon ? ". Big news is close: many traders stay flat until it's out." : ""}`}</p>` : ""}
+  </div>`;
+}
+let hudT = 0;
+function hudTick() { // one-second clock: only touches the page, never the network
+  clearInterval(hudT);
+  hudT = setInterval(() => {
+    if (document.hidden || typeof MK === "undefined" || MK.screen !== "home") return;
+    const now = Date.now(), c = $("#hudClk"); if (!c) return; c.textContent = hudClock(now);
+    const nx = hudNext(now), l = $("#hudLeft"); if (l && nx) l.textContent = hudLeft(nx.t - now);
+    if (new Date(now).getSeconds() === 0) { hudPaint(); lgPaint(); }
+  }, 1000);
+}
+
+/* ---------- Lucid guard: how much room the real Lucid account has left ---------- */
+// Defaults are the 50K numbers most guides agree on. Lucid's plans differ (daily loss limit, consistency %), so the owner sets their own.
+const LG_DEF = { size: 50000, target: 3000, mll: 2000, dll: 0, cons: 50, lock: true, bal: 50000, peak: 50000, today: 0, best: 0, stop: 20, at: 0 };
+const LG_COST = 2 * 0.75 + 2 * 0.25 * 2; // $ per MNQ round trip: $0.75 commission a side plus 1 tick ($0.50) of slippage a side
+const LG = () => { const g = ST.lucid || (ST.lucid = Object.assign({}, LG_DEF)); for (const k in LG_DEF) if (g[k] == null || g[k] === "" || !isFinite(+g[k]) && typeof LG_DEF[k] === "number") g[k] = LG_DEF[k]; return g; };
+function lgCalc() {
+  const g = LG(), floor0 = Math.max(g.peak, g.size) - g.mll, floor = g.lock ? Math.min(floor0, g.size) : floor0;
+  const roomMll = g.bal - floor, roomDay = g.dll > 0 ? g.dll + Math.min(0, g.today) : Infinity, room = Math.max(0, Math.min(roomMll, roomDay));
+  const profit = g.bal - g.size, perStop = g.stop * 2 + LG_COST, maxN = perStop > 0 ? Math.floor(room / perStop) : 0, safeN = perStop > 0 ? Math.floor(room * 0.25 / perStop) : 0;
+  const share = g.cons > 0 && profit > 0 && g.best > 0 ? g.best / profit * 100 : null, needFor = g.cons > 0 && g.best > 0 ? Math.max(0, g.best / (g.cons / 100) - profit) : 0;
+  const lvl = room <= 0 ? "bad" : room < g.mll * 0.25 ? "bad" : room < g.mll * 0.5 ? "warn" : "ok";
+  return { g, floor, roomMll, roomDay, room, profit, perStop, maxN, safeN, share, needFor, lvl, dayLimit: g.dll > 0 && roomDay <= roomMll };
+}
+function lgPaint() {
+  const el = $("#hmLucid"); if (!el) return; const c = lgCalc(), g = c.g;
+  if (!g.at) { el.innerHTML = `<button class="lg set" id="lgOpen"><span class="lgk">LUCID GUARD</span><b>Protect your funded account</b><small>Type in your Lucid balance once a day and see exactly how much room you have before the max loss, and how many MNQ that allows. Quint will size his calls to it.</small><span class="lggo">Set up ▸</span></button>`; return; }
+  const prog = clamp(c.profit / g.target * 100, 0, 100), used = clamp((1 - c.room / g.mll) * 100, 0, 100);
+  el.innerHTML = `<button class="lg ${c.lvl}" id="lgOpen" aria-label="Lucid guard: ${fbal(c.room)} of room left. Tap to update.">
+    <span class="lgh"><span class="lgk">LUCID GUARD</span><span class="lgst">${c.lvl === "ok" ? "SAFE" : c.lvl === "warn" ? "CAREFUL" : c.room <= 0 ? "LIMIT HIT" : "DANGER"}</span></span>
+    <span class="lgrow"><span><small>Room before ${c.dayLimit ? "daily limit" : "max loss"}</small><b class="num">${fbal(c.room)}</b></span><span><small>Max loss floor</small><b class="num">${fbal(c.floor)}</b></span><span><small>Balance</small><b class="num">${fbal(g.bal)}</b></span></span>
+    <span class="lgbar dd" aria-hidden="true"><i style="width:${100 - used}%"></i></span>
+    <span class="lgsz">With a <b>${nf(2).format(g.stop).replace(/\.00$/, "")}-point</b> stop: at most <b>${c.maxN} MNQ</b> before one stop-out breaks the limit. Safer: <b>${Math.max(c.safeN, 0)} MNQ</b> (a quarter of your room).</span>
+    <span class="lgrow two"><span><small>Profit to target</small><b class="num ${c.profit >= 0 ? "pos" : "neg"}">${fusd(c.profit)} / ${fbal(g.target)}</b></span>${g.cons > 0 ? `<span><small>Consistency (${g.cons}% rule)</small><b class="num ${c.share != null && c.share > g.cons ? "neg" : "pos"}">${c.share == null ? "–" : Math.round(c.share) + "%"}</b></span>` : ""}</span>
+    <span class="lgbar" aria-hidden="true"><i style="width:${prog}%"></i></span>
+    ${c.share != null && c.share > g.cons ? `<span class="lgw">Your biggest day is more than ${g.cons}% of your profit, so you need about <b>${fbal(c.needFor)}</b> more profit, spread over other days, before you can pass or get paid.</span>` : ""}
+    <span class="lgu">Updated ${fAgo(g.at)} · tap to update${Date.now() - g.at > 18 * 36e5 ? " (it's old: update it from your Lucid dashboard)" : ""}</span></button>`;
+}
+function lgOpen() {
+  const g = LG(), fld = (id, lab, v, step, help) => `<label class="lgf"><span>${lab}</span><input id="${id}" type="number" inputmode="decimal" step="${step}" value="${v}">${help ? `<small>${help}</small>` : ""}</label>`;
+  openSheet(`${shead("Lucid guard")}<p class="small">Copy these from your Lucid dashboard after each trading day (or after a trade). Nothing is sent anywhere: the numbers stay on this phone and Quint uses them to size his calls. Practice only: the app never places orders.</p>
+    <h3>Today</h3><div class="lgform">${fld("lgBal", "Balance now ($)", g.bal, "1")}${fld("lgPeak", "Highest end-of-day balance ($)", g.peak, "1", "Lucid's max loss trails this.")}${fld("lgToday", "Today's P&amp;L ($)", g.today, "1", "Negative if you're down.")}${fld("lgBest", "Your best day so far ($)", g.best, "1", "For the consistency rule.")}${fld("lgStop", "Your usual stop (MNQ points)", g.stop, "0.25")}</div>
+    <h3>Your plan's rules</h3><p class="small">Lucid's plans differ, and guides disagree on some numbers, so check your own plan's rules page. The defaults are the usual 50K figures.</p>
+    <div class="lgform">${fld("lgSize", "Account size ($)", g.size, "1000")}${fld("lgTarget", "Profit target ($)", g.target, "100")}${fld("lgMll", "Max loss, trailing ($)", g.mll, "100")}${fld("lgDll", "Daily loss limit ($, 0 = none)", g.dll, "100")}${fld("lgCons", "Consistency rule (%, 0 = none)", g.cons, "5", "Biggest day ÷ total profit must stay under this.")}</div>
+    <button class="tog lgtog" id="lgLock" aria-pressed="${g.lock}"><span class="k"></span><span>Max loss stops trailing once it reaches the starting balance</span></button>
+    <div class="row" style="margin-top:12px"><button class="btn pri" id="lgSave">Save</button><button class="btn" id="lgReset">Reset to defaults</button></div>`, sh => {
+    $("#lgLock", sh).onclick = e => { const b = e.currentTarget; b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"); };
+    $("#lgReset", sh).onclick = () => { ST.lucid = Object.assign({}, LG_DEF); save(); closeSheet(); lgOpen(); };
+    $("#lgSave", sh).onclick = () => {
+      const v = id => { const x = parseFloat($("#" + id, sh).value); return isFinite(x) ? x : null; }, G = LG();
+      const map = { bal: "lgBal", peak: "lgPeak", today: "lgToday", best: "lgBest", stop: "lgStop", size: "lgSize", target: "lgTarget", mll: "lgMll", dll: "lgDll", cons: "lgCons" };
+      for (const k in map) { const x = v(map[k]); if (x != null) G[k] = x; }
+      G.stop = Math.max(0.25, G.stop); G.mll = Math.max(1, G.mll); G.target = Math.max(1, G.target); G.dll = Math.max(0, G.dll); G.cons = clamp(G.cons, 0, 100); G.best = Math.max(0, G.best);
+      G.lock = $("#lgLock", sh).getAttribute("aria-pressed") === "true"; G.at = Date.now(); save(); closeSheet(); lgPaint(); toast("Lucid guard updated");
+    };
+  });
+}
+function lgBrief() { // one line for Quint's brief, so his calls respect the real account
+  const g = ST.lucid; if (!g || !g.at) return null; const c = lgCalc();
+  return `LUCID GUARD (the user's REAL Lucid funded account, typed in by them ${fAgo(g.at)}): balance ${fbal(g.bal)}, max-loss floor ${fbal(c.floor)}, ${fbal(c.room)} of room left before ${c.dayLimit ? "the daily loss limit" : "the trailing max loss"}${g.dll > 0 ? ` (daily limit ${fbal(g.dll)}, today ${fusd(g.today)})` : ""}; profit ${fusd(c.profit)} of the ${fbal(g.target)} target${g.cons > 0 ? `, consistency rule ${g.cons}%${c.share != null ? ` (biggest day is ${Math.round(c.share)}% of profit)` : ""}` : ""}. With a ${g.stop}-point MNQ stop one stop-out costs about ${fbal(c.perStop)} per contract, so ${c.maxN} MNQ would use all the room. When you give a trade for their real account, keep the full stop loss under a quarter of that room (about ${c.safeN} MNQ at that stop, fewer with a wider stop), and say plainly if the account is close to its limit.`;
+}
+document.addEventListener("click", e => { if (e.target.closest("#lgOpen")) lgOpen(); });
+hudTick();
 
 /* ================= START ================= */
 renderRank(); renderTools();
