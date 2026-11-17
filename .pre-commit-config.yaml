@@ -1,0 +1,10 @@
+# Keeps README.md and the issue-form dropdown in sync with the CSV + config.
+repos:
+  - repo: local
+    hooks:
+      - id: generate-readme
+        name: Regenerate README.md (fails if it changed)
+        entry: venv/bin/python scripts/check_generated.py
+        language: system
+        pass_filenames: false
+        files: ^(THE_RESOURCES_TABLE_NEW\.csv|config\.yaml|templates/|listkit/|generate_readme\.py|\.github/ISSUE_TEMPLATE/)

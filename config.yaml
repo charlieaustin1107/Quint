@@ -1,0 +1,48 @@
+# Quint resource list — category configuration.
+#
+# Category order here is the order in README.md. Edit with
+# `make add-category / move-category / remove-category` so the issue-form
+# dropdown and README stay in sync (hand edits are fine too; run `make generate`).
+
+title: Quint
+tagline: A curated, generated list of resources for trading MNQ1! (Micro E-mini Nasdaq-100 futures) and passing funded-account evaluations.
+disclaimer: Nothing here is financial advice. Futures trading carries substantial risk of loss. Always read a prop firm's current rules on its own site — they change often.
+ticker:
+  query: MNQ futures in:name,description,readme
+  limit: 12
+recently_added:
+  limit: 6
+categories:
+- name: Contract Specs & Market Structure
+  prefix: spec
+  description: Official references for how MNQ trades — tick size, point value, sessions, margins.
+- name: Prop Firms & Funded Accounts
+  prefix: prop
+  description: Futures evaluation programs and tools for staying inside their rules.
+  subcategories:
+  - name: Evaluation Firms
+    description: Futures prop firms that offer funded-account evaluations.
+  - name: Risk & Rule Tools
+    description: Calculators and trackers for daily loss limits, trailing drawdown, and position sizing.
+- name: Platforms & Data
+  prefix: plat
+  description: Where you chart, route orders, and get market data.
+  subcategories:
+  - name: Charting
+  - name: Execution Platforms
+  - name: Data Feeds
+- name: Indicators & Scripts
+  prefix: ind
+  description: Indicators, strategies, and the languages used to write them.
+- name: Backtesting & Research
+  prefix: bt
+  description: Frameworks for testing an edge before risking an evaluation on it.
+- name: Economic Calendar & News
+  prefix: news
+  description: Scheduled events that move the Nasdaq — know them before you size up.
+- name: Journaling & Performance
+  prefix: jrnl
+  description: Trade journals and analytics for finding and fixing leaks.
+- name: Education
+  prefix: edu
+  description: Courses and reference material on futures and index trading.
