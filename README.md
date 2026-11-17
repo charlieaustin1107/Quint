@@ -14,6 +14,11 @@ A curated, generated list of resources for trading MNQ1! (Micro E-mini Nasdaq-10
   <img alt="Recently added resources" src="assets/recently-added-light.svg" width="100%">
 </picture>
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/repo-ticker-dark.svg">
+  <img alt="Trending repositories" src="assets/repo-ticker-light.svg" width="100%">
+</picture>
+
 ## Contents
 
 - [Contract Specs & Market Structure](#contract-specs--market-structure)
