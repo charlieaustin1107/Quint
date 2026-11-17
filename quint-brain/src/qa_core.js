@@ -115,7 +115,7 @@ function voiceScore(v) {
   return (/en[-_]GB/i.test(v.lang) ? 30 : /en[-_](US|AU|IE)/i.test(v.lang) ? 20 : 10) + (/premium/i.test(n) ? 60 : /enhanced|natural|neural/i.test(n) ? 45 : 0) + (VOICE_GOOD.test(v.name) ? 20 : 0) + (/compact/i.test(n) ? -5 : 0) + (v.localService ? 2 : 0);
 }
 function voiceList() { try { return (window.speechSynthesis && speechSynthesis.getVoices()) || []; } catch (e) { return []; } }
-function voicePick() { const vs = voiceList(), want = ST.set.voice && vs.find(v => v.voiceURI === ST.set.voice || v.name === ST.set.voice); if (want) return want; const best = vs.filter(v => voiceScore(v) > 0).sort((a, b) => voiceScore(b) - voiceScore(a))[0]; return best || null; }
+function voicePick() { if (ST.set.voice === VOICE_SYS) return null; const vs = voiceList(), want = ST.set.voice && vs.find(v => v.voiceURI === ST.set.voice || v.name === ST.set.voice); if (want) return want; return voiceAuto(vs); }
 if (window.speechSynthesis) { try { speechSynthesis.onvoiceschanged = () => { if ($("#vlist")) paintVoices(); }; speechSynthesis.getVoices(); } catch (e) {} }
 function qaSpoke() { QT.speaking = false; QT.level = 0; $$(".say").forEach(b => { b.textContent = "Listen"; b.setAttribute("aria-pressed", "false"); }); coreKick(); }
 function qaSpeak(text, btn, name, cb) { // speaks like a person: the call first, trader words, one sentence at a time
@@ -126,7 +126,7 @@ function qaSpeak(text, btn, name, cb) { // speaks like a person: the call first,
   if (QT.tts) { QT.tts.speak(sayLines(script).map(t => ({ text: t, voice: ST.set.tvoice || "buttery", rate, language: "en" }))).catch(e => { if (e && e.code === "not_granted") hmToast("Reading aloud is turned off for Quint. Turn it back on in this page's Permissions menu."); }).then(fin); return; }
   if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { fin(); hmToast("This device can't read aloud here."); return; }
   try { speechSynthesis.cancel(); const v = voicePick(), parts = saySplit(script);
-    parts.forEach((t, i) => { const u = new SpeechSynthesisUtterance(t); if (v) u.voice = v; u.lang = v ? v.lang : "en-GB"; u.rate = rate; u.pitch = /\?$/.test(t) ? 1.04 : 1;
+    parts.forEach((t, i) => { const u = new SpeechSynthesisUtterance(t); if (v) { u.voice = v; u.lang = v.lang; } // no voice chosen: leave it to the iPhone, so the voice set in Settings speaks u.rate = rate; u.pitch = /\?$/.test(t) ? 1.04 : 1;
       u.onboundary = () => { QT.level = 1; coreKick(); }; if (i === parts.length - 1) { u.onend = fin; u.onerror = fin; } speechSynthesis.speak(u); }); } catch (e) { fin(); }
 }
 function qaHush() { QT.tok = (QT.tok || 0) + 1; try { if (QT.tts) QT.tts.stop().catch(() => {}); else speechSynthesis.cancel(); } catch (e) {} qaSpoke(); }

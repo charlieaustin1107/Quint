@@ -333,9 +333,11 @@ function openSet() {
     <div class="fld"><span class="lab">How you trade</span><div class="opts" role="group" aria-label="How you trade">${[["scalp", "Scalper"], ["day", "Day trader"], ["both", "Both"]].map(([k, l]) => `<button type="button" data-st="${k}" aria-pressed="${TS() === k}">${l}</button>`).join("")}</div></div>
     <div class="fld"><span class="lab">TradingView calls today: <span id="tvu">${tvOut() ? "used up, says TradingView" : s.tvPlanSet ? `${tvUsed()} of ${tvPlan()}` : `${tvUsed()} counted · pick your plan`}</span></span><div class="opts" role="group" aria-label="Your TradingView plan">${TV_PLANS.map(([n, nm]) => `<button type="button" data-tvp="${n}" aria-pressed="${!!s.tvPlanSet && tvPlan() === n}">${esc(nm)} ${n}</button>`).join("")}</div><p class="small">TradingView allows its connector a set number of calls a day on each plan (the AI add-on gives 500). A Quint answer costs about one: he keeps the candles on this phone and fetches only the newest minutes. He refreshes on his own only on Ultimate (every 10 minutes) or the AI add-on (every 2); otherwise tap ↻ or ask him.</p></div>
     <div class="fld"><span class="lab">Quint's voice</span><p class="small" id="vnote"></p><div class="voices" id="vlist"></div></div>
+    <div class="fld">${fxSetHTML().replace("<h3>", '<span class="lab">').replace("</h3>", "</span>")}</div>
     <div class="fld"><label for="srate">Speaking speed: <span id="sratev">${(+s.rate || 1).toFixed(2)}×</span></label><input type="range" id="srate" min="0.7" max="1.5" step="0.05" value="${esc(s.rate || 1)}"></div>
     <p class="small">Prices come from your TradingView connector${MK.tvLive ? ", with real-time CME data" : " (futures run about 10 minutes behind without real-time CME data)"}. Calls, alerts and settings are kept on this device. Quint makes calls to help you learn and decide; he can be wrong, and nothing here places real orders.</p>`;
   $("#scrim").classList.add("open"); paintVoices();
+  fxSetWire(sh);
   $("#setx").onclick = closeSet; $("#scrim").onclick = e => { if (e.target.id === "scrim") closeSet(); };
   $("#sname").oninput = e => { s.name = e.target.value.slice(0, 40); save(); };
   $("#ssize").oninput = e => { const v = +e.target.value; if (v >= 1000) { s.acct = v; save(); $("#spctv").textContent = `${s.pct}% = ${fbal(qaAcct().risk)}`; } };
@@ -351,8 +353,8 @@ function paintVoices() {
   if (QT.tts) { note.textContent = "Claude's own voices, available here."; el.innerHTML = ["buttery", "airy", "glassy", "rounded"].map(v => `<button type="button" data-tv="${v}" aria-pressed="${(s.tvoice || "buttery") === v}"><span>${v[0].toUpperCase() + v.slice(1)}</span><small>Claude</small></button>`).join("");
     $$("[data-tv]", el).forEach(b => b.onclick = () => { s.tvoice = b.dataset.tv; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); }); return; }
   const vs = voiceList().filter(v => /^en/i.test(v.lang)).sort((a, b) => voiceScore(b) - voiceScore(a)), cur = voicePick();
-  note.innerHTML = `On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. <b>For a much more human voice, download a Premium one:</b> Settings → Accessibility → Spoken Content (Read &amp; Speak on newer iPhones) → Voices → English, then tap a voice marked Premium, such as Ava, Zoe or Evan (US) or Jamie or Serena (UK), and download it. Come back here and tap it. Robotic voices are at the bottom.`;
-  el.innerHTML = vs.length ? vs.map(v => `<button type="button" data-vu="${esc(v.voiceURI || v.name)}" aria-pressed="${!!cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name)}"><span>${esc(v.name.replace(/\s*\(.*\)$/, ""))}${voiceScore(v) < 0 ? " · robotic" : ""}</span><small>${esc(v.lang)}${/premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : `<p class="small" style="padding:10px 12px">No voices are listed yet. Tap Listen on any answer and they'll load.</p>`;
+  note.innerHTML = voiceHelp(voiceList(), cur);
+  el.innerHTML = `<button type="button" data-vu="${VOICE_SYS}" aria-pressed="${!cur}"><span>My iPhone's voice</span><small>set in Settings</small></button>` + (vs.length ? vs.map(v => `<button type="button" data-vu="${esc(v.voiceURI || v.name)}" aria-pressed="${!!cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name)}"><span>${esc(v.name.replace(/\s*\(.*\)$/, ""))}${voiceScore(v) < 0 ? " · robotic" : ""}</span><small>${esc(v.lang)}${/premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : "");
   $$("[data-vu]", el).forEach(b => b.onclick = () => { s.voice = b.dataset.vu; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); });
 }
 
@@ -374,7 +376,7 @@ function qaStart() {
   ta.addEventListener("focus", () => kbOn(true)); ta.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== ta) kbOn(false); }, 150));
   $("#askf").onsubmit = e => { e.preventDefault(); if (DK.busy) { if (DK.ctl) DK.ctl.abort(); return; } const v = ta.value.trim(); if (!v && !DK.img) return; ta.value = ""; fit();
     if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(v || "Read my chart and give me your call.", DK.img ? { img: DK.img } : {}); DK.img = null; paintImg(); };
-  $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
+  fxInit(); $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
   $("#file").onchange = async e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { DK.img = await qtShrink(f); paintImg(); ta.focus(); } catch (err) { hmToast("That file couldn't be opened as an image."); } };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#scrim").classList.contains("open")) { e.preventDefault(); closeSet(); } });
   window.addEventListener("resize", () => { drawTape(); drawSess(); drawScope(); coreKick(); });
@@ -392,5 +394,5 @@ function qbVmPaint(V) {
   if (!V.on) { if (bar) bar.remove(); return; }
   if (!bar) { bar = document.createElement("div"); bar.id = "vmbar"; f.before(bar); }
   bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="btn sm vmx" aria-label="End voice mode">End</button>`;
-  bar.querySelector(".vmx").onclick = vmEnd;
+  bar.querySelector(".vmx").onclick = vmEnd; qcMount(bar.querySelector(".vmorb"));
 }
