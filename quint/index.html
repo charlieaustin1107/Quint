@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Martian+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Quint: a cockpit for one market. Amber phosphor instruments on deep navy glass; mint for buys, rose for sells.
+     Layout: instruments on top (price tape, the five-point core, the session tape), the conversation below; side by side on a wide screen. */
+  --void: #03060b;
+  --glass: #08101c;
+  --glass2: #0c1626;
+  --line: #17263b;
+  --line2: #22364f;
+  --ink: #dce6f3;
+  --dim: #7a8ea8;
+  --faint: #4a5d76;
+  --amber: #ffb547;
+  --amber2: #ffd38a;
+  --buy: #3ef0b0;
+  --sell: #ff5c7a;
+  --warn: #ffd166;
+  --f-display: "Chakra Petch", "Rajdhani", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num: "Martian Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: var(--void); color: var(--ink); font: 15px/1.5 var(--f-body); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+body { overflow: hidden; }
+button, select, textarea, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.pos { color: var(--buy); } .neg { color: var(--sell); } .wrn { color: var(--warn); }
+
+#app { position: fixed; left: 0; right: 0; top: 0; height: var(--vvh, 100%); display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: radial-gradient(900px 420px at 80% -8%, rgba(255,181,71,.10), transparent 62%), radial-gradient(700px 500px at -10% 110%, rgba(62,240,176,.05), transparent 60%), var(--void); }
+#app::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .35; background-image: linear-gradient(rgba(122,142,168,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(122,142,168,.07) 1px, transparent 1px); background-size: 28px 28px; -webkit-mask-image: linear-gradient(180deg, #000, transparent 55%); mask-image: linear-gradient(180deg, #000, transparent 55%); }
+
+/* top bar */
+.bar { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 4px 14px; border-bottom: 1px solid var(--line); }
+.mark { display: flex; align-items: center; gap: 8px; font: 700 18px/1 var(--f-display); letter-spacing: .32em; text-transform: uppercase; color: var(--amber); text-shadow: 0 0 14px rgba(255,181,71,.45); }
+.mark svg { flex: none; }
+.mkt { position: relative; display: flex; align-items: center; }
+.mkt select { appearance: none; -webkit-appearance: none; min-height: 34px; padding: 0 26px 0 10px; border-radius: 4px; border: 1px solid var(--line2); background: var(--glass2); font: 600 14px/1 var(--f-display); letter-spacing: .08em; color: var(--ink); }
+.mkt::after { content: ""; position: absolute; right: 10px; top: 50%; width: 6px; height: 6px; margin-top: -5px; border-right: 1.5px solid var(--dim); border-bottom: 1.5px solid var(--dim); transform: rotate(45deg); pointer-events: none; }
+.spacer { flex: 1; }
+.stat { display: flex; align-items: center; gap: 6px; font: 600 10.5px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); white-space: nowrap; }
+.stat i { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.stat.on i { background: var(--buy); box-shadow: 0 0 8px var(--buy); } .stat.off i { background: var(--sell); } .stat.wait i { background: var(--warn); }
+.ibtn { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 4px; border: 1px solid var(--line2); background: var(--glass2); color: var(--dim); }
+.ibtn:hover { color: var(--amber); border-color: rgba(255,181,71,.5); }
+
+.cols { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.inst { flex: none; display: flex; flex-direction: column; min-height: 0; }
+.talk { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#app:not([data-view="console"]) .inst { flex: 1; }
+#app:not([data-view="console"]) .talk { flex: none; }
+#app:not([data-view="console"]) .log { display: none; }
+#app[data-view="console"] .side { display: none; }
+
+/* instrument deck */
+.deck { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0; height: 228px; border-bottom: 1px solid var(--line); }
+.tapebox { position: relative; border-right: 1px solid var(--line); }
+#tape, #core { display: block; width: 100%; height: 100%; }
+.corebox { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.corebox canvas { position: absolute; inset: 0; }
+.verdict { position: relative; text-align: center; pointer-events: none; }
+.verdict b { display: block; font: 700 22px/1 var(--f-display); letter-spacing: .18em; color: var(--amber); text-shadow: 0 0 18px rgba(255,181,71,.5); }
+.verdict.buy b { color: var(--buy); text-shadow: 0 0 18px rgba(62,240,176,.55); } .verdict.sell b { color: var(--sell); text-shadow: 0 0 18px rgba(255,92,122,.55); }
+.verdict small { display: block; max-width: 118px; margin: 6px auto 0; font: 500 10px/1.3 var(--f-num); color: var(--dim); letter-spacing: .04em; }
+.deckfoot { position: absolute; left: 8px; right: 8px; bottom: 6px; display: flex; justify-content: space-between; font: 500 9.5px/1 var(--f-num); color: var(--faint); pointer-events: none; }
+.dmin { display: none; align-items: center; gap: 10px; padding: 6px 14px; border-bottom: 1px solid var(--line); }
+.dmin .px { font: 700 18px/1 var(--f-num); } .dmin .vd { font: 700 12px/1 var(--f-display); letter-spacing: .16em; }
+#app.typing .deck, #app.typing .strip { display: none; } #app.typing .dmin { display: flex; }
+
+/* session tape */
+.strip { position: relative; height: 40px; border-bottom: 1px solid var(--line); overflow: hidden; }
+#sess { display: block; width: 100%; height: 100%; }
+
+/* segmented view switch */
+.seg { flex: none; display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
+.seg button { position: relative; min-height: 40px; border: 0; background: transparent; font: 600 11.5px/1 var(--f-display); letter-spacing: .2em; text-transform: uppercase; color: var(--dim); }
+.seg button[aria-pressed="true"] { color: var(--amber); }
+.seg button[aria-pressed="true"]::after { content: ""; position: absolute; left: 22%; right: 22%; bottom: -1px; height: 2px; background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+.seg button .n { margin-left: 5px; color: var(--ink); letter-spacing: 0; }
+
+.side { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 16px; }
+.log { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 14px 16px 10px; display: flex; flex-direction: column; gap: 14px; }
+
+/* panels */
+.h { margin: 0 0 8px; font: 600 11px/1 var(--f-display); letter-spacing: .24em; text-transform: uppercase; color: var(--dim); display: flex; align-items: center; gap: 8px; }
+.h .spacer { flex: 1; }
+.read { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink); text-wrap: pretty; }
+.read b { color: var(--amber2); font-weight: 600; }
+table.mx { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.mx th { text-align: left; font: 600 10px/1 var(--f-display); letter-spacing: .16em; color: var(--faint); text-transform: uppercase; padding: 0 6px 7px 0; border-bottom: 1px solid var(--line); }
+table.mx td { padding: 8px 6px 8px 0; border-bottom: 1px solid var(--line); font-family: var(--f-num); font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.mx td:first-child { font: 700 12px/1 var(--f-display); letter-spacing: .1em; color: var(--ink); }
+.tr { display: inline-flex; align-items: center; gap: 4px; font: 700 11px/1 var(--f-display); letter-spacing: .12em; }
+.tr.up { color: var(--buy); } .tr.dn { color: var(--sell); } .tr.fl { color: var(--dim); }
+.rsi { display: inline-block; width: 34px; height: 4px; margin-left: 6px; vertical-align: middle; background: var(--line2); position: relative; border-radius: 2px; }
+.rsi i { position: absolute; top: -2px; width: 2px; height: 8px; background: var(--amber); }
+.lv { display: grid; grid-template-columns: auto 1fr auto auto; gap: 4px 12px; align-items: baseline; font-size: 12.5px; }
+.lv > span { padding: 5px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.lv .k { font: 700 11px/1 var(--f-display); letter-spacing: .12em; padding-top: 7px; }
+.lv .t { color: var(--dim); overflow: hidden; text-overflow: ellipsis; }
+.lv .p, .lv .d { font-family: var(--f-num); font-variant-numeric: tabular-nums; text-align: right; }
+.lv .now { color: var(--amber); }
+.xm { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.xm div { padding: 8px 9px; border: 1px solid var(--line); border-radius: 4px; background: var(--glass); }
+.xm small { display: block; font: 600 9.5px/1 var(--f-display); letter-spacing: .16em; color: var(--faint); text-transform: uppercase; }
+.xm b { display: block; margin-top: 5px; font: 600 13px/1 var(--f-num); }
+#scope { display: block; width: 100%; height: 190px; border: 1px solid var(--line); border-radius: 4px; background: var(--glass); }
+.tfs { display: flex; gap: 4px; }
+.tfs button { min-height: 28px; padding: 0 9px; border-radius: 3px; border: 1px solid var(--line2); background: transparent; font: 600 10.5px/1 var(--f-num); color: var(--dim); }
+.tfs button[aria-pressed="true"] { color: var(--void); background: var(--amber); border-color: var(--amber); }
+.ev { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.ev div { display: flex; gap: 10px; align-items: baseline; } .ev .tm { font: 500 11.5px/1 var(--f-num); color: var(--dim); width: 74px; flex: none; } .ev .hi { color: var(--warn); }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.tiles div { padding: 11px 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--glass); }
+.tiles small { display: block; font: 600 9.5px/1 var(--f-display); letter-spacing: .18em; color: var(--faint); text-transform: uppercase; }
+.tiles b { display: block; margin-top: 7px; font: 700 20px/1 var(--f-num); }
+.cal { position: relative; height: 10px; border-radius: 2px; background: var(--line); }
+.cal i { position: absolute; top: -3px; width: 2px; height: 16px; }
+.cal .a { background: var(--ink); } .cal .s { background: var(--amber); }
+.rows { display: flex; flex-direction: column; }
+.row { display: grid; grid-template-columns: 70px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.row .w { font: 500 11px/1.3 var(--f-num); color: var(--dim); }
+.row .r { font: 600 11.5px/1 var(--f-display); letter-spacing: .08em; text-align: right; }
+.st-win { color: var(--buy); } .st-loss { color: var(--sell); } .st-time { color: var(--warn); } .st-live { color: var(--amber); }
+.small { font-size: 12.5px; color: var(--dim); line-height: 1.5; margin: 0; }
+.note { padding: 11px 12px; border-left: 2px solid var(--amber); background: rgba(255,181,71,.05); }
+.note ol { margin: 6px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
+.al { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.al span { flex: 1; min-width: 0; } .al b { display: block; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; } .al small { display: block; font-size: 11.5px; color: var(--dim); }
+.al.off { opacity: .55; }
+.btn { min-height: 38px; padding: 0 14px; border-radius: 4px; border: 1px solid var(--line2); background: var(--glass2); font: 600 12px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+.btn:hover { border-color: rgba(255,181,71,.55); color: var(--amber2); }
+.btn.pri { border-color: var(--amber); background: var(--amber); color: #1b1203; }
+.btn.pri:hover { background: var(--amber2); color: #1b1203; }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.sm { min-height: 32px; padding: 0 11px; font-size: 11px; }
+.err { margin: 0; padding: 10px 12px; border-left: 2px solid var(--sell); background: rgba(255,92,122,.07); font-size: 13px; }
+
+/* the conversation */
+.m { max-width: 680px; }
+.m.u { align-self: flex-end; max-width: 86%; padding: 9px 13px; border: 1px solid var(--line2); border-radius: 12px 12px 2px 12px; background: var(--glass2); font-size: 14.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.m.a { position: relative; padding-left: 16px; border-left: 1px solid rgba(255,181,71,.35); font-size: 14.5px; }
+.m.a::before { content: "Q"; position: absolute; left: -8px; top: 0; width: 15px; height: 15px; display: grid; place-items: center; font: 700 9px/1 var(--f-display); color: var(--void); background: var(--amber); clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%); }
+.m.a p { margin: 0 0 8px; } .m.a h3, .m.a h4 { margin: 12px 0 6px; font: 600 11px/1 var(--f-display); letter-spacing: .22em; text-transform: uppercase; color: var(--amber); }
+.m.a ul, .m.a ol { margin: 0 0 8px; padding-left: 18px; } .m.a li { margin: 3px 0; }
+.m.a b, .m.a strong { color: #fff; font-weight: 600; }
+.m.a code { font: 12px var(--f-num); padding: 1px 4px; border-radius: 3px; background: var(--glass2); }
+.m.a pre { overflow-x: auto; padding: 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--glass); font: 11.5px/1.5 var(--f-num); }
+.m.a table { border-collapse: collapse; font-size: 12.5px; display: block; overflow-x: auto; } .m.a th, .m.a td { padding: 4px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+.think { display: flex; align-items: center; gap: 8px; margin: 0; font: 500 12px/1.3 var(--f-num); color: var(--amber); }
+.think::before { content: ""; width: 10px; height: 10px; border: 1.5px solid var(--amber); border-right-color: transparent; border-radius: 50%; animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chipb { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 10px; border-radius: 3px; border: 1px solid var(--line2); background: transparent; font: 600 10.5px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.chipb:hover { color: var(--amber2); border-color: rgba(255,181,71,.5); }
+.chipb.on, .chipb.on:disabled { color: var(--warn); border-color: rgba(255,209,102,.55); background: rgba(255,209,102,.07); opacity: 1; }
+.xbtn { display: block; width: 100%; margin-top: 8px; padding: 10px 12px; text-align: left; border-radius: 4px; border: 1px dashed rgba(255,181,71,.45); background: rgba(255,181,71,.04); font-size: 13px; color: var(--amber2); }
+.xbtn.on, .xbtn.on:disabled { border-style: solid; color: var(--warn); opacity: 1; }
+.hello { padding: 14px 16px; border: 1px solid var(--line); border-radius: 4px; background: linear-gradient(135deg, rgba(255,181,71,.07), transparent 60%), var(--glass); }
+.hello > b { display: block; font: 700 13px/1.2 var(--f-display); letter-spacing: .2em; text-transform: uppercase; color: var(--amber); margin-bottom: 8px; }
+.hello p { margin: 0; font-size: 14px; color: var(--ink); }
+
+/* a trade call */
+.call { margin-top: 10px; position: relative; padding: 13px 14px 12px; border: 1px solid var(--line2); border-radius: 4px; background: var(--glass); overflow: hidden; }
+.call::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--amber); }
+.call.buy::before { background: var(--buy); box-shadow: 0 0 14px var(--buy); } .call.sell::before { background: var(--sell); box-shadow: 0 0 14px var(--sell); }
+.call.buy { background: linear-gradient(100deg, rgba(62,240,176,.08), transparent 55%), var(--glass); } .call.sell { background: linear-gradient(100deg, rgba(255,92,122,.08), transparent 55%), var(--glass); }
+.ch { display: flex; align-items: center; gap: 12px; }
+.ch .v { flex: 1; font: 700 17px/1 var(--f-display); letter-spacing: .16em; text-transform: uppercase; }
+.call.buy .ch .v { color: var(--buy); } .call.sell .ch .v { color: var(--sell); } .call.none .ch .v { color: var(--warn); }
+.ring { --p: 50; flex: none; position: relative; width: 46px; height: 46px; border-radius: 50%; background: conic-gradient(var(--amber) calc(var(--p) * 1%), var(--line2) 0); }
+.ring::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--glass); }
+.ring b { position: absolute; inset: 0; display: grid; place-items: center; font: 700 12px/1 var(--f-num); color: var(--ink); }
+.lvls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin-top: 12px; background: var(--line); border: 1px solid var(--line); }
+.lvls div { padding: 8px 9px; background: var(--glass2); min-width: 0; }
+.lvls small { display: block; font: 600 9.5px/1 var(--f-display); letter-spacing: .18em; color: var(--faint); text-transform: uppercase; }
+.lvls b { display: block; margin-top: 6px; font: 700 14px/1 var(--f-num); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; }
+.lvls em { display: block; margin-top: 4px; font: normal 500 10.5px/1 var(--f-num); color: var(--dim); }
+.cmeta { margin: 10px 0 0; font-size: 12.5px; color: var(--dim); }
+.cmeta b { color: var(--ink); font-weight: 600; }
+.cw { margin: 6px 0 0; font-size: 12.5px; color: var(--warn); }
+.cst { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font: 600 10.5px/1 var(--f-display); letter-spacing: .16em; text-transform: uppercase; color: var(--amber); }
+.cst::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+.cst.win { color: var(--buy); } .cst.loss { color: var(--sell); } .cst.time, .cst.nofill, .cst.skip, .cst.bad, .cst.nodata { color: var(--dim); }
+
+/* quick asks and the input */
+.chips { flex: none; display: flex; gap: 6px; overflow-x: auto; padding: 8px 14px 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.chips::-webkit-scrollbar { display: none; }
+.chips button { flex: none; min-height: 32px; padding: 0 11px; border-radius: 3px; border: 1px solid var(--line2); background: rgba(8,16,28,.7); font: 600 10.5px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.chips button:hover { color: var(--amber2); border-color: rgba(255,181,71,.5); }
+.ask { flex: none; display: flex; align-items: flex-end; gap: 8px; padding: 8px 14px 10px; }
+.ask textarea { flex: 1; min-height: 44px; max-height: 120px; resize: none; padding: 11px 13px; border-radius: 4px; border: 1px solid var(--line2); background: var(--glass); font-size: 16px; line-height: 1.35; color: var(--ink); }
+.ask textarea::placeholder { color: var(--faint); }
+.ask textarea:focus { outline: none; border-color: rgba(255,181,71,.7); box-shadow: 0 0 0 3px rgba(255,181,71,.12); }
+.ask .ibtn { width: 44px; height: 44px; } .ask .go { width: 44px; height: 44px; border-radius: 4px; border: 0; background: var(--amber); color: #1b1203; display: grid; place-items: center; box-shadow: 0 0 18px rgba(255,181,71,.35); }
+.ask .go.stop { background: var(--sell); color: #fff; box-shadow: none; }
+.prev { flex: none; display: flex; align-items: center; gap: 10px; margin: 0 14px; padding: 7px 10px; border: 1px dashed rgba(255,181,71,.45); border-radius: 4px; font-size: 12.5px; color: var(--amber2); }
+.prev span { flex: 1; }
+
+/* settings sheet */
+.scrim { position: fixed; inset: 0; z-index: 20; display: none; background: rgba(2,4,8,.72); }
+.scrim.open { display: block; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; overflow-y: auto; padding: 18px 18px calc(18px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,181,71,.5); background: var(--glass); display: flex; flex-direction: column; gap: 16px; }
+.sheet h2 { margin: 0; font: 700 14px/1 var(--f-display); letter-spacing: .26em; text-transform: uppercase; color: var(--amber); display: flex; align-items: center; }
+.sheet h2 .spacer { flex: 1; }
+.fld { display: flex; flex-direction: column; gap: 6px; }
+.fld label, .fld .lab { font: 600 10.5px/1 var(--f-display); letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
+.fld input[type="text"], .fld input[type="number"], .fld select { min-height: 42px; padding: 0 12px; border-radius: 4px; border: 1px solid var(--line2); background: var(--glass2); font-size: 16px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.opts { display: flex; gap: 6px; flex-wrap: wrap; }
+.opts button { min-height: 36px; padding: 0 12px; border-radius: 3px; border: 1px solid var(--line2); background: transparent; font: 600 11px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.opts button[aria-pressed="true"] { color: #1b1203; background: var(--amber); border-color: var(--amber); }
+.voices { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 4px; max-height: 230px; overflow-y: auto; }
+.voices button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; font-size: 14px; }
+.voices button:last-child { border-bottom: 0; }
+.voices button span { flex: 1; } .voices button small { color: var(--faint); font: 500 10.5px var(--f-num); }
+.voices button[aria-pressed="true"] { background: rgba(255,181,71,.09); color: var(--amber2); }
+.tog { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0; border: 0; background: transparent; text-align: left; font-size: 14px; }
+.tog .k { flex: none; position: relative; width: 42px; height: 24px; border-radius: 12px; background: var(--line2); transition: background .2s; }
+.tog .k::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); transition: transform .2s; }
+.tog[aria-pressed="true"] .k { background: var(--amber); } .tog[aria-pressed="true"] .k::after { transform: translateX(18px); background: #1b1203; }
+input[type="range"] { width: 100%; accent-color: var(--amber); }
+
+.toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 30; transform: translate(-50%, 12px); max-width: min(92vw, 520px); padding: 10px 14px; border: 1px solid rgba(255,181,71,.5); border-radius: 4px; background: rgba(8,16,28,.96); font-size: 13px; color: var(--ink); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 520px) { .mark { font-size: 15px; letter-spacing: .2em; gap: 6px; } .mkt select { max-width: 132px; font-size: 13px; padding-right: 22px; } .bar { gap: 8px; padding: 4px 10px; } .stat span { display: none; } .stat { padding: 6px; } }
+@media (min-width: 900px) {
+  .cols { display: grid; grid-template-columns: 420px minmax(0, 1fr); }
+  .inst { border-right: 1px solid var(--line); min-height: 0; }
+  #app .inst, #app:not([data-view="console"]) .inst { flex: none; }
+  #app .side, #app[data-view="console"] .side { display: flex; }
+  #app .log, #app:not([data-view="console"]) .log { display: flex; }
+  .seg { grid-template-columns: repeat(3, 1fr); } .seg [data-v="console"] { display: none; }
+  .deck { height: 250px; }
+  .log, .chips, .ask { width: 100%; max-width: 860px; margin: 0 auto; }
+  .prev { width: calc(100% - 28px); max-width: 832px; margin: 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) { .think::before { animation: none; } .toast { transition: none; } }
+</style>
+</head>
+<body>
+<div id="app" data-view="console">
+  <header class="bar">
+    <div class="mark" aria-label="Quint"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1.5 18.5,7.7 15.3,17.6 4.7,17.6 1.5,7.7" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="10.6" r="2.4" fill="currentColor"/></svg>Quint</div>
+    <label class="mkt"><span class="sr">Market</span><select id="mk" aria-label="Market Quint is watching"></select></label>
+    <span class="spacer"></span>
+    <span class="stat" id="stat"><i></i><span>Connecting</span></span>
+    <button class="ibtn" id="setb" type="button" aria-label="Settings: account, risk, style and voice"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.8v2.6M10 15.6v2.6M1.8 10h2.6M15.6 10h2.6M4.2 4.2l1.8 1.8M14 14l1.8 1.8M4.2 15.8 6 14M14 6l1.8-1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+  </header>
+  <div class="cols">
+    <aside class="inst" aria-label="Instruments">
+      <section class="deck" aria-label="Price tape and Quint's verdict">
+        <div class="tapebox"><canvas id="tape" role="img" aria-label="Price tape: the latest price in the middle with the session's key levels above and below"></canvas></div>
+        <div class="corebox"><canvas id="core" aria-hidden="true"></canvas><div class="verdict" id="vd" aria-live="polite"><b>Scanning</b><small>Reading the market</small></div><div class="deckfoot"><span id="dkl"></span><span id="dkr"></span></div></div>
+      </section>
+      <div class="dmin" id="dmin" aria-hidden="true"><span class="px num" id="dminp"></span><span class="vd" id="dminv"></span></div>
+      <div class="strip"><canvas id="sess" role="img" aria-label="Session clock"></canvas></div>
+      <nav class="seg" aria-label="Views">
+        <button type="button" data-v="console" aria-pressed="true">Console</button>
+        <button type="button" data-v="matrix" aria-pressed="false">Matrix</button>
+        <button type="button" data-v="record" aria-pressed="false">Record</button>
+        <button type="button" data-v="alerts" aria-pressed="false">Alerts</button>
+      </nav>
+      <div class="side" id="side" aria-live="polite"></div>
+    </aside>
+    <section class="talk" aria-label="Talk to Quint">
+      <div class="log" id="log" aria-live="polite"></div>
+      <div class="chips" id="chips" role="group" aria-label="Quick questions"></div>
+      <form class="ask" id="askf">
+        <label class="ibtn" for="file" aria-label="Send Quint a screenshot of your chart"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6.5h3l1.5-2h5L14 6.5h3v9.5H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="11" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><input type="file" id="file" accept="image/*" hidden></label>
+        <textarea id="q" rows="1" placeholder="Ask Quint: buy or sell MNQ?" aria-label="Message Quint" enterkeyhint="send"></textarea>
+        <button class="go" id="go" type="submit" aria-label="Send"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h12M10 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </form>
+    </section>
+  </div>
+</div>
+<div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="sheth"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+'use strict';
+const FUTS = [{"k":"MNQ","tv":"CME_MINI:MNQ1!","grp":"idx","name":"Micro Nasdaq-100","logo":"NQ","what":"1 MNQ micro = $2 a point (one 0.25 tick = $0.50), 1 NQ = $20 a point","S":{"sym":"NQ","name":"E-mini Nasdaq-100","short":"Nasdaq (MNQ)","pv":20,"mpv":2,"micro":"MNQ","tick":0.25,"dec":2,"money":false,"unit":"points"}},{"k":"ES","tv":"CME_MINI:ES1!","grp":"idx","name":"S&P 500 E-mini","logo":"ES","what":"1 MES micro = $5 a point, 1 ES = $50 a point","S":{"sym":"ES","name":"E-mini S&P 500","short":"S&P 500 E-mini","pv":50,"mpv":5,"micro":"MES","tick":0.25,"dec":2,"money":false,"unit":"points"}},{"k":"YM","tv":"CBOT_MINI:YM1!","grp":"idx","name":"E-mini Dow","logo":"YM","what":"1 MYM micro = $0.50 a point (one 1 tick = $0.50), 1 YM = $5 a point ($5 a tick)","S":{"sym":"YM","name":"E-mini Dow","short":"Dow","pv":5,"mpv":0.5,"micro":"MYM","tick":1,"dec":0,"money":false,"unit":"points"}},{"k":"RTY","tv":"CME_MINI:RTY1!","grp":"idx","name":"E-mini Russell 2000","logo":"RTY","what":"1 M2K micro = $5 a point (one 0.1 tick = $0.50), 1 RTY = $50 a point ($5 a tick)","S":{"sym":"RTY","name":"E-mini Russell 2000","short":"Russell 2000","pv":50,"mpv":5,"micro":"M2K","tick":0.1,"dec":1,"money":false,"unit":"points"}},{"k":"NKD","tv":"CME:NKD1!","grp":"idx","name":"Nikkei 225 (dollar)","logo":"NKD","what":"1 NKD = $5 a point (one 5 tick = $25); there's no micro","S":{"sym":"NKD","name":"Nikkei 225 (dollar)","short":"Nikkei","pv":5,"mpv":5,"micro":"NKD","tick":5,"dec":0,"money":false,"unit":"points"}},{"k":"CL","tv":"NYMEX:CL1!","grp":"nrg","name":"WTI Crude Oil","logo":"CL","what":"1 MCL micro = $100 per 1.00 move (one 0.01 tick = $1), 1 CL = $1,000 per 1.00 move ($10 a tick)","S":{"sym":"CL","name":"WTI Crude Oil","short":"Crude oil","pv":1000,"mpv":100,"micro":"MCL","tick":0.01,"dec":2,"money":true,"unit":"$/barrel"}},{"k":"BZ","tv":"NYMEX:BZ1!","grp":"nrg","name":"Brent crude","logo":"BZ","what":"1 contract = 1,000 barrels ($10 a tick); there's no micro","S":{"sym":"BZ","name":"Brent crude oil","short":"Brent","pv":1000,"mpv":1000,"micro":"BZ","tick":0.01,"dec":2,"money":true,"unit":"$/barrel"}},{"k":"NG","tv":"NYMEX:NG1!","grp":"nrg","name":"Natural gas","logo":"NG","what":"1 NG = $10,000 per 1.00 move (one 0.001 tick = $10); there's no micro","S":{"sym":"NG","name":"Natural gas","short":"Nat gas","pv":10000,"mpv":10000,"micro":"NG","tick":0.001,"dec":3,"money":true,"unit":"$/MMBtu"}},{"k":"RB","tv":"NYMEX:RB1!","grp":"nrg","name":"RBOB gasoline","logo":"RB","what":"1 RB = $42,000 per 1.00 move (one 0.0001 tick = $4.20); there's no micro","S":{"sym":"RB","name":"RBOB gasoline","short":"Gasoline","pv":42000,"mpv":42000,"micro":"RB","tick":0.0001,"dec":4,"money":true,"unit":"$/gallon"}},{"k":"HO","tv":"NYMEX:HO1!","grp":"nrg","name":"Heating oil","logo":"HO","what":"1 HO = $42,000 per 1.00 move (one 0.0001 tick = $4.20); there's no micro","S":{"sym":"HO","name":"Heating oil","short":"Heating oil","pv":42000,"mpv":42000,"micro":"HO","tick":0.0001,"dec":4,"money":true,"unit":"$/gallon"}},{"k":"GC","tv":"COMEX:GC1!","grp":"met","name":"Gold","logo":"Au","what":"1 MGC micro = 10 oz, 1 GC = 100 oz","S":{"sym":"GC","name":"Gold","short":"Gold","pv":100,"mpv":10,"micro":"MGC","tick":0.1,"dec":1,"money":true,"unit":"$/oz"}},{"k":"SI","tv":"COMEX:SI1!","grp":"met","name":"Silver","logo":"Ag","what":"1 SIL micro = 1,000 oz, 1 SI = 5,000 oz","S":{"sym":"SI","name":"Silver","short":"Silver","pv":5000,"mpv":1000,"micro":"SIL","tick":0.005,"dec":3,"money":true,"unit":"$/oz"}},{"k":"HG","tv":"COMEX:HG1!","grp":"met","name":"Copper","logo":"Cu","what":"1 MHG micro = $2,500 per 1.00 move (one 0.0005 tick = $1.25), 1 HG = $25,000 per 1.00 move ($12.50 a tick)","S":{"sym":"HG","name":"Copper","short":"Copper","pv":25000,"mpv":2500,"micro":"MHG","tick":0.0005,"dec":4,"money":true,"unit":"$/lb"}},{"k":"PL","tv":"NYMEX:PL1!","grp":"met","name":"Platinum","logo":"Pt","what":"1 PL = $50 per 1.00 move (one 0.1 tick = $5); there's no micro","S":{"sym":"PL","name":"Platinum","short":"Platinum","pv":50,"mpv":50,"micro":"PL","tick":0.1,"dec":1,"money":true,"unit":"$/oz"}},{"k":"PA","tv":"NYMEX:PA1!","grp":"met","name":"Palladium","logo":"Pd","what":"1 PA = $100 per 1.00 move (one 0.5 tick = $50); there's no micro","S":{"sym":"PA","name":"Palladium","short":"Palladium","pv":100,"mpv":100,"micro":"PA","tick":0.5,"dec":1,"money":true,"unit":"$/oz"}},{"k":"ZB","tv":"CBOT:ZB1!","grp":"rate","name":"30-year Treasury bond","logo":"ZB","what":"1 ZB = $1,000 a point (one 0.03125 tick = $31.25); there's no micro","S":{"sym":"ZB","name":"30-year Treasury bond","short":"30Y bond","pv":1000,"mpv":1000,"micro":"ZB","tick":0.03125,"dec":5,"money":false,"unit":"points"}},{"k":"ZN","tv":"CBOT:ZN1!","grp":"rate","name":"10-year Treasury note","logo":"ZN","what":"1 ZN = $1,000 a point (one 0.015625 tick = $15.63); there's no micro","S":{"sym":"ZN","name":"10-year Treasury note","short":"10Y note","pv":1000,"mpv":1000,"micro":"ZN","tick":0.015625,"dec":6,"money":false,"unit":"points"}},{"k":"6E","tv":"CME:6E1!","grp":"fx","name":"Euro FX","logo":"€","what":"1 M6E micro = $12,500 per 1.00 move (one 0.00005 tick = $0.63), 1 6E = $125,000 per 1.00 move ($6.25 a tick)","S":{"sym":"6E","name":"Euro FX","short":"Euro","pv":125000,"mpv":12500,"micro":"M6E","tick":5e-05,"dec":5,"money":false,"unit":"$ per euro"}},{"k":"6B","tv":"CME:6B1!","grp":"fx","name":"British pound","logo":"£","what":"1 M6B micro = $6,250 per 1.00 move (one 0.0001 tick = $0.63), 1 6B = $62,500 per 1.00 move ($6.25 a tick)","S":{"sym":"6B","name":"British pound","short":"Pound","pv":62500,"mpv":6250,"micro":"M6B","tick":0.0001,"dec":4,"money":false,"unit":"$ per pound"}},{"k":"6J","tv":"CME:6J1!","grp":"fx","name":"Japanese yen","logo":"¥","what":"1 6J = $12,500,000 per 1.00 move (one 0.0000005 tick = $6.25); there's no micro","S":{"sym":"6J","name":"Japanese yen","short":"Yen","pv":12500000,"mpv":12500000,"micro":"6J","tick":5e-07,"dec":7,"money":false,"unit":"$ per yen"}},{"k":"6A","tv":"CME:6A1!","grp":"fx","name":"Australian dollar","logo":"A$","what":"1 M6A micro = $10,000 per 1.00 move (one 0.00005 tick = $0.50), 1 6A = $100,000 per 1.00 move ($5 a tick)","S":{"sym":"6A","name":"Australian dollar","short":"Aussie","pv":100000,"mpv":10000,"micro":"M6A","tick":5e-05,"dec":5,"money":false,"unit":"$ per A$"}},{"k":"6C","tv":"CME:6C1!","grp":"fx","name":"Canadian dollar","logo":"C$","what":"1 6C = $100,000 per 1.00 move (one 0.00005 tick = $5); there's no micro","S":{"sym":"6C","name":"Canadian dollar","short":"Loonie","pv":100000,"mpv":100000,"micro":"6C","tick":5e-05,"dec":5,"money":false,"unit":"$ per C$"}},{"k":"MBT","tv":"CME:BTC1!","grp":"cry","name":"CME Bitcoin futures","logo":"₿F","what":"1 MBT micro = $0.10 per 1.00 move (one 5 tick = $0.50), 1 BTC = $5 per 1.00 move ($25 a tick)","S":{"sym":"BTCF","big":"BTC","name":"CME Bitcoin futures","short":"Bitcoin futures","pv":5,"mpv":0.1,"micro":"MBT","tick":5,"dec":0,"money":true,"unit":"$/BTC"}},{"k":"MET","tv":"CME:ETH1!","grp":"cry","name":"CME Ether futures","logo":"Ξ","what":"1 MET micro = $0.10 per 1.00 move (one 0.5 tick = $0.05), 1 ETH = $50 per 1.00 move ($25 a tick)","S":{"sym":"ETHF","big":"ETH","name":"CME Ether futures","short":"Ether futures","pv":50,"mpv":0.1,"micro":"MET","tick":0.5,"dec":1,"money":true,"unit":"$/ETH"}}];
+const NF = {}; // number formatters are slow to create, so make each one once
+const nf = k => NF[k] || (NF[k] = new Intl.NumberFormat("en-US", { minimumFractionDigits: k, maximumFractionDigits: k }));
+const fnum = (I, x, d) => nf(d == null ? I.dec : d).format(x);
+const fusd = x => (x < 0 ? "−" : x > 0 ? "+" : "") + "$" + nf(0).format(Math.abs(Math.round(x)));
+const fbal = x => "$" + nf(0).format(Math.round(x));
+const fpct = (x, d = 1) => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(d) + "%";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+function lastBrk(S, t) { for (let i = t; i > 0; i--) if (S.brk[i]) return i; return 0; }
+function swings(S, a, b, kind) {
+  const out = [];
+  for (let i = Math.max(a, 2); i <= b - 2; i++) {
+    if (kind === "low") { const v = S.l[i]; if (v < S.l[i - 1] && v < S.l[i - 2] && v <= S.l[i + 1] && v <= S.l[i + 2]) out.push(i); }
+    else { const v = S.h[i]; if (v > S.h[i - 1] && v > S.h[i - 2] && v >= S.h[i + 1] && v >= S.h[i + 2]) out.push(i); }
+  }
+  return out;
+}
+function levels(S, t) {
+  const a = Math.max(lastBrk(S, t), t - 60), A = S.atr[t] || 1, res = { sup: null, res: null };
+  if (t - a < 8) return res;
+  const minAfter = i => { let m = Infinity; for (let j = i + 1; j <= t; j++) m = Math.min(m, S.l[j]); return m; };
+  const maxAfter = i => { let m = -Infinity; for (let j = i + 1; j <= t; j++) m = Math.max(m, S.h[j]); return m; };
+  const lows = swings(S, a, t, "low").filter(i => S.l[i] < S.c[t] - 0.2 * A && minAfter(i) > S.l[i]);
+  const highs = swings(S, a, t, "high").filter(i => S.h[i] > S.c[t] + 0.2 * A && maxAfter(i) < S.h[i]);
+  if (lows.length) { const i = lows.reduce((x, y) => S.l[y] > S.l[x] ? y : x); res.sup = { i, p: S.l[i] }; }
+  if (highs.length) { const i = highs.reduce((x, y) => S.h[y] < S.h[x] ? y : x); res.res = { i, p: S.h[i] }; }
+  return res;
+}
+const MK_SERVER = "FMP", TV_SERVER = "Tradingview", WEEK = 6048e5, DAYMS = 864e5;
+const usdOf = v => "$" + (v >= 100 ? nf(0).format(v) : nf(2).format(v).replace(/\.00$/, ""));
+function whatOf(S) { // contract sizes in plain words
+  const big = S.big || S.sym, tk = nf(S.dec).format(S.tick), per = S.unit === "points" ? "a point" : "per 1.00 move";
+  return S.mpv !== S.pv ? `1 ${S.micro} micro = ${usdOf(S.mpv)} ${per} (one ${tk} tick = ${usdOf(S.mpv * S.tick)}), 1 ${big} = ${usdOf(S.pv)} ${per} (${usdOf(S.pv * S.tick)} a tick)` : `1 ${big} = ${usdOf(S.pv)} ${per} (one ${tk} tick = ${usdOf(S.pv * S.tick)}); there's no micro`;
+}
+const TV_TFS = ["1m", "5m", "15m", "1h", "4h", "1D"], TF_NAME = { "1m": "1-minute", "5m": "5-minute", "15m": "15-minute", "1h": "hourly", "4h": "4-hour", "1D": "daily" };
+const ETF = (() => { try { return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", weekday: "short" }); } catch (e) { return null; } })();
+const WDX = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+function etNow(ms) {
+  if (!ETF) { const d = new Date(ms - 5 * 36e5); return { wd: d.getUTCDay(), min: d.getUTCHours() * 60 + d.getUTCMinutes(), off: -300, y: d.getUTCFullYear(), mo: d.getUTCMonth() + 1, d: d.getUTCDate() }; }
+  const p = {}; for (const x of ETF.formatToParts(new Date(ms))) p[x.type] = x.value;
+  const h = +p.hour % 24, mi = +p.minute, y = +p.year, mo = +p.month, d = +p.day;
+  return { wd: WDX[p.weekday], min: h * 60 + mi, off: Math.round((Date.UTC(y, mo - 1, d, h, mi) - Math.floor(ms / 6e4) * 6e4) / 6e4), y, mo, d };
+}
+function etAt(ms, dd, m) { const e = etNow(ms); return Date.UTC(e.y, e.mo - 1, e.d + dd, 0, 0) + m * 6e4 - e.off * 6e4; } // epoch ms of a New York wall-clock minute
+function mktStatus(cls, ms = Date.now()) {
+  if (cls === "crypto") return { open: true, cls: "open", label: "24/7" };
+  const e = etNow(ms), wd = e.wd, m = e.min;
+  if (cls === "fut") { // CME Globex: Sunday 18:00 to Friday 17:00 New York, with a break 17:00–18:00 each weekday
+    const brk = wd >= 1 && wd <= 4 && m >= 1020 && m < 1080, wkend = wd === 6 || (wd === 0 && m < 1080) || (wd === 5 && m >= 1020);
+    if (!brk && !wkend) return { open: true, cls: "open", label: "Open" };
+    return { open: false, cls: "", label: brk ? "Daily break" : "Weekend", next: brk ? etAt(ms, 0, 1080) : etAt(ms, wd === 5 ? 2 : wd === 6 ? 1 : 0, 1080) };
+  }
+  const wk = wd >= 1 && wd <= 5; // US stocks: 09:30–16:00 New York, Monday to Friday (holidays not shown)
+  if (wk && m >= 570 && m < 960) return { open: true, cls: "open", label: "Open" };
+  let nx; if (wk && m < 570) nx = etAt(ms, 0, 570); else { let dd = 1; while ((wd + dd) % 7 === 0 || (wd + dd) % 7 === 6) dd++; nx = etAt(ms, dd, 570); }
+  if (wk && m >= 240 && m < 570) return { open: false, cls: "ext", label: "Pre-market", next: nx };
+  if (wk && m >= 960 && m < 1200) return { open: false, cls: "ext", label: "After hours", next: nx };
+  return { open: false, cls: "", label: "Closed", next: nx };
+}
+function lastClose(cls, ms = Date.now()) {
+  if (cls === "crypto") return 0; const e = etNow(ms), cm = cls === "fut" ? 1020 : 960;
+  for (let dd = 0; dd <= 7; dd++) { const wd = (e.wd - dd + 7) % 7; if (wd === 0 || wd === 6) continue; const t = etAt(ms, -dd, cm); if (t <= ms) return t; }
+  return ms - 3 * DAYMS;
+}
+const LTF = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }), LTD = new Intl.DateTimeFormat(undefined, { weekday: "short", hour: "2-digit", minute: "2-digit" });
+const fLocal = ms => { const d = new Date(ms); return d.toDateString() === new Date().toDateString() ? LTF.format(d) : LTD.format(d); };
+const fAgo = ms => { const s = Math.max(0, (Date.now() - ms) / 1000); return s < 50 ? "just now" : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`; };
+const stLabel = st => st.open ? st.label : `${st.label}${st.next ? ` · opens ${fLocal(st.next)}` : ""}`;
+
+const numv = v => v == null || v === "" || !isFinite(+v) ? null : +v;
+function fmpErr(p) { if (typeof p === "string") return p; if (p && !Array.isArray(p) && typeof p === "object") { const s = p["Error Message"] || p.error || p.message; if (s) return String(s); if (p.success === false) return "TradingView couldn't answer"; } return null; }
+function tvDelay(mode) { const k = /delayed\D*(\d+)/.exec(String(mode || "")); return k ? +k[1] : /delayed|endofday/i.test(String(mode || "")) ? 900 : 0; }
+function parseQtv(p, m) {
+  const x = p && p.data; if (!x || typeof x !== "object") return null; const c = numv(x.close); if (c == null || c <= 0) return null;
+  const ch = numv(x.change_abs), delay = tvDelay(x.update_mode), st = mktStatus(m.cls);
+  return { p: c, ch, pct: numv(x.change), lo: numv(x.low), hi: numv(x.high), o: numv(x.open), pc: ch != null ? c - ch : null, v: numv(x.volume), yh: numv(x.price_52_week_high), yl: numv(x.price_52_week_low), a50: numv(x.SMA50), a200: numv(x.SMA200), cap: null, ts: st.open ? Date.now() - delay * 1000 : lastClose(m.cls), name: null, delay, mode: String(x.update_mode || "") };
+}
+function tvBars(p) { const b = p && p.bars; if (!b) return null; if (Array.isArray(b)) return { t: b.map(r => r.t), o: b.map(r => r.o), h: b.map(r => r.h), l: b.map(r => r.l), c: b.map(r => r.c), v: b.map(r => r.v) }; return Array.isArray(b.t) && Array.isArray(b.c) ? b : null; }
+function atr14(B) { // daily ATR(14) from completed candles
+  if (!B || B.n < 3) return null; const end = B.n - 1; let s = 0, k = 0;
+  for (let i = Math.max(1, end - 14); i < end; i++) { s += Math.max(B.h[i] - B.l[i], Math.abs(B.h[i] - B.c[i - 1]), Math.abs(B.l[i] - B.c[i - 1])); k++; }
+  return k ? s / k : null;
+}
+
+const PAGE_CODES = new Set(["needs_reauth", "server_not_connected", "selection_required", "server_not_found", "not_in_manifest", "blocked_by_policy", "approval_required", "consent_required", "not_granted", "capability_disabled", "capability_removed", "user_changed"]);
+const num = s => { const x = parseFloat(String(s).replace(/[,$£\s]/g, "")); return isFinite(x) ? x : NaN; };
+function coachMD(src) {
+  const inl = s => { const codes = []; s = String(s).replace(/`([^`]+)`/g, (_, c) => `\u0000${codes.push(c) - 1}\u0000`);
+    return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<i>$2</i>").replace(/\u0000(\d+)\u0000/g, (_, k) => `<code>${esc(codes[+k])}</code>`); };
+  const out = []; let list = null, code = null, table = null;
+  const close = () => { if (list) { out.push(`</${list}>`); list = null; } };
+  const endTable = () => { if (!table) return; const rows = table.filter(r => !/^\s*\|?\s*:?-{2,}/.test(r)), cells = r => r.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+    const head = table.length > 1 && /^\s*\|?\s*:?-{2,}/.test(table[1]);
+    out.push(`<div class="ctable"><table>${rows.map((r, k) => `<tr>${cells(r).map(c => k === 0 && head ? `<th>${inl(c)}</th>` : `<td>${inl(c)}</td>`).join("")}</tr>`).join("")}</table></div>`); table = null; };
+  for (const raw of String(src || "").split("\n")) {
+    if (code) { if (/^\s*```/.test(raw)) { out.push(`<pre class="ccode"><code>${esc(code.join("\n"))}</code></pre>`); code = null; } else code.push(raw); continue; }
+    if (/^\s*```/.test(raw)) { close(); endTable(); code = []; continue; }
+    const line = raw.trimEnd();
+    if (/^\s*\|.*\|\s*$/.test(line)) { close(); (table = table || []).push(line); continue; }
+    endTable();
+    const ul = line.match(/^\s*[-*•]\s+(.*)/), ol = line.match(/^\s*\d+[.)]\s+(.*)/), h = line.match(/^#{1,4}\s+(.*)/);
+    if (ul || ol) { const t = ul ? "ul" : "ol"; if (list !== t) { close(); out.push(`<${t}>`); list = t; } out.push(`<li>${inl((ul || ol)[1])}</li>`); continue; }
+    close();
+    if (h) out.push(`<p class="ch">${inl(h[1])}</p>`); else if (line.trim()) out.push(`<p>${inl(line)}</p>`);
+  }
+  if (code) out.push(`<pre class="ccode"><code>${esc(code.join("\n"))}</code></pre>`); // still streaming
+  close(); endTable(); return out.join("");
+}
+
+const NW_ERR = { cancelled: "Stopped.", not_granted: "Quint needs your permission to use Claude, and it wasn't given. Reload the page to be asked again.", sampling_disabled: "Claude isn't available for this account here.", rate_limited: "Quint is busy or you've hit a usage limit. Give it a minute, then try again.", session_expired: "Your Claude session has expired. Sign in again, then retry.", refused: "Claude couldn't answer that one.", empty_completion: "Claude didn't come up with an answer. Try again." };
+const TS_DEF = {
+  scalp: { ic: "⚡", name: "Scalper", hold: "seconds to about 15 minutes", tf: "5m" },
+  day: { ic: "🕐", name: "Day trader", hold: "15 minutes to a few hours", tf: "15m" },
+  both: { ic: "🔀", name: "Scalps and day trades", hold: "a few minutes up to a few hours", tf: "5m" },
+};
+function styleLine() {
+  const k = TS();
+  return k === "scalp" ? "The user trades as a SCALPER: trades last seconds to about 15 minutes. Read the 15m for direction and the 5m and 1m for entries; stops sit just beyond the last 1m or 5m swing; costs and slippage matter a lot, so targets must be worth several times the cost."
+    : k === "day" ? "The user trades as a DAY TRADER: trades last from 15 minutes to a few hours and are closed before the session ends. Read the daily and 1h for direction and the 15m and 5m for entries; stops sit beyond the last 15m swing or a level; they hold through small pullbacks and trail the stop behind structure."
+    : "The user both SCALPS (minutes) and DAY TRADES (15 minutes to a few hours). Always give the bigger-picture direction first (daily, 1h, 15m), then label separately what a scalp would do and what a day trade lasting an hour or two would do, because the stop, target and hold time differ.";
+}
+const mdPlain = s => String(s || "").replace(/^\s*\**\s*LEAN[^\n]*\n?/i, "").replace(/```[\s\S]*?```/g, " ").replace(/^#{1,6}\s*/gm, "").replace(/[*_`>|]/g, "").replace(/\[\[[^\]]*\]\]/g, "").replace(/\n{2,}/g, "\n").trim();
+
+async function tvCall(tool, input, stale = 60000) {
+  if (!MK.mcp || MK.st !== "ready") throw { code: "not_ready", message: "Live data isn't connected yet." };
+  const r = await MK.mcp.callTool(TV_SERVER, tool, input, { cache: stale ? { staleTime: stale, gcTime: WEEK } : false }), p = r && r.payload, em = tvErrOf(p);
+  if (em) throw { code: "tool_error", message: em }; return p;
+}
+function tvErrOf(p) {
+  if (typeof p === "string") return p; if (!p || typeof p !== "object" || Array.isArray(p)) return null;
+  if (p.success === false) return String(p.error || p.message || p.detail || "TradingView couldn't do that");
+  if (typeof p.error === "string" && p.error) return p.error; if (p["Error Message"]) return String(p["Error Message"]);
+  if (p.message && Object.keys(p).every(k => /^(message|code|status|detail|error|success)$/.test(k))) return String(p.message); return null;
+}
+const tvWhy = e => e && e.code === "tool_error" && e.message ? `TradingView said: ${String(e.message).slice(0, 160)}` : tvErr(e); // the real reason, when TradingView gave one
+const tvErr = e => { const c = e && e.code; return c === "not_ready" ? "Live data isn't connected in this view." : PAGE_CODES.has(c) ? "This needs your TradingView connector. Add or reconnect it in claude.ai → Settings → Connectors, then reload." : c === "rate_limited" ? "TradingView is busy. Try again in a minute." : "Couldn't load this from TradingView just now. Try again in a moment."; };
+function qtATR(B, n = 14) { // Wilder's ATR as an array
+  const N = B.c.length, A = new Array(N).fill(0); let s = 0;
+  for (let i = 1; i < N; i++) { const tr = Math.max(B.h[i] - B.l[i], Math.abs(B.h[i] - B.c[i - 1]), Math.abs(B.l[i] - B.c[i - 1])); if (i <= n) { s += tr; A[i] = s / i; } else A[i] = (A[i - 1] * (n - 1) + tr) / n; }
+  return A;
+}
+function qtShrink(file) {
+  return new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { try { const k = Math.min(1, 2000 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); c.toBlob(b => { URL.revokeObjectURL(u); b ? res(b) : rej(new Error("blob")); }, "image/jpeg", 0.9); } catch (e) { rej(e); } };
+    im.onerror = () => { URL.revokeObjectURL(u); rej(new Error("image")); }; im.src = u; });
+}
+const BL = { run: null, split: 0.5 };
+const BL_F = {
+  breakout: { name: "Breakout", p: { n: [10, 15, 20, 30, 40, 55] } },
+  pullback: { name: "Trend pullback", p: { fast: [10, 20], slow: [50, 100] } },
+  meanrev: { name: "Oversold bounce", p: { n: [2, 3, 5], x: [10, 20, 30], slow: [50, 100, 200] } },
+  cross: { name: "Average cross", p: { fast: [5, 10, 20], slow: [30, 50, 100] } },
+  sweep: { name: "Failed breakout", p: { n: [10, 20, 30, 40] } },
+  orb: { name: "New York open range", p: { or: [15, 30, 60], cut: [60, 120, 240], mid: [0, 1] } },
+};
+function blInd(B) {
+  if (B._i) return B._i; const N = B.c.length, mem = {}, c = B.c;
+  const I = B._i = { atr: qtATR(B),
+    ema: n => mem["e" + n] || (mem["e" + n] = (() => { const o = new Array(N), k = 2 / (n + 1); o[0] = c[0]; for (let i = 1; i < N; i++) o[i] = c[i] * k + o[i - 1] * (1 - k); return o; })()),
+    hh: n => mem["h" + n] || (mem["h" + n] = (() => { const o = new Array(N).fill(Infinity); for (let i = n; i < N; i++) { let m = -Infinity; for (let j = i - n; j < i; j++) if (B.h[j] > m) m = B.h[j]; o[i] = m; } return o; })()), // the highest high of the n candles before i
+    ll: n => mem["l" + n] || (mem["l" + n] = (() => { const o = new Array(N).fill(-Infinity); for (let i = n; i < N; i++) { let m = Infinity; for (let j = i - n; j < i; j++) if (B.l[j] < m) m = B.l[j]; o[i] = m; } return o; })()),
+    rsi: n => mem["r" + n] || (mem["r" + n] = (() => { const o = new Array(N).fill(50); let g = 0, l = 0; for (let i = 1; i < N; i++) { const d = c[i] - c[i - 1], u = d > 0 ? d : 0, w = d < 0 ? -d : 0; if (i <= n) { g += u / n; l += w / n; } else { g = (g * (n - 1) + u) / n; l = (l * (n - 1) + w) / n; } o[i] = l === 0 ? (g === 0 ? 50 : 100) : 100 - 100 / (1 + g / l); } return o; })()) };
+  return I;
+}
+function blClock(B) { // New York minute-of-day and day number for every candle (intraday series only)
+  if (B._c) return B._c; const N = B.c.length, em = new Int16Array(N), ed = new Int32Array(N);
+  for (let i = 0; i < N; i++) { const e = etNow(B.t[i] * 1000); em[i] = e.min; ed[i] = e.y * 10000 + e.mo * 100 + e.d; }
+  return B._c = { em, ed, tf: N > 1 ? Math.round((B.t[N - 1] - B.t[N - 2]) / 60) || 15 : 15 };
+}
+function orbEval(V, B, cost, sp, out) { // opening range breakout: the range is the first V.or minutes from 9:30 New York; one trade a day; flat by 15:55
+  const C = blClock(B), em = C.em, ed = C.ed, tf = C.tf, N = B.c.length, need = Math.round(V.or / tf); if (tf > 30 || need < 1 || V.or % tf) return;
+  let i = 0;
+  while (i < N) {
+    if (em[i] !== 570) { i++; continue; }
+    const day = ed[i]; let hi = -Infinity, lo = Infinity, k = i, cnt = 0;
+    for (; k < N && ed[k] === day && em[k] < 570 + V.or; k++) { hi = Math.max(hi, B.h[k]); lo = Math.min(lo, B.l[k]); cnt++; }
+    let done = false;
+    if (cnt === need && hi > lo) for (; k < N - 1 && ed[k] === day && em[k] < 570 + V.cut; k++) {
+      const d = B.c[k] > hi ? 1 : B.c[k] < lo ? -1 : 0; if (!d) continue; if (!(V.dir === "both" || (V.dir === "long") === (d > 0))) continue;
+      if (ed[k + 1] !== day) break; const e = B.o[k + 1], st = V.mid ? (hi + lo) / 2 : d > 0 ? lo : hi, sd = (e - st) * d; if (!(sd > 0)) break;
+      const tg = V.tgt ? e + d * sd * V.tgt : null; let x = null, j = k + 1;
+      for (; j < N && ed[j] === day; j++) {
+        if (d > 0) { if (B.l[j] <= st) { x = Math.min(B.o[j], st); break; } if (tg != null && B.h[j] >= tg) { x = tg; break; } }
+        else { if (B.h[j] >= st) { x = Math.max(B.o[j], st); break; } if (tg != null && B.l[j] <= tg) { x = tg; break; } }
+        if (em[j] + tf >= 955) { x = B.c[j]; break; }
+      }
+      if (x == null) { j = Math.min(j, N) - 1; x = B.c[j]; }
+      out.push({ t: B.t[k + 1], r: (x - e) * d / sd - (cost != null ? cost : e * 5e-5) / sd, is: k + 1 < sp, i: k, j, d, e, st, tg, x, a: i, hi, lo }); done = true; break;
+    }
+    while (i < N && ed[i] === day) i++;
+  }
+}
+function blSig(V, B, I, i) { // +1 buy, -1 sell, 0 nothing, from data up to the close of candle i
+  const c = B.c[i]; let d = 0;
+  if (V.f === "breakout") d = c > I.hh(V.n)[i] ? 1 : c < I.ll(V.n)[i] ? -1 : 0;
+  else if (V.f === "pullback") { const f = I.ema(V.fast)[i], s = I.ema(V.slow)[i]; d = f > s && c > s && B.l[i] <= f && c > f && c > B.o[i] ? 1 : f < s && c < s && B.h[i] >= f && c < f && c < B.o[i] ? -1 : 0; }
+  else if (V.f === "meanrev") { const r = I.rsi(V.n)[i], s = I.ema(V.slow)[i]; d = r < V.x && c > s ? 1 : r > 100 - V.x && c < s ? -1 : 0; }
+  else if (V.f === "cross") { const f = I.ema(V.fast), s = I.ema(V.slow); d = f[i] > s[i] && f[i - 1] <= s[i - 1] ? 1 : f[i] < s[i] && f[i - 1] >= s[i - 1] ? -1 : 0; }
+  else if (V.f === "sweep") { const lo = I.ll(V.n)[i], hi = I.hh(V.n)[i]; d = B.l[i] < lo && c > lo ? 1 : B.h[i] > hi && c < hi ? -1 : 0; }
+  return d && (V.dir === "both" || (V.dir === "long") === (d > 0)) ? d : 0;
+}
+function blEval(V, S, cost) { // every closed trade: one position at a time, in at the next open, stop checked before target inside a candle
+  const out = [];
+  for (let si = 0; si < S.length; si++) {
+    const B = S[si], n = B.c.length, sp = Math.floor(n * BL.split), I = blInd(B), A = I.atr, o = B.o, h = B.h, l = B.l, c = B.c, cst = cost >= 0 && B.pts ? cost : null;
+    if (V.f === "orb") { if (B.pts) orbEval(V, B, cst, sp, out); continue; }
+    let i = Math.max(V.slow || 0, V.n || 0, V.fast || 0, 15) + 1;
+    while (i < n - 1) {
+      const d = blSig(V, B, I, i); if (!d || !(A[i] > 0)) { i++; continue; }
+      const e = o[i + 1], sd = V.stop * A[i], st = e - d * sd, tg = e + d * sd * V.tgt; let x = null, j = i + 1;
+      for (; j < n; j++) {
+        if (d > 0) { if (l[j] <= st) { x = Math.min(o[j], st); break; } if (h[j] >= tg) { x = tg; break; } }
+        else { if (h[j] >= st) { x = Math.max(o[j], st); break; } if (l[j] <= tg) { x = tg; break; } }
+        if (j - i >= V.hold) { x = c[j]; break; }
+      }
+      if (x == null) break; // still open when the data ends: not counted
+      out.push({ t: B.t[i + 1], r: (x - e) * d / sd - (cst != null ? cst : e * 5e-5) / sd, is: i + 1 < sp, i, j, d, e, st, tg, x }); i = j;
+    }
+  }
+  if (S.length > 1) out.sort((a, b) => a.t < b.t ? -1 : a.t > b.t ? 1 : 0);
+  return out;
+}
+function blStats(tr) { // risking 1% of the account on each trade
+  let n = tr.length, w = 0, gw = 0, gl = 0, tot = 0, eq = 1, pk = 1, dd = 0;
+  for (const x of tr) { if (x.r > 0) { w++; gw += x.r; } else gl -= x.r; tot += x.r; eq *= 1 + 0.01 * x.r; if (eq > pk) pk = eq; dd = Math.max(dd, (pk - eq) / pk); }
+  return { n, wr: n ? w / n * 100 : 0, pf: gl > 0 ? gw / gl : gw > 0 ? 9.99 : 0, tot, avg: n ? tot / n : 0, dd: dd * 100 };
+}
+function blFix(V) { // make a variant Quint proposed safe to run
+  if (V && V.f === "orb") return { f: "orb", or: [15, 30, 60].includes(+V.or) ? +V.or : 15, cut: [60, 120, 240].includes(+V.cut) ? +V.cut : 120, mid: V.mid ? 1 : 0, tgt: [0, 1, 1.5, 2, 3].includes(+V.tgt) ? +V.tgt : 2, dir: ["long", "short", "both"].includes(V.dir) ? V.dir : "both" };
+  if (!V || !BL_F[V.f]) return null; const num = (v, a, b, d) => isFinite(+v) ? clamp(+v, a, b) : d, o = { f: V.f, stop: num(V.stop, 0.5, 5, 1.5), tgt: num(V.tgt, 0.5, 6, 2), hold: Math.round(num(V.hold, 2, 80, 20)), dir: ["long", "short", "both"].includes(V.dir) ? V.dir : "both" };
+  if (V.f === "breakout" || V.f === "sweep") o.n = Math.round(num(V.n, 5, 100, 20));
+  if (V.f === "pullback" || V.f === "cross") { o.fast = Math.round(num(V.fast, 3, 50, 20)); o.slow = Math.round(num(V.slow, 20, 200, 50)); if (o.fast >= o.slow) o.slow = o.fast * 2 + 10; }
+  if (V.f === "meanrev") { o.n = Math.round(num(V.n, 2, 14, 2)); o.x = Math.round(num(V.x, 5, 45, 20)); o.slow = Math.round(num(V.slow, 20, 200, 100)); }
+  return o;
+}
+function blRules(V, unit = "candles") {
+  if (V.f === "orb") return `Mark the high and low of the first ${V.or} minutes after the US open (9:30 New York, 2:30pm UK). ${V.dir === "short" ? "Sell short when a candle closes below the low" : V.dir === "long" ? "Buy when a candle closes above the high" : "Buy when a candle closes above the high; sell short when one closes below the low"}, within ${V.cut >= 120 ? V.cut / 60 + " hours" : V.cut + " minutes"} of the open. One trade a day. Stop at the ${V.mid ? "middle" : "other side"} of the range; ${V.tgt ? `target ${V.tgt}× the risk` : "no target: hold"}; out by 3:55pm New York whatever happens.`;
+  const L = V.dir !== "short", S = V.dir !== "long", both = (a, b) => [L ? a : "", S ? b : ""].filter(Boolean).join(" ");
+  const sig = V.f === "breakout" ? both(`Buy when a candle closes above the highest high of the previous ${V.n} ${unit}.`, `Sell short when a candle closes below the lowest low of the previous ${V.n} ${unit}.`)
+    : V.f === "pullback" ? both(`Buy when the ${V.fast} EMA is above the ${V.slow} EMA and a candle dips to the ${V.fast} EMA, then closes back above it as a green candle.`, `Sell short on the mirror image when the ${V.fast} EMA is below the ${V.slow} EMA.`)
+    : V.f === "meanrev" ? both(`Buy when RSI(${V.n}) drops below ${V.x} while price is above the ${V.slow} EMA.`, `Sell short when RSI(${V.n}) rises above ${100 - V.x} while price is below the ${V.slow} EMA.`)
+    : V.f === "cross" ? both(`Buy when the ${V.fast} EMA crosses above the ${V.slow} EMA.`, `Sell short when it crosses below.`)
+    : both(`Buy when price dips below the lowest low of the previous ${V.n} ${unit} but closes back above it (a failed breakdown).`, `Sell short when price pokes above the highest high of the previous ${V.n} ${unit} but closes back below it.`);
+  return `${sig} Enter at the next candle's open. Stop ${V.stop}× ATR(14) away; target ${V.tgt}× the stop (${V.tgt}R); close after ${V.hold} ${unit} if neither is hit.`;
+}
+const blName = V => V.f === "orb" ? `New York open · ${V.or}-min range · ${V.dir === "both" ? "long & short" : V.dir + " only"} · stop ${V.mid ? "mid-range" : "far side"} · ${V.tgt ? V.tgt + "R" : "hold to close"}` : `${BL_F[V.f].name} ${V.f === "breakout" || V.f === "sweep" ? V.n : V.f === "meanrev" ? `RSI${V.n}<${V.x}` : `${V.fast}/${V.slow}`} · ${V.dir === "both" ? "long & short" : V.dir + " only"} · stop ${V.stop} ATR · ${V.tgt}R · ${V.hold} bars`;
+function blPine(V) { // the same rules as a TradingView strategy
+  if (V.f === "orb") return `//@version=6
+strategy("Quint: ${blName(V)}", overlay = true, initial_capital = 50000, default_qty_type = strategy.fixed, default_qty_value = 1, commission_type = strategy.commission.cash_per_contract, commission_value = 0.75, slippage = 1, margin_long = 10, margin_short = 10)
+// Made by Quint. Use it on a ${V.or >= 30 ? "15 or 5" : "15, 5 or 1"} minute chart. Education only, not financial advice.
+orMin = input.int(${V.or}, "Opening range (minutes)")
+tgtMult = input.float(${V.tgt}, "Target (x risk, 0 = hold to the close)", step = 0.5)
+cutMin = input.int(${V.cut}, "No new entries after this many minutes")
+useMid = input.bool(${V.mid ? "true" : "false"}, "Stop at the middle of the range")
+mins = hour(time, "America/New_York") * 60 + minute(time, "America/New_York") - 570
+inSess = mins >= 0 and mins < 390 and dayofweek(time, "America/New_York") != dayofweek.saturday and dayofweek(time, "America/New_York") != dayofweek.sunday
+var float hi = na
+var float lo = na
+var bool done = true
+if inSess and mins == 0
+    hi := high
+    lo := low
+    done := false
+else if inSess and mins < orMin
+    hi := math.max(hi, high)
+    lo := math.min(lo, low)
+canEnter = inSess and mins >= orMin and mins < cutMin and not done and strategy.position_size == 0
+if canEnter and close > hi and ${V.dir !== "short"}
+    done := true
+    strategy.entry("L", strategy.long)
+if canEnter and close < lo and ${V.dir !== "long"}
+    done := true
+    strategy.entry("S", strategy.short)
+stopL = useMid ? (hi + lo) / 2 : lo
+stopS = useMid ? (hi + lo) / 2 : hi
+if strategy.position_size > 0
+    riskL = strategy.position_avg_price - stopL
+    strategy.exit("XL", "L", stop = stopL, limit = tgtMult > 0 ? strategy.position_avg_price + riskL * tgtMult : na)
+if strategy.position_size < 0
+    riskS = stopS - strategy.position_avg_price
+    strategy.exit("XS", "S", stop = stopS, limit = tgtMult > 0 ? strategy.position_avg_price - riskS * tgtMult : na)
+if strategy.position_size != 0 and mins >= 385
+    strategy.close_all("Close")
+plot(inSess and mins >= orMin ? hi : na, "Range high", color.new(color.teal, 0), style = plot.style_linebr)
+plot(inSess and mins >= orMin ? lo : na, "Range low", color.new(color.red, 0), style = plot.style_linebr)
+`;
+  const L = V.dir !== "short", S = V.dir !== "long";
+  const sig = V.f === "breakout" ? [`longSig = close > ta.highest(high, ${V.n})[1]`, `shortSig = close < ta.lowest(low, ${V.n})[1]`]
+    : V.f === "pullback" ? [`f = ta.ema(close, ${V.fast})`, `s = ta.ema(close, ${V.slow})`, `longSig = f > s and close > s and low <= f and close > f and close > open`, `shortSig = f < s and close < s and high >= f and close < f and close < open`]
+    : V.f === "meanrev" ? [`r = ta.rsi(close, ${V.n})`, `s = ta.ema(close, ${V.slow})`, `longSig = r < ${V.x} and close > s`, `shortSig = r > ${100 - V.x} and close < s`]
+    : V.f === "cross" ? [`f = ta.ema(close, ${V.fast})`, `s = ta.ema(close, ${V.slow})`, `longSig = ta.crossover(f, s)`, `shortSig = ta.crossunder(f, s)`]
+    : [`ll = ta.lowest(low, ${V.n})[1]`, `hh = ta.highest(high, ${V.n})[1]`, `longSig = low < ll and close > ll`, `shortSig = high > hh and close < hh`];
+  return `//@version=6
+strategy("Quint: ${blName(V).replace(/"/g, "")}", overlay = true, initial_capital = 50000, default_qty_type = strategy.fixed, default_qty_value = 1, commission_type = strategy.commission.cash_per_contract, commission_value = 0.75, slippage = 1, margin_long = 10, margin_short = 10)
+// Made by Quint. Education only, not financial advice.
+stopMult = input.float(${V.stop}, "Stop (x ATR)", step = 0.25)
+tgtMult = input.float(${V.tgt}, "Target (x stop)", step = 0.25)
+maxBars = input.int(${V.hold}, "Close after this many bars")
+atr = ta.atr(14)
+${sig.join("\n")}
+var float sd = na
+if strategy.position_size == 0
+    if ${L ? "longSig" : "false"}
+        sd := atr * stopMult
+        strategy.entry("L", strategy.long)
+    else if ${S ? "shortSig" : "false"}
+        sd := atr * stopMult
+        strategy.entry("S", strategy.short)
+if strategy.position_size > 0
+    strategy.exit("XL", "L", stop = strategy.position_avg_price - sd, limit = strategy.position_avg_price + sd * tgtMult)
+if strategy.position_size < 0
+    strategy.exit("XS", "S", stop = strategy.position_avg_price + sd, limit = strategy.position_avg_price - sd * tgtMult)
+if strategy.position_size != 0 and bar_index - strategy.opentrades.entry_bar_index(0) >= maxBars
+    strategy.close_all("Time")
+`;
+}
+
+const DK_TFS = ["1m", "5m", "15m", "30m", "1h", "4h", "1D", "1W"];
+const DK_TTL = { "1m": 40e3, "5m": 50e3, "15m": 9e4, "30m": 12e4, "1h": 3e5, "4h": 6e5, "1D": 18e5, "1W": 36e5 };
+const tvSym = m => m.tv || (m.cls === "stk" ? m.fmp : m.k === "BTC" ? "COINBASE:BTCUSD" : null);
+const dkMsgs = k => { const s = ST.qd || (ST.qd = {}); return s[k] || (s[k] = []); };
+const dkCalls = () => Array.isArray(ST.qcalls) ? ST.qcalls : (ST.qcalls = []);
+const decFor = p => p < 0.05 ? 7 : p < 2 ? 5 : p < 20 ? 4 : 2;
+const dkSpec = (sym, m) => { if (m && tvSym(m) === sym) return mkSpec(m); const k = FUT_KEYS.find(x => MKDEF[x].tv === sym); return k ? MKSPEC[k] : null; };
+
+const DK_AROUND = { idx: ["CME_MINI:ES1!", "CME_MINI:NQ1!", "CBOT_MINI:YM1!", "CME_MINI:RTY1!", "CBOE:VIX", "TVC:DXY", "CBOT:ZN1!"], other: ["CME_MINI:ES1!", "CME_MINI:NQ1!", "CBOE:VIX", "TVC:DXY", "CBOT:ZN1!", "NYMEX:CL1!", "COMEX:GC1!"] };
+const DK_AN = { "CME_MINI:ES1!": "S&P 500 (ES)", "CME_MINI:NQ1!": "Nasdaq-100 (NQ)", "CBOT_MINI:YM1!": "Dow (YM)", "CME_MINI:RTY1!": "Russell 2000 (RTY)", "CBOE:VIX": "VIX", "TVC:DXY": "US dollar index", "CBOT:ZN1!": "10-year note (ZN, up = yields down)", "NYMEX:CL1!": "crude oil", "COMEX:GC1!": "gold" };
+async function dkAround(m) {
+  try { const syms = DK_AROUND[m.grp === "idx" ? "idx" : "other"].filter(s => s !== m.tv), p = await tvCall("mcp-tv-get-symbol-data-batch", { symbols: syms, columns: ["close", "change"] }, 6e4), d = p && p.data; if (!d) return null;
+    const out = syms.filter(s => d[s] && isFinite(+d[s].change)).map(s => `${DK_AN[s] || s} ${+d[s].change >= 0 ? "+" : ""}${(+d[s].change).toFixed(2)}%${s === "CBOE:VIX" ? ` at ${(+d[s].close).toFixed(1)}` : ""}`); return out.length ? out.join(", ") : null; } catch (e) { return null; }
+}
+async function dkBars(sym, tf, count, signal) { qaLight(sym, tf, 1);
+  const key = `${sym}|${tf}|${count}`, c = DK.bars[key], ttl = (DK_TTL[tf] || 6e4) * (MK.tvLive && /^(1m|5m|15m)$/.test(tf) ? 0.35 : 1); if (c && Date.now() - c.at < ttl) { qaLight(sym, tf, 2); return c.B; }
+  if (!MK.mcp || MK.st !== "ready") throw { code: "not_ready", message: "Live data isn't connected." };
+  const r = await MK.mcp.callTool(TV_SERVER, "mcp-tv-get-ohlcv", { symbol: sym, interval: tf, count, format: "columns" }, { cache: false, signal }), p = r && r.payload, em = fmpErr(p), b = tvBars(p);
+  if (em || !b || !b.t || b.t.length < 3) throw { code: "tool_error", message: em || `no ${tf} candles for ${sym}` };
+  const B = { t: [], o: [], h: [], l: [], c: [], v: [] };
+  for (let i = 0; i < b.t.length; i++) { const cc = +b.c[i]; if (!(cc > 0)) continue; const o = +b.o[i] > 0 ? +b.o[i] : cc; B.t.push(+b.t[i]); B.o.push(o); B.h.push(Math.max(o, cc, +b.h[i] || cc)); B.l.push(Math.min(o, cc, +b.l[i] > 0 ? +b.l[i] : cc)); B.c.push(cc); B.v.push(+b.v[i] || 0); }
+  B.n = B.c.length; DK.bars[key] = { B, at: Date.now() }; qaLight(sym, tf, 2); return B;
+}
+function dkEma(c, n) { const o = new Array(c.length), k = 2 / (n + 1); o[0] = c[0]; for (let i = 1; i < c.length; i++) o[i] = c[i] * k + o[i - 1] * (1 - k); return o; }
+function dkRsi(c, n = 14) { let g = 0, l = 0; const o = new Array(c.length).fill(50); for (let i = 1; i < c.length; i++) { const d = c[i] - c[i - 1], u = Math.max(d, 0), w = Math.max(-d, 0); if (i <= n) { g += u / n; l += w / n; } else { g = (g * (n - 1) + u) / n; l = (l * (n - 1) + w) / n; } o[i] = l === 0 ? (g === 0 ? 50 : 100) : 100 - 100 / (1 + g / l); } return o; }
+const dkT = (sec, tf) => { const d = new Date(sec * 1000); return tf === "1D" || tf === "1W" ? d.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" }) : `${d.toLocaleDateString([], { weekday: "short" })} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`; };
+function dkStats(B, S) { // the facts a trader reads off one timeframe
+  const n = B.c.length, L = n - 1, c = B.c, f = x => fnum(S, x); if (n < 25) return "not enough candles yet";
+  const e20 = dkEma(c, 20), e50 = dkEma(c, 50), A = qtATR(B), R = dkRsi(c), sl = e20[L] - e20[Math.max(0, L - 5)];
+  const hi = (a, b) => Math.max(...B.h.slice(Math.max(0, a), b)), lo = (a, b) => Math.min(...B.l.slice(Math.max(0, a), b));
+  const trend = c[L] > e20[L] && e20[L] > e50[L] && sl > 0 ? "UP (price above a rising 20 EMA, 20 above 50)" : c[L] < e20[L] && e20[L] < e50[L] && sl < 0 ? "DOWN (price below a falling 20 EMA, 20 below 50)" : "MIXED or ranging";
+  const k = Math.min(20, L), vAvg = k ? B.v.slice(L - k, L).reduce((a, x) => a + x, 0) / k : 0, piv = [];
+  for (let i = L - 3; i >= 3 && piv.length < 6; i--) { if (B.h[i] >= Math.max(B.h[i - 1], B.h[i - 2], B.h[i + 1], B.h[i + 2])) piv.push(`high ${f(B.h[i])} (${L - i} bars ago)`); if (B.l[i] <= Math.min(B.l[i - 1], B.l[i - 2], B.l[i + 1], B.l[i + 2])) piv.push(`low ${f(B.l[i])} (${L - i} bars ago)`); }
+  return `last ${f(c[L])} · EMA20 ${f(e20[L])} ${sl >= 0 ? "rising" : "falling"} · EMA50 ${f(e50[L])} · trend ${trend} · ATR14 ${f(A[L])} · RSI14 ${R[L].toFixed(0)} · 20-bar range ${f(lo(L - 20, L))} to ${f(hi(L - 20, L))} · 50-bar range ${f(lo(L - 50, L))} to ${f(hi(L - 50, L))}${vAvg ? ` · last bar volume ${(B.v[L] / vAvg).toFixed(1)}× average` : ""}\n  swing points, newest first: ${piv.join("; ") || "none clear"}`;
+}
+function dkRows(B, S, k, tf) { const a = Math.max(0, B.c.length - k), f = x => fnum(S, x), out = ["time open high low close volume"]; for (let i = a; i < B.c.length; i++) out.push(`${dkT(B.t[i], tf)} ${f(B.o[i])} ${f(B.h[i])} ${f(B.l[i])} ${f(B.c[i])} ${Math.round(B.v[i])}`); return out.join("\n"); }
+function dkSess(B15, B5, S) { // today's futures session in New York terms: overnight range, NY open, opening range, VWAP, yesterday's regular session
+  if (!B15 || B15.n < 30) return ""; const f = x => fnum(S, x), sd = ms => { const e = etNow(ms); return Date.UTC(e.y, e.mo - 1, e.d + (e.min >= 1080 ? 1 : 0)); };
+  const N = B15.n, today = sd(B15.t[N - 1] * 1000); let so = null, sh = -Infinity, sl = Infinity, oh = -Infinity, ol = Infinity, rh = -Infinity, rl = Infinity, ro = null; const pv = { d: null, h: -Infinity, l: Infinity, c: null };
+  for (let i = 0; i < N; i++) { const t = B15.t[i] * 1000, d = sd(t), mn = etNow(t).min;
+    if (d === today) { if (so == null) so = B15.o[i]; sh = Math.max(sh, B15.h[i]); sl = Math.min(sl, B15.l[i]); if (mn >= 570 && mn < 960) { if (ro == null) ro = B15.o[i]; rh = Math.max(rh, B15.h[i]); rl = Math.min(rl, B15.l[i]); } else if (mn < 570 || mn >= 1080) { oh = Math.max(oh, B15.h[i]); ol = Math.min(ol, B15.l[i]); } }
+    else if (d < today && mn >= 570 && mn < 960) { if (pv.d !== d) { pv.d = d; pv.h = -Infinity; pv.l = Infinity; } pv.h = Math.max(pv.h, B15.h[i]); pv.l = Math.min(pv.l, B15.l[i]); pv.c = B15.c[i]; } }
+  let orh = -Infinity, orl = Infinity, orn = 0, p = 0, v = 0, full = false;
+  if (B5 && B5.n) { full = sd(B5.t[0] * 1000) < today; for (let i = 0; i < B5.n; i++) { const t = B5.t[i] * 1000; if (sd(t) !== today) continue; const mn = etNow(t).min; if (mn >= 570 && mn < 585) { orh = Math.max(orh, B5.h[i]); orl = Math.min(orl, B5.l[i]); orn++; } const tp = (B5.h[i] + B5.l[i] + B5.c[i]) / 3; p += tp * B5.v[i]; v += B5.v[i]; } }
+  const last = B15.c[N - 1], vw = v > 0 ? p / v : null; DK.lv = { at: Date.now(), so, sh: sh > -Infinity ? sh : null, sl: sl < Infinity ? sl : null, oh: oh > -Infinity ? oh : null, ol: ol < Infinity ? ol : null, ro, rh: ro != null ? rh : null, rl: ro != null ? rl : null, orh: orn >= 3 ? orh : null, orl: orn >= 3 ? orl : null, vw, pvh: pv.c != null ? pv.h : null, pvl: pv.c != null ? pv.l : null, pvc: pv.c, full }; const rel = x => x == null ? "" : last > x ? " (price above)" : last < x ? " (price below)" : " (price at it)", L = [];
+  if (so != null) L.push(`today's session (from 18:00 New York): open ${f(so)}, high ${f(sh)}, low ${f(sl)}`);
+  if (oh > -Infinity) L.push(`overnight high ${f(oh)}, low ${f(ol)}`);
+  if (ro != null) L.push(`New York session (from 9:30): open ${f(ro)}${rel(ro)}, high ${f(rh)}, low ${f(rl)}`); else L.push("the New York session (9:30 New York) hasn't opened yet today");
+  if (orn >= 3) L.push(`opening range 9:30-9:45: high ${f(orh)}, low ${f(orl)}${last > orh ? " (price above it)" : last < orl ? " (price below it)" : " (price inside it)"}`);
+  if (vw) L.push(`session VWAP ${f(vw)}${rel(vw)}${full ? "" : " (partial: early candles missing)"}`);
+  if (pv.c != null) L.push(`previous New York session: high ${f(pv.h)}, low ${f(pv.l)}, close ${f(pv.c)}`);
+  return L.join("\n  ");
+}
+function dkPhase(ms) { const m = etNow(ms).min; return m < 180 ? "Asian session" : m < 480 ? "London session" : m < 570 ? "US pre-market" : m < 600 ? "the New York open (first 30 minutes, fastest of the day)" : m < 690 ? "New York morning" : m < 810 ? "New York lunch (often slow and choppy)" : m < 960 ? "New York afternoon" : m < 1020 ? "after the New York stock close" : m < 1080 ? "the daily futures break" : "the evening (Asia opening)"; }
+async function dkEvents() { qaLight(null, 'news', 1); try { return await dkEvents0(); } finally { qaLight(null, 'news', 2); } }
+async function dkEvents0() { // high and medium US events, kept 30 minutes
+  if (DK.cal && Date.now() - DK.cal.at < 18e5) return DK.cal.list;
+  if (QT.mv && QT.mv.d && QT.mv.d.cal && Date.now() - QT.mv.at < 18e5) { DK.cal = { at: QT.mv.at, list: QT.mv.d.cal }; return DK.cal.list; }
+  try { const now = Date.now(), day = ms => new Date(ms).toISOString().slice(0, 10), p = await tvCall("mcp-tv-get-economic-calendar", { countries: "US", date_from: day(now), date_to: day(now + 2 * DAYMS), min_importance: 0 }, 18e5);
+    const list = ((p && p.result) || []).map(e => ({ t: Date.parse(e.date), title: String(e.title || e.indicator || ""), imp: +e.importance || 0, fc: e.forecast, pv: e.previous, ac: e.actual, unit: e.unit || "" })).filter(e => e.t && e.title).sort((a, b) => a.t - b.t);
+    DK.cal = { at: Date.now(), list }; return list; } catch (e) { return null; }
+}
+async function dkBrief(m, signal) { // everything Quint should know before he answers, worked out from real data
+  const S = mkSpec(m), f = x => fnum(S, x), sym = tvSym(m), Q = mkQ(m.k), now = Date.now(), L = [], meta = { px: Q ? Q.p : null, tq: Q && Q.ts ? Q.ts : now - 6e5, atr: null };
+  L.push(`MARKET: ${m.name} (${sym || m.k})${MKSPEC[m.k] ? ` · ${m.what || whatOf(S)}` : " · US stock, priced in dollars per share"}`);
+  L.push(`TIME: ${new Date(now).toLocaleString([], { weekday: "long", hour: "2-digit", minute: "2-digit" })} the user's local time; ${String(Math.floor(etNow(now).min / 60)).padStart(2, "0")}:${String(etNow(now).min % 60).padStart(2, "0")} in New York, during ${dkPhase(now)}. Market: ${stLabel(mktStatus(m.cls))}.`);
+  if (Q) L.push(`LATEST PRICE: ${f(Q.p)}${Q.ch != null ? ` (${Q.ch >= 0 ? "+" : ""}${f(Q.ch)}, ${fpct(Q.pct || 0, 2)} today)` : ""}, from ${fLocal(Q.ts || now)}${Q.delay ? `, about ${Math.round(Q.delay / 60)} minutes delayed` : ""}. Day high ${f(Q.hi)}, low ${f(Q.lo)}.`);
+  const live = !!(m.tv && Q && !Q.delay && /stream/i.test(Q.mode || "")); if (m.tv) L.push(live ? "DATA FEED: REAL-TIME. The user's TradingView has live CME data, so prices and candles here are current to the second: give exact entries to the tick." : "DATA FEED: delayed about 10 minutes (the user's TradingView has no real-time CME data). Say so when timing matters, and prefer limit entries at levels over 'enter now'.");
+  if (sym) {
+    DK.prog = "Reading the daily, hourly, 15m and 5m charts…"; dkPaintLast();
+    const ctf = dkTf(m), tfs = [["1D", 160], ["1h", 240], ["15m", 320], ["5m", 300]].concat(TS() === "scalp" || ctf === "1m" || live ? [["1m", 120]] : []);
+    const around = m.cls === "fut" ? dkAround(m) : null; // what the markets around this one are doing, fetched alongside the candles
+    const got = await Promise.allSettled(tfs.map(([tf, n]) => dkBars(sym, tf, n, signal))), B = {};
+    tfs.forEach(([tf], i) => { if (got[i].status === "fulfilled") B[tf] = got[i].value; });
+    if (!Object.keys(B).length) L.push("CANDLES: TradingView didn't answer, so only the latest price is known.");
+    for (const [tf] of tfs) if (B[tf]) L.push(`${TF_NAME[tf].toUpperCase()} CHART: ${dkStats(B[tf], S)}`);
+    if (m.cls === "fut" && B["15m"]) { const ss = dkSess(B["15m"], B["5m"], S); if (ss) L.push(`TODAY'S LEVELS:\n  ${ss}`); }
+    if (Q && Q.hi != null && Q.lo != null && B["1D"] && B["1D"].n > 15) { const Ad = qtATR(B["1D"])[B["1D"].n - 2], rg = Q.hi - Q.lo; if (Ad > 0) L.push(`TODAY'S RANGE SO FAR: ${f(rg)} points, ${(rg / Ad).toFixed(2)}× the 14-day average daily range (${f(Ad)})${rg / Ad > 1.1 ? ": already a big day, so late moves can run out of steam" : rg / Ad < 0.5 ? ": a narrow day so far, with room to expand" : ""}. Price is ${Math.round((Q.p - Q.lo) / (rg || 1) * 100)}% of the way from the day's low to its high.`); }
+    if (B["1m"]) { const M = B["1m"], k = M.n - 1, back = (n) => M.c[k] - M.c[Math.max(0, k - n)]; L.push(`LAST MINUTES: ${back(5) >= 0 ? "+" : ""}${f(back(5))} in 5 minutes, ${back(15) >= 0 ? "+" : ""}${f(back(15))} in 15, ${back(30) >= 0 ? "+" : ""}${f(back(30))} in 30 (1-minute candles).`); }
+    const ar = await around; if (ar) L.push(`AROUND IT (TradingView, % change today): ${ar}.`);
+    else if (B["1D"] && B["1D"].n > 2) { const D = B["1D"], k = D.n - 2; L.push(`YESTERDAY: high ${f(D.h[k])}, low ${f(D.l[k])}, close ${f(D.c[k])}`); }
+    const tf = B[ctf] ? ctf : B["5m"] ? "5m" : Object.keys(B)[0], E = B[tf];
+    if (live && B["1m"] && tf !== "1m") L.push(`LAST 20 1-MINUTE CANDLES (user's local time):\n${dkRows(B["1m"], S, 20, "1m")}`);
+    if (E) { const A = qtATR(E); meta.atr = A[E.n - 1]; meta.tf = tf; if (meta.px == null) meta.px = E.c[E.n - 1]; if (!Q) meta.tq = E.t[E.n - 1] * 1000 + 6e4;
+      L.push(`LAST ${Math.min(30, E.n)} ${TF_NAME[tf].toUpperCase()} CANDLES (user's local time):\n${dkRows(E, S, 30, tf)}`); }
+    if (B["1h"] && tf !== "1h") L.push(`LAST 12 HOURLY CANDLES:\n${dkRows(B["1h"], S, 12, "1h")}`);
+  } else { const D = liveBars(m.k); if (D) { const Bd = { t: D.d.map(d => Date.parse(d + "T12:00:00Z") / 1000), o: D.o, h: D.h, l: D.l, c: D.c, v: D.v, n: D.n }; L.push(`DAILY CHART: ${dkStats(Bd, S)}`); meta.atr = atr14(D); } }
+  L.push(`USER'S PANEL: the price tape and the signal matrix (no picture is sent; work from the numbers)${HC.lvl && HC.lvl.k === m.k && HC.lvl.arr.length ? `, with your lines at ${HC.lvl.arr.map(x => `${x.lab} ${f(x.p)}`).join(", ")}` : ""}.`);
+  const P = lvPosFor(m.k), others = lvOpenList().filter(x => x !== P);
+  L.push(P ? `OPEN POSITION (the user says they took your call): ${P.dir > 0 ? "LONG" : "SHORT"} ${lvSize(P, S)} at ${f(P.e)}, stop ${f(P.stop)}, target ${P.tgt != null ? f(P.tgt) : "none"}, open P&L ${fusd(lvUPL(P))}, opened ${fAgo(P.t0)}.` : "OPEN POSITION: none that the user has told you about in this market.");
+  if (others.length) L.push(`OTHER OPEN TRADES: ${others.map(x => `${x.dir > 0 ? "long" : "short"} ${x.name}`).join(", ")}.`);
+  { const A = qaAcct(); L.push(`ACCOUNT: ${A.name}, size ${fbal(A.size)}, risk per trade ${A.pct}% = ${fbal(A.risk)}. Size every call in ${S.micro || S.sym} contracts from that risk and the stop distance, after about $1.50 a contract in fees.`); }
+  const ev = await dkEvents(); if (ev && ev.length) { const near = ev.filter(e => e.t > now - 36e5 && e.t < now + 8 * 36e5).slice(0, 10); if (near.length) L.push(`US EVENTS, last hour and next 8 hours (user's local time):\n${near.map(e => `  ${new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} ${e.title}${e.imp >= 1 ? " [HIGH importance]" : ""}${e.ac != null ? `, actual ${e.ac}${e.unit}` : ""}${e.fc != null ? `, forecast ${e.fc}${e.unit}` : ""}${e.pv != null ? `, previous ${e.pv}${e.unit}` : ""}`).join("\n")}`); else L.push("US EVENTS: nothing scheduled in the next 8 hours."); }
+  const rc = dkRec(); if (rc.n) L.push(`YOUR RECORD SO FAR: ${rc.w} wins, ${rc.l} losses${rc.tm ? `, ${rc.tm} closed on time` : ""}, total ${rc.R >= 0 ? "+" : ""}${rc.R.toFixed(1)}R; average stated confidence ${rc.conf}% vs actual win rate ${rc.wr}%.`);
+  return { text: "LIVE BRIEF\n" + L.join("\n"), meta };
+}
+function dkRules(m) {
+  return `You are Quint, a trading intelligence in your own app, Quint (you run on Claude, made by Anthropic). The app shows the user a live instrument panel for one market beside your chat: a price tape with the session's key levels, a signal matrix across timeframes and your record. They can ask you anything: a trade call, levels, news, how something works, a strategy to test, Pine Script code.
+
+WHO THEY ARE: ${myLine()} They trade from an iPhone and place real trades on NinjaTrader. This app doesn't place orders: when they tell you they took one of your calls, the brief shows it as their open position.
+
+BE DECISIVE. Whenever they ask what to do (buy or sell, is this an entry, what's the play, should I hold), give ONE clear call: BUY, SELL or NO TRADE. Never answer "it depends", never list options without choosing one, never hand the decision back to them. NO TRADE is a call too: say exactly what would make you take one. Commit to exact prices for entry, stop and target, taken from real levels in the data.
+CONFIDENCE must be honest and calibrated: it's your probability that the target is hit before the stop. 50% is a coin flip; good intraday setups are usually 55 to 70%; never go above 85%. Every call is logged and graded against real candles afterwards, and the user sees your record, so never inflate it.
+HOW TO DECIDE: read the higher timeframes first (daily, hourly), then the 15m and 5m for structure, then the entry timeframe. Trade with the higher-timeframe trend unless price is at a major level with a clear rejection. Put the stop beyond real structure (a swing, the opening range, VWAP) and at least about 1× the entry timeframe's ATR away. Aim for at least 1.5R unless it's a quick scalp into a clear level. Weigh scheduled news (stand aside in the minutes before a HIGH-importance release), the time of day (the first 30 minutes after 9:30 New York are fast; lunch is slow), and that the data is about 10 minutes delayed: say so when a fast market makes that matter. Size from their risk setting and say how many contracts.
+FEED: the brief's DATA FEED line says whether prices are real-time. With a real-time feed, read the 1-minute candles and LAST MINUTES for the trigger and timing; with a delayed feed, plan entries at levels instead of chasing.
+DATA: use only the live brief and your tools. Quote real prices. Never invent a level, a headline or a number. If the data can't answer something, say so in one line.
+THE PANEL: lines you draw with draw_levels appear on the price tape beside your chat straight away.
+TOOLS: the brief already covers this market on the daily, hourly, 15m and 5m charts. Use a tool only for what it doesn't cover: another market, another timeframe, headlines, the calendar, a backtest, checking Pine code, drawing on the chart. Don't announce tool calls; just use them.
+DRAWING: when you name key levels or make a call, draw them on the price tape with draw_levels (up to 6, short labels).
+FORMAT, for a phone: start with the call in one bold line, e.g. **BUY MNQ now: stop 27,321, target 27,420, 64%**. Then 2 to 4 very short sections with ### headings: Why, Levels, Plan (entry, stop, target, size in contracts, when to bail), and Manage (only if they hold a position). Short sentences. No disclaimers.
+Whenever you made a trade call, the very last line must be exactly in this format:
+CALL: BUY · ENTRY NOW · STOP 27321.00 · TARGET 27420.75 · CONF 64% · HOLD 45m
+(SELL for shorts; ENTRY is NOW or a limit price; HOLD is the most time the trade should need, in minutes)
+or, when there's no trade: CALL: NO TRADE · CONF 70% · WAIT FOR a 5m close back above 27400
+PHONE ALERTS: the user gets TradingView alerts on their phone. Whenever a plan depends on price reaching a level (a limit entry, a breakout, the level in WAIT FOR), add one line per level, at most 2, in exactly this format:
+ALERT: BUY 27420.25 · stop 27380, target 27500
+(the first word is BUY, SELL, EXIT or WATCH, then the price, then the plan in a few words). The app turns each line into a one-tap button that sets the alert. Only call set_alert yourself when the user asks you to set an alert.
+For Pine Script, write complete //@version=6 code in a \`\`\`pine block, check it with check_pine first (and pine_backtest for strategies) and fix every error before you show it.
+For questions that aren't about taking a trade (explaining, news, coding), skip the CALL line and just answer well.`;
+}
+
+function dkTools(m, sig) {
+  const say = s => { DK.prog = s; dkPaintLast(); };
+  const symOf = s => { s = String(s || "").trim(); if (!s) { const t = tvSym(m); if (t) return t; throw new Error("This market has no TradingView symbol; name one, like CME_MINI:ES1!"); } const u = s.toUpperCase(); if (MKDEF[u] && MKDEF[u].tv) return MKDEF[u].tv; if (/^[A-Z0-9_]+:[A-Z0-9_.!]+$/.test(u) || /^[A-Z]{1,6}$/.test(u)) return u; throw new Error("Use a TradingView symbol like CME_MINI:ES1!, COMEX:GC1!, NASDAQ:NVDA or TVC:DXY"); };
+  const specOf = (sym, B) => dkSpec(sym, m) || { dec: decFor(B ? B.c[B.n - 1] : 100), tick: 0.01, money: false };
+  const tfOf = (x, d) => DK_TFS.includes(x) ? x : d;
+  return [
+    { name: "get_candles", description: "Real OHLCV candles from TradingView (real-time for CME futures when the brief's DATA FEED says so, otherwise about 10 minutes delayed) for any symbol and timeframe, with EMA20/50, ATR14, RSI14, trend and swing points worked out. Use it for another market or a timeframe the brief doesn't cover.",
+      inputSchema: { type: "object", properties: { symbol: { type: "string", description: "TradingView EXCHANGE:TICKER, e.g. CME_MINI:ES1!, COMEX:GC1!, NASDAQ:NVDA, TVC:DXY. Leave empty for the open market." }, timeframe: { type: "string", enum: DK_TFS }, count: { type: "integer", minimum: 10, maximum: 120, description: "how many recent candles to list, default 40" } }, required: ["timeframe"] },
+      async execute(i) { const sym = symOf(i.symbol), tf = tfOf(i.timeframe, "15m"); say(`Checking ${sym.split(":").pop()} on the ${tf}…`); const B = await dkBars(sym, tf, 300, sig), S = specOf(sym, B); return { symbol: sym, timeframe: tf, stats: dkStats(B, S), candles: dkRows(B, S, clamp(Math.round(+i.count || 40), 10, 120), tf) }; } },
+    { name: "draw_levels", description: "Draw horizontal levels on the user's live chart (replaces your previous lines). Use short labels such as 'PDH', 'OR high', 'VWAP', 'entry', 'stop', 'target'. Optionally switch the chart to the timeframe you're describing.",
+      inputSchema: { type: "object", properties: { levels: { type: "array", maxItems: 6, items: { type: "object", properties: { price: { type: "number" }, label: { type: "string" }, kind: { type: "string", enum: ["support", "resistance", "entry", "stop", "target", "level"] } }, required: ["price", "label"] } }, timeframe: { type: "string", enum: TV_TFS } }, required: ["levels"] },
+      execute(i) { const col = { support: "#5eead4", resistance: "#fca5a5", entry: "#e2e8f0", stop: "#ef5350", target: "#26a69a", level: "#c4b5fd" }, arr = (Array.isArray(i.levels) ? i.levels : []).slice(0, 6).map(x => ({ p: +x.price, lab: String(x.label || "").slice(0, 18), col: col[x.kind] || col.level })).filter(x => isFinite(x.p) && x.p > 0);
+        let tfm = ""; const tf = i.timeframe && String(i.timeframe); if (tf && m.tv && TV_TFS.includes(tf)) { if (dkOnChart(m)) { if (tf !== HC.tf) hcSetTf(tf); } else { HS().tf = tf; save(); } tfm = ` and set the chart to ${TF_NAME[tf]} candles`; }
+        HC.lvl = { k: m.k, arr }; if (dkOnChart(m)) hcPaint(); return `Drew ${arr.length} line${arr.length === 1 ? "" : "s"}${tfm}.${dkOnChart(m) ? "" : " They'll see them when they open the chart."}`; } },
+    { name: "get_quotes", description: "Latest prices and today's % change from TradingView for up to 20 symbols at once, e.g. CME_MINI:ES1!, TVC:DXY, TVC:US10Y, CBOE:VIX, NASDAQ:NVDA. Good for checking what other markets are doing.",
+      inputSchema: { type: "object", properties: { symbols: { type: "array", items: { type: "string" }, maxItems: 20 } }, required: ["symbols"] },
+      async execute(i) { const syms = (Array.isArray(i.symbols) ? i.symbols : []).slice(0, 20).map(symOf); if (!syms.length) throw new Error("Give at least one symbol"); say("Checking other markets…");
+        const p = await tvCall("mcp-tv-get-symbol-data-batch", { symbols: syms, columns: ["close", "change", "high", "low", "update_mode"] }, 3e4), d = (p && p.data) || {}, out = {};
+        for (const s of syms) { const x = d[s]; out[s] = x ? { price: x.close, change_pct: x.change != null ? +(+x.change).toFixed(2) : null, day_high: x.high, day_low: x.low, delayed: /delayed/.test(x.update_mode || "") } : "not found"; } return out; } },
+    { name: "get_news", description: "The latest headlines from TradingView for a symbol (titles, source, age). Leave symbol empty for the open market.",
+      inputSchema: { type: "object", properties: { symbol: { type: "string" } } },
+      async execute(i) { const sym = symOf(i.symbol); say("Reading the headlines…"); const p = await tvCall("mcp-tv-get-news", { symbol: sym, limit: 12 }, 12e4); return (((p && p.data) || {}).headlines || []).slice(0, 12).map(h => `${fAgo((+h.published || 0) * 1000)} · ${h.provider && h.provider.name || ""}: ${String(h.title || "").slice(0, 180)}`); } },
+    { name: "get_calendar", description: "US economic events from TradingView for the next few days, with times in the user's local time, importance, forecast, previous and actual.",
+      inputSchema: { type: "object", properties: { days: { type: "integer", minimum: 1, maximum: 7 } } },
+      async execute(i) { say("Checking the calendar…"); const now = Date.now(), day = ms => new Date(ms).toISOString().slice(0, 10), p = await tvCall("mcp-tv-get-economic-calendar", { countries: "US", date_from: day(now - DAYMS), date_to: day(now + clamp(+i.days || 3, 1, 7) * DAYMS), min_importance: 0 }, 9e5);
+        return ((p && p.result) || []).slice(0, 40).map(e => `${new Date(e.date).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit" })} ${e.title}${+e.importance >= 1 ? " [HIGH]" : ""}${e.actual != null ? ` actual ${e.actual}` : ""}${e.forecast != null ? ` forecast ${e.forecast}` : ""}${e.previous != null ? ` previous ${e.previous}` : ""}`); } },
+    { name: "quick_backtest", description: "Backtest a rule family on this market's real TradingView candles in a second: first half in sample, second half out of sample, costs included, 1R = the stop. Families: orb (New York opening range breakout), breakout, pullback, meanrev (RSI bounce), cross (EMA cross), sweep (failed breakout).",
+      inputSchema: { type: "object", properties: { family: { type: "string", enum: ["orb", "breakout", "pullback", "meanrev", "cross", "sweep"] }, timeframe: { type: "string", enum: ["5m", "15m", "1h"] }, direction: { type: "string", enum: ["long", "short", "both"] }, params: { type: "object", description: "orb: or (15|30|60 minutes), cut (60|120|240), mid (0|1), tgt (0-3). breakout/sweep: n. pullback/cross: fast, slow. meanrev: n, x, slow. All but orb: stop (ATR multiple), tgt (R), hold (bars)." } }, required: ["family", "timeframe"] },
+      async execute(i) { const sym = tvSym(m); if (!sym) throw new Error("No TradingView candles for this market"); const tf = ["5m", "15m", "1h"].includes(i.timeframe) ? i.timeframe : "15m"; say(`Backtesting on ${tf} candles…`);
+        const V = blFix(Object.assign({ f: i.family, dir: i.direction || "both" }, i.params && typeof i.params === "object" ? i.params : {})); if (!V) throw new Error("Unknown rule family");
+        if (V.f === "orb" && tf === "1h") throw new Error("The opening range needs 5m or 15m candles");
+        const B = await dkBars(sym, tf, 5000, sig); B.pts = true; const S = mkSpec(m), tr = blEval(V, [B], m.k === "MNQ" ? 1.5 : 4 * (S.tick || 0.01)), a = blStats(tr), is = blStats(tr.filter(x => x.is)), os = blStats(tr.filter(x => !x.is)), st = x => `${x.n} trades, ${x.wr.toFixed(0)}% wins, profit factor ${x.pf.toFixed(2)}, total ${x.tot.toFixed(1)}R, max drawdown ${x.dd.toFixed(1)}% at 1% risk`;
+        return { rules: blRules(V), candles: `${B.n} ${tf} candles from ${dkT(B.t[0], "1D")} to ${dkT(B.t[B.n - 1], "1D")}`, all: st(a), in_sample: st(is), out_of_sample: st(os) }; } },
+    { name: "check_pine", description: "Compile Pine Script code on TradingView without saving it. Returns whether it is valid and the compiler errors with line numbers. Always check code before showing it.",
+      inputSchema: { type: "object", properties: { code: { type: "string" } }, required: ["code"] },
+      async execute(i) { say("Compiling the Pine code on TradingView…"); const p = await tvCall("mcp-tv-validate-pine-script", { code: String(i.code || "").slice(0, 60000) }, false); return { valid: !!(p && p.valid), errors: ((p && p.errors) || []).slice(0, 8).map(e => `line ${e.start && e.start.line}: ${e.message}`), warnings: ((p && p.warnings) || []).slice(0, 4).map(e => e.message) }; } },
+    { name: "pine_backtest", description: "Run a Pine Script strategy on TradingView over this market's chart history and return its performance (trades, win rate, profit factor, net profit, max drawdown, per contract after the costs in the code).",
+      inputSchema: { type: "object", properties: { code: { type: "string" }, timeframe: { type: "string", enum: ["1m", "5m", "15m", "30m", "1h", "4h", "1D"] }, symbol: { type: "string" } }, required: ["code", "timeframe"] },
+      async execute(i) { const sym = symOf(i.symbol); say("TradingView is backtesting the strategy…"); const p = await tvCall("mcp-tv-run-pine-backtest", { code: String(i.code || "").slice(0, 60000), symbol: sym, timeframe: tfOf(i.timeframe, "15m"), include_trades: 5 }, false);
+        if (p && p.errors && p.errors.length) return { compiled: false, errors: p.errors.slice(0, 8).map(e => `line ${e.start && e.start.line}: ${e.message}`) };
+        const r = (p && p.report) || {}, a = (r.performance || {}).all || {}, pct = x => x == null ? null : +(x * 100).toFixed(1);
+        return { symbol: sym, range: r.range && r.range.backtest, trades: a.total_trades, win_rate_pct: pct(a.percent_profitable), profit_factor: a.profit_factor != null ? +(+a.profit_factor).toFixed(2) : null, net_profit: a.net_profit, max_drawdown: a.max_drawdown, avg_trade: a.avg_trade, long_net: ((r.performance || {}).long || {}).net_profit, short_net: ((r.performance || {}).short || {}).net_profit }; } },
+    { name: "get_technicals", description: "TradingView's technical rating for a symbol and timeframe: the summary, moving-average and oscillator recommendations plus RSI, ADX, MACD and more.",
+      inputSchema: { type: "object", properties: { symbol: { type: "string" }, timeframe: { type: "string", enum: ["1m", "5m", "15m", "30m", "1h", "2h", "4h", "1D", "1W"] } }, required: ["timeframe"] },
+      async execute(i) { const sym = symOf(i.symbol); say("Checking TradingView's technicals…"); const p = await tvCall("mcp-tv-get-technicals-rating", { symbol: sym, interval: String(i.timeframe || "15m") }, 6e4); return JSON.stringify(p && (p.data || p)).slice(0, 4000); } },
+    { name: "set_alert", description: "Set a TradingView price alert that notifies the user's phone (through the TradingView app) when price reaches a level, with your instruction in the message: BUY, SELL, EXIT or WATCH. Only use it when the user asks for an alert or a notification. Their TradingView plan may allow only a few active alerts, so set one or two, not more.",
+      inputSchema: { type: "object", properties: { price: { type: "number" }, direction: { type: "string", enum: ["up", "down", "cross"], description: "up: fires when price rises to the level; down: when it falls to it" }, action: { type: "string", enum: ["BUY", "SELL", "EXIT", "WATCH"] }, note: { type: "string", description: "the plan in a few words, e.g. stop 27,380, target 27,500" } }, required: ["price", "action"] },
+      async execute(i) { if (!/alert|notif|ping|buzz|tell me when|let me know|remind|text me|message me/i.test(DK.lastQ)) throw new Error("Only set alerts when the user asks for one. Suggest it with an ALERT line instead.");
+        if (++DK.alN > 2) throw new Error("That's enough alerts for one answer: their plan may only allow a few."); say("Setting the TradingView alert…");
+        const r = await dkAlertMake(m, +i.price, i.direction, String(i.action || "WATCH").toUpperCase(), String(i.note || "").slice(0, 200)); return r.ok ? `Alert set: ${r.name}` : `Couldn't set it: ${r.msg}`; } },
+  ];
+}
+
+const CALL_RX = /^[ \t>*_]*CALL[*_ ]*:[*_ ]*(BUY|SELL|LONG|SHORT|NO TRADE|STAY OUT|WAIT)\b(.*)$/im;
+function dkParse(text) {
+  const k = CALL_RX.exec(String(text || "")); if (!k) return null;
+  const side = /BUY|LONG/i.test(k[1]) ? 1 : /SELL|SHORT/i.test(k[1]) ? -1 : 0, r = k[2], num = rx => { const x = rx.exec(r); return x ? +x[1].replace(/,/g, "") : null; }, n = "([0-9][0-9,]*\\.?[0-9]*)";
+  const hx = /HOLD\W+([0-9]+(?:\.[0-9]+)?)\s*(m|min|h|hr|hours?)?/i.exec(r);
+  return { side, now: /ENTRY\W+(NOW|MARKET)/i.test(r), entry: num(new RegExp("ENTRY\\W+" + n, "i")), stop: num(new RegExp("STOP\\W+" + n, "i")), tgt: num(new RegExp("TARGET\\W+" + n, "i")), conf: num(/CONF(?:IDENCE)?\W+([0-9]{1,3})/i), hold: hx ? Math.round(+hx[1] * (/^h/i.test(hx[2] || "") ? 60 : 1)) : null, wait: ((/WAIT FOR\s+(.+)$/i.exec(r) || [])[1] || "").replace(/[*_]+$/g, "").trim().slice(0, 160) };
+}
+const dkClean = t => String(t || "").replace(/^[ \t>*_]*(CALL|ALERT)[*_ ]*:.*$/gim, "").replace(/\n{3,}/g, "\n\n").trim();
+function dkLog(c, m, meta, src) {
+  const S = mkSpec(m), px = meta.px, rt = v => v == null ? null : Math.round(v / (S.tick || 0.01)) * (S.tick || 0.01), entry = c.side ? rt(c.now || c.entry == null ? px : c.entry) : null;
+  const C = { id: Date.now() + Math.floor(Math.random() * 1000), t: Date.now(), tq: meta.tq, k: m.k, tv: tvSym(m), name: m.name, side: c.side, entry, stop: rt(c.stop), tgt: rt(c.tgt), conf: c.conf != null ? clamp(c.conf, 1, 99) : null, hold: clamp(c.hold || (TS() === "scalp" ? 20 : 90), 2, 480), tf: meta.tf || HC.tf, px, atr: meta.atr, src, wait: c.wait, st: c.side ? "live" : "skip" };
+  C.ty = !c.side || c.now || px == null || !meta.atr || Math.abs(entry - px) <= 0.25 * meta.atr ? "mkt" : "lim";
+  if (c.side && !(C.entry && C.stop && C.tgt && (C.stop - C.entry) * c.side < 0 && (C.tgt - C.entry) * c.side > 0)) C.st = "bad";
+  const L = dkCalls(); L.unshift(C); if (L.length > 150) L.length = 150; save();
+  if (c.side && C.st !== "bad") { HC.lvl = { k: m.k, arr: [{ p: C.entry, lab: C.ty === "lim" ? "Quint entry" : "entry", col: "#e2e8f0" }, { p: C.stop, lab: "Quint stop", col: "#ef5350" }, { p: C.tgt, lab: "Quint target", col: "#26a69a" }].concat((HC.lvl && HC.lvl.k === m.k ? HC.lvl.arr : []).filter(x => !/entry|stop|target/i.test(x.lab)).slice(0, 3)) }; if (dkOnChart(m)) hcPaint(); }
+  return C;
+}
+const dkCallById = id => dkCalls().find(c => c.id === id) || null;
+function dkWarn(C, m) { // a quick sense check on every call, shown on the card
+  const w = [], sd = Math.abs(C.entry - C.stop), R = Math.abs(C.tgt - C.entry) / (sd || 1);
+  if (C.atr && sd < 0.5 * C.atr) w.push(`Tight stop: under half the ${C.tf} ATR, easy to get shaken out.`);
+  if (R < 1) w.push("The target is closer than the stop: reward under 1R.");
+  const ev = DK.cal && DK.cal.list ? DK.cal.list.find(e => e.imp >= 1 && e.t > C.t && e.t < C.t + Math.max(30, C.hold) * 6e4) : null; if (ev) w.push(`HIGH-importance ${ev.title} at ${new Date(ev.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}, inside this trade's window.`);
+  return w;
+}
+const DK_ST = { live: "… Live: being tracked", win: "✓ Target hit", loss: "✗ Stopped out", time: "⏱ Closed on time", nofill: "∅ Entry never reached", skip: "Stood aside", bad: "⚠ Levels don't line up", nodata: "No candles to grade it" };
+function dkSim(C, B) { // what happened after the call, on 1-minute candles (a candle that touches both levels counts as stopped out)
+  const t0 = Math.floor((C.tq || C.t) / 1000); let i = 0; while (i < B.n && B.t[i] < t0) i++; if (i >= B.n) return null;
+  const d = C.side, last = B.t[B.n - 1]; let j = i;
+  if (C.ty === "lim") { const win = t0 + Math.max(30, C.hold) * 60; let ok = false; for (; j < B.n && B.t[j] <= win; j++) if (B.l[j] <= C.entry && B.h[j] >= C.entry) { ok = true; break; } if (!ok) return last >= win ? { st: "nofill" } : null; }
+  const sd = Math.abs(C.entry - C.stop), end = B.t[j] + C.hold * 60;
+  for (let k = j; k < B.n; k++) {
+    const hs = d > 0 ? B.l[k] <= C.stop : B.h[k] >= C.stop, ht = d > 0 ? B.h[k] >= C.tgt : B.l[k] <= C.tgt;
+    if (hs) return { st: "loss", R: -1, xT: B.t[k] * 1000 }; if (ht) return { st: "win", R: Math.abs(C.tgt - C.entry) / sd, xT: B.t[k] * 1000 };
+    if (B.t[k] + 60 >= end) return { st: "time", R: (B.c[k] - C.entry) * d / sd, xT: B.t[k] * 1000 };
+  }
+  return null;
+}
+async function dkGrade(force) {
+  if (DK.grading || !MK.mcp || MK.st !== "ready" || (!force && Date.now() - DK.gradeAt < 18e4)) return; const now = Date.now(), live = dkCalls().filter(c => c.st === "live" && c.tv && now - c.t > 12e4); if (!live.length) return;
+  DK.grading = true; DK.gradeAt = now; let changed = false;
+  try { const by = {}; for (const c of live) (by[c.tv] || (by[c.tv] = [])).push(c);
+    for (const sym of Object.keys(by).slice(0, 3)) { const cs = by[sym], from = new Date(Math.min(...cs.map(c => c.tq || c.t)) - 36e5).toISOString().slice(0, 10);
+      let B; try { const r = await MK.mcp.callTool(TV_SERVER, "mcp-tv-get-ohlcv", { symbol: sym, interval: "1m", count: 5000, date_from: from, format: "columns" }, { cache: false }), b = tvBars(r && r.payload); if (!b || !b.t || !b.t.length) continue; B = { t: b.t.map(Number), o: b.o.map(Number), h: b.h.map(Number), l: b.l.map(Number), c: b.c.map(Number) }; B.n = B.t.length; } catch (e) { continue; }
+      for (const c of cs) { const r = dkSim(c, B); if (r) { Object.assign(c, r); changed = true; } else if (now - c.t > 4 * DAYMS) { c.st = "nodata"; changed = true; } } } }
+  finally { DK.grading = false; if (changed) { save(); dkPaint(true); } }
+}
+function dkRec() {
+  const g = dkCalls().filter(c => ["win", "loss", "time"].includes(c.st)), w = g.filter(c => c.R > 0).length, R = g.reduce((a, c) => a + (c.R || 0), 0), cs = g.filter(c => c.conf != null);
+  return { n: g.length, w, l: g.filter(c => c.st === "loss").length, tm: g.filter(c => c.st === "time").length, R, wr: g.length ? Math.round(w / g.length * 100) : 0, conf: cs.length ? Math.round(cs.reduce((a, c) => a + c.conf, 0) / cs.length) : 0, live: dkCalls().filter(c => c.st === "live").length, skip: dkCalls().filter(c => c.st === "skip").length };
+}
+function dkChips(m) {
+  const P = lvPosFor(m.k), k = m.k.replace(/^s:/, ""), c = [["call", "📈 Buy or sell now?"], ["ny", "🗽 New York open plan"], ["lv", "🎯 Key levels"]].concat(P ? [["mg", "🛡 Manage my trade"]] : []).concat([["why", "📰 What's moving it?"], ["bt", "🧪 Backtest an idea"], ["mtf", "🔭 Bigger picture"]]);
+  return c.map(([id, l]) => `<button class="chip" type="button" data-qq="${id}">${l}</button>`).join("");
+}
+const DK_Q = { call: k => `What's your call on ${k} right now? Buy, sell or no trade, with exact levels.`, ny: k => `Give me your plan for the New York open on ${k} today: the levels that matter, the setup you'd take and your call.`, lv: k => `Mark the key levels on my ${k} chart and tell me how price is likely to react at each one.`, mg: k => `I'm in this ${k} trade. Hold, tighten the stop, take profit or get out? Give me exact prices.`, why: k => `What's driving ${k} today? Check the headlines and the calendar, then tell me what it means for my trading.`, mtf: k => `Walk me down the timeframes on ${k}, daily to 5-minute: which way is it really heading and where would that view be wrong?` };
+function dkAlertLines(t) {
+  const out = [], m = dkM(), Q = m && MK.q[m.k], px = Q && Q.p;
+  String(t || "").replace(/```[\s\S]*?```/g, "").replace(/^[ \t>*_-]*ALERT[*_ ]*:[*_ ]*(.+)$/gim, (_, r) => {
+    r = r.replace(/[*_`]/g, "").trim(); const nums = [];
+    r.replace(/(^|[^A-Za-z0-9.])(\d[\d,]*(?:\.\d+)?)/g, (x, a, n) => { nums.push(+n.replace(/,/g, "")); return x; });
+    const p = nums.find(v => v > 0 && (!px || Math.abs(v / px - 1) < 0.2)); if (p == null || out.length >= 3) return "";
+    const w = /^(BUY|LONG|SELL|SHORT|EXIT|CLOSE|WATCH)\b/i.exec(r), a0 = w ? w[1].toUpperCase() : /\b(BUY|LONG)\b/i.test(r) ? "BUY" : /\b(SELL|SHORT)\b/i.test(r) ? "SELL" : "WATCH";
+    const act = a0 === "LONG" ? "BUY" : a0 === "SHORT" ? "SELL" : a0 === "CLOSE" ? "EXIT" : a0;
+    const dir = /\b(down|below|falls?|falling|drops?|under)\b/i.test(r) ? "down" : /\b(up|above|rises?|rising|breaks?|over)\b/i.test(r) ? "up" : "cross";
+    const sp = r.search(/\s[·—–|]\s|\s-\s|;/), note = sp >= 0 ? r.slice(sp).replace(/^\s*[·—–|;-]\s*/, "").trim().slice(0, 160) : "";
+    if (!out.some(o => o.p === p)) out.push({ p, act, dir, note }); return "";
+  });
+  return out;
+}
+const dkAls = () => Array.isArray(ST.qal) ? ST.qal : (ST.qal = []);
+const dkIso = ms => new Date(ms).toISOString().replace(/\.\d{3}Z$/, "Z");
+function dkAlertErr(e) {
+  const s = String((e && (e.message || e.text || e.error)) || "");
+  if (e && e.code === "not_ready") return "TradingView isn't connected in this view. Reload the app and try again.";
+  if (e && PAGE_CODES.has(e.code)) return "This needs your TradingView connector. Reconnect it in claude.ai → Settings → Connectors, then reload.";
+  if (/limit|maximum|too many|quota|exceed/i.test(s)) return "Your TradingView plan's alert limit is full. Tap 🔔 Alerts and delete an old one, then try again.";
+  if (/auth|log ?in|sign ?in|session|unauthori[sz]ed|forbidden|\b40[13]\b/i.test(s)) return "TradingView wants you to sign in again. Reconnect the TradingView connector, then try again.";
+  if (e && e.code === "rate_limited") return "TradingView is busy. Try again in a minute.";
+  return s ? `TradingView said: ${s.slice(0, 180)}` : "TradingView didn't answer. Try again in a moment.";
+}
+async function dkAlertMake(m, p, dir, act, note, o = {}) {
+  const sym = tvSym(m); if (!sym || !m.tv) return { ok: false, msg: "Phone alerts work on TradingView futures only." };
+  if (!(p > 0)) return { ok: false, msg: "That level isn't a price." };
+  const S = mkSpec(m), Q = MK.q[m.k], px = Q && Q.p, f = x => fnum(S, x), tk = m.k.replace(/^s:/, "");
+  const d = px ? (p > px ? "up" : p < px ? "down" : "cross") : dir === "up" || dir === "down" ? dir : "cross";
+  const near = px && Math.abs(p - px) <= (S.tick || 0.25) * 2;
+  const verb = d === "up" ? "rose to" : d === "down" ? "fell to" : "reached", A = act === "BUY" ? "▲ BUY" : act === "SELL" ? "▼ SELL" : act === "EXIT" ? "■ EXIT" : "● WATCH";
+  const what = act === "BUY" ? `BUY ${tk}` : act === "SELL" ? `SELL ${tk}` : act === "EXIT" ? `EXIT your ${tk} trade` : `${tk} is at Quint's level`;
+  const name = `Quint ${A} ${tk} ${f(p)}${o.lab ? ` (${o.lab})` : ""}`.slice(0, 120);
+  let nt = String(note || "").replace(/\s+/g, " ").trim().slice(0, 200); if (nt) { nt = nt[0].toUpperCase() + nt.slice(1); if (!/[.!?]$/.test(nt)) nt += "."; }
+  const msg = `${what}: price ${verb} ${f(p)}.${nt ? " " + nt : ""} Check the live chart before you act. (Quint)`;
+  const exp = Date.now() + clamp(o.min || (TS() === "scalp" ? 240 : 480), 20, 7 * 1440) * 6e4;
+  try {
+    const r = await tvCall("mcp-tv-create-alert", { symbol: sym, price: p, condition: d === "up" ? "cross_up" : d === "down" ? "cross_down" : "cross", name, message: msg, mobile_push: true, popup: true, auto_deactivate: true, resolution: "1", expiration: dkIso(exp) }, false);
+    const id = r && (r.alert_id || r.id || (r.alert && r.alert.alert_id)); if (!id) return { ok: false, msg: "TradingView didn't confirm the alert. Tap 🔔 Alerts to check whether it's there." };
+    const L = dkAls(); L.unshift({ id, k: m.k, sym, p, d, act, name, t: Date.now(), exp, cid: o.cid || null, kind: o.kind || null }); if (L.length > 40) L.length = 40; save(); DK.al = null;
+    return { ok: true, id, name, near, d, exp };
+  } catch (e) { return { ok: false, msg: dkAlertErr(e) }; }
+}
+const dkAlFor = (cid, kind) => dkAls().find(a => a.cid === cid && a.kind === kind && a.exp > Date.now() && !a.gone);
+function dkAlertWait(C, m) { const Q = MK.q[m.k], px = (Q && Q.p) || C.px, n = []; String(C.wait || "").replace(/(^|[^A-Za-z0-9.])(\d[\d,]*(?:\.\d+)?)/g, (x, a, v) => { n.push(+v.replace(/,/g, "")); return x; }); const p = n.find(v => px && Math.abs(v / px - 1) < 0.2); return p == null ? null : p; }
+async function dkSend(text, opt = {}) {
+  const m = dkM(); text = String(text || "").trim(); if (!m || !text || DK.busy) return; DK.lastQ = text; DK.alN = 0;
+  if (!CO.sample) { hmToast("Quint needs Claude: open this app inside Claude to talk to him."); return; }
+  DK.view = "chat"; const L = dkMsgs(m.k); L.push({ r: "u", t: text.slice(0, 2000), at: Date.now(), img: !!opt.img }); const A = { r: "a", t: "", at: Date.now(), busy: true }; L.push(A);
+  DK.busy = true; DK.prog = "Reading the charts…"; dkPaint(true); const ctl = DK.ctl = new AbortController();
+  try {
+    if (DK.lim === undefined) DK.lim = await CO.sample.limits().catch(() => null);
+    const br = await dkBrief(m, ctl.signal); if (ctl.signal.aborted) throw { code: "cancelled" };
+    const canImg = !!(DK.lim && DK.lim.images), img = opt.img && canImg ? opt.img : canImg && !opt.img ? await dkShot() : null;
+    const turns = [{ role: "user", content: dkRules(m) }];
+    for (const x of L.slice(-14, -2)) if (x.t && !x.busy) turns.push({ role: x.r === "u" ? "user" : "assistant", content: x.r === "a" ? x.t.slice(0, 3500) : x.t });
+    turns.push({ role: "user", content: `${br.text}\n\n${img ? (opt.img ? "IMAGE: a screenshot the user took of their own chart (it may be NinjaTrader or TradingView, and newer than the brief): read its price scale, lines and any position.\n" : "IMAGE: the Chart Wizard chart exactly as the user sees it now.\n") : ""}QUESTION: ${text}` });
+    DK.prog = "Thinking it through…"; dkPaintLast();
+    const run = tools => CO.sample(turns, Object.assign({ onText: ({ text: t }) => { A.t = t; DK.prog = ""; dkPaintLast(); }, signal: ctl.signal, cache: false }, qaModel(text, !!img), img ? { images: [img] } : {}, tools ? { tools } : {}));
+    const tools = DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
+    let r; try { r = await run(tools); } catch (e) { if (e && e.code === "tools_unavailable" && tools) { DK.noTools = true; A.t = ""; r = await run(null); } else throw e; }
+    if (r && r.text) A.t = r.text; if (!A.t) throw { code: "empty_completion" };
+    const c = dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
+  } catch (e) { const c = e && e.code; if (e && e.text) A.t = e.text; A.err = c === "cancelled" ? (A.t ? null : "Stopped.") : c === "not_ready" ? "Live data isn't connected, so Quint can't read the charts. Reload to reconnect." : c === "image_rejected" ? "Claude couldn't take that image. Try a smaller or clearer screenshot." : NW_ERR[c] || "Something went wrong reaching Quint. Try again in a moment."; }
+  finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); }
+}
+
+/* ================= QUINT: the standalone app. State, markets, connectors, voice ================= */
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const MKSPEC = {}, MKDEF = {};
+for (const r of FUTS) { MKSPEC[r.k] = r.S; MKDEF[r.k] = { k: r.k, tv: r.tv, cls: "fut", grp: r.grp, name: r.name, sub: `${r.tv.split(":")[1]} · TradingView`, logo: r.logo, trade: true, what: r.what }; }
+const FUT_KEYS = FUTS.map(r => r.k);
+const FUT_G = [["idx", "Indices"], ["nrg", "Energy"], ["met", "Metals"], ["rate", "Rates"], ["fx", "FX"], ["cry", "Crypto"]];
+const mkSpec = m => MKSPEC[m.k] || { sym: m.k, dec: 2, money: false, tick: 0.01 };
+const TV_MNQ = "CME_MINI:MNQ1!", TV_QCOLS = ["close", "change", "change_abs", "high", "low", "open", "volume", "update_mode"];
+const KEY = "quint-app-v1";
+const ST = (() => { try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && typeof s === "object") return s; } catch (e) {} return {}; })();
+ST.set = Object.assign({ k: "MNQ", tf: "5m", style: "day", acct: 50000, pct: 1, name: "Prop account", voice: "", tvoice: "buttery", rate: 1, auto: false }, ST.set || {});
+if (!MKDEF[ST.set.k]) ST.set.k = "MNQ";
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ST)); } catch (e) {} };
+const HS = () => ST.set;
+const TS = () => ["scalp", "day", "both"].includes(ST.set.style) ? ST.set.style : "day";
+const MK = { mcp: null, st: "wait", why: null, q: {}, screen: "quint", sel: ST.set.k, x: null, tvLive: !!ST.tvLive };
+const HC = { tf: ["1m", "5m", "15m", "1h"].includes(ST.set.tf) ? ST.set.tf : "5m", lvl: null };
+const DK = { k: ST.set.k, busy: false, ctl: null, prog: "", view: "console", lim: undefined, bars: {}, cal: null, gradeAt: 0, grading: false, img: null, noTools: false, conf: {}, al: null, alBusy: false, alConf: {}, lastQ: "", alN: 0, lv: null, lights: [0, 0, 0, 0, 0], scan: 0, think: 0 };
+const CO = { sample: null }, QT = { tts: null, mv: null, speaking: false, level: 0 };
+const dkM = () => MKDEF[DK.k] || MKDEF.MNQ;
+const dkOnChart = m => !!m && m.k === DK.k;
+const dkTf = () => HC.tf;
+const mkQ = k => MK.q[k] || null;
+const liveBars = () => null;
+const lvOpenList = () => [];
+const lvPosFor = k => { const P = (ST.pos || {})[k]; return P && P.open ? P : null; };
+const lvSize = (P, S) => `${P.qty} ${S.micro || S.sym}`;
+const lvUPL = P => { const Q = MK.q[P.k], S = MKSPEC[P.k] || {}; return Q ? (Q.p - P.e) * P.dir * P.qty * (S.mpv || S.pv || 1) - 1.5 * P.qty : 0; };
+const qaAcct = () => { const s = ST.set, size = Math.max(1000, +s.acct || 50000), pct = clamp(+s.pct || 1, 0.1, 5); return { name: String(s.name || "Prop account").slice(0, 40), size, pct, risk: Math.round(size * pct / 100) }; };
+const myLine = () => `The user's main market is MNQ (Micro E-mini Nasdaq-100 futures: $2 a point, one 0.25 tick = $0.50), on a funded-style prop account. They live in the UK, so give times in UK time as well as New York time. ${styleLine()}`;
+// how many contracts a stop of sd points allows at the user's risk (micro where there is one, about $1.50 a contract in fees)
+function qaSize(m, sd) { const S = mkSpec(m), A = qaAcct(), pv = S.mpv || S.pv; if (!(sd > 0) || !pv) return null; const per = sd * pv + 1.5, qty = Math.floor(A.risk / per); return { qty, risk: qty * per, sym: S.micro || S.sym, A }; }
+function qaEasy(t) { // a short "what is…" question with nothing about a trade in it
+  t = String(t || "").trim(); if (t.length > 90 || /\n/.test(t)) return false;
+  return /^(what('s| is| are| does)|define|meaning of|explain what|what do you mean by)\b/i.test(t) && !/\b(this|that|here|my|chart|candle|trade|buy|sell|long|short|should|now|today|level|stop|target|entry|why|how)\b/i.test(t);
+}
+// the user asked for Fable on trade decisions and analysis and Opus for simple questions, to save their usage
+const qaModel = (text, img) => qaEasy(text) && !img ? { model: "claude-opus-5-5", modelTier: "default", effort: "low" } : { model: "claude-fable-5-2", modelTier: "complex", effort: "high" };
+// the five lights of the core: daily, hourly, 15-minute, 5-minute, calendar
+const QA_TF = { "1D": 0, "1h": 1, "15m": 2, "5m": 3, news: 4 };
+function qaLight(sym, tf, state) { const i = QA_TF[tf]; if (i == null) return; if (sym && sym !== dkM().tv) return; DK.lights[i] = state; if (typeof coreKick === "function") coreKick(); }
+let toastT = 0;
+function hmToast(msg) { const t = $("#toast"); if (!t) return; t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 3400); }
+
+/* ---------- connectors: TradingView through Claude, and Claude itself ---------- */
+function qaInit() {
+  const c = window.claude;
+  if (!c || typeof c.use !== "function") { MK.st = "none"; paintAll(); return; }
+  Promise.resolve(c.use("mcp")).then(ns => { if (!ns) { MK.st = "none"; paintAll(); return; } MK.mcp = ns; qaConnect(); }).catch(() => { MK.st = "none"; paintAll(); });
+  Promise.resolve(c.use("sample")).then(s => { CO.sample = s || null; paintAll(); }).catch(() => {});
+  Promise.resolve(c.use("tts")).then(t => { QT.tts = t || null; if (QT.tts) { try { QT.tts.onState(e => { QT.speaking = e.state !== "idle"; if (!QT.speaking) qaSpoke(); coreKick(); }); QT.tts.onPosition(() => { QT.level = 1; coreKick(); }); } catch (e) {} } }).catch(() => {});
+}
+async function qaQuote(m) {
+  const r = await MK.mcp.callTool(TV_SERVER, "mcp-tv-get-symbol-data", { symbol: m.tv, columns: TV_QCOLS }, { cache: false }), p = r && r.payload, em = tvErrOf(p);
+  if (em) throw { code: "tool_error", message: em }; const x = parseQtv(p, m); if (!x) throw { code: "tool_error", message: "no price" };
+  const o = MK.q[m.k]; x.at = Date.now(); MK.q[m.k] = x; if (o && o.p !== x.p) QA.flash = x.p > o.p ? 1 : -1;
+  if (x.mode) { const lv = !x.delay && /stream/i.test(x.mode); if (lv !== MK.tvLive) { MK.tvLive = ST.tvLive = lv; save(); qaPace(); } } return x;
+}
+async function qaConnect() {
+  MK.st = "wait"; paintAll(); const m = dkM();
+  try { await qaQuote(m); MK.st = "ready"; MK.why = null; } // the first call is where Claude asks the user to allow TradingView here
+  catch (e) { if (e && PAGE_CODES.has(e.code)) { MK.st = "err"; MK.why = e.code; paintAll(); return; } MK.st = "ready"; }
+  paintAll(); qaScan(true); qaCross(); dkGrade(false); qaPace();
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) qaTick(); });
+}
+// a real-time feed refreshes the price every 5 seconds and the candles every 30; a delayed one every 30 seconds
+let tickN = 0, tickT = 0, tickBusy = false;
+function qaPace() { clearInterval(tickT); tickT = setInterval(qaTick, MK.tvLive ? 5000 : 30000); }
+async function qaTick() {
+  if (document.hidden || MK.st !== "ready" || tickBusy) return; tickBusy = true; tickN++; const m = dkM(), open = mktStatus("fut").open, every = n => tickN % (MK.tvLive ? n * 6 : n) === 0;
+  try { if (open || every(6)) { try { await qaQuote(m); } catch (e) {} paintDeck(); paintHead(); }
+    if (open && every(1)) qaScan(false); if (every(4)) qaCross(); if (every(1)) dkGrade(false); } finally { tickBusy = false; }
+}
+// the instruments work from the same candles Quint's brief uses, so asking him costs no extra TradingView calls
+async function qaScan(full) {
+  const m = dkM(), sym = m.tv, S = mkSpec(m), id = ++DK.scan; if (MK.st !== "ready") return;
+  if (full) DK.lights = [0, 0, 0, 0, 0];
+  const get = (tf, n) => dkBars(sym, tf, n).catch(() => null);
+  const [BD, B1, B15, B5] = await Promise.all([get("1D", 160), get("1h", 240), get("15m", 320), get("5m", 300)]);
+  if (id !== DK.scan || dkM() !== m) return;
+  QA.B = { "1D": BD, "1h": B1, "15m": B15, "5m": B5 }; DK.lv = null; if (B15) dkSess(B15, B5, S);
+  if (HC.tf === "1m") QA.B["1m"] = await get("1m", 120);
+  if (!MK.q[m.k] && B5) MK.q[m.k] = { p: B5.c[B5.n - 1], ts: B5.t[B5.n - 1] * 1000 + 3e5, at: Date.now() };
+  dkEvents().then(() => { if (id === DK.scan) paintSide(); });
+  paintAll();
+}
+async function qaCross() { // what the markets around Nasdaq are doing
+  try { const syms = ["CME_MINI:ES1!", "CBOT_MINI:YM1!", "CME_MINI:RTY1!", "CBOT:ZN1!", "TVC:DXY", "CBOE:VIX"], p = await tvCall("mcp-tv-get-symbol-data-batch", { symbols: syms, columns: ["close", "change"] }, 9e4), d = p && p.data;
+    if (d) { MK.x = { at: Date.now(), rows: syms.map(s => ({ s, p: d[s] && +d[s].close, ch: d[s] && +d[s].change })) }; if (QA.view === "matrix") paintSide(); } } catch (e) {}
+}
+
+/* ---------- voice: Claude's voice where Claude allows it, otherwise the best voice the phone gives web pages ---------- */
+// iPhones list some voices that sound robotic (the "Eloquence" set and the novelty voices); Quint never picks those for you
+const VOICE_BAD = /^(eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley|albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|junior|kathy|ralph|fred)\b/i;
+const VOICE_GOOD = /daniel|serena|kate|arthur|martha|oliver|stephanie|jamie|samantha|ava|zoe|allison|susan|tom|evan|nathan|joelle|noelle|karen|lee|moira|tessa|rishi|google uk english|google us english|microsoft .*(natural|online)/i;
+function voiceScore(v) {
+  if (!v || !/^en/i.test(v.lang || "")) return -1e3; const n = `${v.name} ${v.voiceURI || ""}`;
+  if (VOICE_BAD.test(v.name)) return -500;
+  return (/en[-_]GB/i.test(v.lang) ? 30 : /en[-_](US|AU|IE)/i.test(v.lang) ? 20 : 10) + (/premium/i.test(n) ? 60 : /enhanced|natural|neural/i.test(n) ? 45 : 0) + (VOICE_GOOD.test(v.name) ? 20 : 0) + (/compact/i.test(n) ? -5 : 0) + (v.localService ? 2 : 0);
+}
+function voiceList() { try { return (window.speechSynthesis && speechSynthesis.getVoices()) || []; } catch (e) { return []; } }
+function voicePick() { const vs = voiceList(), want = ST.set.voice && vs.find(v => v.voiceURI === ST.set.voice || v.name === ST.set.voice); if (want) return want; const best = vs.filter(v => voiceScore(v) > 0).sort((a, b) => voiceScore(b) - voiceScore(a))[0]; return best || null; }
+if (window.speechSynthesis) { try { speechSynthesis.onvoiceschanged = () => { if ($("#vlist")) paintVoices(); }; speechSynthesis.getVoices(); } catch (e) {} }
+function qaSpoke() { QT.speaking = false; QT.level = 0; $$(".say").forEach(b => { b.textContent = "Listen"; b.setAttribute("aria-pressed", "false"); }); coreKick(); }
+function qaSpeak(text, btn) {
+  if (QT.speaking) { try { if (QT.tts) QT.tts.stop().catch(() => {}); else speechSynthesis.cancel(); } catch (e) {} qaSpoke(); return; }
+  const plain = mdPlain(text); if (!plain) return; const parts = []; let cur = "";
+  for (const para of plain.split("\n")) { if ((cur + "\n" + para).length > 1700) { if (cur) parts.push(cur); cur = para.slice(0, 1700); } else cur = cur ? cur + "\n" + para : para; } if (cur) parts.push(cur);
+  QT.speaking = true; if (btn) { btn.textContent = "Stop"; btn.setAttribute("aria-pressed", "true"); } coreKick();
+  if (QT.tts) { QT.tts.speak(parts.slice(0, 6).map(t => ({ text: t, voice: ST.set.tvoice || "buttery", rate: ST.set.rate || 1, language: "en" }))).catch(e => { if (e && e.code === "not_granted") hmToast("Reading aloud is turned off for Quint. Turn it back on in this page's Permissions menu."); }).then(qaSpoke); return; }
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { qaSpoke(); hmToast("This device can't read aloud here."); return; }
+  try { speechSynthesis.cancel(); const v = voicePick();
+    parts.forEach((t, i) => { const u = new SpeechSynthesisUtterance(t); if (v) u.voice = v; u.lang = v ? v.lang : "en-GB"; u.rate = clamp(+ST.set.rate || 1, 0.7, 1.5); u.pitch = 1;
+      u.onboundary = () => { QT.level = 1; coreKick(); }; if (i === parts.length - 1) { u.onend = qaSpoke; u.onerror = qaSpoke; } speechSynthesis.speak(u); }); } catch (e) { qaSpoke(); }
+}
+
+/* ================= QUINT: the interface ================= */
+const QA = { view: matchMedia("(min-width: 900px)").matches ? "matrix" : "console", B: {}, flash: 0 };
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const tk = m => m.k.replace(/^s:/, "");
+const tfLab = { "1m": "1M", "5m": "5M", "15m": "15M", "1h": "1H", "1D": "1D" };
+const ukT = ms => new Date(ms).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+const nyT = ms => { const e = etNow(ms); return `${String(Math.floor(e.min / 60)).padStart(2, "0")}:${String(e.min % 60).padStart(2, "0")}`; };
+const dkShot = async () => null; // the brief carries the numbers; no picture is sent, which keeps each question cheaper
+function hcPaint() { drawTape(); drawScope(); paintVerdict(); }
+function hcSetTf(tf) { if (!["1m", "5m", "15m", "1h"].includes(tf)) return false; HC.tf = tf; ST.set.tf = tf; save(); const m = dkM(); const n = tf === "1m" ? 120 : tf === "5m" ? 300 : tf === "15m" ? 320 : 240; dkBars(m.tv, tf, n).then(B => { QA.B[tf] = B; drawScope(); }).catch(() => {}); if (QA.view === "matrix") paintSide(); return true; }
+
+function paintAll() { paintHead(); paintDeck(); paintSide(); dkPaint(true); paintChips(); }
+function paintHead() {
+  const st = $("#stat"), f = mktStatus("fut"), Q = MK.q[DK.k]; if (!st) return;
+  const [cls, txt] = MK.st === "none" ? ["off", "Open in Claude"] : MK.st === "err" ? ["off", "TradingView needed"] : MK.st === "wait" ? ["wait", "Connecting"] : f.open ? (MK.tvLive ? ["on", "Live · CME"] : ["wait", Q && Q.delay ? `Delayed ${Math.round(Q.delay / 60)}m` : "Globex open"]) : ["wait", f.label];
+  st.className = "stat " + cls; st.lastChild.textContent = txt;
+  const r = dkRec(), n = dkAls().filter(a => !a.gone && a.exp > Date.now()).length;
+  $('.seg [data-v="record"]').innerHTML = `Record${r.n ? `<span class="n">${r.w}–${r.n - r.w}</span>` : ""}`;
+  $('.seg [data-v="alerts"]').innerHTML = `Alerts${n ? `<span class="n">${n}</span>` : ""}`;
+}
+function fillMarkets() {
+  const sel = $("#mk"); sel.innerHTML = FUT_G.map(([g, l]) => `<optgroup label="${esc(l)}">${FUT_KEYS.filter(k => MKDEF[k].grp === g).map(k => `<option value="${k}" ${k === DK.k ? "selected" : ""}>${esc(k)} · ${esc(MKDEF[k].name)}</option>`).join("")}</optgroup>`).join("");
+  sel.onchange = () => { DK.k = MK.sel = ST.set.k = sel.value; save(); DK.img = null; DK.lv = null; QA.B = {}; DK.lights = [0, 0, 0, 0, 0]; const m = dkM(); $("#q").placeholder = `Ask Quint: buy or sell ${tk(m)}?`; paintAll(); if (MK.st === "ready") { qaQuote(m).then(() => { paintDeck(); paintHead(); }).catch(() => {}); qaScan(true); } };
+}
+
+/* ---------- the verdict in the core ---------- */
+function liveCall() { const now = Date.now(); return dkCalls().find(c => c.k === DK.k && (c.st === "live" || c.st === "skip") && now - c.t < (Math.max(30, c.hold || 30) + (c.side ? c.hold || 30 : 0)) * 6e4) || null; }
+function paintVerdict() {
+  const v = $("#vd"), m = dkM(), C = liveCall(), Q = MK.q[m.k]; if (!v) return; let cls = "", big, sub;
+  if (DK.busy) { big = "Thinking"; sub = DK.prog || "Reading the charts"; }
+  else if (C && C.side) { cls = C.side > 0 ? "buy" : "sell"; big = C.side > 0 ? "Buy" : "Sell"; sub = `${C.conf != null ? Math.min(85, C.conf) + "% · " : ""}${C.ty === "lim" ? "limit " + fnum(mkSpec(m), C.entry) : fAgo(C.t)}`; }
+  else if (C) { big = "Stand by"; sub = C.wait ? `Wait for ${C.wait}`.slice(0, 60) : "No trade right now"; }
+  else if (MK.st === "none") { big = "Offline"; sub = "Open Quint inside Claude"; }
+  else if (MK.st === "err") { big = "No feed"; sub = "Connect TradingView in Claude"; }
+  else if (MK.st === "wait") { big = "Booting"; sub = "Connecting to TradingView"; }
+  else { big = "Ready"; sub = "Ask for a call"; }
+  v.className = "verdict " + cls; v.innerHTML = `<b>${esc(big)}</b><small>${esc(sub)}</small>`;
+  const dm = $("#dminv"); if (dm) { dm.textContent = big.toUpperCase(); dm.style.color = cls === "buy" ? "var(--buy)" : cls === "sell" ? "var(--sell)" : "var(--amber)"; }
+  const dp = $("#dminp"); if (dp) dp.textContent = Q ? `${tk(m)} ${fnum(mkSpec(m), Q.p)}` : tk(m);
+  coreKick();
+}
+function paintDeck() {
+  drawTape(); drawSess(); paintVerdict(); const m = dkM(), Q = MK.q[m.k];
+  $("#dkl").textContent = Q && Q.ts ? `${tk(m)} · ${ukT(Q.ts)} UK` : tk(m);
+  $("#dkr").textContent = `NY ${nyT(Date.now())}`;
+}
+
+/* ---------- canvas helpers ---------- */
+function fitCanvas(cv) { const r = cv.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1), w = Math.max(10, Math.round(r.width)), h = Math.max(10, Math.round(r.height)); if (cv.width !== w * d || cv.height !== h * d) { cv.width = w * d; cv.height = h * d; } const x = cv.getContext("2d"); x.setTransform(d, 0, 0, d, 0, 0); return { x, w, h }; }
+const niceStep = raw => { const p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2.5 : f < 7.5 ? 5 : 10) * p; };
+const CSSV = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const COL = {}; function cols() { if (!COL.amber) for (const k of ["amber", "amber2", "buy", "sell", "warn", "ink", "dim", "faint", "line", "line2", "glass", "glass2"]) COL[k] = CSSV("--" + k); return COL; }
+
+/* the key levels of today's session, for the tape and the matrix */
+function sessLevels(m) {
+  const L = DK.lv, out = []; if (L) {
+    const add = (k, p, kind, t) => { if (p != null && isFinite(p)) out.push({ k, p, kind, t }); };
+    add("PDH", L.pvh, "r", "Previous New York high"); add("PDL", L.pvl, "s", "Previous New York low"); add("ONH", L.oh, "r", "Overnight high"); add("ONL", L.ol, "s", "Overnight low");
+    add("ORH", L.orh, "r", "Opening range high (9:30-9:45 NY)"); add("ORL", L.orl, "s", "Opening range low"); add("VWAP", L.vw, "v", "Session VWAP"); add("NYO", L.ro, "n", "New York open");
+  }
+  if (HC.lvl && HC.lvl.k === m.k) for (const x of HC.lvl.arr) out.push({ k: x.lab.replace(/^Quint /i, "").slice(0, 10).toUpperCase(), p: x.p, kind: /stop/i.test(x.lab) ? "qs" : /target/i.test(x.lab) ? "qt" : /entry/i.test(x.lab) ? "qe" : "q", t: x.lab, q: 1 });
+  return out;
+}
+function atrOf(tf) { const B = QA.B[tf]; if (!B || B.n < 20) return null; const A = qtATR(B); return A[B.n - 1]; }
+
+/* ---------- the price tape: price in the middle, levels above and below, like an altimeter ---------- */
+function drawTape() {
+  const cv = $("#tape"); if (!cv || !cv.offsetParent) return; const { x, w, h } = fitCanvas(cv), C = cols(), m = dkM(), S = mkSpec(m), Q = MK.q[m.k], B5 = QA.B["5m"];
+  x.clearRect(0, 0, w, h); const px = Q ? Q.p : B5 ? B5.c[B5.n - 1] : null;
+  x.font = "600 10px 'Chakra Petch', sans-serif"; x.textBaseline = "middle";
+  if (px == null) { x.fillStyle = C.faint; x.textAlign = "center"; x.fillText(MK.st === "ready" ? "AWAITING PRICE" : "NO FEED", w / 2, h / 2); return; }
+  const lv = sessLevels(m), a15 = atrOf("15m") || px * 0.0015, aD = atrOf("1D") || a15 * 8, ds = lv.map(l => Math.abs(l.p - px)).sort((a, b) => a - b);
+  const half = Math.max(S.tick * 12, Math.min(aD * 1.3, Math.max(a15 * 3, (ds[3] != null ? ds[3] : ds[ds.length - 1] || 0) * 1.12))), mid = h / 2, k = (mid - 14) / half, Y = p => mid - (p - px) * k;
+  // the scale
+  const step = niceStep(half / 3.2), sub = step / 5, top = px + half, bot = px - half;
+  x.strokeStyle = C.line2; x.lineWidth = 1; x.beginPath(); x.moveTo(50.5, 6); x.lineTo(50.5, h - 6); x.stroke();
+  for (let v = Math.ceil(bot / sub) * sub; v <= top; v += sub) { const y = Math.round(Y(v)) + 0.5, maj = Math.abs(v / step - Math.round(v / step)) < 1e-6; x.strokeStyle = maj ? C.dim : C.line2; x.beginPath(); x.moveTo(maj ? 42 : 46, y); x.lineTo(50, y); x.stroke();
+    if (maj && Math.abs(y - mid) > 16) { x.fillStyle = C.faint; x.textAlign = "right"; x.font = "500 9px 'Martian Mono', monospace"; x.fillText(nf(Math.max(0, S.dec - (step >= 1 ? S.dec : 0))).format(v), 39, y); } }
+  // levels on the right, nudged apart so labels never overlap
+  const vis = lv.map(l => ({ ...l, y: Y(l.p), off: l.p > top ? 1 : l.p < bot ? -1 : 0 })).map(l => ({ ...l, ly: clamp(l.y, 9, h - 9) })).sort((a, b) => a.ly - b.ly);
+  // labels keep clear of the price box in the middle: those above stack upwards from it, those below downwards
+  const upL = vis.filter(l => l.ly < mid || (l.ly === mid && l.p >= px)).sort((a, b) => b.ly - a.ly), dnL = vis.filter(l => !upL.includes(l)).sort((a, b) => a.ly - b.ly);
+  let lim = mid - 17; for (const l of upL) { l.ly = Math.min(l.ly, lim); lim = l.ly - 12; } lim = mid + 17; for (const l of dnL) { l.ly = Math.max(l.ly, lim); lim = l.ly + 12; }
+  for (const l of upL) l.ly = Math.max(8, l.ly); for (const l of dnL) l.ly = Math.min(h - 8, l.ly);
+  const colOf = l => l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "q" ? C.amber2 : l.kind === "r" ? "rgba(255,92,122,.85)" : l.kind === "s" ? "rgba(62,240,176,.85)" : l.kind === "v" ? "#b9a6ff" : C.dim;
+  for (const l of vis) { const c = colOf(l);
+    if (!l.off) { x.strokeStyle = c; x.globalAlpha = l.q ? 0.9 : 0.45; x.setLineDash(l.q ? [] : [3, 3]); x.lineWidth = l.q ? 1.5 : 1; x.beginPath(); x.moveTo(52, Math.round(l.y) + 0.5); x.lineTo(w - 4, Math.round(l.y) + 0.5); x.stroke(); x.setLineDash([]); x.globalAlpha = 1; }
+    const d = l.p - px, lab = `${l.off > 0 ? "▲ " : l.off < 0 ? "▼ " : ""}${l.k} ${fnum(S, l.p)}`, ext = l.off ? ` ${d > 0 ? "+" : "−"}${nf(S.dec > 2 ? S.dec : 0).format(Math.abs(d))}` : "";
+    x.font = `${l.q ? 700 : 600} 9.5px 'Chakra Petch', sans-serif`; const tw = x.measureText(lab + ext).width + 8;
+    x.fillStyle = "rgba(3,6,11,.82)"; x.fillRect(w - 4 - tw, l.ly - 6, tw, 12); x.fillStyle = c; x.textAlign = "right"; x.fillText(lab + ext, w - 8, l.ly + 0.5); }
+  // the price box
+  const S5 = B5 && B5.n > 3 ? (B5.c[B5.n - 1] - B5.c[B5.n - 4]) : 0, fl = QA.flash; QA.flash = 0;
+  x.fillStyle = "rgba(3,6,11,.94)"; x.strokeStyle = C.amber; x.lineWidth = 1.5; x.beginPath(); x.moveTo(2, mid - 13); x.lineTo(112, mid - 13); x.lineTo(122, mid); x.lineTo(112, mid + 13); x.lineTo(2, mid + 13); x.closePath(); x.fill(); x.stroke();
+  x.fillStyle = fl > 0 ? C.buy : fl < 0 ? C.sell : C.amber2; x.font = "700 13px 'Martian Mono', monospace"; x.textAlign = "left"; x.fillText(fnum(S, px), 8, mid + 0.5);
+  x.font = "600 9px 'Chakra Petch', sans-serif"; x.fillStyle = S5 > 0 ? C.buy : S5 < 0 ? C.sell : C.dim; x.textAlign = "left"; x.fillText(`${S5 > 0 ? "▲" : S5 < 0 ? "▼" : "•"} ${nf(S.dec > 2 ? S.dec : 0).format(Math.abs(S5))} /15m`, 8, mid + 22);
+}
+
+/* ---------- the core: five lights (daily, hourly, 15m, 5m, calendar) around Quint's verdict ---------- */
+let coreRAF = 0, coreLast = 0;
+function coreKick() { if (!coreRAF) coreRAF = requestAnimationFrame(coreFrame); }
+function coreFrame(t) {
+  coreRAF = 0; const busy = DK.busy || QT.speaking || DK.lights.some(v => v === 1), gap = busy ? 33 : 80;
+  if (t - coreLast >= gap || RM) { coreLast = t; drawCore(t); }
+  if (!RM && !document.hidden) coreRAF = requestAnimationFrame(coreFrame);
+}
+function drawCore(t) {
+  const cv = $("#core"); if (!cv || !cv.offsetParent) return; const { x, w, h } = fitCanvas(cv), C = cols(), cx = w / 2, cy = h / 2 - 4, R = Math.min(w, h) * 0.4;
+  x.clearRect(0, 0, w, h); const s = RM ? 0 : t / 1000, call = liveCall(), hue = call && call.side ? (call.side > 0 ? C.buy : C.sell) : C.amber;
+  const P = (r, rot) => { const pts = []; for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + rot + i * 2 * Math.PI / 5; pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return pts; };
+  const poly = (pts, stroke, wdt, alpha, fill) => { x.beginPath(); pts.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.closePath(); x.globalAlpha = alpha; if (fill) { x.fillStyle = fill; x.fill(); } x.strokeStyle = stroke; x.lineWidth = wdt; x.stroke(); x.globalAlpha = 1; };
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, R * 1.3); g.addColorStop(0, "rgba(255,181,71,.10)"); g.addColorStop(1, "rgba(255,181,71,0)"); x.fillStyle = g; x.fillRect(0, 0, w, h);
+  const outer = P(R, 0); poly(outer, C.amber, 1, 0.35);
+  // the sweep while Quint is thinking
+  if (DK.busy && !RM) { const a = s * 3.2; x.save(); x.beginPath(); outer.forEach(([a1, b1], i) => i ? x.lineTo(a1, b1) : x.moveTo(a1, b1)); x.closePath(); x.clip(); const sw = x.createConicGradient ? x.createConicGradient(a, cx, cy) : null; if (sw) { sw.addColorStop(0, "rgba(255,181,71,.38)"); sw.addColorStop(0.12, "rgba(255,181,71,0)"); sw.addColorStop(1, "rgba(255,181,71,0)"); x.fillStyle = sw; x.fillRect(0, 0, w, h); } x.restore(); }
+  const pulse = QT.speaking ? 1 + 0.05 * Math.sin(t / 85) : 1;
+  poly(P(R * 0.66 * pulse, s * (DK.busy ? 0.8 : 0.12)), hue, 1, 0.55);
+  poly(P(R * 0.42 * pulse, -s * (DK.busy ? 1.2 : 0.18)), hue, 1, 0.3);
+  // confidence arc of the live call
+  if (call && call.side && call.conf != null) { const c = Math.min(85, call.conf) / 100; x.beginPath(); x.arc(cx, cy, R * 0.82, -Math.PI / 2, -Math.PI / 2 + c * Math.PI * 2); x.strokeStyle = hue; x.lineWidth = 2.5; x.globalAlpha = 0.9; x.stroke(); x.globalAlpha = 1; }
+  // edges and the five lights
+  const labs = ["1D", "1H", "15M", "5M", "CAL"];
+  for (let i = 0; i < 5; i++) { const j = (i + 1) % 5, on = DK.lights[i] === 2 && DK.lights[j] === 2; x.beginPath(); x.moveTo(outer[i][0], outer[i][1]); x.lineTo(outer[j][0], outer[j][1]); x.strokeStyle = C.amber; x.globalAlpha = on ? 0.85 : 0.2; x.lineWidth = on ? 1.5 : 1; x.stroke(); x.globalAlpha = 1; }
+  x.font = "600 9px 'Chakra Petch', sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+  outer.forEach(([a, b], i) => { const st = DK.lights[i], blink = st === 1 ? 0.45 + 0.55 * Math.abs(Math.sin(t / 160 + i)) : 1;
+    x.beginPath(); x.arc(a, b, st === 2 ? 4.5 : 3.5, 0, Math.PI * 2); x.fillStyle = st ? C.amber : C.glass; x.globalAlpha = st === 2 ? 1 : st === 1 ? blink : 1; x.fill(); x.strokeStyle = C.amber; x.lineWidth = 1; x.stroke(); x.globalAlpha = 1;
+    if (st === 2) { x.beginPath(); x.arc(a, b, 9, 0, Math.PI * 2); x.fillStyle = "rgba(255,181,71,.14)"; x.fill(); }
+    const dx = a - cx, dy = b - cy, L = Math.hypot(dx, dy) || 1; x.fillStyle = st ? C.amber2 : C.faint; x.fillText(labs[i], a + dx / L * 15, b + dy / L * 13); });
+}
+
+/* ---------- the session tape: where we are in the futures day, in UK and New York time ---------- */
+const SESS = [[-360, 120, "Asia"], [120, 480, "London"], [480, 570, "NY pre"], [570, 660, "NY open"], [660, 840, "Midday"], [840, 960, "Close"], [960, 1020, "After"], [1020, 1080, "Break"]];
+function drawSess() {
+  const cv = $("#sess"); if (!cv || !cv.offsetParent) return; const { x, w, h } = fitCanvas(cv), C = cols(), now = Date.now(), span = 10 * 36e5, t0 = now - span * 0.38, X = ms => (ms - t0) / span * w;
+  x.clearRect(0, 0, w, h); x.textBaseline = "middle";
+  for (let dd = -1; dd <= 1; dd++) for (const [a, b, lab] of SESS) { const s0 = etAt(now, dd, a), s1 = etAt(now, dd, b), x0 = X(s0), x1 = X(s1); if (x1 < 0 || x0 > w) continue;
+    const key = lab === "NY open", brk = lab === "Break"; x.fillStyle = key ? "rgba(255,181,71,.55)" : brk ? "rgba(255,92,122,.25)" : "rgba(122,142,168,.22)"; x.fillRect(x0 + 1, h - 7, Math.max(0, x1 - x0 - 2), 4);
+    x.font = "600 8.5px 'Chakra Petch', sans-serif"; x.fillStyle = key ? C.amber2 : C.faint; x.textAlign = "left"; const lx = Math.max(x0 + 3, 2), xnow = X(now); if (x1 - lx > 30 && (lx > xnow + 130 || lx + 48 < xnow - 4)) x.fillText(lab.toUpperCase(), lx, h - 15); }
+  for (let ms = Math.ceil(t0 / 36e5) * 36e5; ms < t0 + span; ms += 36e5) { const xx = Math.round(X(ms)) + 0.5; x.strokeStyle = C.line2; x.beginPath(); x.moveTo(xx, 0); x.lineTo(xx, 5); x.stroke(); x.font = "500 8.5px 'Martian Mono', monospace"; x.fillStyle = C.faint; x.textAlign = "center"; x.fillText(ukT(ms).slice(0, 2), xx, 11); }
+  const ev = DK.cal && DK.cal.list ? DK.cal.list.filter(e => e.imp >= 1 && e.t > t0 && e.t < t0 + span) : [];
+  for (const e of ev) { const xx = X(e.t); x.fillStyle = C.warn; x.beginPath(); x.moveTo(xx, h - 11); x.lineTo(xx + 4, h - 7); x.lineTo(xx, h - 3); x.lineTo(xx - 4, h - 7); x.closePath(); x.fill(); }
+  const xn = Math.round(X(now)) + 0.5; x.strokeStyle = C.amber; x.lineWidth = 1.5; x.beginPath(); x.moveTo(xn, 3); x.lineTo(xn, h - 2); x.stroke(); x.lineWidth = 1;
+  x.font = "700 9px 'Martian Mono', monospace"; x.textAlign = "left"; x.fillStyle = C.amber2; const lab = `${ukT(now)} UK · ${nyT(now)} NY`; x.fillText(lab, Math.min(xn + 6, w - x.measureText(lab).width - 4), 22);
+}
+
+/* ---------- the scope: a small candle chart with Quint's levels ---------- */
+function drawScope() {
+  const cv = $("#scope"); if (!cv || !cv.offsetParent) return; const { x, w, h } = fitCanvas(cv), C = cols(), m = dkM(), S = mkSpec(m), B = QA.B[HC.tf]; x.clearRect(0, 0, w, h);
+  if (!B || B.n < 5) { x.fillStyle = C.faint; x.font = "600 10px 'Chakra Petch', sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("LOADING CANDLES", w / 2, h / 2); return; }
+  const N = Math.min(B.n, Math.max(30, Math.floor((w - 52) / 5))), a = B.n - N, e20 = dkEma(B.c, 20); let hi = -Infinity, lo = Infinity;
+  for (let i = a; i < B.n; i++) { hi = Math.max(hi, B.h[i]); lo = Math.min(lo, B.l[i]); }
+  const lv = sessLevels(m).filter(l => l.p < hi + (hi - lo) * 0.25 && l.p > lo - (hi - lo) * 0.25); for (const l of lv) { hi = Math.max(hi, l.p); lo = Math.min(lo, l.p); }
+  const pad = (hi - lo) * 0.06 || S.tick * 4, H = hi + pad, L = lo - pad, Y = p => 8 + (H - p) / (H - L) * (h - 22), cw = (w - 52) / N;
+  x.strokeStyle = C.line; x.lineWidth = 1; const st = niceStep((H - L) / 4); x.font = "500 8.5px 'Martian Mono', monospace"; x.fillStyle = C.faint; x.textAlign = "left"; x.textBaseline = "middle";
+  for (let v = Math.ceil(L / st) * st; v < H; v += st) { const y = Math.round(Y(v)) + 0.5; x.beginPath(); x.moveTo(0, y); x.lineTo(w - 50, y); x.stroke(); x.fillText(nf(st >= 1 ? 0 : S.dec).format(v), w - 46, y); }
+  for (const l of lv) { const y = Math.round(Y(l.p)) + 0.5; x.strokeStyle = l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "v" ? "#b9a6ff" : "rgba(255,181,71,.55)"; x.setLineDash(l.q ? [] : [3, 3]); x.beginPath(); x.moveTo(0, y); x.lineTo(w - 50, y); x.stroke(); x.setLineDash([]); x.fillStyle = x.strokeStyle; x.font = "600 8.5px 'Chakra Petch', sans-serif"; x.fillText(l.k, 3, y - 6); }
+  for (let i = a; i < B.n; i++) { const xx = (i - a) * cw + cw / 2, up = B.c[i] >= B.o[i]; x.strokeStyle = x.fillStyle = up ? C.buy : C.sell; x.globalAlpha = 0.9; x.beginPath(); x.moveTo(Math.round(xx) + 0.5, Y(B.h[i])); x.lineTo(Math.round(xx) + 0.5, Y(B.l[i])); x.stroke(); const y0 = Y(Math.max(B.o[i], B.c[i])), y1 = Y(Math.min(B.o[i], B.c[i])); x.fillRect(xx - Math.max(1, cw * 0.32), y0, Math.max(2, cw * 0.64), Math.max(1, y1 - y0)); x.globalAlpha = 1; }
+  x.strokeStyle = C.amber; x.lineWidth = 1.3; x.beginPath(); for (let i = a; i < B.n; i++) { const xx = (i - a) * cw + cw / 2, y = Y(e20[i]); i === a ? x.moveTo(xx, y) : x.lineTo(xx, y); } x.stroke(); x.lineWidth = 1;
+  const lc = B.c[B.n - 1], yl = Y(lc); x.fillStyle = C.amber; x.fillRect(w - 50, yl - 7, 50, 14); x.fillStyle = "#1b1203"; x.font = "700 8.5px 'Martian Mono', monospace"; x.fillText(fnum(S, lc), w - 47, yl);
+  x.fillStyle = C.faint; x.font = "500 8.5px 'Martian Mono', monospace"; x.textAlign = "left"; x.fillText(`${tfLab[HC.tf]} · EMA20 · ${N} candles`, 3, h - 6);
+}
+
+/* ---------- the matrix: every timeframe at a glance, worked out here without asking Claude ---------- */
+function mxRow(tf) {
+  const B = QA.B[tf]; if (!B || B.n < 30) return null; const c = B.c, L = B.n - 1, e20 = dkEma(c, 20), e50 = dkEma(c, 50), A = qtATR(B)[L] || 0, R = dkRsi(c)[L], sl = e20[L] - e20[Math.max(0, L - 5)];
+  const tr = e20[L] > e50[L] && sl > 0 ? 1 : e20[L] < e50[L] && sl < 0 ? -1 : 0; return { tf, tr, rsi: R, atr: A, vs: A ? (c[L] - e20[L]) / A : 0, last: c[L] };
+}
+function machineRead(m, rows) {
+  const S = mkSpec(m), Q = MK.q[m.k], px = Q ? Q.p : rows[3] ? rows[3].last : null; if (px == null || !rows.some(Boolean)) return "Reading the market…";
+  const w = r => r ? (r.tr > 0 ? "up" : r.tr < 0 ? "down" : "flat") : "–", [d, h1, m15, m5] = rows, parts = [];
+  parts.push(`Daily <b>${w(d)}</b>, hourly <b>${w(h1)}</b>, 15-minute <b>${w(m15)}</b>, 5-minute <b>${w(m5)}</b>.`);
+  if (d && h1 && m15 && d.tr && d.tr === h1.tr && h1.tr === m15.tr) parts.push(`The timeframes agree: the path of least resistance is <b>${d.tr > 0 ? "up" : "down"}</b>.`);
+  else if (h1 && m15 && h1.tr && m15.tr && h1.tr !== m15.tr) parts.push(`The 15-minute is moving against the hourly: a ${m15.tr < 0 ? "pullback in an uptrend" : "bounce in a downtrend"} until it breaks.`);
+  const L = DK.lv; if (L) { const rel = (p, n) => p == null ? null : `${px > p ? "above" : "below"} ${n} ${fnum(S, p)}`, r = [rel(L.vw, "VWAP"), L.orh != null ? (px > L.orh ? `above the opening range` : px < L.orl ? `below the opening range` : `inside the opening range`) : null].filter(Boolean); if (r.length) parts.push(`Price is ${r.join(" and ")}.`); }
+  const lv = sessLevels(m).filter(l => !l.q), up = lv.filter(l => l.p > px).sort((a, b) => a.p - b.p)[0], dn = lv.filter(l => l.p < px).sort((a, b) => b.p - a.p)[0], pv = S.mpv || S.pv, pts = v => nf(S.dec > 2 ? S.dec : 0).format(v);
+  if (up) parts.push(`Resistance <b>${up.k} ${fnum(S, up.p)}</b> is ${pts(up.p - px)} points up ($${nf(0).format((up.p - px) * pv)} a ${S.micro || S.sym}).`);
+  if (dn) parts.push(`Support <b>${dn.k} ${fnum(S, dn.p)}</b> is ${pts(px - dn.p)} points down.`);
+  if (m5 && m5.rsi > 70) parts.push("5-minute RSI is stretched above 70."); else if (m5 && m5.rsi < 30) parts.push("5-minute RSI is washed out below 30.");
+  return parts.join(" ");
+}
+function paintSide() {
+  const el = $("#side"); if (!el) return; const v = QA.view === "console" && matchMedia("(min-width: 900px)").matches ? "matrix" : QA.view;
+  if (v === "console") { el.innerHTML = ""; return; }
+  if (v === "record") { el.innerHTML = recordHTML(); return; }
+  if (v === "alerts") { el.innerHTML = alertsHTML(); return; }
+  const m = dkM(), S = mkSpec(m), Q = MK.q[m.k], rows = ["1D", "1h", "15m", "5m"].map(mxRow), px = Q ? Q.p : rows[3] && rows[3].last, pv = S.mpv || S.pv;
+  const trd = r => r ? `<span class="tr ${r.tr > 0 ? "up" : r.tr < 0 ? "dn" : "fl"}">${r.tr > 0 ? "▲ UP" : r.tr < 0 ? "▼ DOWN" : "◆ FLAT"}</span>` : "–";
+  const lv = sessLevels(m).filter(l => !l.q).concat(HC.lvl && HC.lvl.k === m.k ? sessLevels(m).filter(l => l.q) : []).sort((a, b) => b.p - a.p);
+  const ev = DK.cal && DK.cal.list ? DK.cal.list.filter(e => e.t > Date.now() - 36e5 && e.imp >= 0).slice(0, 6) : null, X = MK.x;
+  el.innerHTML = `<div><h2 class="h">Machine read <span class="spacer"></span><span class="num" style="letter-spacing:0">${Q && Q.ts ? esc(fAgo(Q.ts)) : ""}</span></h2><p class="read">${machineRead(m, rows)}</p></div>
+    <div><h2 class="h">Signal matrix · ${esc(tk(m))}</h2><table class="mx"><thead><tr><th>TF</th><th>Trend</th><th>RSI 14</th><th>ATR</th><th>vs EMA20</th></tr></thead><tbody>${rows.map((r, i) => `<tr><td>${["1D", "1H", "15M", "5M"][i]}</td><td>${trd(r)}</td><td>${r ? `${Math.round(r.rsi)}<span class="rsi" aria-hidden="true"><i style="left:${clamp(r.rsi, 0, 100)}%"></i></span>` : "–"}</td><td>${r ? nf(S.dec > 2 ? S.dec : 1).format(r.atr) : "–"}</td><td class="${r && r.vs > 0 ? "pos" : r && r.vs < 0 ? "neg" : ""}">${r ? `${r.vs >= 0 ? "+" : "−"}${Math.abs(r.vs).toFixed(1)} ATR` : "–"}</td></tr>`).join("")}</tbody></table></div>
+    <div><h2 class="h">Scope <span class="spacer"></span><span class="tfs" role="group" aria-label="Candle size">${["1m", "5m", "15m", "1h"].map(t => `<button type="button" data-tf="${t}" aria-pressed="${HC.tf === t}">${t}</button>`).join("")}</span></h2><canvas id="scope" role="img" aria-label="${esc(tk(m))} ${esc(TF_NAME[HC.tf] || "")} candles with the 20 EMA and today's levels"></canvas></div>
+    <div><h2 class="h">Levels today</h2>${lv.length && px != null ? `<div class="lv">${lv.map(l => `<span class="k" style="color:${l.kind === "r" || l.kind === "qs" ? "var(--sell)" : l.kind === "s" || l.kind === "qt" ? "var(--buy)" : l.kind === "v" ? "#b9a6ff" : "var(--amber2)"}">${esc(l.k)}</span><span class="t">${esc(l.t)}</span><span class="p">${fnum(S, l.p)}</span><span class="d ${l.p > px ? "pos" : "neg"}">${l.p > px ? "+" : "−"}${nf(S.dec > 2 ? S.dec : 0).format(Math.abs(l.p - px))} · $${nf(0).format(Math.abs(l.p - px) * pv)}</span>`).join("")}</div><p class="small" style="margin-top:6px">Distance in points and in dollars for one ${esc(S.micro || S.sym)}.</p>` : `<p class="small">${MK.st === "ready" ? "Working out today's levels…" : "Levels appear once TradingView is connected."}</p>`}</div>
+    ${X ? `<div><h2 class="h">Around Nasdaq</h2><div class="xm">${X.rows.map(r => `<div><small>${esc(({ "CME_MINI:ES1!": "S&P ES", "CBOT_MINI:YM1!": "Dow YM", "CME_MINI:RTY1!": "Russell", "CBOT:ZN1!": "10Y note", "TVC:DXY": "Dollar", "CBOE:VIX": "VIX" })[r.s])}</small><b class="${r.ch > 0 ? "pos" : r.ch < 0 ? "neg" : ""}">${isFinite(r.ch) ? `${r.ch >= 0 ? "+" : "−"}${Math.abs(r.ch).toFixed(2)}%` : "–"}</b></div>`).join("")}</div></div>` : ""}
+    <div><h2 class="h">US calendar</h2>${ev ? ev.length ? `<div class="ev">${ev.map(e => `<div><span class="tm">${esc(new Date(e.t).toLocaleString("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit" }))}</span><span class="${e.imp >= 1 ? "hi" : ""}">${e.imp >= 1 ? "◆ " : ""}${esc(e.title)}</span></div>`).join("")}</div>` : `<p class="small">No US releases in the next two days.</p>` : `<p class="small">Loading the calendar…</p>`}</div>`;
+  $$("[data-tf]", el).forEach(b => b.onclick = () => hcSetTf(b.dataset.tf)); requestAnimationFrame(drawScope);
+}
+function recordHTML() {
+  const r = dkRec(), L = dkCalls().slice(0, 40), cl = Math.min(85, r.conf);
+  return `<div><h2 class="h">Quint's record</h2>${r.n ? `<div class="tiles"><div><small>Graded calls</small><b>${r.n}</b></div><div><small>Win rate</small><b>${r.wr}%</b></div><div><small>Total</small><b class="${r.R >= 0 ? "pos" : "neg"}">${r.R >= 0 ? "+" : "−"}${Math.abs(r.R).toFixed(1)}R</b></div><div><small>Said · actual</small><b>${cl}% · ${r.wr}%</b></div></div>
+      <div style="margin-top:12px"><div class="cal" aria-label="Confidence he gave against how often he was right"><i class="s" style="left:${cl}%"></i><i class="a" style="left:${r.wr}%"></i></div><p class="small" style="margin-top:8px"><span style="color:var(--amber)">▮</span> the confidence he gave · <span style="color:var(--ink)">▮</span> how often he was right. Close together means his percentages can be trusted.</p></div>` : `<p class="small">No graded calls yet. Every call is checked against TradingView's 1-minute candles once its time has passed: a candle that touches both the stop and the target counts as a loss.</p>`}</div>
+    ${L.length ? `<div class="rows">${L.map(c => `<div class="row"><span class="w">${esc(new Date(c.t).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }))}</span><span><b>${c.side > 0 ? "Buy" : c.side < 0 ? "Sell" : "No trade"}</b> ${esc(c.k)}${c.conf != null ? ` · ${Math.min(85, c.conf)}%` : ""}${c.src === "shot" ? " · screenshot" : ""}</span><span class="r st-${esc(c.st)}">${esc((DK_ST[c.st] || c.st).replace(/^[^A-Za-z]+/, ""))}${c.R != null ? ` ${c.R >= 0 ? "+" : "−"}${Math.abs(c.R).toFixed(2)}R` : ""}</span></div>`).join("")}</div>` : ""}
+    <p class="small">${r.live ? `${r.live} still being tracked. ` : ""}${r.skip ? `${r.skip} times he said stay out. ` : ""}These are tracked calls, not real trades, and past results don't promise future ones.</p>`;
+}
+function alertsHTML() {
+  const A = DK.al, cond = { cross_up: "rises to", cross_down: "falls to", cross: "crosses", greater: "goes above", less: "goes below" };
+  const row = x => { const id = +x.alert_id || +x.id, k = FUT_KEYS.find(q => MKDEF[q].tv === x.symbol), S = k ? MKSPEC[k] : null, th = x.threshold != null ? x.threshold : x.price;
+    return `<div class="al${x.active ? "" : " off"}"><span><b>${esc(x.name || "Alert")}</b><small>${esc(k || x.symbol || "")} ${esc(cond[x.condition_type] || x.condition_type || "")} ${th != null ? esc(S ? fnum(S, +th) : String(th)) : ""} · ${x.active ? "on" : "off"}${x.expiration ? ` · ends ${esc(dkAlTime(x.expiration))}` : ""}</small></span><button class="btn sm" type="button" data-aldel="${id}">${DK.alConf[id] ? "Tap again" : "Delete"}</button></div>`; };
+  const on = A && A.list ? A.list.filter(x => x.active) : [], off = A && A.list ? A.list.filter(x => !x.active).slice(0, 8) : [];
+  return `<div><h2 class="h">TradingView alerts <span class="spacer"></span><button class="btn sm" type="button" id="alr" ${DK.alBusy ? "disabled" : ""}>${DK.alBusy ? "Loading" : "Refresh"}</button></h2>
+    ${!A ? `<p class="small">Loading your alerts…</p>` : A.err ? `<p class="err">${esc(A.err)}</p>` : `${on.length ? `<div>${on.map(row).join("")}</div>` : `<p class="small">No alerts are on. Ask Quint for a call, then tap an alert button on it.</p>`}${off.length ? `<h2 class="h" style="margin-top:14px">Finished or off</h2><div>${off.map(row).join("")}</div>` : ""}
+    <h2 class="h" style="margin-top:14px">Fired in the last 7 days</h2>${A.log && A.log.length ? A.log.map(e => `<div class="al"><span><b>${esc(e.name || e.alert_name || e.message || "Alert")}</b><small>${esc(dkAlTime(e.fire_time || e.time || e.timestamp || e.fired_at))}${e.symbol ? " · " + esc(e.symbol) : ""}</small></span></div>`).join("") : `<p class="small">None yet. An alert fires only when price reaches its level.</p>`}`}</div>
+    <div class="note"><p class="small" style="color:var(--ink)"><b>How alerts reach your iPhone</b></p><ol class="small"><li>TradingView sends them. Install the TradingView app and sign in with the account you connected to Claude.</li><li>iPhone Settings → Notifications → TradingView: allow notifications.</li><li>Quint's alerts fire once, then switch off, and each ends when its trade plan runs out.</li><li>Your TradingView plan limits how many alerts can be on at once. Delete old ones here.</li><li>${MK.tvLive ? "Your TradingView has real-time CME data, so alerts trigger on the live price." : "Without real-time CME data, TradingView futures run about 10 minutes behind, and alerts most likely trigger on that delayed price too."}</li></ol></div>`;
+}
+const dkAlTime = v => { const t = typeof v === "number" ? (v < 1e12 ? v * 1000 : v) : Date.parse(v); return isFinite(t) ? new Date(t).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""; };
+async function dkAlertsLoad(force) {
+  if (DK.alBusy) return; if (!force && DK.al && Date.now() - DK.al.at < 6e4) { paintSide(); return; } DK.alBusy = true; paintSide();
+  try { const [a, g] = await Promise.all([tvCall("mcp-tv-list-alerts", {}, false), tvCall("mcp-tv-get-alerts-log", { days: 7, limit: 30 }, false).catch(() => null)]);
+    const list = (a && (a.alerts || a.items || a.data)) || (Array.isArray(a) ? a : []), log = (g && (g.events || g.log || g.alerts || g.items || g.data)) || (Array.isArray(g) ? g : []);
+    DK.al = { at: Date.now(), list: list.slice(0, 60), log: log.slice(0, 20) }; const ids = new Set(DK.al.list.map(x => +x.alert_id || +x.id)); dkAls().forEach(x => { if (!ids.has(+x.id)) x.gone = 1; }); save(); }
+  catch (e) { DK.al = { at: Date.now(), list: [], log: [], err: dkAlertErr(e) }; }
+  finally { DK.alBusy = false; paintSide(); paintHead(); }
+}
+async function dkAlertDel(btn) {
+  const id = +btn.dataset.aldel; if (!id) return; if (!DK.alConf[id]) { DK.alConf[id] = 1; btn.textContent = "Tap again"; setTimeout(() => { delete DK.alConf[id]; }, 4000); return; }
+  delete DK.alConf[id]; btn.disabled = true; btn.textContent = "Deleting";
+  try { await tvCall("mcp-tv-delete-alert", { alert_ids: [id] }, false); dkAls().forEach(x => { if (+x.id === id) x.gone = 1; }); save(); hmToast("Alert deleted from your TradingView."); } catch (e) { hmToast(dkAlertErr(e)); }
+  DK.al = null; dkAlertsLoad(true);
+}
+
+/* ---------- the conversation ---------- */
+function dkCallHTML(C, m) {
+  const S = mkSpec(m), f = x => fnum(S, x), conf = C.conf != null ? Math.min(85, C.conf) : null, cls = C.side > 0 ? "buy" : C.side < 0 ? "sell" : "none";
+  const ring = conf != null ? `<span class="ring" style="--p:${conf}" aria-label="${conf}% sure"><b>${conf}%</b></span>` : "";
+  if (!C.side) return `<div class="call none"><div class="ch"><span class="v">No trade · ${esc(tk(m))}</span>${ring}</div>${C.wait ? `<p class="cmeta">Wait for <b>${esc(C.wait)}</b>.</p>` : ""}${C.tv && Date.now() - C.t < 864e5 ? dkCallAlerts(C, m) : ""}</div>`;
+  if (C.st === "bad") return `<div class="call ${cls}"><div class="ch"><span class="v">${C.side > 0 ? "Buy" : "Sell"} · ${esc(tk(m))}</span></div><p class="cw">The stop or target is on the wrong side of the entry, so this call isn't tracked. Ask Quint again.</p></div>`;
+  const sd = Math.abs(C.entry - C.stop), R = Math.abs(C.tgt - C.entry) / sd, z = qaSize(m, sd), done = C.st !== "live", P = lvPosFor(m.k), mine = P && P.cid === C.id;
+  return `<div class="call ${cls}"><div class="ch"><span class="v">${C.side > 0 ? "Buy" : "Sell"} · ${esc(tk(m))}</span>${ring}</div>
+    <div class="lvls"><div><small>Entry</small><b>${f(C.entry)}</b><em>${C.ty === "lim" ? "limit" : "at market"}</em></div><div><small>Stop</small><b class="neg">${f(C.stop)}</b><em>−${nf(S.dec > 2 ? S.dec : 2).format(sd)}</em></div><div><small>Target</small><b class="pos">${f(C.tgt)}</b><em>${R.toFixed(1)}R</em></div></div>
+    <p class="cmeta">${z ? `${z.qty > 0 ? `<b>${z.qty} ${esc(z.sym)}</b> for your ${fbal(z.A.risk)} risk (${fbal(z.risk)} if stopped)` : `Your ${fbal(z.A.risk)} risk is smaller than one ${esc(z.sym)} at this stop`} · ` : ""}hold up to ${C.hold >= 90 ? (C.hold / 60).toFixed(C.hold % 60 ? 1 : 0) + " h" : C.hold + " min"} · ${esc(C.tf)}</p>
+    ${dkWarn(C, m).map(w => `<p class="cw">⚠ ${esc(w)}</p>`).join("")}
+    <span class="cst ${esc(C.st)}">${esc((DK_ST[C.st] || C.st).replace(/^[^A-Za-z]+/, ""))}${C.R != null ? ` · ${C.R >= 0 ? "+" : "−"}${Math.abs(C.R).toFixed(2)}R` : ""}</span>
+    ${!done ? `<div class="acts"><button class="chipb${mine ? " on" : ""}" type="button" data-in="${C.id}">${mine ? "✓ I'm in · tap when out" : "I took it"}</button></div>${C.tv ? dkCallAlerts(C, m) : ""}` : ""}</div>`;
+}
+function dkCallAlerts(C, m) {
+  if (!m || !m.tv) return ""; const f = x => fnum(mkSpec(m), x), b = (kind, lab, p) => { const a = dkAlFor(C.id, kind); return `<button class="chipb${a ? " on" : ""}" type="button" data-cal="${C.id}:${kind}" ${a ? "disabled" : ""}>${a ? "✓ " : "◉ "}${lab} ${f(p)}</button>`; };
+  let h = ""; if (C.side) { if (C.ty === "lim") h += b("e", "Entry", C.entry); h += b("s", "Stop", C.stop) + b("t", "Target", C.tgt); } else { const w = dkAlertWait(C, m); if (w != null) h += b("w", "Wait level", w); }
+  return h ? `<div class="acts" aria-label="Alert my phone through TradingView">${h}</div>` : "";
+}
+async function dkCallAlert(btn) {
+  const [id, kind] = btn.dataset.cal.split(":"), C = dkCallById(+id), m = C && MKDEF[C.k]; if (!C || !m) return; const f = x => fnum(mkSpec(m), x);
+  const end = C.t + (Math.max(30, C.hold) + (kind === "e" || kind === "w" ? 0 : C.hold)) * 6e4, min = Math.max(20, (end - Date.now()) / 6e4), side = C.side > 0 ? "BUY" : "SELL", plan = `stop ${f(C.stop)}, target ${f(C.tgt)}`;
+  const spec = { e: [C.entry, side, `Quint's limit entry. Plan: ${plan}.`, "entry"], s: [C.stop, "EXIT", `Quint's stop for your ${side === "BUY" ? "long" : "short"} from ${f(C.entry)} was hit: close it if you're still in.`, "stop"], t: [C.tgt, "EXIT", `Quint's target for your ${side === "BUY" ? "long" : "short"} from ${f(C.entry)} was reached: take profit.`, "target"], w: [dkAlertWait(C, m), "WATCH", `Quint said wait for ${String(C.wait || "").slice(0, 120)}. Ask him for a fresh call now.`, "wait"] }[kind];
+  if (!spec || spec[0] == null) return; btn.disabled = true; btn.textContent = "Setting…";
+  const r = await dkAlertMake(m, spec[0], null, spec[1], spec[2], { cid: C.id, kind, min, lab: spec[3] });
+  if (r.ok) hmToast(`Alert set: ${tk(m)} ${r.d === "up" ? "rising to" : r.d === "down" ? "falling to" : "at"} ${f(spec[0])}. TradingView will notify your phone.`); else { btn.disabled = false; hmToast(r.msg); }
+  dkPaint(false); paintHead();
+}
+function dkExtras(x, i) {
+  if (x.busy || !x.t) return ""; let h = ""; const code = []; x.t.replace(/```[a-z]*\s*\n([\s\S]*?)```/gi, (_, c) => { if (/\/\/@version\s*=\s*\d/.test(c)) code.push(c); return ""; });
+  code.forEach((c, k) => { h += `<button class="xbtn" type="button" data-pine="${i}:${k}">Save this script to my TradingView</button>`; });
+  const al = dkAlertLines(x.t), m = dkM(), Q = m && MK.q[m.k], C = x.c ? dkCallById(x.c) : null, onCard = C && C.side && C.st !== "bad" ? [C.entry, C.stop, C.tgt] : [];
+  al.slice(0, 3).forEach((a, k) => { if (!m || !m.tv || onCard.some(v => v != null && Math.abs(v - a.p) < 1e-9)) return; const d = Q && Q.p ? (a.p > Q.p ? "up" : a.p < Q.p ? "down" : "cross") : a.dir, done = dkAlFor(x.at, "L" + k), px = esc(fnum(mkSpec(m), a.p));
+    h += done ? `<button class="xbtn on" type="button" disabled>✓ Alert set: ${esc(a.act)} ${esc(tk(m))} at ${px}</button>` : `<button class="xbtn" type="button" data-alert="${i}:${k}">◉ Alert my phone: ${esc(a.act)} ${esc(tk(m))} when price ${d === "up" ? "rises to" : d === "down" ? "falls to" : "reaches"} ${px}</button>`; });
+  return h;
+}
+async function dkAlert(btn, m) {
+  const [i, k] = btn.dataset.alert.split(":").map(Number), x = dkMsgs(m.k)[i], a = x && dkAlertLines(x.t)[k]; if (!a) return; btn.disabled = true; btn.textContent = "Setting the alert on TradingView…";
+  const C = x.c ? dkCallById(x.c) : null, end = C ? C.t + (Math.max(30, C.hold) + (a.act === "EXIT" ? C.hold : 0)) * 6e4 : 0;
+  const r = await dkAlertMake(m, a.p, a.dir, a.act, a.note, Object.assign({ cid: x.at, kind: "L" + k }, end ? { min: Math.max(30, (end - Date.now()) / 6e4) } : {}));
+  if (r.ok) { hmToast("Alert set. TradingView will notify your phone."); dkPaint(false); paintHead(); } else { btn.disabled = false; btn.textContent = `✗ ${r.msg}`; }
+}
+async function dkPine(btn) {
+  const m = dkM(), [i, k] = btn.dataset.pine.split(":").map(Number), x = dkMsgs(m.k)[i]; if (!x) return; const codes = []; x.t.replace(/```[a-z]*\s*\n([\s\S]*?)```/gi, (_, c) => { if (/\/\/@version\s*=\s*\d/.test(c)) codes.push(c); return ""; }); const code = codes[k]; if (!code) return;
+  btn.disabled = true; btn.textContent = "Checking it compiles…";
+  try { const v = await tvCall("mcp-tv-validate-pine-script", { code }, false); if (!v || !v.valid) { const er = ((v && v.errors) || [])[0]; btn.textContent = `✗ Doesn't compile${er ? `: line ${er.start && er.start.line}, ${er.message}` : ""}. Ask Quint to fix it.`; return; }
+    const nm = ((/(?:indicator|strategy)\(\s*["']([^"']+)/.exec(code) || [])[1] || "Quint script").slice(0, 100), p = await tvCall("mcp-tv-create-pine-script", { code, name: nm }, false);
+    btn.textContent = `✓ Saved to your TradingView as “${(p && p.name) || nm}”.`; }
+  catch (e) { btn.disabled = false; btn.textContent = /name_taken/i.test(String(e && e.message)) ? "You already have a script with that name on TradingView." : tvWhy(e); }
+}
+function dkMsgHTML(x, i, m) {
+  if (x.r === "u") return `<div class="m u">${x.img ? "[screenshot] " : ""}${esc(x.t)}</div>`;
+  const C = x.c ? dkCallById(x.c) : null, body = dkClean(x.t);
+  return `<div class="m a" data-i="${i}">${x.busy && !body ? `<p class="think">${esc(DK.prog || "Thinking…")}</p>` : ""}${body ? coachMD(body) : ""}${x.busy && body && DK.prog ? `<p class="think">${esc(DK.prog)}</p>` : ""}${C ? dkCallHTML(C, m) : ""}${dkExtras(x, i)}${x.err ? `<p class="err">${esc(x.err)}</p>` : ""}${!x.busy && body ? `<div class="acts"><button class="chipb say" type="button" aria-pressed="false">Listen</button></div>` : ""}</div>`;
+}
+function helloHTML(m) {
+  const rows = ["1D", "1h", "15m", "5m"].map(mxRow), A = qaAcct();
+  return `<div class="hello"><b>Quint online · ${esc(tk(m))}</b><p>${CO.sample ? machineRead(m, rows) : "Quint needs Claude to talk. Open this app inside Claude."}</p><p class="small" style="margin-top:10px">Ask for a call and he answers straight: buy, sell or no trade, with entry, stop and target sized for your ${fbal(A.risk)} risk. Every call is graded afterwards against real candles.</p></div>`;
+}
+function dkPaint(all) {
+  const b = $("#log"); if (!b) return; const m = dkM(), L = dkMsgs(m.k), go = $("#go");
+  if (go) { go.classList.toggle("stop", DK.busy); go.setAttribute("aria-label", DK.busy ? "Stop" : "Send"); go.innerHTML = DK.busy ? `<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="2" width="10" height="10" fill="currentColor"/></svg>` : `<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h12M10 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+  b.innerHTML = L.length ? L.map((x, i) => dkMsgHTML(x, i, m)).join("") : helloHTML(m);
+  if (all) b.scrollTop = b.scrollHeight; paintVerdict(); paintChips();
+  if (!DK.busy) { const last = L[L.length - 1]; if (last && last.c && !last.seen) { last.seen = 1; paintHead(); if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); } }
+}
+function dkPaintLast() {
+  const b = $("#log"), m = dkM(); if (!b) return; const L = dkMsgs(m.k), i = L.length - 1, el = b.querySelector(`.m.a[data-i="${i}"]`); if (!el || !L[i]) { paintVerdict(); return; }
+  const near = b.scrollHeight - b.scrollTop - b.clientHeight < 90; el.outerHTML = dkMsgHTML(L[i], i, m); if (near) b.scrollTop = b.scrollHeight; paintVerdict();
+}
+const CHIPS = [["call", "Call it now"], ["ny", "New York open plan"], ["lv", "Key levels"], ["mg", "Manage my trade"], ["why", "What's moving it"], ["mtf", "Bigger picture"], ["al", "Set my alerts"], ["bt", "Backtest an idea"]];
+function paintChips() {
+  const el = $("#chips"); if (!el) return; const P = lvPosFor(DK.k);
+  el.hidden = DK.busy || !CO.sample; el.innerHTML = CHIPS.filter(([k]) => k !== "mg" || P).map(([k, l]) => `<button type="button" data-qq="${k}">${esc(l)}</button>`).join("");
+}
+function qaAsk(k) {
+  const m = dkM(), n = tk(m), t = $("#q");
+  if (k === "bt") { t.value = `Backtest this on ${n}: `; t.focus(); return; }
+  if (k === "al") { dkSend(`Set TradingView alerts on my phone for the ${n} levels that matter most right now (two at most), each telling me what to do when price gets there.`); return; }
+  dkSend(DK_Q[k](n));
+}
+function setView(v) { QA.view = v; $("#app").dataset.view = v; $$(".seg [data-v]").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v)); paintSide(); if (v === "alerts") dkAlertsLoad(false); if (v === "console") { const b = $("#log"); if (b) b.scrollTop = b.scrollHeight; } requestAnimationFrame(() => { drawTape(); drawSess(); coreKick(); }); }
+function onLog(e) {
+  const m = dkM(); let t;
+  if ((t = e.target.closest("[data-qq]"))) { qaAsk(t.dataset.qq); return; }
+  if ((t = e.target.closest("[data-cal]"))) { dkCallAlert(t); return; }
+  if ((t = e.target.closest("[data-alert]"))) { dkAlert(t, m); return; }
+  if ((t = e.target.closest("[data-pine]"))) { dkPine(t); return; }
+  if ((t = e.target.closest("[data-in]"))) { const C = dkCallById(+t.dataset.in); if (!C) return; ST.pos = ST.pos || {}; const P = ST.pos[C.k];
+    if (P && P.open && P.cid === C.id) { P.open = false; hmToast("Noted: you're out. Quint won't count it as open."); } else { const z = qaSize(MKDEF[C.k], Math.abs(C.entry - C.stop)); ST.pos[C.k] = { open: true, k: C.k, cid: C.id, dir: C.side, qty: Math.max(1, z ? z.qty : 1), e: C.entry, stop: C.stop, tgt: C.tgt, t0: Date.now() }; hmToast("Noted. Quint now treats this as your open trade. Tap again when you're out."); }
+    save(); dkPaint(false); return; }
+  if ((t = e.target.closest(".say"))) { const i = +t.closest("[data-i]").dataset.i, x = dkMsgs(m.k)[i]; if (x) qaSpeak(dkClean(x.t), t); return; }
+  if ((t = e.target.closest("[data-aldel]"))) { dkAlertDel(t); return; }
+  if (e.target.closest("#alr")) { dkAlertsLoad(true); return; }
+}
+
+/* ---------- settings: account, risk, style and voice ---------- */
+function openSet() {
+  const s = ST.set, sh = $("#sheet");
+  sh.innerHTML = `<h2 id="sheth">Settings <span class="spacer"></span><button class="ibtn" type="button" id="setx" aria-label="Close settings">✕</button></h2>
+    <div class="two"><div class="fld"><label for="sname">Account</label><input type="text" id="sname" value="${esc(s.name)}" maxlength="40"></div><div class="fld"><label for="ssize">Size ($)</label><input type="number" id="ssize" inputmode="numeric" min="1000" step="1000" value="${esc(s.acct)}"></div></div>
+    <div class="fld"><label for="spct">Risk per trade: <span id="spctv">${esc(s.pct)}% = ${fbal(qaAcct().risk)}</span></label><input type="range" id="spct" min="0.25" max="3" step="0.25" value="${esc(s.pct)}"></div>
+    <div class="fld"><span class="lab">How you trade</span><div class="opts" role="group" aria-label="How you trade">${[["scalp", "Scalper"], ["day", "Day trader"], ["both", "Both"]].map(([k, l]) => `<button type="button" data-st="${k}" aria-pressed="${TS() === k}">${l}</button>`).join("")}</div></div>
+    <div class="fld"><span class="lab">Quint's voice</span><p class="small" id="vnote"></p><div class="voices" id="vlist"></div></div>
+    <div class="fld"><label for="srate">Speaking speed: <span id="sratev">${(+s.rate || 1).toFixed(2)}×</span></label><input type="range" id="srate" min="0.7" max="1.5" step="0.05" value="${esc(s.rate || 1)}"></div>
+    <p class="small">Prices come from your TradingView connector${MK.tvLive ? ", with real-time CME data" : " (futures run about 10 minutes behind without real-time CME data)"}. Calls, alerts and settings are kept on this device. Quint makes calls to help you learn and decide; he can be wrong, and nothing here places real orders.</p>`;
+  $("#scrim").classList.add("open"); paintVoices();
+  $("#setx").onclick = closeSet; $("#scrim").onclick = e => { if (e.target.id === "scrim") closeSet(); };
+  $("#sname").oninput = e => { s.name = e.target.value.slice(0, 40); save(); };
+  $("#ssize").oninput = e => { const v = +e.target.value; if (v >= 1000) { s.acct = v; save(); $("#spctv").textContent = `${s.pct}% = ${fbal(qaAcct().risk)}`; } };
+  $("#spct").oninput = e => { s.pct = +e.target.value; save(); $("#spctv").textContent = `${s.pct}% = ${fbal(qaAcct().risk)}`; };
+  $$("[data-st]", sh).forEach(b => b.onclick = () => { s.style = b.dataset.st; save(); $$("[data-st]", sh).forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  $("#srate").oninput = e => { s.rate = +e.target.value; save(); $("#sratev").textContent = `${s.rate.toFixed(2)}×`; try { QT.tts && QT.tts.setRate && QT.tts.setRate(s.rate).catch(() => {}); } catch (err) {} };
+  setTimeout(() => $("#setx").focus(), 30);
+}
+function closeSet() { $("#scrim").classList.remove("open"); paintAll(); $("#setb").focus(); }
+function paintVoices() {
+  const el = $("#vlist"), note = $("#vnote"); if (!el) return; const s = ST.set;
+  if (QT.tts) { note.textContent = "Claude's own voices, available here."; el.innerHTML = ["buttery", "airy", "glassy", "rounded"].map(v => `<button type="button" data-tv="${v}" aria-pressed="${(s.tvoice || "buttery") === v}"><span>${v[0].toUpperCase() + v.slice(1)}</span><small>Claude</small></button>`).join("");
+    $$("[data-tv]", el).forEach(b => b.onclick = () => { s.tvoice = b.dataset.tv; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); }); return; }
+  const vs = voiceList().filter(v => /^en/i.test(v.lang)).sort((a, b) => voiceScore(b) - voiceScore(a)), cur = voicePick();
+  note.textContent = "On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. The robotic ones are at the bottom; tap one to hear it.";
+  el.innerHTML = vs.length ? vs.map(v => `<button type="button" data-vu="${esc(v.voiceURI || v.name)}" aria-pressed="${!!cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name)}"><span>${esc(v.name.replace(/\s*\(.*\)$/, ""))}${voiceScore(v) < 0 ? " · robotic" : ""}</span><small>${esc(v.lang)}${/premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : `<p class="small" style="padding:10px 12px">No voices are listed yet. Tap Listen on any answer and they'll load.</p>`;
+  $$("[data-vu]", el).forEach(b => b.onclick = () => { s.voice = b.dataset.vu; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); });
+}
+
+/* ---------- typing on a phone: the instruments fold away and the box sits on the keyboard ---------- */
+function fitVV() { const vv = window.visualViewport; if (!vv) return; document.documentElement.style.setProperty("--vvh", vv.height + "px"); $("#app").style.top = vv.offsetTop + "px"; const b = $("#log"); if (b) b.scrollTop = b.scrollHeight; }
+function kbOn(on) { const app = $("#app"), vv = window.visualViewport; app.classList.toggle("typing", on && window.innerWidth < 900);
+  if (vv) { if (on) { vv.addEventListener("resize", fitVV); vv.addEventListener("scroll", fitVV); fitVV(); } else { vv.removeEventListener("resize", fitVV); vv.removeEventListener("scroll", fitVV); document.documentElement.style.removeProperty("--vvh"); app.style.top = ""; } }
+  if (!on) requestAnimationFrame(() => { drawTape(); drawSess(); coreKick(); }); }
+function paintImg() { let p = $("#prev"); if (!DK.img) { if (p) p.remove(); return; } if (!p) { p = document.createElement("div"); p.id = "prev"; p.className = "prev"; $("#askf").before(p); } p.innerHTML = `<span>Screenshot attached. Ask a question, or just send.</span><button class="btn sm" type="button" id="imgx">Remove</button>`; $("#imgx").onclick = () => { DK.img = null; paintImg(); }; }
+
+function qaStart() {
+  fillMarkets(); const m = dkM(); $("#q").placeholder = `Ask Quint: buy or sell ${tk(m)}?`; setView(QA.view);
+  $$(".seg [data-v]").forEach(b => b.onclick = () => setView(b.dataset.v));
+  $("#log").addEventListener("click", onLog); $("#side").addEventListener("click", onLog); $("#chips").addEventListener("click", onLog);
+  $("#setb").onclick = openSet;
+  const ta = $("#q"), fit = () => { ta.style.height = "auto"; ta.style.height = Math.min(120, ta.scrollHeight) + "px"; };
+  ta.oninput = fit; ta.onkeydown = e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("#askf").requestSubmit(); } };
+  ta.addEventListener("focus", () => kbOn(true)); ta.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== ta) kbOn(false); }, 150));
+  $("#askf").onsubmit = e => { e.preventDefault(); if (DK.busy) { if (DK.ctl) DK.ctl.abort(); return; } const v = ta.value.trim(); if (!v && !DK.img) return; ta.value = ""; fit();
+    if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(v || "Read my chart and give me your call.", DK.img ? { img: DK.img } : {}); DK.img = null; paintImg(); };
+  $("#file").onchange = async e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { DK.img = await qtShrink(f); paintImg(); ta.focus(); } catch (err) { hmToast("That file couldn't be opened as an image."); } };
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#scrim").classList.contains("open")) { e.preventDefault(); closeSet(); } });
+  window.addEventListener("resize", () => { drawTape(); drawSess(); drawScope(); coreKick(); });
+  setInterval(() => { drawSess(); paintVerdict(); paintHead(); }, 30000);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawTape(); drawSess(); drawScope(); coreKick(); });
+  paintAll(); coreKick(); qaInit();
+}
+
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', qaStart); else qaStart();
+})();
+</script>
+</body>
+</html>
