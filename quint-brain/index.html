@@ -302,6 +302,14 @@ input[type="range"] { width: 100%; accent-color: var(--amber); }
 .vmbar.listen .vmorb, .vmbar.speak .vmorb { animation: vmpulse 1s ease-in-out infinite; } .vmbar.think .vmorb { border-color: var(--violet); }
 @media (prefers-reduced-motion: reduce) { .ask .mic.live, .vmbar .vmorb { animation: none !important; } }
 @media (min-width: 900px) { .vmbar { width: calc(100% - 28px); max-width: 832px; margin: 6px auto 0; } }
+
+/* 3D core + sound settings */
+.vmbar .vmorb.has3d { position: relative; border: 0; box-shadow: none; animation: none; } canvas.qcore { position: absolute; left: -35%; top: -35%; width: 170%; height: 170%; pointer-events: none; }
+.fxset { display: flex; flex-direction: column; gap: 10px; } .fxset .small { margin: 0; }
+.lgtog { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0; border: 0; background: transparent; text-align: left; font-size: 14px; color: var(--ink); }
+.lgtog .k { flex: none; position: relative; width: 42px; height: 24px; border-radius: 12px; background: var(--line2); }
+.lgtog .k::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); transition: transform .2s; }
+.lgtog[aria-pressed="true"] .k { background: var(--amber); } .lgtog[aria-pressed="true"] .k::after { transform: translateX(18px); background: #021422; }
 </style>
 </head>
 <body>
@@ -595,6 +603,101 @@ function qtATR(B, n = 14) { // Wilder's ATR as an array
   for (let i = 1; i < N; i++) { const tr = Math.max(B.h[i] - B.l[i], Math.abs(B.h[i] - B.c[i - 1]), Math.abs(B.l[i] - B.c[i - 1])); if (i <= n) { s += tr; A[i] = s / i; } else A[i] = (A[i - 1] * (n - 1) + tr) / n; }
   return A;
 }
+let zzfxV = .3, zzfxX = null;
+const zzfx = (volume = 1, randomness = .05, frequency = 220, attack = 0, sustain = 0, release = .1, shape = 0, shapeCurve = 1, slide = 0, deltaSlide = 0, pitchJump = 0, pitchJumpTime = 0, repeatTime = 0, noise = 0, modulation = 0, bitCrush = 0, delay = 0, sustainVolume = 1, decay = 0, tremolo = 0, filter = 0) => {
+  if (!zzfxX) return null;
+  const sampleRate = 44100; let PI2 = Math.PI * 2, abs = Math.abs, sign = v => v < 0 ? -1 : 1, startSlide = slide *= 500 * PI2 / sampleRate / sampleRate,
+    startFrequency = frequency *= (1 + randomness * 2 * Math.random() - randomness) * PI2 / sampleRate, modOffset = 0, repeat = 0, crush = 0, jump = 1, length, b = [], t = 0, i = 0, s = 0, f,
+    source = zzfxX.createBufferSource(), buffer, quality = 2, w = PI2 * abs(filter) * 2 / sampleRate, cos = Math.cos(w), alpha = Math.sin(w) / 2 / quality,
+    a0 = 1 + alpha, a1 = -2 * cos / a0, a2 = (1 - alpha) / a0, b0 = (1 + sign(filter) * cos) / 2 / a0, b1 = -(sign(filter) + cos) / a0, b2 = b0, x2 = 0, x1 = 0, y2 = 0, y1 = 0;
+  const minAttack = 9; attack = attack * sampleRate || minAttack; decay *= sampleRate; sustain *= sampleRate; release *= sampleRate; delay *= sampleRate; deltaSlide *= 500 * PI2 / sampleRate ** 3;
+  modulation *= PI2 / sampleRate; pitchJump *= PI2 / sampleRate; pitchJumpTime *= sampleRate; repeatTime = repeatTime * sampleRate | 0; volume *= zzfxV;
+  for (length = attack + decay + sustain + release + delay | 0; i < length; b[i++] = s * volume) {
+    if (!(++crush % (bitCrush * 100 | 0))) {
+      s = shape ? shape > 1 ? shape > 2 ? shape > 3 ? shape > 4 ? (t / PI2 % 1 < shapeCurve / 2) * 2 - 1 : Math.sin(t ** 3) : Math.max(Math.min(Math.tan(t), 1), -1) : 1 - (2 * t / PI2 % 2 + 2) % 2 : 1 - 4 * abs(Math.round(t / PI2) - t / PI2) : Math.sin(t);
+      s = (repeatTime ? 1 - tremolo + tremolo * Math.sin(PI2 * i / repeatTime) : 1) * (shape > 4 ? s : sign(s) * abs(s) ** shapeCurve) *
+        (i < attack ? i / attack : i < attack + decay ? 1 - ((i - attack) / decay) * (1 - sustainVolume) : i < attack + decay + sustain ? sustainVolume : i < length - delay ? (length - i - delay) / release * sustainVolume : 0);
+      s = delay ? s / 2 + (delay > i ? 0 : (i < length - delay ? 1 : (length - i) / delay) * b[i - delay | 0] / 2 / volume) : s;
+      if (filter) s = y1 = b2 * x2 + b1 * (x2 = x1) + b0 * (x1 = s) - a2 * y2 - a1 * (y2 = y1);
+    }
+    f = (frequency += slide += deltaSlide) * Math.cos(modulation * modOffset++); t += f + f * noise * (i * i * PI2 % 2 - 1);
+    if (jump && ++jump > pitchJumpTime) { frequency += pitchJump; startFrequency += pitchJump; jump = 0; }
+    if (repeatTime && !(++repeat % repeatTime)) { frequency = startFrequency; slide = startSlide; jump ||= 1; }
+  }
+  buffer = zzfxX.createBuffer(1, b.length, sampleRate); buffer.getChannelData(0).set(b); source.buffer = buffer; source.connect(zzfxX.destination); source.start(); return source;
+};
+const FX_SND = {
+  buy: [[0, [.55, 0, 523, .005, .05, .16, 0]], [85, [.55, 0, 784, .005, .07, .24, 0]]],          // rising: a buy call
+  sell: [[0, [.55, 0, 784, .005, .05, .16, 0]], [85, [.55, 0, 523, .005, .07, .24, 0]]],         // falling: a sell call
+  flat: [[0, [.4, 0, 392, .005, .04, .18, 0]]],                                                   // no trade
+  right: [[0, [.5, 0, 1047, .004, .03, .14, 0]], [80, [.5, 0, 1319, .004, .05, .22, 0]]],       // practice: right
+  wrong: [[0, [.45, 0, 196, .01, .07, .2, 2, 1, -.6, , , , , , , , , , , , 900]]],               // practice: wrong
+  win: [[0, [.5, 0, 523, .004, .04, .12, 0]], [70, [.5, 0, 659, .004, .04, .12, 0]], [140, [.55, 0, 1047, .004, .08, .3, 0]]], // target hit
+  loss: [[0, [.5, 0, 220, .01, .1, .3, 1, 1, -.8]]],                                              // stop hit
+  alert: [[0, [.45, 0, 1568, .002, .02, .5, 0, 1, , , , , , , , , .09]]],                          // alert set
+  warn: [[0, [.4, 0, 330, .005, .06, .06, 1]], [160, [.4, 0, 330, .005, .06, .06, 1]]],          // careful
+  on: [[0, [.4, 0, 660, .005, .04, .1, 0, 1, 6]]], off: [[0, [.4, 0, 880, .005, .04, .1, 0, 1, -6]]], // voice mode on and off
+  draw: [[0, [.25, 0, 1400, .002, .01, .04, 1]]],                                                 // a line placed
+};
+const FX_HAP = { tick: [1, [8]], draw: [1, [10]], buy: [2, [14, 70, 22]], sell: [2, [22, 70, 14]], flat: [1, [12]], right: [2, [12, 60, 18]], wrong: [3, [30, 50, 30, 50, 30]], win: [3, [12, 50, 12, 50, 30]], loss: [2, [40, 60, 40]], alert: [2, [18, 80, 18]], warn: [2, [25, 90, 25]], on: [1, [16]], off: [1, [10]] };
+const fxCfg = () => { const h = HS(); if (!h.fx || typeof h.fx !== "object") h.fx = { snd: true, hap: true }; return h.fx; };
+const FXH = { lab: null, inp: null };
+function fxUnlock() { // inside a tap: wake the audio, build the haptic switch
+  try { if (!zzfxX) { const A = window.AudioContext || window.webkitAudioContext; if (A) zzfxX = new A(); } if (zzfxX && zzfxX.state === "suspended") zzfxX.resume(); } catch (e) {}
+  if (!FXH.lab && document.body) { try { const l = document.createElement("label"), i = document.createElement("input"); i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1; l.setAttribute("aria-hidden", "true"); l.style.cssText = "position:fixed;left:-99px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden"; l.appendChild(i); document.body.appendChild(l); FXH.lab = l; FXH.inp = i; } catch (e) {} }
+}
+function fxHaptic(name) { // iPhone (Safari 17.4+): toggling a switch inside a tap gives a Taptic tick (the technique from lochie/web-haptics, MIT). Android: the Vibration API.
+  if (!fxCfg().hap) return; const h = FX_HAP[name] || FX_HAP.tick;
+  try { if (navigator.vibrate && !/iP(hone|ad|od)/.test(navigator.userAgent)) { navigator.vibrate(h[1]); return; } } catch (e) {}
+  if (!FXH.lab) return; for (let k = 0; k < h[0]; k++) setTimeout(() => { try { FXH.lab.click(); } catch (e) {} }, k * 70);
+  (window.__haps = window.__haps || []).push(name);
+}
+function sfx(name, o = {}) { // play a moment: its sound and its feel
+  const c = fxCfg(); if (o.hap !== false) fxHaptic(name);
+  if (!c.snd || o.snd === false || !FX_SND[name]) return; if (QT && QT.speaking && !o.over) return; // never talk over Quint
+  zzfxV = clamp(c.vol != null ? +c.vol : .3, 0, 1); (window.__sfx = window.__sfx || []).push(name);
+  for (const [ms, p] of FX_SND[name]) setTimeout(() => { try { zzfx(...p); } catch (e) {} }, ms);
+}
+function fxInit() { // each app calls this once
+  if (FXH.init || typeof document === "undefined") return; FXH.init = true;
+  document.addEventListener("pointerdown", fxUnlock, { capture: true, passive: true });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && QCORE.cvs.size && !QCORE.raf) QCORE.raf = requestAnimationFrame(qcLoop); });
+  document.addEventListener("click", e => { // a light tick on the buttons that matter, so the app feels physical
+    const t = e.target.closest && e.target.closest(".btn.pri, .ord, .tabbar button, .seg button, .opts button, .chips button, .lcbar button, [data-su], [data-g], .ask .go, #go");
+    if (t && !t.disabled) fxHaptic("tick");
+    const o = e.target.closest && e.target.closest(".opt"); if (o) setTimeout(() => { if (o.classList.contains("right")) sfx("right", { hap: false }); else if (o.classList.contains("wrong")) sfx("wrong", { hap: false }); }, 0);
+  }, true);
+}
+
+const QCORE = { cvs: new Set(), raf: 0, t0: 0 };
+const QC_V = (() => { const p = (1 + Math.sqrt(5)) / 2, v = [[-1, p, 0], [1, p, 0], [-1, -p, 0], [1, -p, 0], [0, -1, p], [0, 1, p], [0, -1, -p], [0, 1, -p], [p, 0, -1], [p, 0, 1], [-p, 0, -1], [-p, 0, 1]]; return v.map(a => { const n = Math.hypot(...a); return a.map(x => x / n); }); })();
+const QC_E = (() => { const e = []; for (let i = 0; i < 12; i++) for (let j = i + 1; j < 12; j++) { const d = Math.hypot(QC_V[i][0] - QC_V[j][0], QC_V[i][1] - QC_V[j][1], QC_V[i][2] - QC_V[j][2]); if (d < 1.1) e.push([i, j]); } return e; })();
+const QC_P = Array.from({ length: 42 }, (_, k) => { const y = 1 - (k + .5) / 21, r = Math.sqrt(Math.max(0, 1 - y * y)), a = k * 2.39996; return [Math.cos(a) * r, y, Math.sin(a) * r]; }); // Fibonacci sphere
+function qcState() { return typeof VM !== "undefined" && VM.on && VM.st !== "idle" && VM.st !== "type" ? VM.st : (typeof DK !== "undefined" && DK.busy) ? "think" : (QT && QT.speaking) ? "speak" : "idle"; }
+function qcDraw(cv, now) {
+  const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return; const dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const x = cv.getContext("2d"), st = qcState(), t = now / 1000, sp = st === "think" ? 2.6 : st === "speak" ? 1.4 : st === "listen" ? 1 : .45;
+  QCORE.ang = (QCORE.ang || 0) + sp * Math.min(.05, (now - (QCORE.last || now)) / 1000); QCORE.last = now; const a = QCORE.ang, b = a * .63 + .4;
+  const pulse = st === "speak" ? 1 + .1 * Math.sin(t * 17) * Math.sin(t * 5.3) : st === "listen" ? 1 + .06 * Math.sin(t * 4) : 1, R = Math.min(W, H) * .36 * pulse, cx = W / 2, cy = H / 2;
+  const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b), pr = v => { const x1 = v[0] * ca + v[2] * sa, z1 = -v[0] * sa + v[2] * ca, y1 = v[1] * cb - z1 * sb, z2 = v[1] * sb + z1 * cb, k = 2.6 / (2.6 + z2); return [cx + x1 * R * k, cy + y1 * R * k, z2]; };
+  const c1 = st === "think" ? "155,107,255" : "41,216,255", c2 = st === "think" ? "41,216,255" : "155,107,255";
+  x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, R * 1.5); g.addColorStop(0, `rgba(${c1},.32)`); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const P = QC_V.map(pr); x.lineWidth = Math.max(.8, R / 22);
+  for (const [i, j] of QC_E) { const z = (P[i][2] + P[j][2]) / 2, al = .35 + .5 * (1 - (z + 1) / 2); x.strokeStyle = `rgba(${c1},${al.toFixed(2)})`; x.beginPath(); x.moveTo(P[i][0], P[i][1]); x.lineTo(P[j][0], P[j][1]); x.stroke(); }
+  for (const p of QC_P.map(v => pr([v[0] * 1.35, v[1] * .25 * 1.35, v[2] * 1.35]))) { const al = .3 + .6 * (1 - (p[2] + 1.4) / 2.8); x.fillStyle = `rgba(${c2},${al.toFixed(2)})`; x.beginPath(); x.arc(p[0], p[1], Math.max(.7, R / 26), 0, Math.PI * 2); x.fill(); }
+  x.fillStyle = "#fff"; x.globalAlpha = .9; x.beginPath(); x.arc(cx, cy, Math.max(1.2, R * .16), 0, Math.PI * 2); x.fill(); x.globalAlpha = 1;
+}
+function qcLoop(now) {
+  QCORE.raf = 0; for (const cv of [...QCORE.cvs]) if (!cv.isConnected) QCORE.cvs.delete(cv); if (!QCORE.cvs.size || document.hidden) return;
+  for (const cv of QCORE.cvs) try { qcDraw(cv, now); } catch (e) {}
+  if (!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) QCORE.raf = requestAnimationFrame(qcLoop);
+}
+function qcMount(host) { // swap a CSS orb (or any empty box) for the 3D core
+  if (!host || host.querySelector("canvas.qcore")) return; const cv = document.createElement("canvas"); cv.className = "qcore"; cv.setAttribute("aria-hidden", "true"); host.classList.add("has3d"); host.appendChild(cv); QCORE.cvs.add(cv);
+  if (!QCORE.raf) QCORE.raf = requestAnimationFrame(qcLoop);
+}
 const VM = { on: false, st: "off", rec: null, txt: "", o: null, noRec: false, noAuto: false };
 const vmRecog = () => VM.noRec ? null : (window.SpeechRecognition || window.webkitSpeechRecognition || null);
 function vmHint() { return VM.on ? "\nVOICE MODE: the user is talking to you out loud and hears your reply read aloud. Answer in a few natural spoken sentences (under about 90 words unless they ask for detail), with no tables, lists, headings or symbols. If you make a trade call, still end with the CALL line." : ""; }
@@ -613,14 +716,14 @@ function vmListen(auto) {
   vmPaint();
 }
 function vmToggle(o) { // the mic button: start voice mode, talk, cut in while Quint speaks, or finish talking
-  if (!VM.on) { VM.on = true; VM.o = o; VM.noAuto = false; vmUnlock(); vmListen(false); return; } // listening starts inside the tap, as phones require
+  if (!VM.on) { VM.on = true; VM.o = o; VM.noAuto = false; vmUnlock(); sfx("on"); vmListen(false); return; } // listening starts inside the tap, as phones require
   VM.o = o;
   if (VM.st === "listen") { const r = VM.rec; if (r) try { r.stop(); } catch (e) { vmStopRec(); VM.st = "idle"; vmPaint(); } return; } // done talking: send what was heard
   if (VM.st === "speak") { try { o.hush(); } catch (e) {} VM.st = "idle"; vmListen(false); return; } // cut in
   if (VM.st === "think") return;
   vmListen(false);
 }
-function vmEnd() { if (!VM.on) return; VM.on = false; vmStopRec(); try { VM.o && VM.o.hush(); } catch (e) {} VM.st = "off"; vmPaint(); }
+function vmEnd() { if (!VM.on) return; sfx("off"); VM.on = false; vmStopRec(); try { VM.o && VM.o.hush(); } catch (e) {} VM.st = "off"; vmPaint(); }
 function vmAnswer(text) { // an answer arrived: say it, then listen again
   if (!VM.on || !VM.o) return; if (!text) { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); return; }
   const back = VM.st === "type", id = VM.sid = (VM.sid || 0) + 1; VM.st = "speak"; vmPaint();
@@ -684,6 +787,12 @@ function qtShrink(file) {
     im.onload = () => { try { const k = Math.min(1, 2000 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); c.toBlob(b => { URL.revokeObjectURL(u); b ? res(b) : rej(new Error("blob")); }, "image/jpeg", 0.9); } catch (e) { rej(e); } };
     im.onerror = () => { URL.revokeObjectURL(u); rej(new Error("image")); }; im.src = u; });
 }
+function fxSetHTML() { const c = fxCfg(); return `<h3>Sounds and haptics</h3><div class="fxset"><button type="button" class="lgtog" id="fxSnd" aria-pressed="${c.snd}"><span class="k"></span><span>Sound effects: a rising chime for a buy, falling for a sell, right and wrong in practice, target and stop</span></button>
+  <label class="small" for="fxVol">Volume: <b id="fxVolV">${Math.round((c.vol != null ? c.vol : .3) * 100)}%</b></label><input type="range" id="fxVol" min="0.05" max="1" step="0.05" value="${c.vol != null ? c.vol : .3}" style="width:100%">
+  <button type="button" class="lgtog" id="fxHap" aria-pressed="${c.hap}"><span class="k"></span><span>Haptics: little taps you feel on buttons and answers (iPhone with iOS 17.4 or later, or Android)</span></button>
+  <p class="small">The iPhone's silent switch also silences these sounds.</p></div>`; }
+function fxSetWire(sh) { const c = fxCfg(), tg = (id, k) => { const b = $("#" + id, sh); if (b) b.onclick = () => { c[k] = !c[k]; b.setAttribute("aria-pressed", c[k]); save(); if (c[k]) sfx(k === "snd" ? "right" : "tick"); }; };
+  tg("fxSnd", "snd"); tg("fxHap", "hap"); const v = $("#fxVol", sh); if (v) { v.oninput = () => { c.vol = +v.value; $("#fxVolV", sh).textContent = Math.round(c.vol * 100) + "%"; save(); }; v.onchange = () => sfx("buy"); } }
 const BL = { run: null, split: 0.5 };
 const BL_F = {
   breakout: { name: "Breakout", p: { n: [10, 15, 20, 30, 40, 55] } },
@@ -1329,7 +1438,7 @@ async function dkSend(text, opt = {}) {
     const tools = !chat && DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
     let r; try { r = await run(tools); } catch (e) { if (e && e.code === "tools_unavailable" && tools) { DK.noTools = true; A.t = ""; r = await run(null); } else throw e; }
     if (r && r.text) A.t = r.text; if (!A.t) throw { code: "empty_completion" };
-    const c = chat ? null : dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
+    const c = chat ? null : dkParse(A.t); if (c) { A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id; sfx(c.side > 0 ? "buy" : c.side < 0 ? "sell" : "flat", { hap: false }); }
   } catch (e) { const c = e && e.code; if (e && e.text) A.t = e.text; A.err = c === "cancelled" ? (A.t ? null : "Stopped.") : c === "not_ready" ? "Live data isn't connected, so Quint can't read the charts. Reload to reconnect." : c === "image_rejected" ? "Claude couldn't take that image. Try a smaller or clearer screenshot." : NW_ERR[c] || "Something went wrong reaching Quint. Try again in a moment."; }
   finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); if (typeof vmAnswer === "function") vmAnswer(A.t ? A.t : A.err || "", m); }
 }
@@ -1803,9 +1912,11 @@ function openSet() {
     <div class="fld"><span class="lab">How you trade</span><div class="opts" role="group" aria-label="How you trade">${[["scalp", "Scalper"], ["day", "Day trader"], ["both", "Both"]].map(([k, l]) => `<button type="button" data-st="${k}" aria-pressed="${TS() === k}">${l}</button>`).join("")}</div></div>
     <div class="fld"><span class="lab">TradingView calls today: <span id="tvu">${tvOut() ? "used up, says TradingView" : s.tvPlanSet ? `${tvUsed()} of ${tvPlan()}` : `${tvUsed()} counted · pick your plan`}</span></span><div class="opts" role="group" aria-label="Your TradingView plan">${TV_PLANS.map(([n, nm]) => `<button type="button" data-tvp="${n}" aria-pressed="${!!s.tvPlanSet && tvPlan() === n}">${esc(nm)} ${n}</button>`).join("")}</div><p class="small">TradingView allows its connector a set number of calls a day on each plan (the AI add-on gives 500). A Quint answer costs about one: he keeps the candles on this phone and fetches only the newest minutes. He refreshes on his own only on Ultimate (every 10 minutes) or the AI add-on (every 2); otherwise tap ↻ or ask him.</p></div>
     <div class="fld"><span class="lab">Quint's voice</span><p class="small" id="vnote"></p><div class="voices" id="vlist"></div></div>
+    <div class="fld">${fxSetHTML().replace("<h3>", '<span class="lab">').replace("</h3>", "</span>")}</div>
     <div class="fld"><label for="srate">Speaking speed: <span id="sratev">${(+s.rate || 1).toFixed(2)}×</span></label><input type="range" id="srate" min="0.7" max="1.5" step="0.05" value="${esc(s.rate || 1)}"></div>
     <p class="small">Prices come from your TradingView connector${MK.tvLive ? ", with real-time CME data" : " (futures run about 10 minutes behind without real-time CME data)"}. Calls, alerts and settings are kept on this device. Quint makes calls to help you learn and decide; he can be wrong, and nothing here places real orders.</p>`;
   $("#scrim").classList.add("open"); paintVoices();
+  fxSetWire(sh);
   $("#setx").onclick = closeSet; $("#scrim").onclick = e => { if (e.target.id === "scrim") closeSet(); };
   $("#sname").oninput = e => { s.name = e.target.value.slice(0, 40); save(); };
   $("#ssize").oninput = e => { const v = +e.target.value; if (v >= 1000) { s.acct = v; save(); $("#spctv").textContent = `${s.pct}% = ${fbal(qaAcct().risk)}`; } };
@@ -1844,7 +1955,7 @@ function qaStart() {
   ta.addEventListener("focus", () => kbOn(true)); ta.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== ta) kbOn(false); }, 150));
   $("#askf").onsubmit = e => { e.preventDefault(); if (DK.busy) { if (DK.ctl) DK.ctl.abort(); return; } const v = ta.value.trim(); if (!v && !DK.img) return; ta.value = ""; fit();
     if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(v || "Read my chart and give me your call.", DK.img ? { img: DK.img } : {}); DK.img = null; paintImg(); };
-  $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
+  fxInit(); $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
   $("#file").onchange = async e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { DK.img = await qtShrink(f); paintImg(); ta.focus(); } catch (err) { hmToast("That file couldn't be opened as an image."); } };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#scrim").classList.contains("open")) { e.preventDefault(); closeSet(); } });
   window.addEventListener("resize", () => { drawTape(); drawSess(); drawScope(); coreKick(); });
@@ -1862,7 +1973,7 @@ function qbVmPaint(V) {
   if (!V.on) { if (bar) bar.remove(); return; }
   if (!bar) { bar = document.createElement("div"); bar.id = "vmbar"; f.before(bar); }
   bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="btn sm vmx" aria-label="End voice mode">End</button>`;
-  bar.querySelector(".vmx").onclick = vmEnd;
+  bar.querySelector(".vmx").onclick = vmEnd; qcMount(bar.querySelector(".vmorb"));
 }
 
 /* ================= QUINT: the brain. A 3D network that turns as you drag it, wired from the same live data ================= */

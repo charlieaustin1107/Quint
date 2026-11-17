@@ -97,7 +97,7 @@ function voiceList() { try { return (window.speechSynthesis && speechSynthesis.g
 function voicePick() { const vs = voiceList(), want = HS().voice && vs.find(v => v.voiceURI === HS().voice || v.name === HS().voice); if (want) return want; return vs.filter(v => voiceScore(v) > 0).sort((a, b) => voiceScore(b) - voiceScore(a))[0] || null; }
 if (window.speechSynthesis) { try { speechSynthesis.onvoiceschanged = () => { if ($("#qvl")) qtVoicePaint(); }; speechSynthesis.getVoices(); } catch (e) {} }
 function openVoice() {
-  openSheet(`${shead("🔊 Quint's voice")}<p class="small" id="qvn"></p><div class="qvl" id="qvl"></div><label class="small" for="qvr" style="display:block;margin-top:10px">Speed: <b id="qvrv">${(+HS().vrate || 1).toFixed(2)}×</b></label><input type="range" id="qvr" min="0.7" max="1.5" step="0.05" value="${+HS().vrate || 1}" style="width:100%">`);
+  openSheet(`${shead("🔊 Voice, sounds &amp; haptics")}<p class="small" id="qvn"></p><div class="qvl" id="qvl"></div><label class="small" for="qvr" style="display:block;margin-top:10px">Speed: <b id="qvrv">${(+HS().vrate || 1).toFixed(2)}×</b></label><input type="range" id="qvr" min="0.7" max="1.5" step="0.05" value="${+HS().vrate || 1}" style="width:100%">${fxSetHTML()}`, fxSetWire);
   $("#qvr").oninput = e => { HS().vrate = +e.target.value; save(); $("#qvrv").textContent = `${HS().vrate.toFixed(2)}×`; }; qtVoicePaint();
 }
 function qtVoicePaint() {
@@ -107,6 +107,109 @@ function qtVoicePaint() {
   note.innerHTML = `On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. <b>For a much more human voice, download a Premium one:</b> Settings → Accessibility → Spoken Content (Read &amp; Speak on newer iPhones) → Voices → English, then tap a voice marked Premium, such as Ava, Zoe or Evan (US) or Jamie or Serena (UK), and download it. Come back here and tap it. Robotic voices are marked at the bottom.`;
   el.innerHTML = vs.length ? vs.map(v => `<button class="btn${cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name) ? " pri" : ""}" data-vu="${esc(v.voiceURI || v.name)}">${esc(v.name.replace(/\s*\(.*\)$/, ""))} <small>${esc(v.lang)}${voiceScore(v) < 0 ? " · robotic" : /premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : `<p class="small">No voices are listed yet. Tap 🔊 Listen on any answer, then come back.</p>`;
   $$("[data-vu]", el).forEach(b => b.onclick = () => { HS().voice = b.dataset.vu; save(); qtVoicePaint(); test(); });
+}
+/* ---------- sound effects, haptics and the 3D Quint core ---------- */
+// ZzFX - Zuper Zmall Zound Zynth - Micro Edition, v1.4.0 by Frank Force
+// MIT License - Copyright 2019 Frank Force - https://github.com/KilledByAPixel/ZzFX
+// (vendored; the only change: the audio context is created on the first tap, as iPhones require, and volume follows the setting)
+let zzfxV = .3, zzfxX = null;
+const zzfx = (volume = 1, randomness = .05, frequency = 220, attack = 0, sustain = 0, release = .1, shape = 0, shapeCurve = 1, slide = 0, deltaSlide = 0, pitchJump = 0, pitchJumpTime = 0, repeatTime = 0, noise = 0, modulation = 0, bitCrush = 0, delay = 0, sustainVolume = 1, decay = 0, tremolo = 0, filter = 0) => {
+  if (!zzfxX) return null;
+  const sampleRate = 44100; let PI2 = Math.PI * 2, abs = Math.abs, sign = v => v < 0 ? -1 : 1, startSlide = slide *= 500 * PI2 / sampleRate / sampleRate,
+    startFrequency = frequency *= (1 + randomness * 2 * Math.random() - randomness) * PI2 / sampleRate, modOffset = 0, repeat = 0, crush = 0, jump = 1, length, b = [], t = 0, i = 0, s = 0, f,
+    source = zzfxX.createBufferSource(), buffer, quality = 2, w = PI2 * abs(filter) * 2 / sampleRate, cos = Math.cos(w), alpha = Math.sin(w) / 2 / quality,
+    a0 = 1 + alpha, a1 = -2 * cos / a0, a2 = (1 - alpha) / a0, b0 = (1 + sign(filter) * cos) / 2 / a0, b1 = -(sign(filter) + cos) / a0, b2 = b0, x2 = 0, x1 = 0, y2 = 0, y1 = 0;
+  const minAttack = 9; attack = attack * sampleRate || minAttack; decay *= sampleRate; sustain *= sampleRate; release *= sampleRate; delay *= sampleRate; deltaSlide *= 500 * PI2 / sampleRate ** 3;
+  modulation *= PI2 / sampleRate; pitchJump *= PI2 / sampleRate; pitchJumpTime *= sampleRate; repeatTime = repeatTime * sampleRate | 0; volume *= zzfxV;
+  for (length = attack + decay + sustain + release + delay | 0; i < length; b[i++] = s * volume) {
+    if (!(++crush % (bitCrush * 100 | 0))) {
+      s = shape ? shape > 1 ? shape > 2 ? shape > 3 ? shape > 4 ? (t / PI2 % 1 < shapeCurve / 2) * 2 - 1 : Math.sin(t ** 3) : Math.max(Math.min(Math.tan(t), 1), -1) : 1 - (2 * t / PI2 % 2 + 2) % 2 : 1 - 4 * abs(Math.round(t / PI2) - t / PI2) : Math.sin(t);
+      s = (repeatTime ? 1 - tremolo + tremolo * Math.sin(PI2 * i / repeatTime) : 1) * (shape > 4 ? s : sign(s) * abs(s) ** shapeCurve) *
+        (i < attack ? i / attack : i < attack + decay ? 1 - ((i - attack) / decay) * (1 - sustainVolume) : i < attack + decay + sustain ? sustainVolume : i < length - delay ? (length - i - delay) / release * sustainVolume : 0);
+      s = delay ? s / 2 + (delay > i ? 0 : (i < length - delay ? 1 : (length - i) / delay) * b[i - delay | 0] / 2 / volume) : s;
+      if (filter) s = y1 = b2 * x2 + b1 * (x2 = x1) + b0 * (x1 = s) - a2 * y2 - a1 * (y2 = y1);
+    }
+    f = (frequency += slide += deltaSlide) * Math.cos(modulation * modOffset++); t += f + f * noise * (i * i * PI2 % 2 - 1);
+    if (jump && ++jump > pitchJumpTime) { frequency += pitchJump; startFrequency += pitchJump; jump = 0; }
+    if (repeatTime && !(++repeat % repeatTime)) { frequency = startFrequency; slide = startSlide; jump ||= 1; }
+  }
+  buffer = zzfxX.createBuffer(1, b.length, sampleRate); buffer.getChannelData(0).set(b); source.buffer = buffer; source.connect(zzfxX.destination); source.start(); return source;
+};
+// What each moment sounds like: [delay ms, ZzFX parameters] steps. Short, quiet, and each one means something.
+const FX_SND = {
+  buy: [[0, [.55, 0, 523, .005, .05, .16, 0]], [85, [.55, 0, 784, .005, .07, .24, 0]]],          // rising: a buy call
+  sell: [[0, [.55, 0, 784, .005, .05, .16, 0]], [85, [.55, 0, 523, .005, .07, .24, 0]]],         // falling: a sell call
+  flat: [[0, [.4, 0, 392, .005, .04, .18, 0]]],                                                   // no trade
+  right: [[0, [.5, 0, 1047, .004, .03, .14, 0]], [80, [.5, 0, 1319, .004, .05, .22, 0]]],       // practice: right
+  wrong: [[0, [.45, 0, 196, .01, .07, .2, 2, 1, -.6, , , , , , , , , , , , 900]]],               // practice: wrong
+  win: [[0, [.5, 0, 523, .004, .04, .12, 0]], [70, [.5, 0, 659, .004, .04, .12, 0]], [140, [.55, 0, 1047, .004, .08, .3, 0]]], // target hit
+  loss: [[0, [.5, 0, 220, .01, .1, .3, 1, 1, -.8]]],                                              // stop hit
+  alert: [[0, [.45, 0, 1568, .002, .02, .5, 0, 1, , , , , , , , , .09]]],                          // alert set
+  warn: [[0, [.4, 0, 330, .005, .06, .06, 1]], [160, [.4, 0, 330, .005, .06, .06, 1]]],          // careful
+  on: [[0, [.4, 0, 660, .005, .04, .1, 0, 1, 6]]], off: [[0, [.4, 0, 880, .005, .04, .1, 0, 1, -6]]], // voice mode on and off
+  draw: [[0, [.25, 0, 1400, .002, .01, .04, 1]]],                                                 // a line placed
+};
+// What each moment feels like: ticks (iPhone) or a vibration pattern in ms (Android)
+const FX_HAP = { tick: [1, [8]], draw: [1, [10]], buy: [2, [14, 70, 22]], sell: [2, [22, 70, 14]], flat: [1, [12]], right: [2, [12, 60, 18]], wrong: [3, [30, 50, 30, 50, 30]], win: [3, [12, 50, 12, 50, 30]], loss: [2, [40, 60, 40]], alert: [2, [18, 80, 18]], warn: [2, [25, 90, 25]], on: [1, [16]], off: [1, [10]] };
+const fxCfg = () => { const h = HS(); if (!h.fx || typeof h.fx !== "object") h.fx = { snd: true, hap: true }; return h.fx; };
+const FXH = { lab: null, inp: null };
+function fxUnlock() { // inside a tap: wake the audio, build the haptic switch
+  try { if (!zzfxX) { const A = window.AudioContext || window.webkitAudioContext; if (A) zzfxX = new A(); } if (zzfxX && zzfxX.state === "suspended") zzfxX.resume(); } catch (e) {}
+  if (!FXH.lab && document.body) { try { const l = document.createElement("label"), i = document.createElement("input"); i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1; l.setAttribute("aria-hidden", "true"); l.style.cssText = "position:fixed;left:-99px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden"; l.appendChild(i); document.body.appendChild(l); FXH.lab = l; FXH.inp = i; } catch (e) {} }
+}
+function fxHaptic(name) { // iPhone (Safari 17.4+): toggling a switch inside a tap gives a Taptic tick (the technique from lochie/web-haptics, MIT). Android: the Vibration API.
+  if (!fxCfg().hap) return; const h = FX_HAP[name] || FX_HAP.tick;
+  try { if (navigator.vibrate && !/iP(hone|ad|od)/.test(navigator.userAgent)) { navigator.vibrate(h[1]); return; } } catch (e) {}
+  if (!FXH.lab) return; for (let k = 0; k < h[0]; k++) setTimeout(() => { try { FXH.lab.click(); } catch (e) {} }, k * 70);
+  (window.__haps = window.__haps || []).push(name);
+}
+function sfx(name, o = {}) { // play a moment: its sound and its feel
+  const c = fxCfg(); if (o.hap !== false) fxHaptic(name);
+  if (!c.snd || o.snd === false || !FX_SND[name]) return; if (QT && QT.speaking && !o.over) return; // never talk over Quint
+  zzfxV = clamp(c.vol != null ? +c.vol : .3, 0, 1); (window.__sfx = window.__sfx || []).push(name);
+  for (const [ms, p] of FX_SND[name]) setTimeout(() => { try { zzfx(...p); } catch (e) {} }, ms);
+}
+function fxInit() { // each app calls this once
+  if (FXH.init || typeof document === "undefined") return; FXH.init = true;
+  document.addEventListener("pointerdown", fxUnlock, { capture: true, passive: true });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && QCORE.cvs.size && !QCORE.raf) QCORE.raf = requestAnimationFrame(qcLoop); });
+  document.addEventListener("click", e => { // a light tick on the buttons that matter, so the app feels physical
+    const t = e.target.closest && e.target.closest(".btn.pri, .ord, .tabbar button, .seg button, .opts button, .chips button, .lcbar button, [data-su], [data-g], .ask .go, #go");
+    if (t && !t.disabled) fxHaptic("tick");
+    const o = e.target.closest && e.target.closest(".opt"); if (o) setTimeout(() => { if (o.classList.contains("right")) sfx("right", { hap: false }); else if (o.classList.contains("wrong")) sfx("wrong", { hap: false }); }, 0);
+  }, true);
+}
+
+/* the 3D Quint core: a glowing wireframe icosahedron with an orbit of points, drawn with a plain canvas projection.
+   It turns slowly at rest, spins while Quint thinks, pulses while he talks and breathes while he listens. */
+const QCORE = { cvs: new Set(), raf: 0, t0: 0 };
+const QC_V = (() => { const p = (1 + Math.sqrt(5)) / 2, v = [[-1, p, 0], [1, p, 0], [-1, -p, 0], [1, -p, 0], [0, -1, p], [0, 1, p], [0, -1, -p], [0, 1, -p], [p, 0, -1], [p, 0, 1], [-p, 0, -1], [-p, 0, 1]]; return v.map(a => { const n = Math.hypot(...a); return a.map(x => x / n); }); })();
+const QC_E = (() => { const e = []; for (let i = 0; i < 12; i++) for (let j = i + 1; j < 12; j++) { const d = Math.hypot(QC_V[i][0] - QC_V[j][0], QC_V[i][1] - QC_V[j][1], QC_V[i][2] - QC_V[j][2]); if (d < 1.1) e.push([i, j]); } return e; })();
+const QC_P = Array.from({ length: 42 }, (_, k) => { const y = 1 - (k + .5) / 21, r = Math.sqrt(Math.max(0, 1 - y * y)), a = k * 2.39996; return [Math.cos(a) * r, y, Math.sin(a) * r]; }); // Fibonacci sphere
+function qcState() { return typeof VM !== "undefined" && VM.on && VM.st !== "idle" && VM.st !== "type" ? VM.st : (typeof DK !== "undefined" && DK.busy) ? "think" : (QT && QT.speaking) ? "speak" : "idle"; }
+function qcDraw(cv, now) {
+  const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return; const dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const x = cv.getContext("2d"), st = qcState(), t = now / 1000, sp = st === "think" ? 2.6 : st === "speak" ? 1.4 : st === "listen" ? 1 : .45;
+  QCORE.ang = (QCORE.ang || 0) + sp * Math.min(.05, (now - (QCORE.last || now)) / 1000); QCORE.last = now; const a = QCORE.ang, b = a * .63 + .4;
+  const pulse = st === "speak" ? 1 + .1 * Math.sin(t * 17) * Math.sin(t * 5.3) : st === "listen" ? 1 + .06 * Math.sin(t * 4) : 1, R = Math.min(W, H) * .36 * pulse, cx = W / 2, cy = H / 2;
+  const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b), pr = v => { const x1 = v[0] * ca + v[2] * sa, z1 = -v[0] * sa + v[2] * ca, y1 = v[1] * cb - z1 * sb, z2 = v[1] * sb + z1 * cb, k = 2.6 / (2.6 + z2); return [cx + x1 * R * k, cy + y1 * R * k, z2]; };
+  const c1 = st === "think" ? "155,107,255" : "41,216,255", c2 = st === "think" ? "41,216,255" : "155,107,255";
+  x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, R * 1.5); g.addColorStop(0, `rgba(${c1},.32)`); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const P = QC_V.map(pr); x.lineWidth = Math.max(.8, R / 22);
+  for (const [i, j] of QC_E) { const z = (P[i][2] + P[j][2]) / 2, al = .35 + .5 * (1 - (z + 1) / 2); x.strokeStyle = `rgba(${c1},${al.toFixed(2)})`; x.beginPath(); x.moveTo(P[i][0], P[i][1]); x.lineTo(P[j][0], P[j][1]); x.stroke(); }
+  for (const p of QC_P.map(v => pr([v[0] * 1.35, v[1] * .25 * 1.35, v[2] * 1.35]))) { const al = .3 + .6 * (1 - (p[2] + 1.4) / 2.8); x.fillStyle = `rgba(${c2},${al.toFixed(2)})`; x.beginPath(); x.arc(p[0], p[1], Math.max(.7, R / 26), 0, Math.PI * 2); x.fill(); }
+  x.fillStyle = "#fff"; x.globalAlpha = .9; x.beginPath(); x.arc(cx, cy, Math.max(1.2, R * .16), 0, Math.PI * 2); x.fill(); x.globalAlpha = 1;
+}
+function qcLoop(now) {
+  QCORE.raf = 0; for (const cv of [...QCORE.cvs]) if (!cv.isConnected) QCORE.cvs.delete(cv); if (!QCORE.cvs.size || document.hidden) return;
+  for (const cv of QCORE.cvs) try { qcDraw(cv, now); } catch (e) {}
+  if (!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) QCORE.raf = requestAnimationFrame(qcLoop);
+}
+function qcMount(host) { // swap a CSS orb (or any empty box) for the 3D core
+  if (!host || host.querySelector("canvas.qcore")) return; const cv = document.createElement("canvas"); cv.className = "qcore"; cv.setAttribute("aria-hidden", "true"); host.classList.add("has3d"); host.appendChild(cv); QCORE.cvs.add(cv);
+  if (!QCORE.raf) QCORE.raf = requestAnimationFrame(qcLoop);
 }
 /* ---------- voice mode: talk to Quint, he answers out loud, then listens again ----------
    Each app hands vmToggle an adapter: { input, send(text), speak(text, done), hush(), paint(), lang }.
@@ -130,14 +233,14 @@ function vmListen(auto) {
   vmPaint();
 }
 function vmToggle(o) { // the mic button: start voice mode, talk, cut in while Quint speaks, or finish talking
-  if (!VM.on) { VM.on = true; VM.o = o; VM.noAuto = false; vmUnlock(); vmListen(false); return; } // listening starts inside the tap, as phones require
+  if (!VM.on) { VM.on = true; VM.o = o; VM.noAuto = false; vmUnlock(); sfx("on"); vmListen(false); return; } // listening starts inside the tap, as phones require
   VM.o = o;
   if (VM.st === "listen") { const r = VM.rec; if (r) try { r.stop(); } catch (e) { vmStopRec(); VM.st = "idle"; vmPaint(); } return; } // done talking: send what was heard
   if (VM.st === "speak") { try { o.hush(); } catch (e) {} VM.st = "idle"; vmListen(false); return; } // cut in
   if (VM.st === "think") return;
   vmListen(false);
 }
-function vmEnd() { if (!VM.on) return; VM.on = false; vmStopRec(); try { VM.o && VM.o.hush(); } catch (e) {} VM.st = "off"; vmPaint(); }
+function vmEnd() { if (!VM.on) return; sfx("off"); VM.on = false; vmStopRec(); try { VM.o && VM.o.hush(); } catch (e) {} VM.st = "off"; vmPaint(); }
 function vmAnswer(text) { // an answer arrived: say it, then listen again
   if (!VM.on || !VM.o) return; if (!text) { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); return; }
   const back = VM.st === "type", id = VM.sid = (VM.sid || 0) + 1; VM.st = "speak"; vmPaint();
@@ -472,7 +575,7 @@ function prPaint() {
   if (P.done) { const m = R.mine, lines = m ? [{ p: m.e, col: "#9fb3d9", lab: "entry" }, { p: m.st, col: "#ef5350", lab: "stop" }, { p: m.tg, col: "#26a69a", lab: "target" }] : []; qtDraw($("#prCv"), B, i - 99, R.end + 1, { h: 300, mark: i + 1, lines, S: MKSPEC[P.k], tf: P.tf }); }
   else qtDraw($("#prCv"), B, i - 99, i + 1, { h: 300, S: MKSPEC[P.k], tf: P.tf });
   $$("#prBody [data-g]").forEach(b => b.onclick = () => { const g = b.dataset.g; P[g] = g === "stop" || g === "tgt" ? +b.dataset.k : b.dataset.k; prPaint(); });
-  const go = $("#prGo"); if (go) go.onclick = () => { prReveal(); prPaint(); };
+  const go = $("#prGo"); if (go) go.onclick = () => { prReveal(); sfx(P.res && P.dir === P.res.truth ? "right" : "wrong"); prPaint(); };
   const nx = $("#prNext"); if (nx) nx.onclick = () => { if (P.B.sim && (P.nSim = (P.nSim || 0) + 1) % 8 === 0) { prLoad(P.tf); return; } prNew(P.B); prPaint(); $("#sheet").scrollTop = 0; }; // practice candles move to a new stretch of the year every 8 charts
   const rl = $("#prReal"); if (rl) rl.onclick = () => { P.real = true; prLoad(P.tf); };
   const why = $("#prWhy"); if (why) why.onclick = () => nwAsk(P.T, prWhyPrompt(), () => { const o = $("#prOut"); if (o) { o.hidden = false; o.innerHTML = qtQ(P.T); } }).then(prPaint);
@@ -491,3 +594,10 @@ function openPrac(k0) {
 qtVoiceInit();
 
 function qtHush() { try { if (QT.tts) QT.tts.stop(); else if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {} QT.speaking = false; $$(".qtsay").forEach(b => { b.textContent = "🔊 Listen"; }); }
+
+function fxSetHTML() { const c = fxCfg(); return `<h3>Sounds and haptics</h3><div class="fxset"><button type="button" class="lgtog" id="fxSnd" aria-pressed="${c.snd}"><span class="k"></span><span>Sound effects: a rising chime for a buy, falling for a sell, right and wrong in practice, target and stop</span></button>
+  <label class="small" for="fxVol">Volume: <b id="fxVolV">${Math.round((c.vol != null ? c.vol : .3) * 100)}%</b></label><input type="range" id="fxVol" min="0.05" max="1" step="0.05" value="${c.vol != null ? c.vol : .3}" style="width:100%">
+  <button type="button" class="lgtog" id="fxHap" aria-pressed="${c.hap}"><span class="k"></span><span>Haptics: little taps you feel on buttons and answers (iPhone with iOS 17.4 or later, or Android)</span></button>
+  <p class="small">The iPhone's silent switch also silences these sounds.</p></div>`; }
+function fxSetWire(sh) { const c = fxCfg(), tg = (id, k) => { const b = $("#" + id, sh); if (b) b.onclick = () => { c[k] = !c[k]; b.setAttribute("aria-pressed", c[k]); save(); if (c[k]) sfx(k === "snd" ? "right" : "tick"); }; };
+  tg("fxSnd", "snd"); tg("fxHap", "hap"); const v = $("#fxVol", sh); if (v) { v.oninput = () => { c.vol = +v.value; $("#fxVolV", sh).textContent = Math.round(c.vol * 100) + "%"; save(); }; v.onchange = () => sfx("buy"); } }

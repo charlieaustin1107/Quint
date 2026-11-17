@@ -1250,6 +1250,12 @@ h2, h3, h4, .hmsec > h2, .sec h3, .q .qk, .nav h6, .event .tag, .rsec h4, .kpi s
 .vmbar.listen .vmorb { animation-duration: 1s; } .vmbar.listen .vmorb i { animation: qcore .7s ease-in-out infinite; }
 .vmbar.speak .vmorb i { animation: qcore .45s ease-in-out infinite; } .vmbar.think .vmorb { animation-duration: 1.6s; }
 @media (prefers-reduced-motion: reduce) { .vmorb, .vmorb i, .qdkmic.live { animation: none !important; } }
+
+/* ---------- 3D Quint core + sound settings ---------- */
+.has3d { background: none !important; animation: none !important; box-shadow: none !important; } .has3d > s, .has3d > i { display: none !important; }
+canvas.qcore { position: absolute; left: -35%; top: -35%; width: 170%; height: 170%; pointer-events: none; }
+.vmorb.has3d { overflow: visible; }
+.fxset { display: flex; flex-direction: column; gap: 8px; }
 </style>
 </head>
 <body>
@@ -6436,6 +6442,7 @@ function lvClose(P, px, why, at, note) {
   if (!P || !P.open) return true; const m = lvMkt(P), I = mkSpec(m), stk = P.kind === "stk";
   px = Math.round(px / I.tick) * I.tick; P.open = false; P.R = (px - P.e) * P.dir / P.sd; P.net = Math.round(((px - P.e) * P.dir * P.qty * lvPV(P, I) - P.fees) * 100) / 100;
   P.exit = { px, why, at: at || Date.now(), be: why === "stop" && Math.abs(P.stop - P.e) < I.tick / 2 }; P.note = note || null;
+  if (Date.now() - P.exit.at < 6e4 && typeof sfx === "function") sfx(P.net > 0 ? "win" : "loss", { over: true }); // only for trades closing now, not ones settled on reopening
   let cres = null;
   if (stk) { const K = SK(); K.bal = Math.round((K.bal + P.net) * 100) / 100; K.n++; K.net = Math.round((K.net + P.net) * 100) / 100; if (P.net > 0) K.wins++; K.peak = Math.max(K.peak, K.bal); }
   else { ST.fees += P.fees; bank(P.net, "trade"); cres = copyTrade(P, I); ST.trades++; ST.net += P.net; if (P.net > 0) ST.wins++; ST.eq.push(Math.round(ST.bal)); if (ST.eq.length > 400) ST.eq.shift(); }
@@ -6603,10 +6610,10 @@ const LC_COL = { h: "#ffb547", t: "#29d8ff", z: "#9b6bff" };
     if (d && d.kind === "draw") {
       const p = this.pt(e); this.pts.delete(e.pointerId); try { this.cv.releasePointerCapture(e.pointerId); } catch (_) {} this.drag = null; const T = this.tmp; if (!T || cancel) { this.tmp = null; this.req(); return; }
       const far = Math.hypot(p.x - d.p0.x, p.y - d.p0.y) > 8;
-      if (T.k === "h") { this.pushU(); this.dr.push({ k: "h", a: T.a }); this.selD = this.dr.length - 1; this.tmp = null; this.saveD(); this.setMode("cur"); return; }
+      if (T.k === "h") { sfx("draw"); this.pushU(); this.dr.push({ k: "h", a: T.a }); this.selD = this.dr.length - 1; this.tmp = null; this.saveD(); this.setMode("cur"); return; }
       if (!far && !d.second) { T.armed = true; this.req(); if (this.onHint) this.onHint("Now tap where it ends."); return; } // tap, tap: first point, then the second
       if (T.k === "m") { this.meas = { a: T.a, b: T.b }; this.tmp = null; this.req(); return; }
-      this.pushU(); this.dr.push({ k: T.k, a: T.a, b: T.b }); this.selD = this.dr.length - 1; this.tmp = null; this.saveD(); this.setMode("cur"); return;
+      sfx("draw"); this.pushU(); this.dr.push({ k: T.k, a: T.a, b: T.b }); this.selD = this.dr.length - 1; this.tmp = null; this.saveD(); this.setMode("cur"); return;
     }
     if (d && d.kind === "pan" && !d.moved && !cancel && this.dr) { const h = this.hitD(this.pt(e)); if (h || this.selD != null) { this.selD = h ? h.k : null; this.pts.delete(e.pointerId); this.drag = null; this.cross = null; this.legend(); this.req(); if (this.onMode) this.onMode(this.mode || "cur"); return; } }
     return up0.call(this, e, cancel);
@@ -7485,7 +7492,7 @@ function voiceList() { try { return (window.speechSynthesis && speechSynthesis.g
 function voicePick() { const vs = voiceList(), want = HS().voice && vs.find(v => v.voiceURI === HS().voice || v.name === HS().voice); if (want) return want; return vs.filter(v => voiceScore(v) > 0).sort((a, b) => voiceScore(b) - voiceScore(a))[0] || null; }
 if (window.speechSynthesis) { try { speechSynthesis.onvoiceschanged = () => { if ($("#qvl")) qtVoicePaint(); }; speechSynthesis.getVoices(); } catch (e) {} }
 function openVoice() {
-  openSheet(`${shead("🔊 Quint's voice")}<p class="small" id="qvn"></p><div class="qvl" id="qvl"></div><label class="small" for="qvr" style="display:block;margin-top:10px">Speed: <b id="qvrv">${(+HS().vrate || 1).toFixed(2)}×</b></label><input type="range" id="qvr" min="0.7" max="1.5" step="0.05" value="${+HS().vrate || 1}" style="width:100%">`);
+  openSheet(`${shead("🔊 Voice, sounds &amp; haptics")}<p class="small" id="qvn"></p><div class="qvl" id="qvl"></div><label class="small" for="qvr" style="display:block;margin-top:10px">Speed: <b id="qvrv">${(+HS().vrate || 1).toFixed(2)}×</b></label><input type="range" id="qvr" min="0.7" max="1.5" step="0.05" value="${+HS().vrate || 1}" style="width:100%">${fxSetHTML()}`, fxSetWire);
   $("#qvr").oninput = e => { HS().vrate = +e.target.value; save(); $("#qvrv").textContent = `${HS().vrate.toFixed(2)}×`; }; qtVoicePaint();
 }
 function qtVoicePaint() {
@@ -7495,6 +7502,109 @@ function qtVoicePaint() {
   note.innerHTML = `On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. <b>For a much more human voice, download a Premium one:</b> Settings → Accessibility → Spoken Content (Read &amp; Speak on newer iPhones) → Voices → English, then tap a voice marked Premium, such as Ava, Zoe or Evan (US) or Jamie or Serena (UK), and download it. Come back here and tap it. Robotic voices are marked at the bottom.`;
   el.innerHTML = vs.length ? vs.map(v => `<button class="btn${cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name) ? " pri" : ""}" data-vu="${esc(v.voiceURI || v.name)}">${esc(v.name.replace(/\s*\(.*\)$/, ""))} <small>${esc(v.lang)}${voiceScore(v) < 0 ? " · robotic" : /premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : `<p class="small">No voices are listed yet. Tap 🔊 Listen on any answer, then come back.</p>`;
   $$("[data-vu]", el).forEach(b => b.onclick = () => { HS().voice = b.dataset.vu; save(); qtVoicePaint(); test(); });
+}
+/* ---------- sound effects, haptics and the 3D Quint core ---------- */
+// ZzFX - Zuper Zmall Zound Zynth - Micro Edition, v1.4.0 by Frank Force
+// MIT License - Copyright 2019 Frank Force - https://github.com/KilledByAPixel/ZzFX
+// (vendored; the only change: the audio context is created on the first tap, as iPhones require, and volume follows the setting)
+let zzfxV = .3, zzfxX = null;
+const zzfx = (volume = 1, randomness = .05, frequency = 220, attack = 0, sustain = 0, release = .1, shape = 0, shapeCurve = 1, slide = 0, deltaSlide = 0, pitchJump = 0, pitchJumpTime = 0, repeatTime = 0, noise = 0, modulation = 0, bitCrush = 0, delay = 0, sustainVolume = 1, decay = 0, tremolo = 0, filter = 0) => {
+  if (!zzfxX) return null;
+  const sampleRate = 44100; let PI2 = Math.PI * 2, abs = Math.abs, sign = v => v < 0 ? -1 : 1, startSlide = slide *= 500 * PI2 / sampleRate / sampleRate,
+    startFrequency = frequency *= (1 + randomness * 2 * Math.random() - randomness) * PI2 / sampleRate, modOffset = 0, repeat = 0, crush = 0, jump = 1, length, b = [], t = 0, i = 0, s = 0, f,
+    source = zzfxX.createBufferSource(), buffer, quality = 2, w = PI2 * abs(filter) * 2 / sampleRate, cos = Math.cos(w), alpha = Math.sin(w) / 2 / quality,
+    a0 = 1 + alpha, a1 = -2 * cos / a0, a2 = (1 - alpha) / a0, b0 = (1 + sign(filter) * cos) / 2 / a0, b1 = -(sign(filter) + cos) / a0, b2 = b0, x2 = 0, x1 = 0, y2 = 0, y1 = 0;
+  const minAttack = 9; attack = attack * sampleRate || minAttack; decay *= sampleRate; sustain *= sampleRate; release *= sampleRate; delay *= sampleRate; deltaSlide *= 500 * PI2 / sampleRate ** 3;
+  modulation *= PI2 / sampleRate; pitchJump *= PI2 / sampleRate; pitchJumpTime *= sampleRate; repeatTime = repeatTime * sampleRate | 0; volume *= zzfxV;
+  for (length = attack + decay + sustain + release + delay | 0; i < length; b[i++] = s * volume) {
+    if (!(++crush % (bitCrush * 100 | 0))) {
+      s = shape ? shape > 1 ? shape > 2 ? shape > 3 ? shape > 4 ? (t / PI2 % 1 < shapeCurve / 2) * 2 - 1 : Math.sin(t ** 3) : Math.max(Math.min(Math.tan(t), 1), -1) : 1 - (2 * t / PI2 % 2 + 2) % 2 : 1 - 4 * abs(Math.round(t / PI2) - t / PI2) : Math.sin(t);
+      s = (repeatTime ? 1 - tremolo + tremolo * Math.sin(PI2 * i / repeatTime) : 1) * (shape > 4 ? s : sign(s) * abs(s) ** shapeCurve) *
+        (i < attack ? i / attack : i < attack + decay ? 1 - ((i - attack) / decay) * (1 - sustainVolume) : i < attack + decay + sustain ? sustainVolume : i < length - delay ? (length - i - delay) / release * sustainVolume : 0);
+      s = delay ? s / 2 + (delay > i ? 0 : (i < length - delay ? 1 : (length - i) / delay) * b[i - delay | 0] / 2 / volume) : s;
+      if (filter) s = y1 = b2 * x2 + b1 * (x2 = x1) + b0 * (x1 = s) - a2 * y2 - a1 * (y2 = y1);
+    }
+    f = (frequency += slide += deltaSlide) * Math.cos(modulation * modOffset++); t += f + f * noise * (i * i * PI2 % 2 - 1);
+    if (jump && ++jump > pitchJumpTime) { frequency += pitchJump; startFrequency += pitchJump; jump = 0; }
+    if (repeatTime && !(++repeat % repeatTime)) { frequency = startFrequency; slide = startSlide; jump ||= 1; }
+  }
+  buffer = zzfxX.createBuffer(1, b.length, sampleRate); buffer.getChannelData(0).set(b); source.buffer = buffer; source.connect(zzfxX.destination); source.start(); return source;
+};
+// What each moment sounds like: [delay ms, ZzFX parameters] steps. Short, quiet, and each one means something.
+const FX_SND = {
+  buy: [[0, [.55, 0, 523, .005, .05, .16, 0]], [85, [.55, 0, 784, .005, .07, .24, 0]]],          // rising: a buy call
+  sell: [[0, [.55, 0, 784, .005, .05, .16, 0]], [85, [.55, 0, 523, .005, .07, .24, 0]]],         // falling: a sell call
+  flat: [[0, [.4, 0, 392, .005, .04, .18, 0]]],                                                   // no trade
+  right: [[0, [.5, 0, 1047, .004, .03, .14, 0]], [80, [.5, 0, 1319, .004, .05, .22, 0]]],       // practice: right
+  wrong: [[0, [.45, 0, 196, .01, .07, .2, 2, 1, -.6, , , , , , , , , , , , 900]]],               // practice: wrong
+  win: [[0, [.5, 0, 523, .004, .04, .12, 0]], [70, [.5, 0, 659, .004, .04, .12, 0]], [140, [.55, 0, 1047, .004, .08, .3, 0]]], // target hit
+  loss: [[0, [.5, 0, 220, .01, .1, .3, 1, 1, -.8]]],                                              // stop hit
+  alert: [[0, [.45, 0, 1568, .002, .02, .5, 0, 1, , , , , , , , , .09]]],                          // alert set
+  warn: [[0, [.4, 0, 330, .005, .06, .06, 1]], [160, [.4, 0, 330, .005, .06, .06, 1]]],          // careful
+  on: [[0, [.4, 0, 660, .005, .04, .1, 0, 1, 6]]], off: [[0, [.4, 0, 880, .005, .04, .1, 0, 1, -6]]], // voice mode on and off
+  draw: [[0, [.25, 0, 1400, .002, .01, .04, 1]]],                                                 // a line placed
+};
+// What each moment feels like: ticks (iPhone) or a vibration pattern in ms (Android)
+const FX_HAP = { tick: [1, [8]], draw: [1, [10]], buy: [2, [14, 70, 22]], sell: [2, [22, 70, 14]], flat: [1, [12]], right: [2, [12, 60, 18]], wrong: [3, [30, 50, 30, 50, 30]], win: [3, [12, 50, 12, 50, 30]], loss: [2, [40, 60, 40]], alert: [2, [18, 80, 18]], warn: [2, [25, 90, 25]], on: [1, [16]], off: [1, [10]] };
+const fxCfg = () => { const h = HS(); if (!h.fx || typeof h.fx !== "object") h.fx = { snd: true, hap: true }; return h.fx; };
+const FXH = { lab: null, inp: null };
+function fxUnlock() { // inside a tap: wake the audio, build the haptic switch
+  try { if (!zzfxX) { const A = window.AudioContext || window.webkitAudioContext; if (A) zzfxX = new A(); } if (zzfxX && zzfxX.state === "suspended") zzfxX.resume(); } catch (e) {}
+  if (!FXH.lab && document.body) { try { const l = document.createElement("label"), i = document.createElement("input"); i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1; l.setAttribute("aria-hidden", "true"); l.style.cssText = "position:fixed;left:-99px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden"; l.appendChild(i); document.body.appendChild(l); FXH.lab = l; FXH.inp = i; } catch (e) {} }
+}
+function fxHaptic(name) { // iPhone (Safari 17.4+): toggling a switch inside a tap gives a Taptic tick (the technique from lochie/web-haptics, MIT). Android: the Vibration API.
+  if (!fxCfg().hap) return; const h = FX_HAP[name] || FX_HAP.tick;
+  try { if (navigator.vibrate && !/iP(hone|ad|od)/.test(navigator.userAgent)) { navigator.vibrate(h[1]); return; } } catch (e) {}
+  if (!FXH.lab) return; for (let k = 0; k < h[0]; k++) setTimeout(() => { try { FXH.lab.click(); } catch (e) {} }, k * 70);
+  (window.__haps = window.__haps || []).push(name);
+}
+function sfx(name, o = {}) { // play a moment: its sound and its feel
+  const c = fxCfg(); if (o.hap !== false) fxHaptic(name);
+  if (!c.snd || o.snd === false || !FX_SND[name]) return; if (QT && QT.speaking && !o.over) return; // never talk over Quint
+  zzfxV = clamp(c.vol != null ? +c.vol : .3, 0, 1); (window.__sfx = window.__sfx || []).push(name);
+  for (const [ms, p] of FX_SND[name]) setTimeout(() => { try { zzfx(...p); } catch (e) {} }, ms);
+}
+function fxInit() { // each app calls this once
+  if (FXH.init || typeof document === "undefined") return; FXH.init = true;
+  document.addEventListener("pointerdown", fxUnlock, { capture: true, passive: true });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && QCORE.cvs.size && !QCORE.raf) QCORE.raf = requestAnimationFrame(qcLoop); });
+  document.addEventListener("click", e => { // a light tick on the buttons that matter, so the app feels physical
+    const t = e.target.closest && e.target.closest(".btn.pri, .ord, .tabbar button, .seg button, .opts button, .chips button, .lcbar button, [data-su], [data-g], .ask .go, #go");
+    if (t && !t.disabled) fxHaptic("tick");
+    const o = e.target.closest && e.target.closest(".opt"); if (o) setTimeout(() => { if (o.classList.contains("right")) sfx("right", { hap: false }); else if (o.classList.contains("wrong")) sfx("wrong", { hap: false }); }, 0);
+  }, true);
+}
+
+/* the 3D Quint core: a glowing wireframe icosahedron with an orbit of points, drawn with a plain canvas projection.
+   It turns slowly at rest, spins while Quint thinks, pulses while he talks and breathes while he listens. */
+const QCORE = { cvs: new Set(), raf: 0, t0: 0 };
+const QC_V = (() => { const p = (1 + Math.sqrt(5)) / 2, v = [[-1, p, 0], [1, p, 0], [-1, -p, 0], [1, -p, 0], [0, -1, p], [0, 1, p], [0, -1, -p], [0, 1, -p], [p, 0, -1], [p, 0, 1], [-p, 0, -1], [-p, 0, 1]]; return v.map(a => { const n = Math.hypot(...a); return a.map(x => x / n); }); })();
+const QC_E = (() => { const e = []; for (let i = 0; i < 12; i++) for (let j = i + 1; j < 12; j++) { const d = Math.hypot(QC_V[i][0] - QC_V[j][0], QC_V[i][1] - QC_V[j][1], QC_V[i][2] - QC_V[j][2]); if (d < 1.1) e.push([i, j]); } return e; })();
+const QC_P = Array.from({ length: 42 }, (_, k) => { const y = 1 - (k + .5) / 21, r = Math.sqrt(Math.max(0, 1 - y * y)), a = k * 2.39996; return [Math.cos(a) * r, y, Math.sin(a) * r]; }); // Fibonacci sphere
+function qcState() { return typeof VM !== "undefined" && VM.on && VM.st !== "idle" && VM.st !== "type" ? VM.st : (typeof DK !== "undefined" && DK.busy) ? "think" : (QT && QT.speaking) ? "speak" : "idle"; }
+function qcDraw(cv, now) {
+  const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return; const dpr = Math.min(2, window.devicePixelRatio || 1);
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const x = cv.getContext("2d"), st = qcState(), t = now / 1000, sp = st === "think" ? 2.6 : st === "speak" ? 1.4 : st === "listen" ? 1 : .45;
+  QCORE.ang = (QCORE.ang || 0) + sp * Math.min(.05, (now - (QCORE.last || now)) / 1000); QCORE.last = now; const a = QCORE.ang, b = a * .63 + .4;
+  const pulse = st === "speak" ? 1 + .1 * Math.sin(t * 17) * Math.sin(t * 5.3) : st === "listen" ? 1 + .06 * Math.sin(t * 4) : 1, R = Math.min(W, H) * .36 * pulse, cx = W / 2, cy = H / 2;
+  const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b), pr = v => { const x1 = v[0] * ca + v[2] * sa, z1 = -v[0] * sa + v[2] * ca, y1 = v[1] * cb - z1 * sb, z2 = v[1] * sb + z1 * cb, k = 2.6 / (2.6 + z2); return [cx + x1 * R * k, cy + y1 * R * k, z2]; };
+  const c1 = st === "think" ? "155,107,255" : "41,216,255", c2 = st === "think" ? "41,216,255" : "155,107,255";
+  x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, R * 1.5); g.addColorStop(0, `rgba(${c1},.32)`); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const P = QC_V.map(pr); x.lineWidth = Math.max(.8, R / 22);
+  for (const [i, j] of QC_E) { const z = (P[i][2] + P[j][2]) / 2, al = .35 + .5 * (1 - (z + 1) / 2); x.strokeStyle = `rgba(${c1},${al.toFixed(2)})`; x.beginPath(); x.moveTo(P[i][0], P[i][1]); x.lineTo(P[j][0], P[j][1]); x.stroke(); }
+  for (const p of QC_P.map(v => pr([v[0] * 1.35, v[1] * .25 * 1.35, v[2] * 1.35]))) { const al = .3 + .6 * (1 - (p[2] + 1.4) / 2.8); x.fillStyle = `rgba(${c2},${al.toFixed(2)})`; x.beginPath(); x.arc(p[0], p[1], Math.max(.7, R / 26), 0, Math.PI * 2); x.fill(); }
+  x.fillStyle = "#fff"; x.globalAlpha = .9; x.beginPath(); x.arc(cx, cy, Math.max(1.2, R * .16), 0, Math.PI * 2); x.fill(); x.globalAlpha = 1;
+}
+function qcLoop(now) {
+  QCORE.raf = 0; for (const cv of [...QCORE.cvs]) if (!cv.isConnected) QCORE.cvs.delete(cv); if (!QCORE.cvs.size || document.hidden) return;
+  for (const cv of QCORE.cvs) try { qcDraw(cv, now); } catch (e) {}
+  if (!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) QCORE.raf = requestAnimationFrame(qcLoop);
+}
+function qcMount(host) { // swap a CSS orb (or any empty box) for the 3D core
+  if (!host || host.querySelector("canvas.qcore")) return; const cv = document.createElement("canvas"); cv.className = "qcore"; cv.setAttribute("aria-hidden", "true"); host.classList.add("has3d"); host.appendChild(cv); QCORE.cvs.add(cv);
+  if (!QCORE.raf) QCORE.raf = requestAnimationFrame(qcLoop);
 }
 /* ---------- voice mode: talk to Quint, he answers out loud, then listens again ----------
    Each app hands vmToggle an adapter: { input, send(text), speak(text, done), hush(), paint(), lang }.
@@ -7518,14 +7628,14 @@ function vmListen(auto) {
   vmPaint();
 }
 function vmToggle(o) { // the mic button: start voice mode, talk, cut in while Quint speaks, or finish talking
-  if (!VM.on) { VM.on = true; VM.o = o; VM.noAuto = false; vmUnlock(); vmListen(false); return; } // listening starts inside the tap, as phones require
+  if (!VM.on) { VM.on = true; VM.o = o; VM.noAuto = false; vmUnlock(); sfx("on"); vmListen(false); return; } // listening starts inside the tap, as phones require
   VM.o = o;
   if (VM.st === "listen") { const r = VM.rec; if (r) try { r.stop(); } catch (e) { vmStopRec(); VM.st = "idle"; vmPaint(); } return; } // done talking: send what was heard
   if (VM.st === "speak") { try { o.hush(); } catch (e) {} VM.st = "idle"; vmListen(false); return; } // cut in
   if (VM.st === "think") return;
   vmListen(false);
 }
-function vmEnd() { if (!VM.on) return; VM.on = false; vmStopRec(); try { VM.o && VM.o.hush(); } catch (e) {} VM.st = "off"; vmPaint(); }
+function vmEnd() { if (!VM.on) return; sfx("off"); VM.on = false; vmStopRec(); try { VM.o && VM.o.hush(); } catch (e) {} VM.st = "off"; vmPaint(); }
 function vmAnswer(text) { // an answer arrived: say it, then listen again
   if (!VM.on || !VM.o) return; if (!text) { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); return; }
   const back = VM.st === "type", id = VM.sid = (VM.sid || 0) + 1; VM.st = "speak"; vmPaint();
@@ -7860,7 +7970,7 @@ function prPaint() {
   if (P.done) { const m = R.mine, lines = m ? [{ p: m.e, col: "#9fb3d9", lab: "entry" }, { p: m.st, col: "#ef5350", lab: "stop" }, { p: m.tg, col: "#26a69a", lab: "target" }] : []; qtDraw($("#prCv"), B, i - 99, R.end + 1, { h: 300, mark: i + 1, lines, S: MKSPEC[P.k], tf: P.tf }); }
   else qtDraw($("#prCv"), B, i - 99, i + 1, { h: 300, S: MKSPEC[P.k], tf: P.tf });
   $$("#prBody [data-g]").forEach(b => b.onclick = () => { const g = b.dataset.g; P[g] = g === "stop" || g === "tgt" ? +b.dataset.k : b.dataset.k; prPaint(); });
-  const go = $("#prGo"); if (go) go.onclick = () => { prReveal(); prPaint(); };
+  const go = $("#prGo"); if (go) go.onclick = () => { prReveal(); sfx(P.res && P.dir === P.res.truth ? "right" : "wrong"); prPaint(); };
   const nx = $("#prNext"); if (nx) nx.onclick = () => { if (P.B.sim && (P.nSim = (P.nSim || 0) + 1) % 8 === 0) { prLoad(P.tf); return; } prNew(P.B); prPaint(); $("#sheet").scrollTop = 0; }; // practice candles move to a new stretch of the year every 8 charts
   const rl = $("#prReal"); if (rl) rl.onclick = () => { P.real = true; prLoad(P.tf); };
   const why = $("#prWhy"); if (why) why.onclick = () => nwAsk(P.T, prWhyPrompt(), () => { const o = $("#prOut"); if (o) { o.hidden = false; o.innerHTML = qtQ(P.T); } }).then(prPaint);
@@ -7879,6 +7989,13 @@ function openPrac(k0) {
 qtVoiceInit();
 
 function qtHush() { try { if (QT.tts) QT.tts.stop(); else if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {} QT.speaking = false; $$(".qtsay").forEach(b => { b.textContent = "🔊 Listen"; }); }
+
+function fxSetHTML() { const c = fxCfg(); return `<h3>Sounds and haptics</h3><div class="fxset"><button type="button" class="lgtog" id="fxSnd" aria-pressed="${c.snd}"><span class="k"></span><span>Sound effects: a rising chime for a buy, falling for a sell, right and wrong in practice, target and stop</span></button>
+  <label class="small" for="fxVol">Volume: <b id="fxVolV">${Math.round((c.vol != null ? c.vol : .3) * 100)}%</b></label><input type="range" id="fxVol" min="0.05" max="1" step="0.05" value="${c.vol != null ? c.vol : .3}" style="width:100%">
+  <button type="button" class="lgtog" id="fxHap" aria-pressed="${c.hap}"><span class="k"></span><span>Haptics: little taps you feel on buttons and answers (iPhone with iOS 17.4 or later, or Android)</span></button>
+  <p class="small">The iPhone's silent switch also silences these sounds.</p></div>`; }
+function fxSetWire(sh) { const c = fxCfg(), tg = (id, k) => { const b = $("#" + id, sh); if (b) b.onclick = () => { c[k] = !c[k]; b.setAttribute("aria-pressed", c[k]); save(); if (c[k]) sfx(k === "snd" ? "right" : "tick"); }; };
+  tg("fxSnd", "snd"); tg("fxHap", "hap"); const v = $("#fxVol", sh); if (v) { v.oninput = () => { c.vol = +v.value; $("#fxVolV", sh).textContent = Math.round(c.vol * 100) + "%"; save(); }; v.onchange = () => sfx("buy"); } }
 
 /* ================= QUINT'S BACKTEST LOOP: describe a strategy and its goals; Quint tests versions in sample and out of sample and keeps the best ================= */
 const BL = { run: null, split: 0.5 };
@@ -8399,7 +8516,7 @@ function suPaint() {
     ${done ? `<div class="prres"><div class="${ok ? "ok" : "no"}"><b>${ok ? "✓ Right" : "✗ Not quite"}: ${truth === "none" ? "no setup here" : "the rule said " + truth}</b><span>${t ? `That trade ${t.r > 0 ? "made" : "lost"} ${t.r >= 0 ? "+" : ""}${t.r.toFixed(2)}R ($${Math.abs((t.x - t.e) * t.d * 2).toFixed(0)} per MNQ).` : "Nothing triggered on this candle, so the right move was to wait."}</span></div></div><button class="btn pri qtwide" id="suNext">Next chart ▸</button>` : ""}`;
   if (done && t) qtDraw($("#suCv"), B, Math.max(0, (U.rg ? U.rg.a - 6 : i - 70)), Math.min(B.c.length, t.j + 5), { h: 300, tf: "15m", mark: i + 1, lines: lines.concat([{ p: t.e, col: "#9fb3d9", lab: "entry" }, { p: t.st, col: "#ef5350", lab: "stop" }].concat(t.tg != null ? [{ p: t.tg, col: "#26a69a", lab: "target" }] : [])) });
   else qtDraw($("#suCv"), B, Math.max(0, (U.rg ? U.rg.a - 6 : i - 70)), i + 1, { h: 300, tf: "15m", lines });
-  $$("[data-su]", el).forEach(b => b.onclick = () => { U.pick = b.dataset.su; const m = ST.mnqp || (ST.mnqp = { n: 0, dirOk: 0, trades: 0, r: 0, wins: 0, skips: 0 }); m.su = (m.su || 0) + 1; if (U.pick === truth) m.suOk = (m.suOk || 0) + 1; save(); suPaint(); });
+  $$("[data-su]", el).forEach(b => b.onclick = () => { U.pick = b.dataset.su; sfx(U.pick === truth ? "right" : "wrong"); const m = ST.mnqp || (ST.mnqp = { n: 0, dirOk: 0, trades: 0, r: 0, wins: 0, skips: 0 }); m.su = (m.su || 0) + 1; if (U.pick === truth) m.suOk = (m.suOk || 0) + 1; save(); suPaint(); });
   const nx = $("#suNext"); if (nx) nx.onclick = () => { if (B.sim && (U.nSim = (U.nSim || 0) + 1) % 8 === 0) { const B2 = pracSim("15m", "MNQ"); B2.pts = true; const tr = blEval(U.s.V, [B2], 1.5); if (tr.length) { U.B = B2; U.tr = tr; } } suNew(); suPaint(); $("#sheet").scrollTop = 0; };
   const rl = $("#suReal"); if (rl) rl.onclick = () => openSetup(U.s, { real: true });
 }
@@ -8794,7 +8911,7 @@ function dkWire(box) { // the parts the chart dock and Quint's own screen share
 }
 /* ---------- Quint's own screen: a full chat, any market, with the desk tools ---------- */
 const QS_MK = () => { const g = FUT_G.filter(([k]) => k !== "all").map(([k, l]) => [l, FUT_KEYS.filter(x => MKDEF[x].grp === k)]).filter(x => x[1].length); return g.concat([["Crypto & stocks", ["BTC"].concat(mkStocks().map(t => "s:" + t)).filter(k => MKDEF[k])]]); };
-const QS_TOOLS = [["shot", "📷", "Read my chart"], ["best", "🏆", "My 3 strategies"], ["prac", "🎯", "Practise"], ["voice", "🔊", "Voice"], ["style", "🎚", "My style"]];
+const QS_TOOLS = [["shot", "📷", "Read my chart"], ["best", "🏆", "My 3 strategies"], ["prac", "🎯", "Practise"], ["voice", "🔊", "Voice &amp; sounds"], ["style", "🎚", "My style"]];
 function qsOpen() {
   const root = $("#hmQuint"); if (!root) return; if (!DK.qkInit) { DK.qkInit = true; if (MKDEF[HS().qk]) DK.qk = HS().qk; } if (!MKDEF[DK.qk]) DK.qk = "MNQ"; DK.k = DK.qk; DK.open = false; DK.view = "chat";
   if (!CO.sample) { root.innerHTML = `<header class="hmh">${DK_ORB}<div class="hctitle"><span><b>Quint</b><small>Your trading analyst</small></span></div></header><div class="hmwrap"><p class="small">Quint needs Claude, so he only works when Chart Wizard is opened inside Claude.</p></div>`; return; }
@@ -8861,7 +8978,7 @@ async function dkPine(btn) {
 async function dkAlert(btn, m) {
   const [i, k] = btn.dataset.alert.split(":").map(Number), x = dkMsgs(m.k)[i], a = x && dkAlertLines(x.t)[k]; if (!a) return; btn.disabled = true; btn.textContent = "Setting the alert on TradingView…";
   const C = x.c ? dkCallById(x.c) : null, end = C ? C.t + (Math.max(30, C.hold) + (a.act === "EXIT" ? C.hold : 0)) * 6e4 : 0; // tied to the call's own time window when there is one
-  const r = await dkAlertMake(m, a.p, a.dir, a.act, a.note, Object.assign({ cid: x.at, kind: "L" + k }, end ? { min: Math.max(30, (end - Date.now()) / 6e4) } : {})); btn.textContent = r.ok ? `✓ Alert set: ${r.name}. Your phone gets it from the TradingView app.` : `✗ ${r.msg}`; if (!r.ok) btn.disabled = false;
+  const r = await dkAlertMake(m, a.p, a.dir, a.act, a.note, Object.assign({ cid: x.at, kind: "L" + k }, end ? { min: Math.max(30, (end - Date.now()) / 6e4) } : {})); if (r.ok) sfx("alert"); btn.textContent = r.ok ? `✓ Alert set: ${r.name}. Your phone gets it from the TradingView app.` : `✗ ${r.msg}`; if (!r.ok) btn.disabled = false;
 }
 /* ---------- TradingView alerts: Quint's levels to the user's phone ---------- */
 // ALERT: BUY 27420.25 · stop 27380, target 27500   (older form: ALERT: 27420 crossing up)
@@ -8962,7 +9079,7 @@ function dkMsgHTML(x, i, m) {
   return `<div class="qdkm a" data-i="${i}">${x.now ? `<p class="qnow">⚡ ${esc(x.now)}</p>` : ""}${x.busy && !body ? `<p class="dim qthink">${esc(DK.prog || "Thinking…")}</p>` : ""}${body ? coachMD(body) : ""}${x.busy && body && DK.prog ? `<p class="dim qthink">${esc(DK.prog)}</p>` : ""}${C ? dkCallHTML(C, m) : ""}${dkExtras(x, i)}${x.err ? `<p class="nwerr">${esc(x.err)}</p>` : ""}${!x.busy && body ? `<div class="qdka"><button class="chip qtsay" type="button">🔊 Listen</button></div>` : ""}</div>`;
 }
 function dkPaint(all) {
-  const b = $("#qdkB"); if (!b) return; const m = dkM(); if (!m) return; const L = dkMsgs(m.k); dkHead();
+  const b = $("#qdkB"); if (!b) return; const m = dkM(); if (!m) return; const L = dkMsgs(m.k); dkHead(); $$(".qdkh .qorb, .qsh .qorb").forEach(qcMount);
   const s = $("#qdkS"); if (s) { s.textContent = DK.busy ? "■" : "➤"; s.setAttribute("aria-label", DK.busy ? "Stop" : "Send"); }
   $("#qdkQ").hidden = DK.busy || DK.view !== "chat"; $("#qdkQ").innerHTML = dkChips(m);
   if (DK.view === "rec") { b.innerHTML = dkRecHTML(); return; }
@@ -9023,7 +9140,7 @@ async function dkSend(text, opt = {}) {
     const tools = !chat && DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
     let r; try { r = await run(tools); } catch (e) { if (e && e.code === "tools_unavailable" && tools) { DK.noTools = true; A.t = ""; r = await run(null); } else throw e; }
     if (r && r.text) A.t = r.text; if (!A.t) throw { code: "empty_completion" };
-    const c = chat ? null : dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
+    const c = chat ? null : dkParse(A.t); if (c) { A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id; sfx(c.side > 0 ? "buy" : c.side < 0 ? "sell" : "flat", { hap: false }); }
   } catch (e) { const c = e && e.code; if (e && e.text) A.t = e.text; A.err = c === "cancelled" ? (A.t ? null : "Stopped.") : c === "not_ready" ? "Live data isn't connected, so Quint can't read the charts. Reload to reconnect." : c === "image_rejected" ? "Claude couldn't take that image. Try a smaller or clearer screenshot." : NW_ERR[c] || "Something went wrong reaching Quint. Try again in a moment."; }
   finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); if (typeof vmAnswer === "function") vmAnswer(A.t ? A.t : A.err || "", m); }
 }
@@ -9037,7 +9154,7 @@ function dkVmPaint(V) {
   if (!V.on) { if (bar) bar.remove(); return; }
   if (!bar) { bar = document.createElement("div"); bar.id = "qdkVm"; bar.className = "vmbar"; f.parentNode.insertBefore(bar, f); }
   bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"><i></i></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="chip vmx" aria-label="End voice mode">End</button>`;
-  bar.querySelector(".vmx").onclick = vmEnd;
+  bar.querySelector(".vmx").onclick = vmEnd; qcMount(bar.querySelector(".vmorb"));
 }
 
 /* ================= SESSION HUD + LUCID GUARD =================
@@ -9141,7 +9258,7 @@ function lgOpen() {
       const map = { bal: "lgBal", peak: "lgPeak", today: "lgToday", best: "lgBest", stop: "lgStop", size: "lgSize", target: "lgTarget", mll: "lgMll", dll: "lgDll", cons: "lgCons" };
       for (const k in map) { const x = v(map[k]); if (x != null) G[k] = x; }
       G.stop = Math.max(0.25, G.stop); G.mll = Math.max(1, G.mll); G.target = Math.max(1, G.target); G.dll = Math.max(0, G.dll); G.cons = clamp(G.cons, 0, 100); G.best = Math.max(0, G.best);
-      G.lock = $("#lgLock", sh).getAttribute("aria-pressed") === "true"; G.at = Date.now(); save(); closeSheet(); lgPaint(); toast("Lucid guard updated");
+      G.lock = $("#lgLock", sh).getAttribute("aria-pressed") === "true"; G.at = Date.now(); save(); closeSheet(); lgPaint(); toast("Lucid guard updated"); sfx(lgCalc().lvl === "ok" ? "right" : "warn");
     };
   });
 }
@@ -9155,7 +9272,7 @@ hudTick();
 /* ================= START ================= */
 renderRank(); renderTools();
 
-openReplayHome(); // the trainer opens on replay, underneath the live Markets home page
+fxInit(); openReplayHome(); // the trainer opens on replay, underneath the live Markets home page
 mkBoot(); shBoot();
 
 })();

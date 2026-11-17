@@ -855,6 +855,7 @@ function lvClose(P, px, why, at, note) {
   if (!P || !P.open) return true; const m = lvMkt(P), I = mkSpec(m), stk = P.kind === "stk";
   px = Math.round(px / I.tick) * I.tick; P.open = false; P.R = (px - P.e) * P.dir / P.sd; P.net = Math.round(((px - P.e) * P.dir * P.qty * lvPV(P, I) - P.fees) * 100) / 100;
   P.exit = { px, why, at: at || Date.now(), be: why === "stop" && Math.abs(P.stop - P.e) < I.tick / 2 }; P.note = note || null;
+  if (Date.now() - P.exit.at < 6e4 && typeof sfx === "function") sfx(P.net > 0 ? "win" : "loss", { over: true }); // only for trades closing now, not ones settled on reopening
   let cres = null;
   if (stk) { const K = SK(); K.bal = Math.round((K.bal + P.net) * 100) / 100; K.n++; K.net = Math.round((K.net + P.net) * 100) / 100; if (P.net > 0) K.wins++; K.peak = Math.max(K.peak, K.bal); }
   else { ST.fees += P.fees; bank(P.net, "trade"); cres = copyTrade(P, I); ST.trades++; ST.net += P.net; if (P.net > 0) ST.wins++; ST.eq.push(Math.round(ST.bal)); if (ST.eq.length > 400) ST.eq.shift(); }

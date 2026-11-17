@@ -333,9 +333,11 @@ function openSet() {
     <div class="fld"><span class="lab">How you trade</span><div class="opts" role="group" aria-label="How you trade">${[["scalp", "Scalper"], ["day", "Day trader"], ["both", "Both"]].map(([k, l]) => `<button type="button" data-st="${k}" aria-pressed="${TS() === k}">${l}</button>`).join("")}</div></div>
     <div class="fld"><span class="lab">TradingView calls today: <span id="tvu">${tvOut() ? "used up, says TradingView" : s.tvPlanSet ? `${tvUsed()} of ${tvPlan()}` : `${tvUsed()} counted · pick your plan`}</span></span><div class="opts" role="group" aria-label="Your TradingView plan">${TV_PLANS.map(([n, nm]) => `<button type="button" data-tvp="${n}" aria-pressed="${!!s.tvPlanSet && tvPlan() === n}">${esc(nm)} ${n}</button>`).join("")}</div><p class="small">TradingView allows its connector a set number of calls a day on each plan (the AI add-on gives 500). A Quint answer costs about one: he keeps the candles on this phone and fetches only the newest minutes. He refreshes on his own only on Ultimate (every 10 minutes) or the AI add-on (every 2); otherwise tap ↻ or ask him.</p></div>
     <div class="fld"><span class="lab">Quint's voice</span><p class="small" id="vnote"></p><div class="voices" id="vlist"></div></div>
+    <div class="fld">${fxSetHTML().replace("<h3>", '<span class="lab">').replace("</h3>", "</span>")}</div>
     <div class="fld"><label for="srate">Speaking speed: <span id="sratev">${(+s.rate || 1).toFixed(2)}×</span></label><input type="range" id="srate" min="0.7" max="1.5" step="0.05" value="${esc(s.rate || 1)}"></div>
     <p class="small">Prices come from your TradingView connector${MK.tvLive ? ", with real-time CME data" : " (futures run about 10 minutes behind without real-time CME data)"}. Calls, alerts and settings are kept on this device. Quint makes calls to help you learn and decide; he can be wrong, and nothing here places real orders.</p>`;
   $("#scrim").classList.add("open"); paintVoices();
+  fxSetWire(sh);
   $("#setx").onclick = closeSet; $("#scrim").onclick = e => { if (e.target.id === "scrim") closeSet(); };
   $("#sname").oninput = e => { s.name = e.target.value.slice(0, 40); save(); };
   $("#ssize").oninput = e => { const v = +e.target.value; if (v >= 1000) { s.acct = v; save(); $("#spctv").textContent = `${s.pct}% = ${fbal(qaAcct().risk)}`; } };
@@ -374,7 +376,7 @@ function qaStart() {
   ta.addEventListener("focus", () => kbOn(true)); ta.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== ta) kbOn(false); }, 150));
   $("#askf").onsubmit = e => { e.preventDefault(); if (DK.busy) { if (DK.ctl) DK.ctl.abort(); return; } const v = ta.value.trim(); if (!v && !DK.img) return; ta.value = ""; fit();
     if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(v || "Read my chart and give me your call.", DK.img ? { img: DK.img } : {}); DK.img = null; paintImg(); };
-  $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
+  fxInit(); $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
   $("#file").onchange = async e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { DK.img = await qtShrink(f); paintImg(); ta.focus(); } catch (err) { hmToast("That file couldn't be opened as an image."); } };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#scrim").classList.contains("open")) { e.preventDefault(); closeSet(); } });
   window.addEventListener("resize", () => { drawTape(); drawSess(); drawScope(); coreKick(); });
@@ -392,5 +394,5 @@ function qbVmPaint(V) {
   if (!V.on) { if (bar) bar.remove(); return; }
   if (!bar) { bar = document.createElement("div"); bar.id = "vmbar"; f.before(bar); }
   bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="btn sm vmx" aria-label="End voice mode">End</button>`;
-  bar.querySelector(".vmx").onclick = vmEnd;
+  bar.querySelector(".vmx").onclick = vmEnd; qcMount(bar.querySelector(".vmorb"));
 }

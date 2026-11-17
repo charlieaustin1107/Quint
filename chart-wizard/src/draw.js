@@ -52,10 +52,10 @@ const LC_COL = { h: "#ffb547", t: "#29d8ff", z: "#9b6bff" };
     if (d && d.kind === "draw") {
       const p = this.pt(e); this.pts.delete(e.pointerId); try { this.cv.releasePointerCapture(e.pointerId); } catch (_) {} this.drag = null; const T = this.tmp; if (!T || cancel) { this.tmp = null; this.req(); return; }
       const far = Math.hypot(p.x - d.p0.x, p.y - d.p0.y) > 8;
-      if (T.k === "h") { this.pushU(); this.dr.push({ k: "h", a: T.a }); this.selD = this.dr.length - 1; this.tmp = null; this.saveD(); this.setMode("cur"); return; }
+      if (T.k === "h") { sfx("draw"); this.pushU(); this.dr.push({ k: "h", a: T.a }); this.selD = this.dr.length - 1; this.tmp = null; this.saveD(); this.setMode("cur"); return; }
       if (!far && !d.second) { T.armed = true; this.req(); if (this.onHint) this.onHint("Now tap where it ends."); return; } // tap, tap: first point, then the second
       if (T.k === "m") { this.meas = { a: T.a, b: T.b }; this.tmp = null; this.req(); return; }
-      this.pushU(); this.dr.push({ k: T.k, a: T.a, b: T.b }); this.selD = this.dr.length - 1; this.tmp = null; this.saveD(); this.setMode("cur"); return;
+      sfx("draw"); this.pushU(); this.dr.push({ k: T.k, a: T.a, b: T.b }); this.selD = this.dr.length - 1; this.tmp = null; this.saveD(); this.setMode("cur"); return;
     }
     if (d && d.kind === "pan" && !d.moved && !cancel && this.dr) { const h = this.hitD(this.pt(e)); if (h || this.selD != null) { this.selD = h ? h.k : null; this.pts.delete(e.pointerId); this.drag = null; this.cross = null; this.legend(); this.req(); if (this.onMode) this.onMode(this.mode || "cur"); return; } }
     return up0.call(this, e, cancel);
