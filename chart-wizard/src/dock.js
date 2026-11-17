@@ -198,7 +198,7 @@ async function dkBrief(m, signal) { // everything Quint should know before he an
 function dkRules(m) {
   return `You are Quint, the trading mentor and analyst built into Chart Wizard (you run on Claude, made by Anthropic). You sit next to the user's live chart. They can ask you anything: a trade call, levels, news, how something works, a strategy to test, Pine Script code.
 
-WHO THEY ARE: ${myLine()} They trade from an iPhone and place real trades on NinjaTrader; in this app they paper trade.
+WHO THEY ARE: ${myLine()} They trade from an iPhone and place real trades on NinjaTrader; in this app they paper trade. Talk to them like a person, not a terminal: if part of their message is just chat (how you are, how their day went, nerves after a loss), answer that part warmly and naturally in a sentence or two, then get to the trading.
 
 THEIR OWN STRATEGY: the 5-pillar playbook, in order. 1 Location: price at a higher-timeframe level (previous day high or low, a 1h, 4h or daily fair value gap or order block). 2 Liquidity sweep: price trades through that level or the recent highs/lows and closes back inside. 3 CISD (change in state of delivery): a close back through the open of the candles that drove price into the sweep. 4 Displacement: a strong candle the new way, body at least 1.2× ATR, closing near its extreme, often leaving a fair value gap. 5 Execution: the pullback into that fair value gap, order block or CISD level with a confirming close; stop just beyond the sweep, target the liquidity on the other side at 1.5R or more; New York session. When they mention their playbook, the pillars or "my strategy", judge it pillar by pillar from the 5-PILLAR CHECK in the brief, name the first missing pillar and what would complete it, and give the exact entry, stop and target when all five are in place.${ST.bspil && ST.bspil.n != null ? ` Its test on their real 5-minute MNQ candles: ${ST.bspil.n} trades, ${ST.bspil.wr}% wins, profit factor ${ST.bspil.pf}, ${ST.bspil.net >= 0 ? "+" : "−"}$${Math.abs(ST.bspil.net)} on 1 MNQ after costs; quote this honestly if asked.` : ""}
 
@@ -352,7 +352,7 @@ function dkRecHTML() {
 }
 
 /* ---------- the dock ---------- */
-const DK_FORM = (m, ph) => `<form class="qdkf" id="qdkF"><label class="tbtn qdkimg" aria-label="Send Quint a screenshot of your own chart"><input type="file" accept="image/*" id="qdkFile" hidden>📷</label><textarea id="qdkI" rows="1" placeholder="${esc(ph)}" aria-label="Message Quint" enterkeyhint="send"></textarea><button class="btn pri" id="qdkS" type="submit" aria-label="Send">➤</button></form>`;
+const DK_FORM = (m, ph) => `<form class="qdkf" id="qdkF"><label class="tbtn qdkimg" aria-label="Send Quint a screenshot of your own chart"><input type="file" accept="image/*" id="qdkFile" hidden>📷</label><button class="tbtn qdkmic" id="qdkMic" type="button" aria-label="Voice mode: talk to Quint" aria-pressed="false">🎙</button><textarea id="qdkI" rows="1" placeholder="${esc(ph)}" aria-label="Message Quint" enterkeyhint="send"></textarea><button class="btn pri" id="qdkS" type="submit" aria-label="Send">➤</button></form>`;
 const DK_ORB = `<span class="qorb" aria-hidden="true"><s></s><s></s><i></i></span>`;
 function dkMount(m) { // Quint beside the live chart
   const root = $("#hmChart"); if (!root || $("#qDock", root)) return; DK.k = m.k; const box = document.createElement("div"); box.id = "qDock"; root.appendChild(box);
@@ -375,6 +375,7 @@ function dkWire(box) { // the parts the chart dock and Quint's own screen share
   $("#qdkF", box).onsubmit = e => { e.preventDefault(); if (DK.busy) { if (DK.ctl) DK.ctl.abort(); return; } const v = ta.value.trim(); if (!v && !DK.img) return; ta.value = ""; fit(); dkSend(v || "Read my chart and give me your call.", DK.img ? { img: DK.img } : {}); DK.img = null; dkPaintImg(); };
   $("#qdkFile", box).onchange = async e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { DK.img = await qtShrink(f); dkPaintImg(); ta.focus(); } catch (err) { hmToast("That file couldn't be opened as an image."); } };
   $("#qdkB", box).addEventListener("click", dkClick); $("#qdkQ", box).addEventListener("click", dkClick);
+  $("#qdkMic", box).onclick = () => vmToggle(dkVmO()); vmPaint();
   ta.addEventListener("focus", dkKb); ta.addEventListener("blur", () => setTimeout(dkKb, 120));
 }
 /* ---------- Quint's own screen: a full chat, any market, with the desk tools ---------- */
@@ -566,24 +567,61 @@ function dkPaintLast() {
   const near = b.scrollHeight - b.scrollTop - b.clientHeight < 80; el.outerHTML = dkMsgHTML(L[i], i, m); if (near) b.scrollTop = b.scrollHeight;
 }
 async function dkShot() { if (MK.screen !== "chart") return null; const cv = HC.chart && HC.chart.cv; if (!cv || !cv.width) return null; return await new Promise(res => { try { cv.toBlob(b => res(b || null), "image/png"); } catch (e) { res(null); } }); }
+/* ---------- normal conversation: when the user is just talking, Quint talks back like a person (and spends no TradingView calls) ---------- */
+const DK_TRADE_RX = /\b(buy|sell|long|short|trades?|trading|entry|enter|stop|target|tp|sl|charts?|price|levels?|setups?|mnq|mes|nq|es|ym|rty|gold|oil|crude|bitcoin|btc|markets?|candles?|trend|support|resistance|vwap|pillars?|call|scalp|news|fomc|cpi|nfp|fed|risk|contracts?|lucid|account|eval|funded|payout|pine|strateg(y|ies)|backtest|alerts?|bull|bear|breakout|range|sweep|liquidity|cisd|displacement|fvg|order block|ema|rsi|atr|session|london|new york|futures|nasdaq|s&p|dow|points?|ticks?|win rate|drawdown|p&l|pnl|position|exit|bias|direction|chop|volume|ninjatrader|tradingview|screenshot|practi[cs]e|spot it|code|script|indicator)\b|\d{4,}/i;
+const DK_CHAT_RX = /^\s*(hi|hiya|hey|hello|yo|sup|morning|evening|good (morning|afternoon|evening|night)|gm|thanks|thank you|thx|cheers|ta|lol|lmao|haha|ok|okay|cool|nice|great|love (it|you)|how are you|how r u|how's it going|hows it going|how you doing|how was your|what's up|whats up|wassup|who are you|what are you|what's your name|tell me (a joke|about yourself)|i'?m (so |really |a bit )?(tired|stressed|bored|nervous|anxious|happy|sad|angry|frustrated|gutted|buzzing|done)|bye|goodnight|night|see you|talk later)\b/i;
+function dkRecentTrade(m) { const L = m ? dkMsgs(m.k) : []; for (let k = L.length - 1; k >= 0; k--) { const x = L[k]; if (x.r === "a" && !x.busy) return !x.chat && Date.now() - (x.at || 0) < 15 * 6e4; } return false; } // a follow-up to a trading answer stays a trading question
+function dkIsChat(text, m, opt = {}) {
+  if (opt.img || opt.trade) return false; const t = String(text || "").trim(); if (!t) return false;
+  if (DK_CHAT_RX.test(t) && t.length < 90 && !DK_TRADE_RX.test(t)) return true;
+  return !DK_TRADE_RX.test(t) && !dkRecentTrade(m);
+}
+function dkChatRules(m) {
+  return `You are Quint, the trading mentor built into the user's trading app (you run on Claude, made by Anthropic). Right now the user isn't asking for a trade: they're just talking to you.
+
+WHO THEY ARE: ${myLine()} They trade MNQ futures from an iPhone and are working to pass a Lucid Trading funded account.
+
+HOW TO TALK: like a warm, sharp friend who happens to be a professional trader. Natural, relaxed, plain English, the way a person speaks: contractions, short sentences, a little humour when it fits. Usually one to four sentences; more only if they ask for it. Ask a question back now and then. No headings, bullet lists or tables. Never make a trade call here and never write a CALL: or ALERT: line or price levels.
+
+If they ask about the market, a chart or a trade, say in a few words that you'll read the live charts if they ask you for a call (for example "buy or sell now?"), because you haven't looked at the data for this reply. If they sound stressed, tilted or are chasing losses, be kind and steady, and gently point them back to their own rules and their account limits, without lecturing. This app is for learning and practice and never places real orders.`;
+}
+function dkChatBrief(m) {
+  const now = Date.now(), e = etNow(now), L = [`CHAT CONTEXT: it's ${new Date(now).toLocaleString([], { weekday: "long", hour: "2-digit", minute: "2-digit" })} for the user, ${String(Math.floor(e.min / 60)).padStart(2, "0")}:${String(e.min % 60).padStart(2, "0")} in New York. Futures: ${stLabel(mktStatus("fut", now))}.`];
+  const rc = dkRec(); if (rc.n) L.push(`Your calls so far: ${rc.w} wins, ${rc.l} losses, ${rc.R >= 0 ? "+" : ""}${rc.R.toFixed(1)}R.`);
+  if (typeof lgBrief === "function") { const g = lgBrief(); if (g) L.push(g.replace(/ When you give a trade[\s\S]*$/, "")); }
+  return L.join("\n");
+}
 async function dkSend(text, opt = {}) {
   const m = dkM(); text = String(text || "").trim(); if (!m || !text || DK.busy) return; DK.lastQ = text; DK.alN = 0;
   if (!CO.sample) { hmToast("Quint isn't available in this view."); return; }
   DK.view = "chat"; const L = dkMsgs(m.k); L.push({ r: "u", t: text.slice(0, 2000), at: Date.now(), img: !!opt.img }); const A = { r: "a", t: "", at: Date.now(), busy: true, now: dkNow(m) }; L.push(A);
-  DK.busy = true; DK.prog = "Reading the charts…"; dkPaint(true); const ctl = DK.ctl = new AbortController();
+  const chat = dkIsChat(text, m, opt); if (chat) A.chat = true;
+  DK.busy = true; DK.prog = chat ? "Thinking…" : "Reading the charts…"; dkPaint(true); const ctl = DK.ctl = new AbortController();
   try {
     if (DK.lim === undefined) DK.lim = await CO.sample.limits().catch(() => null);
-    const br = await dkBrief(m, ctl.signal); if (ctl.signal.aborted) throw { code: "cancelled" };
-    const canImg = !!(DK.lim && DK.lim.images), img = opt.img && canImg ? opt.img : canImg && !opt.img ? await dkShot() : null;
-    const turns = [{ role: "user", content: dkRules(m) }];
+    const br = chat ? { text: dkChatBrief(m), meta: {} } : await dkBrief(m, ctl.signal); if (ctl.signal.aborted) throw { code: "cancelled" };
+    const canImg = !!(DK.lim && DK.lim.images), img = chat ? null : opt.img && canImg ? opt.img : canImg && !opt.img ? await dkShot() : null;
+    const turns = [{ role: "user", content: chat ? dkChatRules(m) : dkRules(m) }];
     for (const x of L.slice(-14, -2)) if (x.t && !x.busy) turns.push({ role: x.r === "u" ? "user" : "assistant", content: x.r === "a" ? x.t.slice(0, 3500) : x.t });
-    turns.push({ role: "user", content: `${br.text}\n\n${img ? (opt.img ? "IMAGE: a screenshot the user took of their own chart (it may be NinjaTrader or TradingView, and newer than the brief): read its price scale, lines and any position.\n" : "IMAGE: the Chart Wizard chart exactly as the user sees it now.\n") : ""}QUESTION: ${text}` });
-    DK.prog = "Thinking it through…"; dkPaintLast();
-    const run = tools => CO.sample(turns, Object.assign({ onText: ({ text: t }) => { A.t = t; DK.prog = ""; dkPaintLast(); }, signal: ctl.signal, model: "claude-fable-5-2", modelTier: "complex", effort: "high", cache: false }, img ? { images: [img] } : {}, tools ? { tools } : {}));
-    const tools = DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
+    turns.push({ role: "user", content: `${br.text}\n\n${img ? (opt.img ? "IMAGE: a screenshot the user took of their own chart (it may be NinjaTrader or TradingView, and newer than the brief): read its price scale, lines and any position.\n" : "IMAGE: the Chart Wizard chart exactly as the user sees it now.\n") : ""}${chat ? "MESSAGE" : "QUESTION"}: ${text}${typeof vmHint === "function" ? vmHint() : ""}` });
+    DK.prog = chat ? "Thinking…" : "Thinking it through…"; dkPaintLast();
+    const run = tools => CO.sample(turns, Object.assign({ onText: ({ text: t }) => { A.t = t; DK.prog = ""; dkPaintLast(); }, signal: ctl.signal, model: "claude-fable-5-2", modelTier: "complex", effort: "high", cache: false }, img ? { images: [img] } : {}, tools ? { tools } : {}, chat ? { model: "claude-opus-5-5", modelTier: "default", effort: "low" } : {}));
+    const tools = !chat && DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
     let r; try { r = await run(tools); } catch (e) { if (e && e.code === "tools_unavailable" && tools) { DK.noTools = true; A.t = ""; r = await run(null); } else throw e; }
     if (r && r.text) A.t = r.text; if (!A.t) throw { code: "empty_completion" };
-    const c = dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
+    const c = chat ? null : dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
   } catch (e) { const c = e && e.code; if (e && e.text) A.t = e.text; A.err = c === "cancelled" ? (A.t ? null : "Stopped.") : c === "not_ready" ? "Live data isn't connected, so Quint can't read the charts. Reload to reconnect." : c === "image_rejected" ? "Claude couldn't take that image. Try a smaller or clearer screenshot." : NW_ERR[c] || "Something went wrong reaching Quint. Try again in a moment."; }
-  finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); }
+  finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); if (typeof vmAnswer === "function") vmAnswer(A.t ? A.t : A.err || "", m); }
+}
+
+function dkVmO() { // voice mode wired to Chart Wizard's chat
+  return { input: $("#qdkI"), lang: navigator.language || "en-GB", send: t => dkSend(t), speak: (t, done) => { QT.speaking = false; const m = dkM(); qtSpeak(t, null, m ? m.k : "", done); }, hush: qtHush, paint: dkVmPaint };
+}
+function dkVmPaint(V) {
+  const f = $("#qdkF"); if (!f) return; const mic = $("#qdkMic"); let bar = $("#qdkVm");
+  if (mic) { mic.setAttribute("aria-pressed", V.on); mic.classList.toggle("on", V.on); mic.classList.toggle("live", V.st === "listen"); }
+  if (!V.on) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement("div"); bar.id = "qdkVm"; bar.className = "vmbar"; f.parentNode.insertBefore(bar, f); }
+  bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"><i></i></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="chip vmx" aria-label="End voice mode">End</button>`;
+  bar.querySelector(".vmx").onclick = vmEnd;
 }

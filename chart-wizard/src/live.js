@@ -544,7 +544,7 @@ function hcOpen() {
   $$("#hcRng [data-tf]", root).forEach(b => b.onclick = () => hcSetTf(b.dataset.tf));
   $("#hcLvX", root).onclick = () => { HC.lvl = null; hcPaint(); };
   $$("#hcRng [data-n]", root).forEach(b => b.onclick = () => { MK.vis = +b.dataset.n; if (HC.chart) { HC.chart.vis = MK.vis; HC.chart.off = 0; HC.chart.req(); } $$("#hcRng button", root).forEach(x => x.setAttribute("aria-pressed", x === b)); });
-  HC.chart = new LiveChart($("#hcCv", root), $("#hcLg", root)); HC.chart.vis = MK.vis; HC.chart.onLevel = (w, p, done) => lvSetLevel(w, p, done);
+  HC.chart = new LiveChart($("#hcCv", root), $("#hcLg", root)); HC.chart.vis = MK.vis; HC.chart.onLevel = (w, p, done) => lvSetLevel(w, p, done); lcLiveMount(m);
   root.scrollTop = 0; shHist(m.k); hcPaint(); lvPanel();
   if (m.tv && HC.tf !== "1D") hcLoadIB(m, false);
   hcLive();
@@ -553,7 +553,7 @@ function hcOpen() {
 function hcSetTf(tf) {
   const m = MKDEF[MK.sel]; if (!m || !m.tv || !TV_TFS.includes(tf)) return false;
   HC.tf = tf; HS().tf = tf; save(); $$("#hcRng [data-tf]").forEach(b => b.setAttribute("aria-pressed", b.dataset.tf === tf)); const l = $("#hcTfl"); if (l) l.textContent = " · " + TF_NAME[tf] + " candles";
-  if (HC.chart) { HC.chart.off = 0; HC.chart.vis = tf === "1D" ? MK.vis : 90; }
+  if (HC.chart) { HC.chart.off = 0; HC.chart.vis = tf === "1D" ? MK.vis : 90; HC.chart.selD = null; HC.chart.und = []; lcLiveMount(m); }
   if (tf !== "1D") hcLoadIB(m, false); hcPaint(); lvPanel(); return true;
 }
 function hcLive() { // (re)start the chart's candle refresh at the rate the feed deserves

@@ -291,6 +291,17 @@ input[type="range"] { width: 100%; accent-color: var(--amber); }
 .m.u { background: linear-gradient(135deg, rgba(41,216,255,.14), rgba(155,107,255,.2)); border-color: rgba(155,107,255,.45); }
 .ask textarea { border-radius: 22px; background: rgba(4,8,18,.85); }
 .sheet { box-shadow: 0 -10px 40px rgba(41,216,255,.12); }
+
+/* voice mode */
+.ask .mic[aria-pressed="true"] { color: #01131c; background: linear-gradient(135deg, var(--amber), var(--violet)); border-color: transparent; box-shadow: 0 0 16px -2px rgba(41,216,255,.8); }
+.ask .mic.live { animation: vmpulse 1.2s ease-in-out infinite; }
+@keyframes vmpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(41,216,255,.7); } 50% { box-shadow: 0 0 0 10px rgba(41,216,255,0); } }
+.vmbar { flex: none; display: flex; align-items: center; gap: 10px; margin: 6px 14px 0; padding: 8px 10px; border: 1px solid rgba(41,216,255,.4); border-radius: 4px; background: linear-gradient(90deg, rgba(41,216,255,.08), rgba(155,107,255,.1)); font: 500 12.5px/1.35 var(--f-num); color: var(--amber2); }
+.vmbar .vmt { flex: 1; min-width: 0; }
+.vmbar .vmorb { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--amber); box-shadow: 0 0 12px var(--amber); }
+.vmbar.listen .vmorb, .vmbar.speak .vmorb { animation: vmpulse 1s ease-in-out infinite; } .vmbar.think .vmorb { border-color: var(--violet); }
+@media (prefers-reduced-motion: reduce) { .ask .mic.live, .vmbar .vmorb { animation: none !important; } }
+@media (min-width: 900px) { .vmbar { width: calc(100% - 28px); max-width: 832px; margin: 6px auto 0; } }
 </style>
 </head>
 <body>
@@ -325,6 +336,7 @@ input[type="range"] { width: 100%; accent-color: var(--amber); }
       <div class="chips" id="chips" role="group" aria-label="Quick questions"></div>
       <form class="ask" id="askf">
         <label class="ibtn" for="file" aria-label="Send Quint a screenshot of your chart"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6.5h3l1.5-2h5L14 6.5h3v9.5H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="11" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><input type="file" id="file" accept="image/*" hidden></label>
+        <button class="ibtn mic" id="mic" type="button" aria-label="Voice mode: talk to Quint" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="2.5" width="6" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         <textarea id="q" rows="1" placeholder="Ask Quint: buy or sell MNQ?" aria-label="Message Quint" enterkeyhint="send"></textarea>
         <button class="go" id="go" type="submit" aria-label="Send"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h12M10 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </form>
@@ -435,6 +447,21 @@ const tvBgEvery = () => { const p = tvPlan(); if (tvOut() || tvCooling() || tvLe
 function tvCount() { const k = tvDay(), d = HS().tvDay; HS().tvDay = d && d.d === k ? { d: k, n: d.n + 1 } : { d: k, n: 1 }; clearTimeout(TVQ.svT); TVQ.svT = setTimeout(save, 800); }
 const tvCooling = () => Date.now() < TVQ.until;
 const tvCoolMsg = () => tvOut() ? `TradingView says your connector calls for today are used up. It counts every call on your TradingView account (Chart Wizard, Quint Brain and Claude chats, plus any earlier today), so its total is higher than the ${tvUsed()} this app counted. Quint still answers from the candles saved on this phone, or from a screenshot of your chart.` : `TradingView's connector is cooling down after too many calls. Live prices and Quint's charts come back at ${new Date(TVQ.until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}.`;
+const TIERS = [
+  { name: "Foundations", stake: 25, q: 2, tol: 1.4, opts: 3, speed: false, pool: ["trend", "ema", "levels", "candles", "range"], tf: [["1D", .55], ["4h", .2], ["1h", .15], ["15m", .1]], unlock: "Trend, the 20 EMA, candle size and patterns, drawing support and resistance." },
+  { name: "Structure", stake: 40, q: 3, tol: 1.2, opts: 3, speed: false, pool: ["mtf", "trend", "ema", "structure", "levels", "candles", "range", "rsi"], tf: [["1D", .45], ["4h", .18], ["1h", .15], ["15m", .12], ["5m", .1]], unlock: "Market structure (higher highs and lows), RSI, top-down timeframe checks. Answers now worth ±$40." },
+  { name: "Confluence", stake: 60, q: 3, tol: 1.0, opts: 4, speed: true, pool: ["mtf", "trend", "structure", "tlines", "levels", "volume", "candles", "rsi", "div"], tf: [["1D", .4], ["4h", .16], ["1h", .15], ["15m", .15], ["5m", .14]], unlock: "RSI divergence, trend-line drawing, volume, 4-choice pattern questions, speed bonuses. ±$60 per answer." },
+  { name: "Execution", stake: 80, q: 3, tol: 0.85, opts: 4, speed: true, pool: ["mtf", "trend", "structure", "tlines", "levels", "stop", "rr", "volume", "candles", "div", "rsi"], tf: [["1D", .4], ["4h", .16], ["1h", .15], ["15m", .15], ["5m", .14]], unlock: "Stop placement and reward-to-risk planning. Easy questions retired, drawings graded tighter. ±$80 per answer." },
+  { name: "Mastery", stake: 100, q: 4, tol: 0.7, opts: 4, speed: true, pool: ["mtf", "trend", "structure", "tlines", "levels", "stop", "rr", "volume", "candles", "div", "rsi"], tf: [["1D", .4], ["4h", .16], ["1h", .15], ["15m", .15], ["5m", .14]], unlock: "Four questions per chart and the strictest grading. ±$100 per answer." },
+];
+function speedLimit(q) { return q.kind === "draw" ? 45 : 20; }
+const stakeNow = () => G.pbm ? STAGES[G.pb.stage].stake : TIERS[G.tier].stake;
+function payout(q, score) {
+  const T = TIERS[G.tier], st = stakeNow(), secs = (performance.now() - q.t0) / 1000; q.secs = Math.round(secs);
+  let cash = q.kind === "mc" ? (score ? st : -st) : Math.round(st * (2 * score - 1));
+  if (T.speed && !G.pbm && score >= 0.6 && secs <= speedLimit(q)) { cash = Math.round(cash * 1.5); q.bonus = true; }
+  return cash;
+}
 const REGIMES = { trend: "Trend", upch: "Upward channel", dnch: "Downward channel", range: "Range", transition: "Transition" };
 function regime(S, t, N = 48) {
   if (t < N + 2 || !S.atr[t]) return null;
@@ -567,6 +594,44 @@ function qtATR(B, n = 14) { // Wilder's ATR as an array
   const N = B.c.length, A = new Array(N).fill(0); let s = 0;
   for (let i = 1; i < N; i++) { const tr = Math.max(B.h[i] - B.l[i], Math.abs(B.h[i] - B.c[i - 1]), Math.abs(B.l[i] - B.c[i - 1])); if (i <= n) { s += tr; A[i] = s / i; } else A[i] = (A[i - 1] * (n - 1) + tr) / n; }
   return A;
+}
+const VM = { on: false, st: "off", rec: null, txt: "", o: null, noRec: false, noAuto: false };
+const vmRecog = () => VM.noRec ? null : (window.SpeechRecognition || window.webkitSpeechRecognition || null);
+function vmHint() { return VM.on ? "\nVOICE MODE: the user is talking to you out loud and hears your reply read aloud. Answer in a few natural spoken sentences (under about 90 words unless they ask for detail), with no tables, lists, headings or symbols. If you make a trade call, still end with the CALL line." : ""; }
+function vmPaint() { if (VM.o && VM.o.paint) try { VM.o.paint(VM); } catch (e) {} }
+function vmStopRec() { const r = VM.rec; VM.rec = null; if (r) { try { r.onend = null; r.abort(); } catch (e) {} } }
+function vmListen(auto) {
+  if (!VM.on) return; const R = vmRecog(); vmStopRec();
+  if (!R || (auto && VM.noAuto)) { VM.st = R ? "idle" : "type"; vmPaint(); if (!R && VM.o.input && !auto) try { VM.o.input.focus(); } catch (e) {} return; }
+  let rec; try { rec = new R(); } catch (e) { VM.noRec = true; VM.st = "type"; vmPaint(); return; }
+  rec.lang = VM.o.lang || navigator.language || "en-GB"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1; VM.txt = "";
+  rec.onresult = e => { let t = ""; for (let k = 0; k < e.results.length; k++) t += e.results[k][0].transcript; VM.txt = t; if (VM.o.input) VM.o.input.value = t; vmPaint(); };
+  rec.onerror = e => { const c = e && e.error; if (c === "not-allowed" || c === "service-not-allowed" || c === "audio-capture") { if (auto) VM.noAuto = true; else VM.noRec = true; } };
+  rec.onend = () => { if (VM.rec !== rec) return; VM.rec = null; const t = VM.txt.trim(); VM.txt = ""; if (!VM.on) return;
+    if (t) { if (VM.o.input) VM.o.input.value = ""; VM.st = "think"; vmPaint(); VM.o.send(t); } else { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); } };
+  try { rec.start(); VM.rec = rec; VM.st = "listen"; } catch (e) { if (auto) VM.noAuto = true; else VM.noRec = true; VM.st = vmRecog() ? "idle" : "type"; }
+  vmPaint();
+}
+function vmToggle(o) { // the mic button: start voice mode, talk, cut in while Quint speaks, or finish talking
+  if (!VM.on) { VM.on = true; VM.o = o; VM.noAuto = false; vmUnlock(); vmListen(false); return; } // listening starts inside the tap, as phones require
+  VM.o = o;
+  if (VM.st === "listen") { const r = VM.rec; if (r) try { r.stop(); } catch (e) { vmStopRec(); VM.st = "idle"; vmPaint(); } return; } // done talking: send what was heard
+  if (VM.st === "speak") { try { o.hush(); } catch (e) {} VM.st = "idle"; vmListen(false); return; } // cut in
+  if (VM.st === "think") return;
+  vmListen(false);
+}
+function vmEnd() { if (!VM.on) return; VM.on = false; vmStopRec(); try { VM.o && VM.o.hush(); } catch (e) {} VM.st = "off"; vmPaint(); }
+function vmAnswer(text) { // an answer arrived: say it, then listen again
+  if (!VM.on || !VM.o) return; if (!text) { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); return; }
+  const back = VM.st === "type", id = VM.sid = (VM.sid || 0) + 1; VM.st = "speak"; vmPaint();
+  VM.o.speak(text, () => { if (!VM.on || VM.st !== "speak" || VM.sid !== id) return; if (back || !vmRecog()) { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); return; } VM.st = "idle"; vmPaint(); setTimeout(() => { if (VM.on && VM.st === "idle") vmListen(true); }, 400); });
+}
+function vmLabel(V) { // what the voice strip says in each state
+  return V.st === "listen" ? (V.txt ? `“${V.txt}”` : "Listening… speak now, then pause") : V.st === "think" ? "Quint is thinking…" : V.st === "speak" ? "Quint is talking: tap 🎙 to cut in"
+    : V.st === "type" ? "Tap the 🎤 on your keyboard, speak, then send. Quint answers out loud." : "Tap 🎙 to talk";
+}
+function vmUnlock() { // a silent word inside the tap, so the phone lets Quint's voice play later without another tap
+  try { if (window.speechSynthesis && typeof SpeechSynthesisUtterance !== "undefined") { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; window.speechSynthesis.speak(u); } } catch (e) {}
 }
 const SAY_WORDS = [[/\bVWAP\b/g, "V-wap"], [/\bORH\b/g, "the opening range high"], [/\bORL\b/g, "the opening range low"], [/\bONH\b/g, "the overnight high"], [/\bONL\b/g, "the overnight low"],
   [/\bPDH\b/g, "yesterday's high"], [/\bPDL\b/g, "yesterday's low"], [/\bPDC\b/g, "yesterday's close"], [/\bNYO\b/g, "the New York open"], [/\bFVG\b/g, "fair value gap"], [/\bBOS\b/g, "break of structure"],
@@ -1039,7 +1104,7 @@ async function dkBrief(m, signal) { // everything Quint should know before he an
 function dkRules(m) {
   return `You are Quint, a trading intelligence in your own app, Quint (you run on Claude, made by Anthropic). The app shows the user a live instrument panel for one market beside your chat: a price tape with the session's key levels, a signal matrix across timeframes and your record. They can ask you anything: a trade call, levels, news, how something works, a strategy to test, Pine Script code.
 
-WHO THEY ARE: ${myLine()} They trade from an iPhone and place real trades on NinjaTrader. This app doesn't place orders: when they tell you they took one of your calls, the brief shows it as their open position.
+WHO THEY ARE: ${myLine()} They trade from an iPhone and place real trades on NinjaTrader. This app doesn't place orders: when they tell you they took one of your calls, the brief shows it as their open position. Talk to them like a person, not a terminal: if part of their message is just chat (how you are, how their day went, nerves after a loss), answer that part warmly and naturally in a sentence or two, then get to the trading.
 
 THEIR OWN STRATEGY: the 5-pillar playbook, in order. 1 Location: price at a higher-timeframe level (previous day high or low, a 1h, 4h or daily fair value gap or order block). 2 Liquidity sweep: price trades through that level or the recent highs/lows and closes back inside. 3 CISD (change in state of delivery): a close back through the open of the candles that drove price into the sweep. 4 Displacement: a strong candle the new way, body at least 1.2× ATR, closing near its extreme, often leaving a fair value gap. 5 Execution: the pullback into that fair value gap, order block or CISD level with a confirming close; stop just beyond the sweep, target the liquidity on the other side at 1.5R or more; New York session. When they mention their playbook, the pillars or "my strategy", judge it pillar by pillar from the 5-PILLAR CHECK in the brief, name the first missing pillar and what would complete it, and give the exact entry, stop and target when all five are in place.${ST.bspil && ST.bspil.n != null ? ` Its test on their real 5-minute MNQ candles: ${ST.bspil.n} trades, ${ST.bspil.wr}% wins, profit factor ${ST.bspil.pf}, ${ST.bspil.net >= 0 ? "+" : "−"}$${Math.abs(ST.bspil.net)} on 1 MNQ after costs; quote this honestly if asked.` : ""}
 
@@ -1223,27 +1288,52 @@ async function dkAlertMake(m, p, dir, act, note, o = {}) {
 }
 const dkAlFor = (cid, kind) => dkAls().find(a => a.cid === cid && a.kind === kind && a.exp > Date.now() && !a.gone);
 function dkAlertWait(C, m) { const Q = MK.q[m.k], px = (Q && Q.p) || C.px, n = []; String(C.wait || "").replace(/(^|[^A-Za-z0-9.])(\d[\d,]*(?:\.\d+)?)/g, (x, a, v) => { n.push(+v.replace(/,/g, "")); return x; }); const p = n.find(v => px && Math.abs(v / px - 1) < 0.2); return p == null ? null : p; }
+const DK_TRADE_RX = /\b(buy|sell|long|short|trades?|trading|entry|enter|stop|target|tp|sl|charts?|price|levels?|setups?|mnq|mes|nq|es|ym|rty|gold|oil|crude|bitcoin|btc|markets?|candles?|trend|support|resistance|vwap|pillars?|call|scalp|news|fomc|cpi|nfp|fed|risk|contracts?|lucid|account|eval|funded|payout|pine|strateg(y|ies)|backtest|alerts?|bull|bear|breakout|range|sweep|liquidity|cisd|displacement|fvg|order block|ema|rsi|atr|session|london|new york|futures|nasdaq|s&p|dow|points?|ticks?|win rate|drawdown|p&l|pnl|position|exit|bias|direction|chop|volume|ninjatrader|tradingview|screenshot|practi[cs]e|spot it|code|script|indicator)\b|\d{4,}/i;
+const DK_CHAT_RX = /^\s*(hi|hiya|hey|hello|yo|sup|morning|evening|good (morning|afternoon|evening|night)|gm|thanks|thank you|thx|cheers|ta|lol|lmao|haha|ok|okay|cool|nice|great|love (it|you)|how are you|how r u|how's it going|hows it going|how you doing|how was your|what's up|whats up|wassup|who are you|what are you|what's your name|tell me (a joke|about yourself)|i'?m (so |really |a bit )?(tired|stressed|bored|nervous|anxious|happy|sad|angry|frustrated|gutted|buzzing|done)|bye|goodnight|night|see you|talk later)\b/i;
+function dkRecentTrade(m) { const L = m ? dkMsgs(m.k) : []; for (let k = L.length - 1; k >= 0; k--) { const x = L[k]; if (x.r === "a" && !x.busy) return !x.chat && Date.now() - (x.at || 0) < 15 * 6e4; } return false; } // a follow-up to a trading answer stays a trading question
+function dkIsChat(text, m, opt = {}) {
+  if (opt.img || opt.trade) return false; const t = String(text || "").trim(); if (!t) return false;
+  if (DK_CHAT_RX.test(t) && t.length < 90 && !DK_TRADE_RX.test(t)) return true;
+  return !DK_TRADE_RX.test(t) && !dkRecentTrade(m);
+}
+function dkChatRules(m) {
+  return `You are Quint, the trading mentor built into the user's trading app (you run on Claude, made by Anthropic). Right now the user isn't asking for a trade: they're just talking to you.
+
+WHO THEY ARE: ${myLine()} They trade MNQ futures from an iPhone and are working to pass a Lucid Trading funded account.
+
+HOW TO TALK: like a warm, sharp friend who happens to be a professional trader. Natural, relaxed, plain English, the way a person speaks: contractions, short sentences, a little humour when it fits. Usually one to four sentences; more only if they ask for it. Ask a question back now and then. No headings, bullet lists or tables. Never make a trade call here and never write a CALL: or ALERT: line or price levels.
+
+If they ask about the market, a chart or a trade, say in a few words that you'll read the live charts if they ask you for a call (for example "buy or sell now?"), because you haven't looked at the data for this reply. If they sound stressed, tilted or are chasing losses, be kind and steady, and gently point them back to their own rules and their account limits, without lecturing. This app is for learning and practice and never places real orders.`;
+}
+function dkChatBrief(m) {
+  const now = Date.now(), e = etNow(now), L = [`CHAT CONTEXT: it's ${new Date(now).toLocaleString([], { weekday: "long", hour: "2-digit", minute: "2-digit" })} for the user, ${String(Math.floor(e.min / 60)).padStart(2, "0")}:${String(e.min % 60).padStart(2, "0")} in New York. Futures: ${stLabel(mktStatus("fut", now))}.`];
+  const rc = dkRec(); if (rc.n) L.push(`Your calls so far: ${rc.w} wins, ${rc.l} losses, ${rc.R >= 0 ? "+" : ""}${rc.R.toFixed(1)}R.`);
+  if (typeof lgBrief === "function") { const g = lgBrief(); if (g) L.push(g.replace(/ When you give a trade[\s\S]*$/, "")); }
+  return L.join("\n");
+}
 async function dkSend(text, opt = {}) {
   const m = dkM(); text = String(text || "").trim(); if (!m || !text || DK.busy) return; DK.lastQ = text; DK.alN = 0;
   if (!CO.sample) { hmToast("Quint needs Claude: open this app inside Claude to talk to him."); return; }
   DK.view = "chat"; const L = dkMsgs(m.k); L.push({ r: "u", t: text.slice(0, 2000), at: Date.now(), img: !!opt.img }); const A = { r: "a", t: "", at: Date.now(), busy: true, now: dkNow(m) }; L.push(A);
-  DK.busy = true; DK.prog = "Reading the charts…"; dkPaint(true); const ctl = DK.ctl = new AbortController();
+  const chat = dkIsChat(text, m, opt); if (chat) A.chat = true;
+  DK.busy = true; DK.prog = chat ? "Thinking…" : "Reading the charts…"; dkPaint(true); const ctl = DK.ctl = new AbortController();
   try {
     if (DK.lim === undefined) DK.lim = await CO.sample.limits().catch(() => null);
-    const br = await dkBrief(m, ctl.signal); if (ctl.signal.aborted) throw { code: "cancelled" };
-    const canImg = !!(DK.lim && DK.lim.images), img = opt.img && canImg ? opt.img : canImg && !opt.img ? await dkShot() : null;
-    const turns = [{ role: "user", content: dkRules(m) }];
+    const br = chat ? { text: dkChatBrief(m), meta: {} } : await dkBrief(m, ctl.signal); if (ctl.signal.aborted) throw { code: "cancelled" };
+    const canImg = !!(DK.lim && DK.lim.images), img = chat ? null : opt.img && canImg ? opt.img : canImg && !opt.img ? await dkShot() : null;
+    const turns = [{ role: "user", content: chat ? dkChatRules(m) : dkRules(m) }];
     for (const x of L.slice(-14, -2)) if (x.t && !x.busy) turns.push({ role: x.r === "u" ? "user" : "assistant", content: x.r === "a" ? x.t.slice(0, 3500) : x.t });
-    turns.push({ role: "user", content: `${br.text}\n\n${img ? (opt.img ? "IMAGE: a screenshot the user took of their own chart (it may be NinjaTrader or TradingView, and newer than the brief): read its price scale, lines and any position.\n" : "IMAGE: the Chart Wizard chart exactly as the user sees it now.\n") : ""}QUESTION: ${text}` });
-    DK.prog = "Thinking it through…"; dkPaintLast();
-    const run = tools => CO.sample(turns, Object.assign({ onText: ({ text: t }) => { A.t = t; DK.prog = ""; dkPaintLast(); }, signal: ctl.signal, cache: false }, qaModel(text, !!img), img ? { images: [img] } : {}, tools ? { tools } : {}));
-    const tools = DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
+    turns.push({ role: "user", content: `${br.text}\n\n${img ? (opt.img ? "IMAGE: a screenshot the user took of their own chart (it may be NinjaTrader or TradingView, and newer than the brief): read its price scale, lines and any position.\n" : "IMAGE: the Chart Wizard chart exactly as the user sees it now.\n") : ""}${chat ? "MESSAGE" : "QUESTION"}: ${text}${typeof vmHint === "function" ? vmHint() : ""}` });
+    DK.prog = chat ? "Thinking…" : "Thinking it through…"; dkPaintLast();
+    const run = tools => CO.sample(turns, Object.assign({ onText: ({ text: t }) => { A.t = t; DK.prog = ""; dkPaintLast(); }, signal: ctl.signal, cache: false }, qaModel(text, !!img), img ? { images: [img] } : {}, tools ? { tools } : {}, chat ? { model: "claude-opus-5-5", modelTier: "default", effort: "low" } : {}));
+    const tools = !chat && DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
     let r; try { r = await run(tools); } catch (e) { if (e && e.code === "tools_unavailable" && tools) { DK.noTools = true; A.t = ""; r = await run(null); } else throw e; }
     if (r && r.text) A.t = r.text; if (!A.t) throw { code: "empty_completion" };
-    const c = dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
+    const c = chat ? null : dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
   } catch (e) { const c = e && e.code; if (e && e.text) A.t = e.text; A.err = c === "cancelled" ? (A.t ? null : "Stopped.") : c === "not_ready" ? "Live data isn't connected, so Quint can't read the charts. Reload to reconnect." : c === "image_rejected" ? "Claude couldn't take that image. Try a smaller or clearer screenshot." : NW_ERR[c] || "Something went wrong reaching Quint. Try again in a moment."; }
-  finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); }
+  finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); if (typeof vmAnswer === "function") vmAnswer(A.t ? A.t : A.err || "", m); }
 }
+
 
 /* ================= QUINT: the standalone app. State, markets, connectors, voice ================= */
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -1365,16 +1455,18 @@ function voiceList() { try { return (window.speechSynthesis && speechSynthesis.g
 function voicePick() { const vs = voiceList(), want = ST.set.voice && vs.find(v => v.voiceURI === ST.set.voice || v.name === ST.set.voice); if (want) return want; const best = vs.filter(v => voiceScore(v) > 0).sort((a, b) => voiceScore(b) - voiceScore(a))[0]; return best || null; }
 if (window.speechSynthesis) { try { speechSynthesis.onvoiceschanged = () => { if ($("#vlist")) paintVoices(); }; speechSynthesis.getVoices(); } catch (e) {} }
 function qaSpoke() { QT.speaking = false; QT.level = 0; $$(".say").forEach(b => { b.textContent = "Listen"; b.setAttribute("aria-pressed", "false"); }); coreKick(); }
-function qaSpeak(text, btn, name) { // speaks like a person: the call first, trader words, one sentence at a time
-  if (QT.speaking) { try { if (QT.tts) QT.tts.stop().catch(() => {}); else speechSynthesis.cancel(); } catch (e) {} qaSpoke(); return; }
-  const script = sayScript(text, name); if (!script) return; const rate = clamp(+ST.set.rate || 1, 0.7, 1.5);
+function qaSpeak(text, btn, name, cb) { // speaks like a person: the call first, trader words, one sentence at a time
+  if (QT.speaking && !cb) { try { if (QT.tts) QT.tts.stop().catch(() => {}); else speechSynthesis.cancel(); } catch (e) {} qaSpoke(); return; }
+  const tok = QT.tok = (QT.tok || 0) + 1, fin = () => { if (tok !== QT.tok) return; qaSpoke(); if (cb) { const f = cb; cb = null; f(); } };
+  const script = sayScript(text, name); if (!script) { fin(); return; } const rate = clamp(+ST.set.rate || 1, 0.7, 1.5);
   QT.speaking = true; if (btn) { btn.textContent = "Stop"; btn.setAttribute("aria-pressed", "true"); } coreKick();
-  if (QT.tts) { QT.tts.speak(sayLines(script).map(t => ({ text: t, voice: ST.set.tvoice || "buttery", rate, language: "en" }))).catch(e => { if (e && e.code === "not_granted") hmToast("Reading aloud is turned off for Quint. Turn it back on in this page's Permissions menu."); }).then(qaSpoke); return; }
-  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { qaSpoke(); hmToast("This device can't read aloud here."); return; }
+  if (QT.tts) { QT.tts.speak(sayLines(script).map(t => ({ text: t, voice: ST.set.tvoice || "buttery", rate, language: "en" }))).catch(e => { if (e && e.code === "not_granted") hmToast("Reading aloud is turned off for Quint. Turn it back on in this page's Permissions menu."); }).then(fin); return; }
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { fin(); hmToast("This device can't read aloud here."); return; }
   try { speechSynthesis.cancel(); const v = voicePick(), parts = saySplit(script);
     parts.forEach((t, i) => { const u = new SpeechSynthesisUtterance(t); if (v) u.voice = v; u.lang = v ? v.lang : "en-GB"; u.rate = rate; u.pitch = /\?$/.test(t) ? 1.04 : 1;
-      u.onboundary = () => { QT.level = 1; coreKick(); }; if (i === parts.length - 1) { u.onend = qaSpoke; u.onerror = qaSpoke; } speechSynthesis.speak(u); }); } catch (e) { qaSpoke(); }
+      u.onboundary = () => { QT.level = 1; coreKick(); }; if (i === parts.length - 1) { u.onend = fin; u.onerror = fin; } speechSynthesis.speak(u); }); } catch (e) { fin(); }
 }
+function qaHush() { QT.tok = (QT.tok || 0) + 1; try { if (QT.tts) QT.tts.stop().catch(() => {}); else speechSynthesis.cancel(); } catch (e) {} qaSpoke(); }
 
 /* ================= QUINT: the interface ================= */
 const QA = { view: "brain", B: {}, flash: 0 };
@@ -1752,12 +1844,25 @@ function qaStart() {
   ta.addEventListener("focus", () => kbOn(true)); ta.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== ta) kbOn(false); }, 150));
   $("#askf").onsubmit = e => { e.preventDefault(); if (DK.busy) { if (DK.ctl) DK.ctl.abort(); return; } const v = ta.value.trim(); if (!v && !DK.img) return; ta.value = ""; fit();
     if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(v || "Read my chart and give me your call.", DK.img ? { img: DK.img } : {}); DK.img = null; paintImg(); };
+  $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
   $("#file").onchange = async e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { DK.img = await qtShrink(f); paintImg(); ta.focus(); } catch (err) { hmToast("That file couldn't be opened as an image."); } };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#scrim").classList.contains("open")) { e.preventDefault(); closeSet(); } });
   window.addEventListener("resize", () => { drawTape(); drawSess(); drawScope(); coreKick(); });
   setInterval(() => { drawSess(); paintVerdict(); paintHead(); }, 30000);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawTape(); drawSess(); drawScope(); coreKick(); });
   paintAll(); coreKick(); qaInit();
+}
+
+function qbVmO() { // voice mode wired to Quint Brain
+  return { input: $("#q"), lang: navigator.language || "en-GB", send: t => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(t); }, speak: (t, done) => { const m = dkM(); qaSpeak(t, null, m ? m.k : "", done); }, hush: qaHush, paint: qbVmPaint };
+}
+function qbVmPaint(V) {
+  const f = $("#askf"), mic = $("#mic"); if (!f) return; let bar = $("#vmbar");
+  if (mic) { mic.setAttribute("aria-pressed", V.on); mic.classList.toggle("live", V.st === "listen"); }
+  if (!V.on) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement("div"); bar.id = "vmbar"; f.before(bar); }
+  bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="btn sm vmx" aria-label="End voice mode">End</button>`;
+  bar.querySelector(".vmx").onclick = vmEnd;
 }
 
 /* ================= QUINT: the brain. A 3D network that turns as you drag it, wired from the same live data ================= */

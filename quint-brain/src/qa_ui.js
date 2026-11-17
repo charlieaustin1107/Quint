@@ -374,10 +374,23 @@ function qaStart() {
   ta.addEventListener("focus", () => kbOn(true)); ta.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== ta) kbOn(false); }, 150));
   $("#askf").onsubmit = e => { e.preventDefault(); if (DK.busy) { if (DK.ctl) DK.ctl.abort(); return; } const v = ta.value.trim(); if (!v && !DK.img) return; ta.value = ""; fit();
     if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(v || "Read my chart and give me your call.", DK.img ? { img: DK.img } : {}); DK.img = null; paintImg(); };
+  $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
   $("#file").onchange = async e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { DK.img = await qtShrink(f); paintImg(); ta.focus(); } catch (err) { hmToast("That file couldn't be opened as an image."); } };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#scrim").classList.contains("open")) { e.preventDefault(); closeSet(); } });
   window.addEventListener("resize", () => { drawTape(); drawSess(); drawScope(); coreKick(); });
   setInterval(() => { drawSess(); paintVerdict(); paintHead(); }, 30000);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawTape(); drawSess(); drawScope(); coreKick(); });
   paintAll(); coreKick(); qaInit();
+}
+
+function qbVmO() { // voice mode wired to Quint Brain
+  return { input: $("#q"), lang: navigator.language || "en-GB", send: t => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(t); }, speak: (t, done) => { const m = dkM(); qaSpeak(t, null, m ? m.k : "", done); }, hush: qaHush, paint: qbVmPaint };
+}
+function qbVmPaint(V) {
+  const f = $("#askf"), mic = $("#mic"); if (!f) return; let bar = $("#vmbar");
+  if (mic) { mic.setAttribute("aria-pressed", V.on); mic.classList.toggle("live", V.st === "listen"); }
+  if (!V.on) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement("div"); bar.id = "vmbar"; f.before(bar); }
+  bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="btn sm vmx" aria-label="End voice mode">End</button>`;
+  bar.querySelector(".vmx").onclick = vmEnd;
 }

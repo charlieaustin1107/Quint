@@ -1226,6 +1226,30 @@ h2, h3, h4, .hmsec > h2, .sec h3, .q .qk, .nav h6, .event .tag, .rsec h4, .kpi s
 .lgtog .k::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); transition: transform .2s; }
 .lgtog[aria-pressed="true"] .k { background: var(--acc); } .lgtog[aria-pressed="true"] .k::after { transform: translateX(18px); background: #01131c; }
 @media (max-width: 360px) { .lgform { grid-template-columns: 1fr; } .lgrow { grid-template-columns: 1fr 1fr; } }
+
+/* ---------- chart marking toolbar + question charts ---------- */
+.lcbox { position: relative; width: 100%; border: 1px solid rgba(41,216,255,.16); border-radius: 10px; overflow: hidden; background: var(--bg); }
+.lcbox canvas.lccv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: crosshair; }
+.lcbar { display: flex; align-items: center; gap: 4px; margin: 6px 0; flex-wrap: wrap; }
+.lcbar button { min-width: 38px; height: 36px; padding: 0 8px; border-radius: 6px; border: 1px solid rgba(41,216,255,.22); background: rgba(8,14,28,.85); color: var(--ink); font: 600 15px/1 var(--f-num); display: inline-grid; place-items: center; }
+.lcbar button[aria-pressed="true"] { color: #01131c; background: linear-gradient(135deg, var(--acc), var(--acc2)); border-color: transparent; box-shadow: 0 0 14px -2px rgba(41,216,255,.7); }
+.lcbar button:disabled { opacity: .4; }
+.lcbar .lcsp { flex: 1; } .lcbar .lchint { flex-basis: 100%; min-height: 14px; font: 500 11px/1.2 var(--f-display); letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+.lclg { font-size: 11px; right: 66px; }
+.hcmain > .lcbar { margin: 8px 0 6px; }
+
+/* ---------- voice mode ---------- */
+.qdkmic.on { color: #01131c; background: linear-gradient(135deg, var(--acc), var(--acc2)); border-color: transparent; box-shadow: 0 0 16px -2px rgba(41,216,255,.8); }
+.qdkmic.live { animation: vmpulse 1.2s ease-in-out infinite; }
+@keyframes vmpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(41,216,255,.7); } 50% { box-shadow: 0 0 0 10px rgba(41,216,255,0); } }
+.vmbar { display: flex; align-items: center; gap: 10px; margin: 6px 12px 0; padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(41,216,255,.35); background: linear-gradient(90deg, rgba(41,216,255,.1), rgba(155,107,255,.12)); font-size: 13.5px; color: var(--ink-hi); }
+.vmbar .vmt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.vmbar .vmx { flex: none; min-height: 32px; }
+.vmorb { flex: none; position: relative; width: 26px; height: 26px; border-radius: 50%; background: conic-gradient(var(--acc), var(--acc2), var(--acc)); animation: qspin 4s linear infinite; }
+.vmorb i { position: absolute; inset: 5px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, var(--acc) 45%, #0e7490); }
+.vmbar.listen .vmorb { animation-duration: 1s; } .vmbar.listen .vmorb i { animation: qcore .7s ease-in-out infinite; }
+.vmbar.speak .vmorb i { animation: qcore .45s ease-in-out infinite; } .vmbar.think .vmorb { animation-duration: 1.6s; }
+@media (prefers-reduced-motion: reduce) { .vmorb, .vmorb i, .qdkmic.live { animation: none !important; } }
 </style>
 </head>
 <body>
