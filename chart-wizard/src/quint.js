@@ -81,17 +81,7 @@ function qtAgg(B, k, end) { // group the candles before `end` into bars k times 
   for (let a = first; a + k <= end; a += k) { let h = -Infinity, l = Infinity, v = 0; for (let i = a; i < a + k; i++) { h = Math.max(h, B.h[i]); l = Math.min(l, B.l[i]); v += B.v ? B.v[i] : 0; } O.t.push(B.t[a]); O.o.push(B.o[a]); O.h.push(h); O.l.push(l); O.c.push(B.c[a + k - 1]); O.v.push(v); }
   return O;
 }
-function qtDraw(cv, B, a, b, o = {}) { // a small static candle chart
-  if (!cv) return; const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth || 320, H = o.h || 220; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.height = H + "px";
-  const x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H); a = Math.max(0, a); if (b <= a) return;
-  let lo = Infinity, hi = -Infinity; for (let i = a; i < b; i++) { lo = Math.min(lo, B.l[i]); hi = Math.max(hi, B.h[i]); } for (const L of o.lines || []) { lo = Math.min(lo, L.p); hi = Math.max(hi, L.p); }
-  const pad = (hi - lo) * 0.06 || 1; lo -= pad; hi += pad; const R = 58, n = b - a, bw = (W - R) / n, Y = p => (hi - p) / (hi - lo) * (H - 16) + 8;
-  x.font = "10px ui-monospace, Menlo, monospace"; x.lineWidth = 1;
-  for (let k = 0; k <= 4; k++) { const p = lo + (hi - lo) * k / 4, y = Y(p); x.strokeStyle = "rgba(127,147,184,.14)"; x.beginPath(); x.moveTo(0, y); x.lineTo(W - R, y); x.stroke(); x.fillStyle = "#7f93b8"; x.fillText(p.toFixed(2), W - R + 4, y + 3); }
-  if (o.mark != null && o.mark > a && o.mark < b) { const mx = (o.mark - a) * bw; x.fillStyle = "rgba(167,139,250,.09)"; x.fillRect(mx, 0, W - R - mx, H); x.strokeStyle = "rgba(167,139,250,.75)"; x.setLineDash([4, 3]); x.beginPath(); x.moveTo(mx, 0); x.lineTo(mx, H); x.stroke(); x.setLineDash([]); }
-  for (let i = a; i < b; i++) { const up = B.c[i] >= B.o[i], cx = (i - a + 0.5) * bw, col = up ? "#26a69a" : "#ef5350"; x.strokeStyle = col; x.fillStyle = col; x.beginPath(); x.moveTo(cx, Y(B.h[i])); x.lineTo(cx, Y(B.l[i])); x.stroke(); const y1 = Y(Math.max(B.o[i], B.c[i])), y2 = Y(Math.min(B.o[i], B.c[i])), w = Math.max(1, bw * 0.7); x.fillRect(cx - w / 2, y1, w, Math.max(1, y2 - y1)); }
-  for (const L of o.lines || []) { const y = Y(L.p); x.strokeStyle = L.col; x.setLineDash([5, 3]); x.beginPath(); x.moveTo(0, y); x.lineTo(W - R, y); x.stroke(); x.setLineDash([]); x.fillStyle = L.col; x.fillText(L.lab, 4, y - 3); }
-}
+function qtDraw(cv, B, a, b, o = {}) { return lcMini(cv, B, a, b, o); } // the full TradingView-style chart, with drawing tools on question charts
 
 /* ---------- voice: Claude's voice where this app offers it, the phone's own voice otherwise ---------- */
 function qtVoiceInit() { const c = window.claude; if (c && typeof c.use === "function") Promise.resolve(c.use("tts")).then(t => { QT.tts = t || null; }).catch(() => {}); }
@@ -114,20 +104,109 @@ function qtVoicePaint() {
   const el = $("#qvl"), note = $("#qvn"); if (!el) return; const test = () => { QT.speaking = false; qtSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); };
   if (QT.tts) { note.textContent = "Claude's own voices are available here. Tap one to hear it."; el.innerHTML = ["buttery", "airy", "glassy", "rounded"].map(v => `<button class="btn${(HS().tvoice || "buttery") === v ? " pri" : ""}" data-tv="${v}">${v[0].toUpperCase() + v.slice(1)}</button>`).join(""); $$("[data-tv]", el).forEach(b => b.onclick = () => { HS().tvoice = b.dataset.tv; save(); qtVoicePaint(); test(); }); return; }
   const vs = voiceList().filter(v => /^en/i.test(v.lang)).sort((a, b) => voiceScore(b) - voiceScore(a)), cur = voicePick();
-  note.textContent = "On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. The robotic ones are marked at the bottom. Tap one to hear it.";
+  note.innerHTML = `On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. <b>For a much more human voice, download a Premium one:</b> Settings → Accessibility → Spoken Content (Read &amp; Speak on newer iPhones) → Voices → English, then tap a voice marked Premium, such as Ava, Zoe or Evan (US) or Jamie or Serena (UK), and download it. Come back here and tap it. Robotic voices are marked at the bottom.`;
   el.innerHTML = vs.length ? vs.map(v => `<button class="btn${cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name) ? " pri" : ""}" data-vu="${esc(v.voiceURI || v.name)}">${esc(v.name.replace(/\s*\(.*\)$/, ""))} <small>${esc(v.lang)}${voiceScore(v) < 0 ? " · robotic" : /premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : `<p class="small">No voices are listed yet. Tap 🔊 Listen on any answer, then come back.</p>`;
   $$("[data-vu]", el).forEach(b => b.onclick = () => { HS().voice = b.dataset.vu; save(); qtVoicePaint(); test(); });
 }
-function qtSpeak(text, btn) {
-  const done = () => { QT.speaking = false; $$(".qtsay").forEach(b => { b.textContent = "🔊 Listen"; }); };
-  if (QT.speaking) { try { if (QT.tts) QT.tts.stop(); else window.speechSynthesis.cancel(); } catch (e) {} done(); return; }
-  const plain = mdPlain(text); if (!plain) return;
-  const parts = []; let cur = ""; for (const para of plain.split("\n")) { if ((cur + "\n" + para).length > 1700) { if (cur) parts.push(cur); cur = para.slice(0, 1700); } else cur = cur ? cur + "\n" + para : para; } if (cur) parts.push(cur);
-  QT.speaking = true; if (btn) btn.textContent = "■ Stop";
-  if (QT.tts) { QT.tts.speak(parts.slice(0, 6).map(t => ({ text: t, voice: HS().tvoice || "buttery", rate: HS().vrate || 1, language: "en" }))).catch(() => {}).then(done); return; }
+/* ---------- voice mode: talk to Quint, he answers out loud, then listens again ----------
+   Each app hands vmToggle an adapter: { input, send(text), speak(text, done), hush(), paint(), lang }.
+   Listening uses the phone's speech recognition where the page is allowed it; where it isn't, the keyboard's
+   own dictation (the 🎤 key) does the listening and Quint still answers out loud. */
+const VM = { on: false, st: "off", rec: null, txt: "", o: null, noRec: false, noAuto: false };
+const vmRecog = () => VM.noRec ? null : (window.SpeechRecognition || window.webkitSpeechRecognition || null);
+function vmHint() { return VM.on ? "\nVOICE MODE: the user is talking to you out loud and hears your reply read aloud. Answer in a few natural spoken sentences (under about 90 words unless they ask for detail), with no tables, lists, headings or symbols. If you make a trade call, still end with the CALL line." : ""; }
+function vmPaint() { if (VM.o && VM.o.paint) try { VM.o.paint(VM); } catch (e) {} }
+function vmStopRec() { const r = VM.rec; VM.rec = null; if (r) { try { r.onend = null; r.abort(); } catch (e) {} } }
+function vmListen(auto) {
+  if (!VM.on) return; const R = vmRecog(); vmStopRec();
+  if (!R || (auto && VM.noAuto)) { VM.st = R ? "idle" : "type"; vmPaint(); if (!R && VM.o.input && !auto) try { VM.o.input.focus(); } catch (e) {} return; }
+  let rec; try { rec = new R(); } catch (e) { VM.noRec = true; VM.st = "type"; vmPaint(); return; }
+  rec.lang = VM.o.lang || navigator.language || "en-GB"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1; VM.txt = "";
+  rec.onresult = e => { let t = ""; for (let k = 0; k < e.results.length; k++) t += e.results[k][0].transcript; VM.txt = t; if (VM.o.input) VM.o.input.value = t; vmPaint(); };
+  rec.onerror = e => { const c = e && e.error; if (c === "not-allowed" || c === "service-not-allowed" || c === "audio-capture") { if (auto) VM.noAuto = true; else VM.noRec = true; } };
+  rec.onend = () => { if (VM.rec !== rec) return; VM.rec = null; const t = VM.txt.trim(); VM.txt = ""; if (!VM.on) return;
+    if (t) { if (VM.o.input) VM.o.input.value = ""; VM.st = "think"; vmPaint(); VM.o.send(t); } else { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); } };
+  try { rec.start(); VM.rec = rec; VM.st = "listen"; } catch (e) { if (auto) VM.noAuto = true; else VM.noRec = true; VM.st = vmRecog() ? "idle" : "type"; }
+  vmPaint();
+}
+function vmToggle(o) { // the mic button: start voice mode, talk, cut in while Quint speaks, or finish talking
+  if (!VM.on) { VM.on = true; VM.o = o; VM.noAuto = false; vmUnlock(); vmListen(false); return; } // listening starts inside the tap, as phones require
+  VM.o = o;
+  if (VM.st === "listen") { const r = VM.rec; if (r) try { r.stop(); } catch (e) { vmStopRec(); VM.st = "idle"; vmPaint(); } return; } // done talking: send what was heard
+  if (VM.st === "speak") { try { o.hush(); } catch (e) {} VM.st = "idle"; vmListen(false); return; } // cut in
+  if (VM.st === "think") return;
+  vmListen(false);
+}
+function vmEnd() { if (!VM.on) return; VM.on = false; vmStopRec(); try { VM.o && VM.o.hush(); } catch (e) {} VM.st = "off"; vmPaint(); }
+function vmAnswer(text) { // an answer arrived: say it, then listen again
+  if (!VM.on || !VM.o) return; if (!text) { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); return; }
+  const back = VM.st === "type", id = VM.sid = (VM.sid || 0) + 1; VM.st = "speak"; vmPaint();
+  VM.o.speak(text, () => { if (!VM.on || VM.st !== "speak" || VM.sid !== id) return; if (back || !vmRecog()) { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); return; } VM.st = "idle"; vmPaint(); setTimeout(() => { if (VM.on && VM.st === "idle") vmListen(true); }, 400); });
+}
+function vmLabel(V) { // what the voice strip says in each state
+  return V.st === "listen" ? (V.txt ? `“${V.txt}”` : "Listening… speak now, then pause") : V.st === "think" ? "Quint is thinking…" : V.st === "speak" ? "Quint is talking: tap 🎙 to cut in"
+    : V.st === "type" ? "Tap the 🎤 on your keyboard, speak, then send. Quint answers out loud." : "Tap 🎙 to talk";
+}
+function vmUnlock() { // a silent word inside the tap, so the phone lets Quint's voice play later without another tap
+  try { if (window.speechSynthesis && typeof SpeechSynthesisUtterance !== "undefined") { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; window.speechSynthesis.speak(u); } } catch (e) {}
+}
+/* ---------- speaking like a person: turn screen text into words a trader would say out loud ---------- */
+// Chart shorthand a voice would otherwise spell out or garble
+const SAY_WORDS = [[/\bVWAP\b/g, "V-wap"], [/\bORH\b/g, "the opening range high"], [/\bORL\b/g, "the opening range low"], [/\bONH\b/g, "the overnight high"], [/\bONL\b/g, "the overnight low"],
+  [/\bPDH\b/g, "yesterday's high"], [/\bPDL\b/g, "yesterday's low"], [/\bPDC\b/g, "yesterday's close"], [/\bNYO\b/g, "the New York open"], [/\bFVG\b/g, "fair value gap"], [/\bBOS\b/g, "break of structure"],
+  [/\bCHoCH\b/g, "change of character"], [/\bR:R\b/g, "reward to risk"], [/\bATR\b/g, "A T R"], [/\bEMA\b/g, "E M A"], [/\bSMA\b/g, "S M A"], [/\bRSI\b/g, "R S I"], [/\bCISD\b/g, "C I S D"], [/\bP&L\b/g, "P and L"],
+  [/\bMNQ\b/g, "M N Q"], [/\bMES\b/g, "M E S"], [/\bNQ\b/g, "N Q"], [/\bES\b/g, "E S"], [/\bYM\b/g, "Y M"], [/\bRTY\b/g, "Russell"], [/\bMGC\b/g, "micro gold"], [/\bCME\b/g, "C M E"], [/\bFOMC\b/g, "F O M C"], [/\bCPI\b/g, "C P I"], [/\bNFP\b/g, "the jobs report"],
+  [/\bNY\b/g, "New York"], [/\bET\b/g, "New York time"], [/\be\.g\.\s*/gi, "for example "], [/\bi\.e\.\s*/gi, "that is "], [/\bvs\.?\s/gi, "versus "], [/\bw\/\s?/gi, "with "], [/\bpts?\b/g, m => m === "pt" ? "point" : "points"], [/\b(\d+) min\b/g, "$1 minutes"], [/\bmins\b/g, "minutes"],
+  [/\b(\d+)m\b/g, "$1-minute"], [/\b1h\b/g, "hourly"], [/\b(\d+)h\b/g, "$1-hour"], [/\b1D\b/g, "daily"], [/\b(\d+(?:\.\d+)?)\s?R\b/g, (m, x) => `${+x} R`]];
+const SAY_HEAD = { why: "Here's why.", levels: "The levels.", plan: "The plan.", risk: "The risk.", news: "The news.", context: "The bigger picture.", summary: "In short." };
+function sayNum(s) { // 27347.25 -> "27,347 and a quarter"; other decimals are left as they are
+  s = String(s); const neg = /^[−-]/.test(s), x = +s.replace(/[−,+-]/g, ""); if (!isFinite(x)) return s;
+  const whole = Math.trunc(x), fr = Math.round((x - whole) * 100), big = whole >= 1000 ? nf(0).format(whole) : String(whole);
+  const tail = fr === 0 ? "" : fr === 25 ? " and a quarter" : fr === 50 ? " and a half" : fr === 75 ? " and three quarters" : null;
+  return (neg ? "minus " : "") + (tail == null ? (whole >= 1000 && s.includes(".") ? big + "." + s.split(".")[1] : s.replace(/^[−+-]/, "")) : big + tail);
+}
+function sayable(t) {
+  let s = String(t || "").replace(/https?:\/\/\S+/g, "a link").replace(/^\s*(?:[-*+•]|\d{1,2}[.)])\s+/gm, "").replace(/\s*▲/g, " up,").replace(/\s*▼/g, " down,").replace(/\s*◆/g, " flat,").replace(/\s*→\s*/g, " to ").replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{25A0}-\u{25FF}\u{2B00}-\u{2BFF}️]/gu, " ");
+  s = s.replace(/\s*[·•|]\s*/g, ", ").replace(/\s*→\s*/g, " to ").replace(/~\s?|≈\s?/g, "about ").replace(/\s&\s/g, " and ").replace(/\s*\(([^)]{1,80})\)/g, ", $1,");
+  for (const [rx, to] of SAY_WORDS) s = s.replace(rx, to);
+  s = s.replace(/\b(BUY|SELL|NOW|LONG|SHORT|WAIT|STOP|TARGET|ENTRY|NO TRADE|STAY OUT|HOLD|LEAN|AND|THE|AT|ON|OR)\b/g, w => w.toLowerCase()).replace(/(^|[.!?]\s+|\n)([a-z])/g, (m, a, c) => a + c.toUpperCase());
+  s = s.replace(/([+−-])?\$?\b\d[\d,]*\.\d{1,2}\b/g, m => { const d = m.indexOf("$"); return d >= 0 ? m.slice(0, d) + "$" + sayNum(m.slice(d + 1)) : (m[0] === "+" ? "plus " : "") + sayNum(m); })
+    .replace(/(^|[\s,])[−-](?=\$?\d)/gm, "$1minus ").replace(/(^|[\s,])\+(?=\$?\d)/gm, "$1plus ");
+  return s.split("\n").map(l => l.trim().replace(/^[,\s]+/, "")).filter(Boolean).map(l => { const h = SAY_HEAD[l.toLowerCase().replace(/[:.]$/, "")]; return h || (/[.!?:;,]$/.test(l) ? l : l + "."); })
+    .join("\n").replace(/,\s*,/g, ",").replace(/,\s*([.!?])/g, "$1").replace(/[ \t]+([.,!?])/g, "$1").replace(/[ \t]{2,}/g, " ").trim();
+}
+function sayCall(c, name) { // the trade call, the way a mentor would say it across the desk
+  if (!c) return ""; const p = v => sayNum(String(v)), who = sayable(name || "it").replace(/\.$/, "");
+  if (!c.side) return c.wait ? `No trade on ${who} yet. I'm waiting for ${sayable(c.wait).replace(/\.$/, "").replace(/^(?!New\b|I\b)[A-Z](?=[a-z\s])/, x => x.toLowerCase())}.` : `No trade on ${who} right now. I'd stay out.`;
+  const bits = [`${c.side > 0 ? "Buy" : "Sell"} ${who}.`], risk = c.entry != null && c.stop != null ? Math.abs(c.entry - c.stop) : null;
+  bits.push(`${c.now || c.entry == null ? "In at the market" : `In at ${p(c.entry)}`}${c.stop != null ? `, stop ${p(c.stop)}` : ""}${risk ? `, that's ${sayNum(String(Math.round(risk * 100) / 100))} points of risk` : ""}${c.tgt != null ? `, target ${p(c.tgt)}` : ""}.`);
+  if (c.conf != null) bits.push(c.conf >= 70 ? `I like this one, about ${c.conf} percent.` : c.conf >= 55 ? `I'm about ${c.conf} percent on it.` : `Only about ${c.conf} percent, so keep it small.`);
+  return bits.join(" ");
+}
+function saySplit(t) { // one sentence per utterance, so phone voices pause naturally between them; tiny fragments ride with the one before
+  const out = [];
+  for (const para of String(t).split("\n")) for (const x of para.split(/(?<=[.!?])\s+(?=[A-Z0-9$"'])/)) {
+    const y = x.trim(); if (!y) continue; if (out.length && y.length < 25 && out[out.length - 1].length < 140) out[out.length - 1] += " " + y; else out.push(y); }
+  return out.slice(0, 60);
+}
+function sayScript(raw, name) { // what Quint says out loud for one answer: the call first, then the reasons
+  const c = typeof dkParse === "function" ? dkParse(raw) : null, px = /^\s*PRICE:\s*([0-9][0-9,]*\.?[0-9]*)/im.exec(String(raw || "")); if (c && c.side && c.entry == null && px) c.entry = +px[1].replace(/,/g, ""); let plain = mdPlain(typeof dkClean === "function" ? dkClean(raw) : raw);
+  if (c) plain = plain.replace(/^\s*(BUY|SELL|LONG|SHORT|NO TRADE|STAY OUT|WAIT)\b[^\n]*\n?/i, ""); // the spoken call replaces the headline that says the same thing
+  plain = plain.replace(/^\s*PRICE:[^\n]*$/gim, ""); const body = sayable(plain);
+  return [c ? sayCall(c, name) : "", body].filter(Boolean).join("\n");
+}
+function sayLines(script) { // Claude's voice reads best a paragraph at a time (each line up to 2,000 characters)
+  const out = []; let cur = ""; for (const para of script.split("\n")) { if (cur && (cur + " " + para).length > 600) { out.push(cur); cur = para.slice(0, 1900); } else cur = cur ? cur + " " + para : para.slice(0, 1900); } if (cur) out.push(cur); return out.slice(0, 12);
+}
+function qtSpeak(text, btn, name, cb) {
+  let fin = false; const done = () => { QT.speaking = false; $$(".qtsay").forEach(b => { b.textContent = "🔊 Listen"; }); if (cb && !fin) { fin = true; cb(); } };
+  if (QT.speaking && !cb) { try { if (QT.tts) QT.tts.stop(); else window.speechSynthesis.cancel(); } catch (e) {} done(); return; }
+  const script = sayScript(text, name); if (!script) { done(); return; }
+  QT.speaking = true; if (btn) btn.textContent = "■ Stop"; const rate = clamp(+HS().vrate || 1, 0.7, 1.5);
+  if (QT.tts) { QT.tts.speak(sayLines(script).map(t => ({ text: t, voice: HS().tvoice || "buttery", rate, language: "en" }))).catch(() => {}).then(done); return; }
   if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { done(); qtToast("This device can't read aloud here."); return; }
-  try { window.speechSynthesis.cancel(); const v = voicePick();
-    parts.forEach((t, i) => { const u = new SpeechSynthesisUtterance(t); if (v) u.voice = v; u.rate = 1.02; if (i === parts.length - 1) { u.onend = done; u.onerror = done; } window.speechSynthesis.speak(u); }); } catch (e) { done(); }
+  try { window.speechSynthesis.cancel(); const v = voicePick(), parts = saySplit(script);
+    parts.forEach((t, i) => { const u = new SpeechSynthesisUtterance(t); if (v) { u.voice = v; u.lang = v.lang; } u.rate = rate; u.pitch = /\?$/.test(t) ? 1.04 : 1; if (i === parts.length - 1) { u.onend = done; u.onerror = done; } window.speechSynthesis.speak(u); }); } catch (e) { done(); }
 }
 const sayBtn = () => `<button class="chip qtsay" type="button">🔊 Listen</button>`;
 function bindSay(root, getText) { $$(".qtsay", root).forEach(b => { b.onclick = () => qtSpeak(getText(b), b); }); }
@@ -389,9 +468,9 @@ function prPaint() {
     <div class="prset"><span>Stop</span>${[1, 1.5, 2, 3].map(k => pick("stop", k, `${k}× ATR`)).join("")}</div><div class="prset"><span>Target</span>${[1, 1.5, 2, 3].map(k => pick("tgt", k, `${k}R`)).join("")}</div>
     <p class="small">ATR here is ${fnum(MKSPEC[P.k], P.A[i])}, so a ${P.stop}× stop is ${fnum(MKSPEC[P.k], P.stop * P.A[i])} away ($${(P.stop * P.A[i] * MKSPEC[P.k].mpv).toFixed(0)} per ${esc(MKSPEC[P.k].micro)}).</p>
     <button class="btn pri qtwide" id="prGo" ${P.dir && P.side ? "" : "disabled"}>Reveal</button>`}`;
-  const hi = qtAgg(B, big, i + 1); qtDraw($("#prCv2"), hi, hi.c.length - 60, hi.c.length, { h: 130 });
-  if (P.done) { const m = R.mine, lines = m ? [{ p: m.e, col: "#9fb3d9", lab: "entry" }, { p: m.st, col: "#ef5350", lab: "stop" }, { p: m.tg, col: "#26a69a", lab: "target" }] : []; qtDraw($("#prCv"), B, i - 69, R.end + 1, { h: 230, mark: i + 1, lines }); }
-  else qtDraw($("#prCv"), B, i - 99, i + 1, { h: 230 });
+  const hi = qtAgg(B, big, i + 1); qtDraw($("#prCv2"), hi, hi.c.length - 60, hi.c.length, { h: 150, S: MKSPEC[P.k] });
+  if (P.done) { const m = R.mine, lines = m ? [{ p: m.e, col: "#9fb3d9", lab: "entry" }, { p: m.st, col: "#ef5350", lab: "stop" }, { p: m.tg, col: "#26a69a", lab: "target" }] : []; qtDraw($("#prCv"), B, i - 99, R.end + 1, { h: 300, mark: i + 1, lines, S: MKSPEC[P.k], tf: P.tf }); }
+  else qtDraw($("#prCv"), B, i - 99, i + 1, { h: 300, S: MKSPEC[P.k], tf: P.tf });
   $$("#prBody [data-g]").forEach(b => b.onclick = () => { const g = b.dataset.g; P[g] = g === "stop" || g === "tgt" ? +b.dataset.k : b.dataset.k; prPaint(); });
   const go = $("#prGo"); if (go) go.onclick = () => { prReveal(); prPaint(); };
   const nx = $("#prNext"); if (nx) nx.onclick = () => { if (P.B.sim && (P.nSim = (P.nSim || 0) + 1) % 8 === 0) { prLoad(P.tf); return; } prNew(P.B); prPaint(); $("#sheet").scrollTop = 0; }; // practice candles move to a new stretch of the year every 8 charts
@@ -410,3 +489,5 @@ function openPrac(k0) {
   openSheet(`${shead("🎯 Practise on charts")}<p class="small">No TradingView calls: practice uses the real candles already saved on this phone, or built-in practice candles (a year of real Nasdaq, S&P 500, gold and oil days). First call the direction, then decide the trade. The future stays hidden until you answer. Dollars are per ${esc(S.micro)} (${usdOf(S.mpv)} ${S.unit === "points" ? "a point" : "per 1.00 move"}).</p><div class="qtrow" style="margin:6px 0">${sel}</div><div class="chips" id="prTf">${["1m", "5m", "15m", "1h"].map(t => `<button class="chip" data-k="${t}" aria-pressed="${t === tf0}">${t}</button>`).join("")}</div><div id="prBody"></div>`, s => { $$("#prTf .chip", s).forEach(b => b.onclick = () => prLoad(b.dataset.k)); $("#prMk", s).onchange = e => { ST.prk = e.target.value; save(); openPrac(e.target.value); }; prLoad(tf0); });
 }
 qtVoiceInit();
+
+function qtHush() { try { if (QT.tts) QT.tts.stop(); else if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {} QT.speaking = false; $$(".qtsay").forEach(b => { b.textContent = "🔊 Listen"; }); }

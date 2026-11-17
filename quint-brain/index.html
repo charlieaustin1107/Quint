@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Quint Brain</title>
+<meta name="theme-color" content="#02040a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Martian+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -11,19 +12,20 @@
 :root {
   /* Quint: a neural cockpit for one market. Electric-blue wiring on deep navy glass; mint for buys, rose for sells.
      Layout: instruments on top (price tape, the five-point core, the session tape), the conversation below; side by side on a wide screen. */
-  --void: #03060b;
-  --glass: #08101c;
-  --glass2: #0c1626;
+  --void: #02040a;
+  --glass: #070c18;
+  --glass2: #0b1528;
   --line: #17263b;
   --line2: #22364f;
   --ink: #dce6f3;
   --dim: #7a8ea8;
   --faint: #4a5d76;
-  --amber: #3db8ff;
-  --amber2: #a8e2ff;
-  --buy: #3ef0b0;
-  --sell: #ff5c7a;
-  --warn: #ffd166;
+  --amber: #29d8ff;
+  --amber2: #a6efff;
+  --buy: #2fd9a8;
+  --sell: #ff4f6e;
+  --warn: #ffb547;
+  --violet: #9b6bff;
   --f-display: "Chakra Petch", "Rajdhani", system-ui, sans-serif;
   --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-num: "Martian Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -40,12 +42,12 @@ button { cursor: pointer; }
 .pos { color: var(--buy); } .neg { color: var(--sell); } .wrn { color: var(--warn); }
 
 #app { position: fixed; left: 0; right: 0; top: 0; height: var(--vvh, 100%); display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  background: radial-gradient(900px 420px at 80% -8%, rgba(61,184,255,.10), transparent 62%), radial-gradient(700px 500px at -10% 110%, rgba(62,240,176,.05), transparent 60%), var(--void); }
+  background: radial-gradient(900px 420px at 80% -8%, rgba(41,216,255,.10), transparent 62%), radial-gradient(700px 500px at -10% 110%, rgba(47,217,168,.05), transparent 60%), var(--void); }
 #app::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .35; background-image: linear-gradient(rgba(122,142,168,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(122,142,168,.07) 1px, transparent 1px); background-size: 28px 28px; -webkit-mask-image: linear-gradient(180deg, #000, transparent 55%); mask-image: linear-gradient(180deg, #000, transparent 55%); }
 
 /* top bar */
 .bar { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 4px 14px; border-bottom: 1px solid var(--line); }
-.mark { display: flex; align-items: center; gap: 8px; font: 700 18px/1 var(--f-display); letter-spacing: .32em; text-transform: uppercase; color: var(--amber); text-shadow: 0 0 14px rgba(61,184,255,.45); }
+.mark { display: flex; align-items: center; gap: 8px; font: 700 18px/1 var(--f-display); letter-spacing: .32em; text-transform: uppercase; color: var(--amber); text-shadow: 0 0 14px rgba(41,216,255,.45); }
 .mark svg { flex: none; }
 .mkt { position: relative; display: flex; align-items: center; }
 .mkt select { appearance: none; -webkit-appearance: none; min-height: 34px; padding: 0 26px 0 10px; border-radius: 4px; border: 1px solid var(--line2); background: var(--glass2); font: 600 14px/1 var(--f-display); letter-spacing: .08em; color: var(--ink); }
@@ -55,7 +57,7 @@ button { cursor: pointer; }
 .stat i { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
 .stat.on i { background: var(--buy); box-shadow: 0 0 8px var(--buy); } .stat.off i { background: var(--sell); } .stat.wait i { background: var(--warn); }
 .ibtn { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 4px; border: 1px solid var(--line2); background: var(--glass2); color: var(--dim); }
-.ibtn:hover { color: var(--amber); border-color: rgba(61,184,255,.5); }
+.ibtn:hover { color: var(--amber); border-color: rgba(41,216,255,.5); }
 
 .cols { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .inst { flex: none; display: flex; flex-direction: column; min-height: 0; }
@@ -72,8 +74,8 @@ button { cursor: pointer; }
 .corebox { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .corebox canvas { position: absolute; inset: 0; }
 .verdict { position: relative; text-align: center; pointer-events: none; padding: 7px 10px; border-radius: 4px; background: rgba(3,8,18,.78); box-shadow: 0 0 18px rgba(3,8,18,.9); }
-.verdict b { display: block; font: 700 22px/1 var(--f-display); letter-spacing: .18em; color: var(--amber); text-shadow: 0 0 18px rgba(61,184,255,.5); }
-.verdict.buy b { color: var(--buy); text-shadow: 0 0 18px rgba(62,240,176,.55); } .verdict.sell b { color: var(--sell); text-shadow: 0 0 18px rgba(255,92,122,.55); }
+.verdict b { display: block; font: 700 22px/1 var(--f-display); letter-spacing: .18em; color: var(--amber); text-shadow: 0 0 18px rgba(41,216,255,.5); }
+.verdict.buy b { color: var(--buy); text-shadow: 0 0 18px rgba(47,217,168,.55); } .verdict.sell b { color: var(--sell); text-shadow: 0 0 18px rgba(255,79,110,.55); }
 .verdict small { display: block; max-width: 118px; margin: 6px auto 0; font: 500 10px/1.3 var(--f-num); color: var(--dim); letter-spacing: .04em; }
 .deckfoot { position: absolute; left: 8px; right: 8px; bottom: 6px; display: flex; justify-content: space-between; font: 500 9.5px/1 var(--f-num); color: var(--faint); pointer-events: none; }
 .dmin { display: none; align-items: center; gap: 10px; padding: 6px 14px; border-bottom: 1px solid var(--line); }
@@ -88,7 +90,7 @@ button { cursor: pointer; }
 .feed span { display: inline-block; padding-left: 100%; animation: feed 38s linear infinite; } @keyframes feed { to { transform: translateX(-100%); } }
 @media (prefers-reduced-motion: reduce) { .feed span { animation: none; padding-left: 12px; } }
 .bhint { position: absolute; left: 12px; bottom: 34px; margin: 0; font: 500 10px/1 var(--f-num); color: var(--faint); pointer-events: none; }
-.binfo { position: absolute; left: 12px; right: 12px; bottom: 52px; display: flex; flex-direction: column; gap: 4px; padding: 12px 44px 12px 14px; border: 1px solid rgba(61,184,255,.55); border-radius: 4px; background: rgba(3,10,22,.94); box-shadow: 0 0 30px rgba(61,184,255,.18); }
+.binfo { position: absolute; left: 12px; right: 12px; bottom: 52px; display: flex; flex-direction: column; gap: 4px; padding: 12px 44px 12px 14px; border: 1px solid rgba(41,216,255,.55); border-radius: 4px; background: rgba(3,10,22,.94); box-shadow: 0 0 30px rgba(41,216,255,.18); }
 .binfo[hidden] { display: none; } .binfo b { font: 700 13px/1.2 var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: var(--amber2); } .binfo span { font-size: 13px; color: var(--ink); } .binfo .btn { align-self: flex-start; margin-top: 6px; } .binfo .ibtn { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; }
 
 /* session tape */
@@ -147,23 +149,23 @@ table.mx td:first-child { font: 700 12px/1 var(--f-display); letter-spacing: .1e
 .row .r { font: 600 11.5px/1 var(--f-display); letter-spacing: .08em; text-align: right; }
 .st-win { color: var(--buy); } .st-loss { color: var(--sell); } .st-time { color: var(--warn); } .st-live { color: var(--amber); }
 .small { font-size: 12.5px; color: var(--dim); line-height: 1.5; margin: 0; }
-.note { padding: 11px 12px; border-left: 2px solid var(--amber); background: rgba(61,184,255,.05); }
+.note { padding: 11px 12px; border-left: 2px solid var(--amber); background: rgba(41,216,255,.05); }
 .note ol { margin: 6px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
 .al { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
 .al span { flex: 1; min-width: 0; } .al b { display: block; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; } .al small { display: block; font-size: 11.5px; color: var(--dim); }
 .al.off { opacity: .55; }
 .btn { min-height: 38px; padding: 0 14px; border-radius: 4px; border: 1px solid var(--line2); background: var(--glass2); font: 600 12px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
-.btn:hover { border-color: rgba(61,184,255,.55); color: var(--amber2); }
+.btn:hover { border-color: rgba(41,216,255,.55); color: var(--amber2); }
 .btn.pri { border-color: var(--amber); background: var(--amber); color: #021422; }
 .btn.pri:hover { background: var(--amber2); color: #021422; }
 .btn:disabled { opacity: .5; cursor: default; }
 .btn.sm { min-height: 32px; padding: 0 11px; font-size: 11px; }
-.err { margin: 0; padding: 10px 12px; border-left: 2px solid var(--sell); background: rgba(255,92,122,.07); font-size: 13px; }
+.err { margin: 0; padding: 10px 12px; border-left: 2px solid var(--sell); background: rgba(255,79,110,.07); font-size: 13px; }
 
 /* the conversation */
 .m { max-width: 680px; }
 .m.u { align-self: flex-end; max-width: 86%; padding: 9px 13px; border: 1px solid var(--line2); border-radius: 12px 12px 2px 12px; background: var(--glass2); font-size: 14.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.m.a { position: relative; padding-left: 16px; border-left: 1px solid rgba(61,184,255,.35); font-size: 14.5px; }
+.m.a { position: relative; padding-left: 16px; border-left: 1px solid rgba(41,216,255,.35); font-size: 14.5px; }
 .m.a::before { content: "Q"; position: absolute; left: -8px; top: 0; width: 15px; height: 15px; display: grid; place-items: center; font: 700 9px/1 var(--f-display); color: var(--void); background: var(--amber); clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%); }
 .m.a p { margin: 0 0 8px; } .m.a h3, .m.a h4 { margin: 12px 0 6px; font: 600 11px/1 var(--f-display); letter-spacing: .22em; text-transform: uppercase; color: var(--amber); }
 .m.a ul, .m.a ol { margin: 0 0 8px; padding-left: 18px; } .m.a li { margin: 3px 0; }
@@ -176,11 +178,11 @@ table.mx td:first-child { font: 700 12px/1 var(--f-display); letter-spacing: .1e
 @keyframes spin { to { transform: rotate(360deg); } }
 .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .chipb { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 10px; border-radius: 3px; border: 1px solid var(--line2); background: transparent; font: 600 10.5px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
-.chipb:hover { color: var(--amber2); border-color: rgba(61,184,255,.5); }
+.chipb:hover { color: var(--amber2); border-color: rgba(41,216,255,.5); }
 .chipb.on, .chipb.on:disabled { color: var(--warn); border-color: rgba(255,209,102,.55); background: rgba(255,209,102,.07); opacity: 1; }
-.xbtn { display: block; width: 100%; margin-top: 8px; padding: 10px 12px; text-align: left; border-radius: 4px; border: 1px dashed rgba(61,184,255,.45); background: rgba(61,184,255,.04); font-size: 13px; color: var(--amber2); }
+.xbtn { display: block; width: 100%; margin-top: 8px; padding: 10px 12px; text-align: left; border-radius: 4px; border: 1px dashed rgba(41,216,255,.45); background: rgba(41,216,255,.04); font-size: 13px; color: var(--amber2); }
 .xbtn.on, .xbtn.on:disabled { border-style: solid; color: var(--warn); opacity: 1; }
-.hello { padding: 14px 16px; border: 1px solid var(--line); border-radius: 4px; background: linear-gradient(135deg, rgba(61,184,255,.07), transparent 60%), var(--glass); }
+.hello { padding: 14px 16px; border: 1px solid var(--line); border-radius: 4px; background: linear-gradient(135deg, rgba(41,216,255,.07), transparent 60%), var(--glass); }
 .hello > b { display: block; font: 700 13px/1.2 var(--f-display); letter-spacing: .2em; text-transform: uppercase; color: var(--amber); margin-bottom: 8px; }
 .hello p { margin: 0; font-size: 14px; color: var(--ink); }
 
@@ -188,7 +190,7 @@ table.mx td:first-child { font: 700 12px/1 var(--f-display); letter-spacing: .1e
 .call { margin-top: 10px; position: relative; padding: 13px 14px 12px; border: 1px solid var(--line2); border-radius: 4px; background: var(--glass); overflow: hidden; }
 .call::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--amber); }
 .call.buy::before { background: var(--buy); box-shadow: 0 0 14px var(--buy); } .call.sell::before { background: var(--sell); box-shadow: 0 0 14px var(--sell); }
-.call.buy { background: linear-gradient(100deg, rgba(62,240,176,.08), transparent 55%), var(--glass); } .call.sell { background: linear-gradient(100deg, rgba(255,92,122,.08), transparent 55%), var(--glass); }
+.call.buy { background: linear-gradient(100deg, rgba(47,217,168,.08), transparent 55%), var(--glass); } .call.sell { background: linear-gradient(100deg, rgba(255,79,110,.08), transparent 55%), var(--glass); }
 .ch { display: flex; align-items: center; gap: 12px; }
 .ch .v { flex: 1; font: 700 17px/1 var(--f-display); letter-spacing: .16em; text-transform: uppercase; }
 .call.buy .ch .v { color: var(--buy); } .call.sell .ch .v { color: var(--sell); } .call.none .ch .v { color: var(--warn); }
@@ -211,20 +213,20 @@ table.mx td:first-child { font: 700 12px/1 var(--f-display); letter-spacing: .1e
 .chips { flex: none; display: flex; gap: 6px; overflow-x: auto; padding: 8px 14px 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .chips::-webkit-scrollbar { display: none; }
 .chips button { flex: none; min-height: 32px; padding: 0 11px; border-radius: 3px; border: 1px solid var(--line2); background: rgba(8,16,28,.7); font: 600 10.5px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
-.chips button:hover { color: var(--amber2); border-color: rgba(61,184,255,.5); }
+.chips button:hover { color: var(--amber2); border-color: rgba(41,216,255,.5); }
 .ask { flex: none; display: flex; align-items: flex-end; gap: 8px; padding: 8px 14px 10px; }
 .ask textarea { flex: 1; min-height: 44px; max-height: 120px; resize: none; padding: 11px 13px; border-radius: 4px; border: 1px solid var(--line2); background: var(--glass); font-size: 16px; line-height: 1.35; color: var(--ink); }
 .ask textarea::placeholder { color: var(--faint); }
-.ask textarea:focus { outline: none; border-color: rgba(61,184,255,.7); box-shadow: 0 0 0 3px rgba(61,184,255,.12); }
-.ask .ibtn { width: 44px; height: 44px; } .ask .go { width: 44px; height: 44px; border-radius: 4px; border: 0; background: var(--amber); color: #021422; display: grid; place-items: center; box-shadow: 0 0 18px rgba(61,184,255,.35); }
+.ask textarea:focus { outline: none; border-color: rgba(41,216,255,.7); box-shadow: 0 0 0 3px rgba(41,216,255,.12); }
+.ask .ibtn { width: 44px; height: 44px; } .ask .go { width: 44px; height: 44px; border-radius: 4px; border: 0; background: var(--amber); color: #021422; display: grid; place-items: center; box-shadow: 0 0 18px rgba(41,216,255,.35); }
 .ask .go.stop { background: var(--sell); color: #fff; box-shadow: none; }
-.prev { flex: none; display: flex; align-items: center; gap: 10px; margin: 0 14px; padding: 7px 10px; border: 1px dashed rgba(61,184,255,.45); border-radius: 4px; font-size: 12.5px; color: var(--amber2); }
+.prev { flex: none; display: flex; align-items: center; gap: 10px; margin: 0 14px; padding: 7px 10px; border: 1px dashed rgba(41,216,255,.45); border-radius: 4px; font-size: 12.5px; color: var(--amber2); }
 .prev span { flex: 1; }
 
 /* settings sheet */
 .scrim { position: fixed; inset: 0; z-index: 20; display: none; background: rgba(2,4,8,.72); }
 .scrim.open { display: block; }
-.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; overflow-y: auto; padding: 18px 18px calc(18px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(61,184,255,.5); background: var(--glass); display: flex; flex-direction: column; gap: 16px; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; overflow-y: auto; padding: 18px 18px calc(18px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(41,216,255,.5); background: var(--glass); display: flex; flex-direction: column; gap: 16px; }
 .sheet h2 { margin: 0; font: 700 14px/1 var(--f-display); letter-spacing: .26em; text-transform: uppercase; color: var(--amber); display: flex; align-items: center; }
 .sheet h2 .spacer { flex: 1; }
 .fld { display: flex; flex-direction: column; gap: 6px; }
@@ -238,14 +240,14 @@ table.mx td:first-child { font: 700 12px/1 var(--f-display); letter-spacing: .1e
 .voices button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; font-size: 14px; }
 .voices button:last-child { border-bottom: 0; }
 .voices button span { flex: 1; } .voices button small { color: var(--faint); font: 500 10.5px var(--f-num); }
-.voices button[aria-pressed="true"] { background: rgba(61,184,255,.09); color: var(--amber2); }
+.voices button[aria-pressed="true"] { background: rgba(41,216,255,.09); color: var(--amber2); }
 .tog { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0; border: 0; background: transparent; text-align: left; font-size: 14px; }
 .tog .k { flex: none; position: relative; width: 42px; height: 24px; border-radius: 12px; background: var(--line2); transition: background .2s; }
 .tog .k::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); transition: transform .2s; }
 .tog[aria-pressed="true"] .k { background: var(--amber); } .tog[aria-pressed="true"] .k::after { transform: translateX(18px); background: #021422; }
 input[type="range"] { width: 100%; accent-color: var(--amber); }
 
-.toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 30; transform: translate(-50%, 12px); max-width: min(92vw, 520px); padding: 10px 14px; border: 1px solid rgba(61,184,255,.5); border-radius: 4px; background: rgba(8,16,28,.96); font-size: 13px; color: var(--ink); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+.toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 30; transform: translate(-50%, 12px); max-width: min(92vw, 520px); padding: 10px 14px; border: 1px solid rgba(41,216,255,.5); border-radius: 4px; background: rgba(8,16,28,.96); font-size: 13px; color: var(--ink); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 @media (max-width: 520px) { .mark { font-size: 15px; letter-spacing: .2em; gap: 6px; } .mkt select { max-width: 132px; font-size: 13px; padding-right: 22px; } .bar { gap: 8px; padding: 4px 10px; } .stat span { display: none; } .stat { padding: 6px; } }
@@ -262,7 +264,7 @@ input[type="range"] { width: 100%; accent-color: var(--amber); }
   .prev { width: calc(100% - 28px); max-width: 832px; margin: 0 auto; }
 }
 @media (prefers-reduced-motion: reduce) { .think::before { animation: none; } .toast { transition: none; } }
-.m.a .now { margin: 0 0 8px; padding: 7px 10px 7px 26px; position: relative; border: 1px solid rgba(61,184,255,.35); background: rgba(61,184,255,.07); border-radius: 8px; font: 500 12px/1.45 var(--f-num); color: #cfeaff; font-variant-numeric: tabular-nums; }
+.m.a .now { margin: 0 0 8px; padding: 7px 10px 7px 26px; position: relative; border: 1px solid rgba(41,216,255,.35); background: rgba(41,216,255,.07); border-radius: 8px; font: 500 12px/1.45 var(--f-num); color: #cfeaff; font-variant-numeric: tabular-nums; }
 .m.a .now::before { content: ""; position: absolute; left: 10px; top: 12px; width: 7px; height: 7px; border-radius: 50%; background: var(--buy, #3ee08f); box-shadow: 0 0 8px var(--buy, #3ee08f); }
 .rf { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; min-width: 40px; padding: 0 8px; border: 1px solid var(--line2); border-radius: 3px; background: transparent; color: var(--ink); font: 600 10.5px/1 var(--f-num); }
 .rf.old { color: var(--warn, #ffb347); border-color: rgba(255,179,71,.5); } .rf:disabled { opacity: .55; } .rf:active { transform: scale(.96); }
@@ -270,6 +272,36 @@ input[type="range"] { width: 100%; accent-color: var(--amber); }
 .pil ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; } .pil li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; font-size: 12.5px; line-height: 1.4; }
 .pil li b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font: 700 11px/1 var(--f-num); border: 1px solid var(--line2); color: var(--dim); } .pil li.ok b { background: var(--buy); border-color: var(--buy); color: #02140d; }
 .pil .pv { margin-top: 8px; font-size: 12.5px; } .pil .pv.ok { color: var(--buy); }
+
+/* ================= NEON HUD: matches Chart Wizard ================= */
+.bar { background: linear-gradient(180deg, rgba(5,10,22,.92), rgba(3,6,14,.8)); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.bar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, var(--amber), var(--violet), transparent); box-shadow: 0 0 10px var(--amber); }
+.mark { background: linear-gradient(90deg, #e6fbff, var(--amber) 45%, var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mark svg { color: var(--amber); filter: drop-shadow(0 0 6px rgba(41,216,255,.7)); }
+.seg button[aria-pressed="true"]::after { background: linear-gradient(90deg, var(--amber), var(--violet)); }
+.call, .hello, .tiles div, .xm div, .lvls div { position: relative; }
+.call::after, .hello::after { content: ""; position: absolute; inset: -1px; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(var(--amber), var(--amber)) 100% 0 / 14px 2px no-repeat, linear-gradient(var(--amber), var(--amber)) 100% 0 / 2px 14px no-repeat,
+    linear-gradient(var(--violet), var(--violet)) 100% 100% / 14px 2px no-repeat, linear-gradient(var(--violet), var(--violet)) 100% 100% / 2px 14px no-repeat; opacity: .75; }
+.call { box-shadow: 0 0 0 1px rgba(41,216,255,.06), 0 18px 40px -28px rgba(41,216,255,.6); }
+.ring { background: conic-gradient(var(--amber), var(--violet) calc(var(--p) * 1%), var(--line2) 0); }
+.chips button, .chipb, .btn, .opts button { border-color: rgba(41,216,255,.2); }
+.chips button:hover, .chipb:hover, .btn:hover { box-shadow: 0 0 16px -4px rgba(41,216,255,.7); }
+.btn.pri, .ask .go { background: linear-gradient(135deg, var(--amber), var(--violet)); border-color: transparent; color: #01131c; }
+.m.u { background: linear-gradient(135deg, rgba(41,216,255,.14), rgba(155,107,255,.2)); border-color: rgba(155,107,255,.45); }
+.ask textarea { border-radius: 22px; background: rgba(4,8,18,.85); }
+.sheet { box-shadow: 0 -10px 40px rgba(41,216,255,.12); }
+
+/* voice mode */
+.ask .mic[aria-pressed="true"] { color: #01131c; background: linear-gradient(135deg, var(--amber), var(--violet)); border-color: transparent; box-shadow: 0 0 16px -2px rgba(41,216,255,.8); }
+.ask .mic.live { animation: vmpulse 1.2s ease-in-out infinite; }
+@keyframes vmpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(41,216,255,.7); } 50% { box-shadow: 0 0 0 10px rgba(41,216,255,0); } }
+.vmbar { flex: none; display: flex; align-items: center; gap: 10px; margin: 6px 14px 0; padding: 8px 10px; border: 1px solid rgba(41,216,255,.4); border-radius: 4px; background: linear-gradient(90deg, rgba(41,216,255,.08), rgba(155,107,255,.1)); font: 500 12.5px/1.35 var(--f-num); color: var(--amber2); }
+.vmbar .vmt { flex: 1; min-width: 0; }
+.vmbar .vmorb { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--amber); box-shadow: 0 0 12px var(--amber); }
+.vmbar.listen .vmorb, .vmbar.speak .vmorb { animation: vmpulse 1s ease-in-out infinite; } .vmbar.think .vmorb { border-color: var(--violet); }
+@media (prefers-reduced-motion: reduce) { .ask .mic.live, .vmbar .vmorb { animation: none !important; } }
+@media (min-width: 900px) { .vmbar { width: calc(100% - 28px); max-width: 832px; margin: 6px auto 0; } }
 </style>
 </head>
 <body>
@@ -304,6 +336,7 @@ input[type="range"] { width: 100%; accent-color: var(--amber); }
       <div class="chips" id="chips" role="group" aria-label="Quick questions"></div>
       <form class="ask" id="askf">
         <label class="ibtn" for="file" aria-label="Send Quint a screenshot of your chart"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6.5h3l1.5-2h5L14 6.5h3v9.5H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="11" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><input type="file" id="file" accept="image/*" hidden></label>
+        <button class="ibtn mic" id="mic" type="button" aria-label="Voice mode: talk to Quint" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="2.5" width="6" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
         <textarea id="q" rows="1" placeholder="Ask Quint: buy or sell MNQ?" aria-label="Message Quint" enterkeyhint="send"></textarea>
         <button class="go" id="go" type="submit" aria-label="Send"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h12M10 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </form>
@@ -414,6 +447,21 @@ const tvBgEvery = () => { const p = tvPlan(); if (tvOut() || tvCooling() || tvLe
 function tvCount() { const k = tvDay(), d = HS().tvDay; HS().tvDay = d && d.d === k ? { d: k, n: d.n + 1 } : { d: k, n: 1 }; clearTimeout(TVQ.svT); TVQ.svT = setTimeout(save, 800); }
 const tvCooling = () => Date.now() < TVQ.until;
 const tvCoolMsg = () => tvOut() ? `TradingView says your connector calls for today are used up. It counts every call on your TradingView account (Chart Wizard, Quint Brain and Claude chats, plus any earlier today), so its total is higher than the ${tvUsed()} this app counted. Quint still answers from the candles saved on this phone, or from a screenshot of your chart.` : `TradingView's connector is cooling down after too many calls. Live prices and Quint's charts come back at ${new Date(TVQ.until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}.`;
+const TIERS = [
+  { name: "Foundations", stake: 25, q: 2, tol: 1.4, opts: 3, speed: false, pool: ["trend", "ema", "levels", "candles", "range"], tf: [["1D", .55], ["4h", .2], ["1h", .15], ["15m", .1]], unlock: "Trend, the 20 EMA, candle size and patterns, drawing support and resistance." },
+  { name: "Structure", stake: 40, q: 3, tol: 1.2, opts: 3, speed: false, pool: ["mtf", "trend", "ema", "structure", "levels", "candles", "range", "rsi"], tf: [["1D", .45], ["4h", .18], ["1h", .15], ["15m", .12], ["5m", .1]], unlock: "Market structure (higher highs and lows), RSI, top-down timeframe checks. Answers now worth ±$40." },
+  { name: "Confluence", stake: 60, q: 3, tol: 1.0, opts: 4, speed: true, pool: ["mtf", "trend", "structure", "tlines", "levels", "volume", "candles", "rsi", "div"], tf: [["1D", .4], ["4h", .16], ["1h", .15], ["15m", .15], ["5m", .14]], unlock: "RSI divergence, trend-line drawing, volume, 4-choice pattern questions, speed bonuses. ±$60 per answer." },
+  { name: "Execution", stake: 80, q: 3, tol: 0.85, opts: 4, speed: true, pool: ["mtf", "trend", "structure", "tlines", "levels", "stop", "rr", "volume", "candles", "div", "rsi"], tf: [["1D", .4], ["4h", .16], ["1h", .15], ["15m", .15], ["5m", .14]], unlock: "Stop placement and reward-to-risk planning. Easy questions retired, drawings graded tighter. ±$80 per answer." },
+  { name: "Mastery", stake: 100, q: 4, tol: 0.7, opts: 4, speed: true, pool: ["mtf", "trend", "structure", "tlines", "levels", "stop", "rr", "volume", "candles", "div", "rsi"], tf: [["1D", .4], ["4h", .16], ["1h", .15], ["15m", .15], ["5m", .14]], unlock: "Four questions per chart and the strictest grading. ±$100 per answer." },
+];
+function speedLimit(q) { return q.kind === "draw" ? 45 : 20; }
+const stakeNow = () => G.pbm ? STAGES[G.pb.stage].stake : TIERS[G.tier].stake;
+function payout(q, score) {
+  const T = TIERS[G.tier], st = stakeNow(), secs = (performance.now() - q.t0) / 1000; q.secs = Math.round(secs);
+  let cash = q.kind === "mc" ? (score ? st : -st) : Math.round(st * (2 * score - 1));
+  if (T.speed && !G.pbm && score >= 0.6 && secs <= speedLimit(q)) { cash = Math.round(cash * 1.5); q.bonus = true; }
+  return cash;
+}
 const REGIMES = { trend: "Trend", upch: "Upward channel", dnch: "Downward channel", range: "Range", transition: "Transition" };
 function regime(S, t, N = 48) {
   if (t < N + 2 || !S.atr[t]) return null;
@@ -489,6 +537,7 @@ function pbEval(S, t, pois, need) {
   return ev;
 }
 const r2 = (I, x) => x == null || !isFinite(x) ? null : +x.toFixed(Math.max(I.dec, 2));
+const plain = h => String(h || "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
 const num = s => { const x = parseFloat(String(s).replace(/[,$£\s]/g, "")); return isFinite(x) ? x : NaN; };
 function coachMD(src) {
   const inl = s => { const codes = []; s = String(s).replace(/`([^`]+)`/g, (_, c) => `\u0000${codes.push(c) - 1}\u0000`);
@@ -545,6 +594,90 @@ function qtATR(B, n = 14) { // Wilder's ATR as an array
   const N = B.c.length, A = new Array(N).fill(0); let s = 0;
   for (let i = 1; i < N; i++) { const tr = Math.max(B.h[i] - B.l[i], Math.abs(B.h[i] - B.c[i - 1]), Math.abs(B.l[i] - B.c[i - 1])); if (i <= n) { s += tr; A[i] = s / i; } else A[i] = (A[i - 1] * (n - 1) + tr) / n; }
   return A;
+}
+const VM = { on: false, st: "off", rec: null, txt: "", o: null, noRec: false, noAuto: false };
+const vmRecog = () => VM.noRec ? null : (window.SpeechRecognition || window.webkitSpeechRecognition || null);
+function vmHint() { return VM.on ? "\nVOICE MODE: the user is talking to you out loud and hears your reply read aloud. Answer in a few natural spoken sentences (under about 90 words unless they ask for detail), with no tables, lists, headings or symbols. If you make a trade call, still end with the CALL line." : ""; }
+function vmPaint() { if (VM.o && VM.o.paint) try { VM.o.paint(VM); } catch (e) {} }
+function vmStopRec() { const r = VM.rec; VM.rec = null; if (r) { try { r.onend = null; r.abort(); } catch (e) {} } }
+function vmListen(auto) {
+  if (!VM.on) return; const R = vmRecog(); vmStopRec();
+  if (!R || (auto && VM.noAuto)) { VM.st = R ? "idle" : "type"; vmPaint(); if (!R && VM.o.input && !auto) try { VM.o.input.focus(); } catch (e) {} return; }
+  let rec; try { rec = new R(); } catch (e) { VM.noRec = true; VM.st = "type"; vmPaint(); return; }
+  rec.lang = VM.o.lang || navigator.language || "en-GB"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1; VM.txt = "";
+  rec.onresult = e => { let t = ""; for (let k = 0; k < e.results.length; k++) t += e.results[k][0].transcript; VM.txt = t; if (VM.o.input) VM.o.input.value = t; vmPaint(); };
+  rec.onerror = e => { const c = e && e.error; if (c === "not-allowed" || c === "service-not-allowed" || c === "audio-capture") { if (auto) VM.noAuto = true; else VM.noRec = true; } };
+  rec.onend = () => { if (VM.rec !== rec) return; VM.rec = null; const t = VM.txt.trim(); VM.txt = ""; if (!VM.on) return;
+    if (t) { if (VM.o.input) VM.o.input.value = ""; VM.st = "think"; vmPaint(); VM.o.send(t); } else { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); } };
+  try { rec.start(); VM.rec = rec; VM.st = "listen"; } catch (e) { if (auto) VM.noAuto = true; else VM.noRec = true; VM.st = vmRecog() ? "idle" : "type"; }
+  vmPaint();
+}
+function vmToggle(o) { // the mic button: start voice mode, talk, cut in while Quint speaks, or finish talking
+  if (!VM.on) { VM.on = true; VM.o = o; VM.noAuto = false; vmUnlock(); vmListen(false); return; } // listening starts inside the tap, as phones require
+  VM.o = o;
+  if (VM.st === "listen") { const r = VM.rec; if (r) try { r.stop(); } catch (e) { vmStopRec(); VM.st = "idle"; vmPaint(); } return; } // done talking: send what was heard
+  if (VM.st === "speak") { try { o.hush(); } catch (e) {} VM.st = "idle"; vmListen(false); return; } // cut in
+  if (VM.st === "think") return;
+  vmListen(false);
+}
+function vmEnd() { if (!VM.on) return; VM.on = false; vmStopRec(); try { VM.o && VM.o.hush(); } catch (e) {} VM.st = "off"; vmPaint(); }
+function vmAnswer(text) { // an answer arrived: say it, then listen again
+  if (!VM.on || !VM.o) return; if (!text) { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); return; }
+  const back = VM.st === "type", id = VM.sid = (VM.sid || 0) + 1; VM.st = "speak"; vmPaint();
+  VM.o.speak(text, () => { if (!VM.on || VM.st !== "speak" || VM.sid !== id) return; if (back || !vmRecog()) { VM.st = vmRecog() ? "idle" : "type"; vmPaint(); return; } VM.st = "idle"; vmPaint(); setTimeout(() => { if (VM.on && VM.st === "idle") vmListen(true); }, 400); });
+}
+function vmLabel(V) { // what the voice strip says in each state
+  return V.st === "listen" ? (V.txt ? `“${V.txt}”` : "Listening… speak now, then pause") : V.st === "think" ? "Quint is thinking…" : V.st === "speak" ? "Quint is talking: tap 🎙 to cut in"
+    : V.st === "type" ? "Tap the 🎤 on your keyboard, speak, then send. Quint answers out loud." : "Tap 🎙 to talk";
+}
+function vmUnlock() { // a silent word inside the tap, so the phone lets Quint's voice play later without another tap
+  try { if (window.speechSynthesis && typeof SpeechSynthesisUtterance !== "undefined") { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; window.speechSynthesis.speak(u); } } catch (e) {}
+}
+const SAY_WORDS = [[/\bVWAP\b/g, "V-wap"], [/\bORH\b/g, "the opening range high"], [/\bORL\b/g, "the opening range low"], [/\bONH\b/g, "the overnight high"], [/\bONL\b/g, "the overnight low"],
+  [/\bPDH\b/g, "yesterday's high"], [/\bPDL\b/g, "yesterday's low"], [/\bPDC\b/g, "yesterday's close"], [/\bNYO\b/g, "the New York open"], [/\bFVG\b/g, "fair value gap"], [/\bBOS\b/g, "break of structure"],
+  [/\bCHoCH\b/g, "change of character"], [/\bR:R\b/g, "reward to risk"], [/\bATR\b/g, "A T R"], [/\bEMA\b/g, "E M A"], [/\bSMA\b/g, "S M A"], [/\bRSI\b/g, "R S I"], [/\bCISD\b/g, "C I S D"], [/\bP&L\b/g, "P and L"],
+  [/\bMNQ\b/g, "M N Q"], [/\bMES\b/g, "M E S"], [/\bNQ\b/g, "N Q"], [/\bES\b/g, "E S"], [/\bYM\b/g, "Y M"], [/\bRTY\b/g, "Russell"], [/\bMGC\b/g, "micro gold"], [/\bCME\b/g, "C M E"], [/\bFOMC\b/g, "F O M C"], [/\bCPI\b/g, "C P I"], [/\bNFP\b/g, "the jobs report"],
+  [/\bNY\b/g, "New York"], [/\bET\b/g, "New York time"], [/\be\.g\.\s*/gi, "for example "], [/\bi\.e\.\s*/gi, "that is "], [/\bvs\.?\s/gi, "versus "], [/\bw\/\s?/gi, "with "], [/\bpts?\b/g, m => m === "pt" ? "point" : "points"], [/\b(\d+) min\b/g, "$1 minutes"], [/\bmins\b/g, "minutes"],
+  [/\b(\d+)m\b/g, "$1-minute"], [/\b1h\b/g, "hourly"], [/\b(\d+)h\b/g, "$1-hour"], [/\b1D\b/g, "daily"], [/\b(\d+(?:\.\d+)?)\s?R\b/g, (m, x) => `${+x} R`]];
+const SAY_HEAD = { why: "Here's why.", levels: "The levels.", plan: "The plan.", risk: "The risk.", news: "The news.", context: "The bigger picture.", summary: "In short." };
+function sayNum(s) { // 27347.25 -> "27,347 and a quarter"; other decimals are left as they are
+  s = String(s); const neg = /^[−-]/.test(s), x = +s.replace(/[−,+-]/g, ""); if (!isFinite(x)) return s;
+  const whole = Math.trunc(x), fr = Math.round((x - whole) * 100), big = whole >= 1000 ? nf(0).format(whole) : String(whole);
+  const tail = fr === 0 ? "" : fr === 25 ? " and a quarter" : fr === 50 ? " and a half" : fr === 75 ? " and three quarters" : null;
+  return (neg ? "minus " : "") + (tail == null ? (whole >= 1000 && s.includes(".") ? big + "." + s.split(".")[1] : s.replace(/^[−+-]/, "")) : big + tail);
+}
+function sayable(t) {
+  let s = String(t || "").replace(/https?:\/\/\S+/g, "a link").replace(/^\s*(?:[-*+•]|\d{1,2}[.)])\s+/gm, "").replace(/\s*▲/g, " up,").replace(/\s*▼/g, " down,").replace(/\s*◆/g, " flat,").replace(/\s*→\s*/g, " to ").replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{25A0}-\u{25FF}\u{2B00}-\u{2BFF}️]/gu, " ");
+  s = s.replace(/\s*[·•|]\s*/g, ", ").replace(/\s*→\s*/g, " to ").replace(/~\s?|≈\s?/g, "about ").replace(/\s&\s/g, " and ").replace(/\s*\(([^)]{1,80})\)/g, ", $1,");
+  for (const [rx, to] of SAY_WORDS) s = s.replace(rx, to);
+  s = s.replace(/\b(BUY|SELL|NOW|LONG|SHORT|WAIT|STOP|TARGET|ENTRY|NO TRADE|STAY OUT|HOLD|LEAN|AND|THE|AT|ON|OR)\b/g, w => w.toLowerCase()).replace(/(^|[.!?]\s+|\n)([a-z])/g, (m, a, c) => a + c.toUpperCase());
+  s = s.replace(/([+−-])?\$?\b\d[\d,]*\.\d{1,2}\b/g, m => { const d = m.indexOf("$"); return d >= 0 ? m.slice(0, d) + "$" + sayNum(m.slice(d + 1)) : (m[0] === "+" ? "plus " : "") + sayNum(m); })
+    .replace(/(^|[\s,])[−-](?=\$?\d)/gm, "$1minus ").replace(/(^|[\s,])\+(?=\$?\d)/gm, "$1plus ");
+  return s.split("\n").map(l => l.trim().replace(/^[,\s]+/, "")).filter(Boolean).map(l => { const h = SAY_HEAD[l.toLowerCase().replace(/[:.]$/, "")]; return h || (/[.!?:;,]$/.test(l) ? l : l + "."); })
+    .join("\n").replace(/,\s*,/g, ",").replace(/,\s*([.!?])/g, "$1").replace(/[ \t]+([.,!?])/g, "$1").replace(/[ \t]{2,}/g, " ").trim();
+}
+function sayCall(c, name) { // the trade call, the way a mentor would say it across the desk
+  if (!c) return ""; const p = v => sayNum(String(v)), who = sayable(name || "it").replace(/\.$/, "");
+  if (!c.side) return c.wait ? `No trade on ${who} yet. I'm waiting for ${sayable(c.wait).replace(/\.$/, "").replace(/^(?!New\b|I\b)[A-Z](?=[a-z\s])/, x => x.toLowerCase())}.` : `No trade on ${who} right now. I'd stay out.`;
+  const bits = [`${c.side > 0 ? "Buy" : "Sell"} ${who}.`], risk = c.entry != null && c.stop != null ? Math.abs(c.entry - c.stop) : null;
+  bits.push(`${c.now || c.entry == null ? "In at the market" : `In at ${p(c.entry)}`}${c.stop != null ? `, stop ${p(c.stop)}` : ""}${risk ? `, that's ${sayNum(String(Math.round(risk * 100) / 100))} points of risk` : ""}${c.tgt != null ? `, target ${p(c.tgt)}` : ""}.`);
+  if (c.conf != null) bits.push(c.conf >= 70 ? `I like this one, about ${c.conf} percent.` : c.conf >= 55 ? `I'm about ${c.conf} percent on it.` : `Only about ${c.conf} percent, so keep it small.`);
+  return bits.join(" ");
+}
+function saySplit(t) { // one sentence per utterance, so phone voices pause naturally between them; tiny fragments ride with the one before
+  const out = [];
+  for (const para of String(t).split("\n")) for (const x of para.split(/(?<=[.!?])\s+(?=[A-Z0-9$"'])/)) {
+    const y = x.trim(); if (!y) continue; if (out.length && y.length < 25 && out[out.length - 1].length < 140) out[out.length - 1] += " " + y; else out.push(y); }
+  return out.slice(0, 60);
+}
+function sayScript(raw, name) { // what Quint says out loud for one answer: the call first, then the reasons
+  const c = typeof dkParse === "function" ? dkParse(raw) : null, px = /^\s*PRICE:\s*([0-9][0-9,]*\.?[0-9]*)/im.exec(String(raw || "")); if (c && c.side && c.entry == null && px) c.entry = +px[1].replace(/,/g, ""); let plain = mdPlain(typeof dkClean === "function" ? dkClean(raw) : raw);
+  if (c) plain = plain.replace(/^\s*(BUY|SELL|LONG|SHORT|NO TRADE|STAY OUT|WAIT)\b[^\n]*\n?/i, ""); // the spoken call replaces the headline that says the same thing
+  plain = plain.replace(/^\s*PRICE:[^\n]*$/gim, ""); const body = sayable(plain);
+  return [c ? sayCall(c, name) : "", body].filter(Boolean).join("\n");
+}
+function sayLines(script) { // Claude's voice reads best a paragraph at a time (each line up to 2,000 characters)
+  const out = []; let cur = ""; for (const para of script.split("\n")) { if (cur && (cur + " " + para).length > 600) { out.push(cur); cur = para.slice(0, 1900); } else cur = cur ? cur + " " + para : para.slice(0, 1900); } if (cur) out.push(cur); return out.slice(0, 12);
 }
 function qtShrink(file) {
   return new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image();
@@ -963,6 +1096,7 @@ async function dkBrief(m, signal) { // everything Quint should know before he an
   L.push(P ? `OPEN POSITION (the user says they took your call): ${P.dir > 0 ? "LONG" : "SHORT"} ${lvSize(P, S)} at ${f(P.e)}, stop ${f(P.stop)}, target ${P.tgt != null ? f(P.tgt) : "none"}, open P&L ${fusd(lvUPL(P))}, opened ${fAgo(P.t0)}.` : "OPEN POSITION: none that the user has told you about in this market.");
   if (others.length) L.push(`OTHER OPEN TRADES: ${others.map(x => `${x.dir > 0 ? "long" : "short"} ${x.name}`).join(", ")}.`);
   { const A = qaAcct(); L.push(`ACCOUNT: ${A.name}, size ${fbal(A.size)}, risk per trade ${A.pct}% = ${fbal(A.risk)}. Size every call in ${S.micro || S.sym} contracts from that risk and the stop distance, after about $1.50 a contract in fees.`); }
+  if (m.cls === "fut" && typeof lgBrief === "function") { const lg = lgBrief(); if (lg) L.push(lg); }
   const ev = await dkEvents(); if (ev && ev.length) { const near = ev.filter(e => e.t > now - 36e5 && e.t < now + 8 * 36e5).slice(0, 10); if (near.length) L.push(`US EVENTS, last hour and next 8 hours (user's local time):\n${near.map(e => `  ${new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} ${e.title}${e.imp >= 1 ? " [HIGH importance]" : ""}${e.ac != null ? `, actual ${e.ac}${e.unit}` : ""}${e.fc != null ? `, forecast ${e.fc}${e.unit}` : ""}${e.pv != null ? `, previous ${e.pv}${e.unit}` : ""}`).join("\n")}`); else L.push("US EVENTS: nothing scheduled in the next 8 hours."); }
   const rc = dkRec(); if (rc.n) L.push(`YOUR RECORD SO FAR: ${rc.w} wins, ${rc.l} losses${rc.tm ? `, ${rc.tm} closed on time` : ""}, total ${rc.R >= 0 ? "+" : ""}${rc.R.toFixed(1)}R; average stated confidence ${rc.conf}% vs actual win rate ${rc.wr}%.`);
   return { text: "LIVE BRIEF\n" + L.join("\n"), meta };
@@ -970,7 +1104,7 @@ async function dkBrief(m, signal) { // everything Quint should know before he an
 function dkRules(m) {
   return `You are Quint, a trading intelligence in your own app, Quint (you run on Claude, made by Anthropic). The app shows the user a live instrument panel for one market beside your chat: a price tape with the session's key levels, a signal matrix across timeframes and your record. They can ask you anything: a trade call, levels, news, how something works, a strategy to test, Pine Script code.
 
-WHO THEY ARE: ${myLine()} They trade from an iPhone and place real trades on NinjaTrader. This app doesn't place orders: when they tell you they took one of your calls, the brief shows it as their open position.
+WHO THEY ARE: ${myLine()} They trade from an iPhone and place real trades on NinjaTrader. This app doesn't place orders: when they tell you they took one of your calls, the brief shows it as their open position. Talk to them like a person, not a terminal: if part of their message is just chat (how you are, how their day went, nerves after a loss), answer that part warmly and naturally in a sentence or two, then get to the trading.
 
 THEIR OWN STRATEGY: the 5-pillar playbook, in order. 1 Location: price at a higher-timeframe level (previous day high or low, a 1h, 4h or daily fair value gap or order block). 2 Liquidity sweep: price trades through that level or the recent highs/lows and closes back inside. 3 CISD (change in state of delivery): a close back through the open of the candles that drove price into the sweep. 4 Displacement: a strong candle the new way, body at least 1.2× ATR, closing near its extreme, often leaving a fair value gap. 5 Execution: the pullback into that fair value gap, order block or CISD level with a confirming close; stop just beyond the sweep, target the liquidity on the other side at 1.5R or more; New York session. When they mention their playbook, the pillars or "my strategy", judge it pillar by pillar from the 5-PILLAR CHECK in the brief, name the first missing pillar and what would complete it, and give the exact entry, stop and target when all five are in place.${ST.bspil && ST.bspil.n != null ? ` Its test on their real 5-minute MNQ candles: ${ST.bspil.n} trades, ${ST.bspil.wr}% wins, profit factor ${ST.bspil.pf}, ${ST.bspil.net >= 0 ? "+" : "−"}$${Math.abs(ST.bspil.net)} on 1 MNQ after costs; quote this honestly if asked.` : ""}
 
@@ -1154,27 +1288,52 @@ async function dkAlertMake(m, p, dir, act, note, o = {}) {
 }
 const dkAlFor = (cid, kind) => dkAls().find(a => a.cid === cid && a.kind === kind && a.exp > Date.now() && !a.gone);
 function dkAlertWait(C, m) { const Q = MK.q[m.k], px = (Q && Q.p) || C.px, n = []; String(C.wait || "").replace(/(^|[^A-Za-z0-9.])(\d[\d,]*(?:\.\d+)?)/g, (x, a, v) => { n.push(+v.replace(/,/g, "")); return x; }); const p = n.find(v => px && Math.abs(v / px - 1) < 0.2); return p == null ? null : p; }
+const DK_TRADE_RX = /\b(buy|sell|long|short|trades?|trading|entry|enter|stop|target|tp|sl|charts?|price|levels?|setups?|mnq|mes|nq|es|ym|rty|gold|oil|crude|bitcoin|btc|markets?|candles?|trend|support|resistance|vwap|pillars?|call|scalp|news|fomc|cpi|nfp|fed|risk|contracts?|lucid|account|eval|funded|payout|pine|strateg(y|ies)|backtest|alerts?|bull|bear|breakout|range|sweep|liquidity|cisd|displacement|fvg|order block|ema|rsi|atr|session|london|new york|futures|nasdaq|s&p|dow|points?|ticks?|win rate|drawdown|p&l|pnl|position|exit|bias|direction|chop|volume|ninjatrader|tradingview|screenshot|practi[cs]e|spot it|code|script|indicator)\b|\d{4,}/i;
+const DK_CHAT_RX = /^\s*(hi|hiya|hey|hello|yo|sup|morning|evening|good (morning|afternoon|evening|night)|gm|thanks|thank you|thx|cheers|ta|lol|lmao|haha|ok|okay|cool|nice|great|love (it|you)|how are you|how r u|how's it going|hows it going|how you doing|how was your|what's up|whats up|wassup|who are you|what are you|what's your name|tell me (a joke|about yourself)|i'?m (so |really |a bit )?(tired|stressed|bored|nervous|anxious|happy|sad|angry|frustrated|gutted|buzzing|done)|bye|goodnight|night|see you|talk later)\b/i;
+function dkRecentTrade(m) { const L = m ? dkMsgs(m.k) : []; for (let k = L.length - 1; k >= 0; k--) { const x = L[k]; if (x.r === "a" && !x.busy) return !x.chat && Date.now() - (x.at || 0) < 15 * 6e4; } return false; } // a follow-up to a trading answer stays a trading question
+function dkIsChat(text, m, opt = {}) {
+  if (opt.img || opt.trade) return false; const t = String(text || "").trim(); if (!t) return false;
+  if (DK_CHAT_RX.test(t) && t.length < 90 && !DK_TRADE_RX.test(t)) return true;
+  return !DK_TRADE_RX.test(t) && !dkRecentTrade(m);
+}
+function dkChatRules(m) {
+  return `You are Quint, the trading mentor built into the user's trading app (you run on Claude, made by Anthropic). Right now the user isn't asking for a trade: they're just talking to you.
+
+WHO THEY ARE: ${myLine()} They trade MNQ futures from an iPhone and are working to pass a Lucid Trading funded account.
+
+HOW TO TALK: like a warm, sharp friend who happens to be a professional trader. Natural, relaxed, plain English, the way a person speaks: contractions, short sentences, a little humour when it fits. Usually one to four sentences; more only if they ask for it. Ask a question back now and then. No headings, bullet lists or tables. Never make a trade call here and never write a CALL: or ALERT: line or price levels.
+
+If they ask about the market, a chart or a trade, say in a few words that you'll read the live charts if they ask you for a call (for example "buy or sell now?"), because you haven't looked at the data for this reply. If they sound stressed, tilted or are chasing losses, be kind and steady, and gently point them back to their own rules and their account limits, without lecturing. This app is for learning and practice and never places real orders.`;
+}
+function dkChatBrief(m) {
+  const now = Date.now(), e = etNow(now), L = [`CHAT CONTEXT: it's ${new Date(now).toLocaleString([], { weekday: "long", hour: "2-digit", minute: "2-digit" })} for the user, ${String(Math.floor(e.min / 60)).padStart(2, "0")}:${String(e.min % 60).padStart(2, "0")} in New York. Futures: ${stLabel(mktStatus("fut", now))}.`];
+  const rc = dkRec(); if (rc.n) L.push(`Your calls so far: ${rc.w} wins, ${rc.l} losses, ${rc.R >= 0 ? "+" : ""}${rc.R.toFixed(1)}R.`);
+  if (typeof lgBrief === "function") { const g = lgBrief(); if (g) L.push(g.replace(/ When you give a trade[\s\S]*$/, "")); }
+  return L.join("\n");
+}
 async function dkSend(text, opt = {}) {
   const m = dkM(); text = String(text || "").trim(); if (!m || !text || DK.busy) return; DK.lastQ = text; DK.alN = 0;
   if (!CO.sample) { hmToast("Quint needs Claude: open this app inside Claude to talk to him."); return; }
   DK.view = "chat"; const L = dkMsgs(m.k); L.push({ r: "u", t: text.slice(0, 2000), at: Date.now(), img: !!opt.img }); const A = { r: "a", t: "", at: Date.now(), busy: true, now: dkNow(m) }; L.push(A);
-  DK.busy = true; DK.prog = "Reading the charts…"; dkPaint(true); const ctl = DK.ctl = new AbortController();
+  const chat = dkIsChat(text, m, opt); if (chat) A.chat = true;
+  DK.busy = true; DK.prog = chat ? "Thinking…" : "Reading the charts…"; dkPaint(true); const ctl = DK.ctl = new AbortController();
   try {
     if (DK.lim === undefined) DK.lim = await CO.sample.limits().catch(() => null);
-    const br = await dkBrief(m, ctl.signal); if (ctl.signal.aborted) throw { code: "cancelled" };
-    const canImg = !!(DK.lim && DK.lim.images), img = opt.img && canImg ? opt.img : canImg && !opt.img ? await dkShot() : null;
-    const turns = [{ role: "user", content: dkRules(m) }];
+    const br = chat ? { text: dkChatBrief(m), meta: {} } : await dkBrief(m, ctl.signal); if (ctl.signal.aborted) throw { code: "cancelled" };
+    const canImg = !!(DK.lim && DK.lim.images), img = chat ? null : opt.img && canImg ? opt.img : canImg && !opt.img ? await dkShot() : null;
+    const turns = [{ role: "user", content: chat ? dkChatRules(m) : dkRules(m) }];
     for (const x of L.slice(-14, -2)) if (x.t && !x.busy) turns.push({ role: x.r === "u" ? "user" : "assistant", content: x.r === "a" ? x.t.slice(0, 3500) : x.t });
-    turns.push({ role: "user", content: `${br.text}\n\n${img ? (opt.img ? "IMAGE: a screenshot the user took of their own chart (it may be NinjaTrader or TradingView, and newer than the brief): read its price scale, lines and any position.\n" : "IMAGE: the Chart Wizard chart exactly as the user sees it now.\n") : ""}QUESTION: ${text}` });
-    DK.prog = "Thinking it through…"; dkPaintLast();
-    const run = tools => CO.sample(turns, Object.assign({ onText: ({ text: t }) => { A.t = t; DK.prog = ""; dkPaintLast(); }, signal: ctl.signal, cache: false }, qaModel(text, !!img), img ? { images: [img] } : {}, tools ? { tools } : {}));
-    const tools = DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
+    turns.push({ role: "user", content: `${br.text}\n\n${img ? (opt.img ? "IMAGE: a screenshot the user took of their own chart (it may be NinjaTrader or TradingView, and newer than the brief): read its price scale, lines and any position.\n" : "IMAGE: the Chart Wizard chart exactly as the user sees it now.\n") : ""}${chat ? "MESSAGE" : "QUESTION"}: ${text}${typeof vmHint === "function" ? vmHint() : ""}` });
+    DK.prog = chat ? "Thinking…" : "Thinking it through…"; dkPaintLast();
+    const run = tools => CO.sample(turns, Object.assign({ onText: ({ text: t }) => { A.t = t; DK.prog = ""; dkPaintLast(); }, signal: ctl.signal, cache: false }, qaModel(text, !!img), img ? { images: [img] } : {}, tools ? { tools } : {}, chat ? { model: "claude-opus-5-5", modelTier: "default", effort: "low" } : {}));
+    const tools = !chat && DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
     let r; try { r = await run(tools); } catch (e) { if (e && e.code === "tools_unavailable" && tools) { DK.noTools = true; A.t = ""; r = await run(null); } else throw e; }
     if (r && r.text) A.t = r.text; if (!A.t) throw { code: "empty_completion" };
-    const c = dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
+    const c = chat ? null : dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
   } catch (e) { const c = e && e.code; if (e && e.text) A.t = e.text; A.err = c === "cancelled" ? (A.t ? null : "Stopped.") : c === "not_ready" ? "Live data isn't connected, so Quint can't read the charts. Reload to reconnect." : c === "image_rejected" ? "Claude couldn't take that image. Try a smaller or clearer screenshot." : NW_ERR[c] || "Something went wrong reaching Quint. Try again in a moment."; }
-  finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); }
+  finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); if (typeof vmAnswer === "function") vmAnswer(A.t ? A.t : A.err || "", m); }
 }
+
 
 /* ================= QUINT: the standalone app. State, markets, connectors, voice ================= */
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -1296,17 +1455,18 @@ function voiceList() { try { return (window.speechSynthesis && speechSynthesis.g
 function voicePick() { const vs = voiceList(), want = ST.set.voice && vs.find(v => v.voiceURI === ST.set.voice || v.name === ST.set.voice); if (want) return want; const best = vs.filter(v => voiceScore(v) > 0).sort((a, b) => voiceScore(b) - voiceScore(a))[0]; return best || null; }
 if (window.speechSynthesis) { try { speechSynthesis.onvoiceschanged = () => { if ($("#vlist")) paintVoices(); }; speechSynthesis.getVoices(); } catch (e) {} }
 function qaSpoke() { QT.speaking = false; QT.level = 0; $$(".say").forEach(b => { b.textContent = "Listen"; b.setAttribute("aria-pressed", "false"); }); coreKick(); }
-function qaSpeak(text, btn) {
-  if (QT.speaking) { try { if (QT.tts) QT.tts.stop().catch(() => {}); else speechSynthesis.cancel(); } catch (e) {} qaSpoke(); return; }
-  const plain = mdPlain(text); if (!plain) return; const parts = []; let cur = "";
-  for (const para of plain.split("\n")) { if ((cur + "\n" + para).length > 1700) { if (cur) parts.push(cur); cur = para.slice(0, 1700); } else cur = cur ? cur + "\n" + para : para; } if (cur) parts.push(cur);
+function qaSpeak(text, btn, name, cb) { // speaks like a person: the call first, trader words, one sentence at a time
+  if (QT.speaking && !cb) { try { if (QT.tts) QT.tts.stop().catch(() => {}); else speechSynthesis.cancel(); } catch (e) {} qaSpoke(); return; }
+  const tok = QT.tok = (QT.tok || 0) + 1, fin = () => { if (tok !== QT.tok) return; qaSpoke(); if (cb) { const f = cb; cb = null; f(); } };
+  const script = sayScript(text, name); if (!script) { fin(); return; } const rate = clamp(+ST.set.rate || 1, 0.7, 1.5);
   QT.speaking = true; if (btn) { btn.textContent = "Stop"; btn.setAttribute("aria-pressed", "true"); } coreKick();
-  if (QT.tts) { QT.tts.speak(parts.slice(0, 6).map(t => ({ text: t, voice: ST.set.tvoice || "buttery", rate: ST.set.rate || 1, language: "en" }))).catch(e => { if (e && e.code === "not_granted") hmToast("Reading aloud is turned off for Quint. Turn it back on in this page's Permissions menu."); }).then(qaSpoke); return; }
-  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { qaSpoke(); hmToast("This device can't read aloud here."); return; }
-  try { speechSynthesis.cancel(); const v = voicePick();
-    parts.forEach((t, i) => { const u = new SpeechSynthesisUtterance(t); if (v) u.voice = v; u.lang = v ? v.lang : "en-GB"; u.rate = clamp(+ST.set.rate || 1, 0.7, 1.5); u.pitch = 1;
-      u.onboundary = () => { QT.level = 1; coreKick(); }; if (i === parts.length - 1) { u.onend = qaSpoke; u.onerror = qaSpoke; } speechSynthesis.speak(u); }); } catch (e) { qaSpoke(); }
+  if (QT.tts) { QT.tts.speak(sayLines(script).map(t => ({ text: t, voice: ST.set.tvoice || "buttery", rate, language: "en" }))).catch(e => { if (e && e.code === "not_granted") hmToast("Reading aloud is turned off for Quint. Turn it back on in this page's Permissions menu."); }).then(fin); return; }
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") { fin(); hmToast("This device can't read aloud here."); return; }
+  try { speechSynthesis.cancel(); const v = voicePick(), parts = saySplit(script);
+    parts.forEach((t, i) => { const u = new SpeechSynthesisUtterance(t); if (v) u.voice = v; u.lang = v ? v.lang : "en-GB"; u.rate = rate; u.pitch = /\?$/.test(t) ? 1.04 : 1;
+      u.onboundary = () => { QT.level = 1; coreKick(); }; if (i === parts.length - 1) { u.onend = fin; u.onerror = fin; } speechSynthesis.speak(u); }); } catch (e) { fin(); }
 }
+function qaHush() { QT.tok = (QT.tok || 0) + 1; try { if (QT.tts) QT.tts.stop().catch(() => {}); else speechSynthesis.cancel(); } catch (e) {} qaSpoke(); }
 
 /* ================= QUINT: the interface ================= */
 const QA = { view: "brain", B: {}, flash: 0 };
@@ -1404,7 +1564,7 @@ function drawTape() {
   const upL = vis.filter(l => l.ly < mid || (l.ly === mid && l.p >= px)).sort((a, b) => b.ly - a.ly), dnL = vis.filter(l => !upL.includes(l)).sort((a, b) => a.ly - b.ly);
   let lim = mid - 17; for (const l of upL) { l.ly = Math.min(l.ly, lim); lim = l.ly - 12; } lim = mid + 17; for (const l of dnL) { l.ly = Math.max(l.ly, lim); lim = l.ly + 12; }
   for (const l of upL) l.ly = Math.max(8, l.ly); for (const l of dnL) l.ly = Math.min(h - 8, l.ly);
-  const colOf = l => l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "q" ? C.amber2 : l.kind === "r" ? "rgba(255,92,122,.85)" : l.kind === "s" ? "rgba(62,240,176,.85)" : l.kind === "v" ? "#b9a6ff" : C.dim;
+  const colOf = l => l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "q" ? C.amber2 : l.kind === "r" ? "rgba(255,79,110,.85)" : l.kind === "s" ? "rgba(47,217,168,.85)" : l.kind === "v" ? "#b9a6ff" : C.dim;
   for (const l of vis) { const c = colOf(l);
     if (!l.off) { x.strokeStyle = c; x.globalAlpha = l.q ? 0.9 : 0.45; x.setLineDash(l.q ? [] : [3, 3]); x.lineWidth = l.q ? 1.5 : 1; x.beginPath(); x.moveTo(52, Math.round(l.y) + 0.5); x.lineTo(w - 4, Math.round(l.y) + 0.5); x.stroke(); x.setLineDash([]); x.globalAlpha = 1; }
     const d = l.p - px, lab = `${l.off > 0 ? "▲ " : l.off < 0 ? "▼ " : ""}${l.k} ${fnum(S, l.p)}`, ext = l.off ? ` ${d > 0 ? "+" : "−"}${nf(S.dec > 2 ? S.dec : 0).format(Math.abs(d))}` : "";
@@ -1433,7 +1593,7 @@ function drawSess() {
   const cv = $("#sess"); if (!cv || !cv.offsetParent) return; const { x, w, h } = fitCanvas(cv), C = cols(), now = Date.now(), span = 10 * 36e5, t0 = now - span * 0.38, X = ms => (ms - t0) / span * w;
   x.clearRect(0, 0, w, h); x.textBaseline = "middle";
   for (let dd = -1; dd <= 1; dd++) for (const [a, b, lab] of SESS) { const s0 = etAt(now, dd, a), s1 = etAt(now, dd, b), x0 = X(s0), x1 = X(s1); if (x1 < 0 || x0 > w) continue;
-    const key = lab === "NY open", brk = lab === "Break"; x.fillStyle = key ? "rgba(61,184,255,.55)" : brk ? "rgba(255,92,122,.25)" : "rgba(122,142,168,.22)"; x.fillRect(x0 + 1, h - 7, Math.max(0, x1 - x0 - 2), 4);
+    const key = lab === "NY open", brk = lab === "Break"; x.fillStyle = key ? "rgba(41,216,255,.55)" : brk ? "rgba(255,79,110,.25)" : "rgba(122,142,168,.22)"; x.fillRect(x0 + 1, h - 7, Math.max(0, x1 - x0 - 2), 4);
     x.font = "600 8.5px 'Chakra Petch', sans-serif"; x.fillStyle = key ? C.amber2 : C.faint; x.textAlign = "left"; const lx = Math.max(x0 + 3, 2), xnow = X(now); if (x1 - lx > 30 && (lx > xnow + 130 || lx + 48 < xnow - 4)) x.fillText(lab.toUpperCase(), lx, h - 15); }
   for (let ms = Math.ceil(t0 / 36e5) * 36e5; ms < t0 + span; ms += 36e5) { const xx = Math.round(X(ms)) + 0.5; x.strokeStyle = C.line2; x.beginPath(); x.moveTo(xx, 0); x.lineTo(xx, 5); x.stroke(); x.font = "500 8.5px 'Martian Mono', monospace"; x.fillStyle = C.faint; x.textAlign = "center"; x.fillText(ukT(ms).slice(0, 2), xx, 11); }
   const ev = DK.cal && DK.cal.list ? DK.cal.list.filter(e => e.imp >= 1 && e.t > t0 && e.t < t0 + span) : [];
@@ -1452,7 +1612,7 @@ function drawScope() {
   const pad = (hi - lo) * 0.06 || S.tick * 4, H = hi + pad, L = lo - pad, Y = p => 8 + (H - p) / (H - L) * (h - 22), cw = (w - 52) / N;
   x.strokeStyle = C.line; x.lineWidth = 1; const st = niceStep((H - L) / 4); x.font = "500 8.5px 'Martian Mono', monospace"; x.fillStyle = C.faint; x.textAlign = "left"; x.textBaseline = "middle";
   for (let v = Math.ceil(L / st) * st; v < H; v += st) { const y = Math.round(Y(v)) + 0.5; x.beginPath(); x.moveTo(0, y); x.lineTo(w - 50, y); x.stroke(); x.fillText(nf(st >= 1 ? 0 : S.dec).format(v), w - 46, y); }
-  for (const l of lv) { const y = Math.round(Y(l.p)) + 0.5; x.strokeStyle = l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "v" ? "#b9a6ff" : "rgba(61,184,255,.55)"; x.setLineDash(l.q ? [] : [3, 3]); x.beginPath(); x.moveTo(0, y); x.lineTo(w - 50, y); x.stroke(); x.setLineDash([]); x.fillStyle = x.strokeStyle; x.font = "600 8.5px 'Chakra Petch', sans-serif"; x.fillText(l.k, 3, y - 6); }
+  for (const l of lv) { const y = Math.round(Y(l.p)) + 0.5; x.strokeStyle = l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "v" ? "#b9a6ff" : "rgba(41,216,255,.55)"; x.setLineDash(l.q ? [] : [3, 3]); x.beginPath(); x.moveTo(0, y); x.lineTo(w - 50, y); x.stroke(); x.setLineDash([]); x.fillStyle = x.strokeStyle; x.font = "600 8.5px 'Chakra Petch', sans-serif"; x.fillText(l.k, 3, y - 6); }
   for (let i = a; i < B.n; i++) { const xx = (i - a) * cw + cw / 2, up = B.c[i] >= B.o[i]; x.strokeStyle = x.fillStyle = up ? C.buy : C.sell; x.globalAlpha = 0.9; x.beginPath(); x.moveTo(Math.round(xx) + 0.5, Y(B.h[i])); x.lineTo(Math.round(xx) + 0.5, Y(B.l[i])); x.stroke(); const y0 = Y(Math.max(B.o[i], B.c[i])), y1 = Y(Math.min(B.o[i], B.c[i])); x.fillRect(xx - Math.max(1, cw * 0.32), y0, Math.max(2, cw * 0.64), Math.max(1, y1 - y0)); x.globalAlpha = 1; }
   x.strokeStyle = C.amber; x.lineWidth = 1.3; x.beginPath(); for (let i = a; i < B.n; i++) { const xx = (i - a) * cw + cw / 2, y = Y(e20[i]); i === a ? x.moveTo(xx, y) : x.lineTo(xx, y); } x.stroke(); x.lineWidth = 1;
   const lc = B.c[B.n - 1], yl = Y(lc); x.fillStyle = C.amber; x.fillRect(w - 50, yl - 7, 50, 14); x.fillStyle = "#1b1203"; x.font = "700 8.5px 'Martian Mono', monospace"; x.fillText(fnum(S, lc), w - 47, yl);
@@ -1629,7 +1789,7 @@ function onLog(e) {
   if ((t = e.target.closest("[data-in]"))) { const C = dkCallById(+t.dataset.in); if (!C) return; ST.pos = ST.pos || {}; const P = ST.pos[C.k];
     if (P && P.open && P.cid === C.id) { P.open = false; hmToast("Noted: you're out. Quint won't count it as open."); } else { const z = qaSize(MKDEF[C.k], Math.abs(C.entry - C.stop)); ST.pos[C.k] = { open: true, k: C.k, cid: C.id, dir: C.side, qty: Math.max(1, z ? z.qty : 1), e: C.entry, stop: C.stop, tgt: C.tgt, t0: Date.now() }; hmToast("Noted. Quint now treats this as your open trade. Tap again when you're out."); }
     save(); dkPaint(false); return; }
-  if ((t = e.target.closest(".say"))) { const i = +t.closest("[data-i]").dataset.i, x = dkMsgs(m.k)[i]; if (x) qaSpeak(dkClean(x.t), t); return; }
+  if ((t = e.target.closest(".say"))) { const i = +t.closest("[data-i]").dataset.i, x = dkMsgs(m.k)[i]; if (x) qaSpeak(x.t, t, m.k); return; }
   if ((t = e.target.closest("[data-aldel]"))) { dkAlertDel(t); return; }
   if (e.target.closest("#alr")) { dkAlertsLoad(true); return; }
 }
@@ -1661,7 +1821,7 @@ function paintVoices() {
   if (QT.tts) { note.textContent = "Claude's own voices, available here."; el.innerHTML = ["buttery", "airy", "glassy", "rounded"].map(v => `<button type="button" data-tv="${v}" aria-pressed="${(s.tvoice || "buttery") === v}"><span>${v[0].toUpperCase() + v.slice(1)}</span><small>Claude</small></button>`).join("");
     $$("[data-tv]", el).forEach(b => b.onclick = () => { s.tvoice = b.dataset.tv; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); }); return; }
   const vs = voiceList().filter(v => /^en/i.test(v.lang)).sort((a, b) => voiceScore(b) - voiceScore(a)), cur = voicePick();
-  note.textContent = "On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. The robotic ones are at the bottom; tap one to hear it.";
+  note.innerHTML = `On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. <b>For a much more human voice, download a Premium one:</b> Settings → Accessibility → Spoken Content (Read &amp; Speak on newer iPhones) → Voices → English, then tap a voice marked Premium, such as Ava, Zoe or Evan (US) or Jamie or Serena (UK), and download it. Come back here and tap it. Robotic voices are at the bottom.`;
   el.innerHTML = vs.length ? vs.map(v => `<button type="button" data-vu="${esc(v.voiceURI || v.name)}" aria-pressed="${!!cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name)}"><span>${esc(v.name.replace(/\s*\(.*\)$/, ""))}${voiceScore(v) < 0 ? " · robotic" : ""}</span><small>${esc(v.lang)}${/premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : `<p class="small" style="padding:10px 12px">No voices are listed yet. Tap Listen on any answer and they'll load.</p>`;
   $$("[data-vu]", el).forEach(b => b.onclick = () => { s.voice = b.dataset.vu; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); });
 }
@@ -1684,12 +1844,25 @@ function qaStart() {
   ta.addEventListener("focus", () => kbOn(true)); ta.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== ta) kbOn(false); }, 150));
   $("#askf").onsubmit = e => { e.preventDefault(); if (DK.busy) { if (DK.ctl) DK.ctl.abort(); return; } const v = ta.value.trim(); if (!v && !DK.img) return; ta.value = ""; fit();
     if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(v || "Read my chart and give me your call.", DK.img ? { img: DK.img } : {}); DK.img = null; paintImg(); };
+  $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
   $("#file").onchange = async e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { DK.img = await qtShrink(f); paintImg(); ta.focus(); } catch (err) { hmToast("That file couldn't be opened as an image."); } };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#scrim").classList.contains("open")) { e.preventDefault(); closeSet(); } });
   window.addEventListener("resize", () => { drawTape(); drawSess(); drawScope(); coreKick(); });
   setInterval(() => { drawSess(); paintVerdict(); paintHead(); }, 30000);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawTape(); drawSess(); drawScope(); coreKick(); });
   paintAll(); coreKick(); qaInit();
+}
+
+function qbVmO() { // voice mode wired to Quint Brain
+  return { input: $("#q"), lang: navigator.language || "en-GB", send: t => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(t); }, speak: (t, done) => { const m = dkM(); qaSpeak(t, null, m ? m.k : "", done); }, hush: qaHush, paint: qbVmPaint };
+}
+function qbVmPaint(V) {
+  const f = $("#askf"), mic = $("#mic"); if (!f) return; let bar = $("#vmbar");
+  if (mic) { mic.setAttribute("aria-pressed", V.on); mic.classList.toggle("live", V.st === "listen"); }
+  if (!V.on) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement("div"); bar.id = "vmbar"; f.before(bar); }
+  bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="btn sm vmx" aria-label="End voice mode">End</button>`;
+  bar.querySelector(".vmx").onclick = vmEnd;
 }
 
 /* ================= QUINT: the brain. A 3D network that turns as you drag it, wired from the same live data ================= */

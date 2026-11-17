@@ -94,7 +94,7 @@ function drawTape() {
   const upL = vis.filter(l => l.ly < mid || (l.ly === mid && l.p >= px)).sort((a, b) => b.ly - a.ly), dnL = vis.filter(l => !upL.includes(l)).sort((a, b) => a.ly - b.ly);
   let lim = mid - 17; for (const l of upL) { l.ly = Math.min(l.ly, lim); lim = l.ly - 12; } lim = mid + 17; for (const l of dnL) { l.ly = Math.max(l.ly, lim); lim = l.ly + 12; }
   for (const l of upL) l.ly = Math.max(8, l.ly); for (const l of dnL) l.ly = Math.min(h - 8, l.ly);
-  const colOf = l => l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "q" ? C.amber2 : l.kind === "r" ? "rgba(255,92,122,.85)" : l.kind === "s" ? "rgba(62,240,176,.85)" : l.kind === "v" ? "#b9a6ff" : C.dim;
+  const colOf = l => l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "q" ? C.amber2 : l.kind === "r" ? "rgba(255,79,110,.85)" : l.kind === "s" ? "rgba(47,217,168,.85)" : l.kind === "v" ? "#b9a6ff" : C.dim;
   for (const l of vis) { const c = colOf(l);
     if (!l.off) { x.strokeStyle = c; x.globalAlpha = l.q ? 0.9 : 0.45; x.setLineDash(l.q ? [] : [3, 3]); x.lineWidth = l.q ? 1.5 : 1; x.beginPath(); x.moveTo(52, Math.round(l.y) + 0.5); x.lineTo(w - 4, Math.round(l.y) + 0.5); x.stroke(); x.setLineDash([]); x.globalAlpha = 1; }
     const d = l.p - px, lab = `${l.off > 0 ? "▲ " : l.off < 0 ? "▼ " : ""}${l.k} ${fnum(S, l.p)}`, ext = l.off ? ` ${d > 0 ? "+" : "−"}${nf(S.dec > 2 ? S.dec : 0).format(Math.abs(d))}` : "";
@@ -123,7 +123,7 @@ function drawSess() {
   const cv = $("#sess"); if (!cv || !cv.offsetParent) return; const { x, w, h } = fitCanvas(cv), C = cols(), now = Date.now(), span = 10 * 36e5, t0 = now - span * 0.38, X = ms => (ms - t0) / span * w;
   x.clearRect(0, 0, w, h); x.textBaseline = "middle";
   for (let dd = -1; dd <= 1; dd++) for (const [a, b, lab] of SESS) { const s0 = etAt(now, dd, a), s1 = etAt(now, dd, b), x0 = X(s0), x1 = X(s1); if (x1 < 0 || x0 > w) continue;
-    const key = lab === "NY open", brk = lab === "Break"; x.fillStyle = key ? "rgba(61,184,255,.55)" : brk ? "rgba(255,92,122,.25)" : "rgba(122,142,168,.22)"; x.fillRect(x0 + 1, h - 7, Math.max(0, x1 - x0 - 2), 4);
+    const key = lab === "NY open", brk = lab === "Break"; x.fillStyle = key ? "rgba(41,216,255,.55)" : brk ? "rgba(255,79,110,.25)" : "rgba(122,142,168,.22)"; x.fillRect(x0 + 1, h - 7, Math.max(0, x1 - x0 - 2), 4);
     x.font = "600 8.5px 'Chakra Petch', sans-serif"; x.fillStyle = key ? C.amber2 : C.faint; x.textAlign = "left"; const lx = Math.max(x0 + 3, 2), xnow = X(now); if (x1 - lx > 30 && (lx > xnow + 130 || lx + 48 < xnow - 4)) x.fillText(lab.toUpperCase(), lx, h - 15); }
   for (let ms = Math.ceil(t0 / 36e5) * 36e5; ms < t0 + span; ms += 36e5) { const xx = Math.round(X(ms)) + 0.5; x.strokeStyle = C.line2; x.beginPath(); x.moveTo(xx, 0); x.lineTo(xx, 5); x.stroke(); x.font = "500 8.5px 'Martian Mono', monospace"; x.fillStyle = C.faint; x.textAlign = "center"; x.fillText(ukT(ms).slice(0, 2), xx, 11); }
   const ev = DK.cal && DK.cal.list ? DK.cal.list.filter(e => e.imp >= 1 && e.t > t0 && e.t < t0 + span) : [];
@@ -142,7 +142,7 @@ function drawScope() {
   const pad = (hi - lo) * 0.06 || S.tick * 4, H = hi + pad, L = lo - pad, Y = p => 8 + (H - p) / (H - L) * (h - 22), cw = (w - 52) / N;
   x.strokeStyle = C.line; x.lineWidth = 1; const st = niceStep((H - L) / 4); x.font = "500 8.5px 'Martian Mono', monospace"; x.fillStyle = C.faint; x.textAlign = "left"; x.textBaseline = "middle";
   for (let v = Math.ceil(L / st) * st; v < H; v += st) { const y = Math.round(Y(v)) + 0.5; x.beginPath(); x.moveTo(0, y); x.lineTo(w - 50, y); x.stroke(); x.fillText(nf(st >= 1 ? 0 : S.dec).format(v), w - 46, y); }
-  for (const l of lv) { const y = Math.round(Y(l.p)) + 0.5; x.strokeStyle = l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "v" ? "#b9a6ff" : "rgba(61,184,255,.55)"; x.setLineDash(l.q ? [] : [3, 3]); x.beginPath(); x.moveTo(0, y); x.lineTo(w - 50, y); x.stroke(); x.setLineDash([]); x.fillStyle = x.strokeStyle; x.font = "600 8.5px 'Chakra Petch', sans-serif"; x.fillText(l.k, 3, y - 6); }
+  for (const l of lv) { const y = Math.round(Y(l.p)) + 0.5; x.strokeStyle = l.kind === "qs" ? C.sell : l.kind === "qt" ? C.buy : l.kind === "qe" ? C.ink : l.kind === "v" ? "#b9a6ff" : "rgba(41,216,255,.55)"; x.setLineDash(l.q ? [] : [3, 3]); x.beginPath(); x.moveTo(0, y); x.lineTo(w - 50, y); x.stroke(); x.setLineDash([]); x.fillStyle = x.strokeStyle; x.font = "600 8.5px 'Chakra Petch', sans-serif"; x.fillText(l.k, 3, y - 6); }
   for (let i = a; i < B.n; i++) { const xx = (i - a) * cw + cw / 2, up = B.c[i] >= B.o[i]; x.strokeStyle = x.fillStyle = up ? C.buy : C.sell; x.globalAlpha = 0.9; x.beginPath(); x.moveTo(Math.round(xx) + 0.5, Y(B.h[i])); x.lineTo(Math.round(xx) + 0.5, Y(B.l[i])); x.stroke(); const y0 = Y(Math.max(B.o[i], B.c[i])), y1 = Y(Math.min(B.o[i], B.c[i])); x.fillRect(xx - Math.max(1, cw * 0.32), y0, Math.max(2, cw * 0.64), Math.max(1, y1 - y0)); x.globalAlpha = 1; }
   x.strokeStyle = C.amber; x.lineWidth = 1.3; x.beginPath(); for (let i = a; i < B.n; i++) { const xx = (i - a) * cw + cw / 2, y = Y(e20[i]); i === a ? x.moveTo(xx, y) : x.lineTo(xx, y); } x.stroke(); x.lineWidth = 1;
   const lc = B.c[B.n - 1], yl = Y(lc); x.fillStyle = C.amber; x.fillRect(w - 50, yl - 7, 50, 14); x.fillStyle = "#1b1203"; x.font = "700 8.5px 'Martian Mono', monospace"; x.fillText(fnum(S, lc), w - 47, yl);
@@ -319,7 +319,7 @@ function onLog(e) {
   if ((t = e.target.closest("[data-in]"))) { const C = dkCallById(+t.dataset.in); if (!C) return; ST.pos = ST.pos || {}; const P = ST.pos[C.k];
     if (P && P.open && P.cid === C.id) { P.open = false; hmToast("Noted: you're out. Quint won't count it as open."); } else { const z = qaSize(MKDEF[C.k], Math.abs(C.entry - C.stop)); ST.pos[C.k] = { open: true, k: C.k, cid: C.id, dir: C.side, qty: Math.max(1, z ? z.qty : 1), e: C.entry, stop: C.stop, tgt: C.tgt, t0: Date.now() }; hmToast("Noted. Quint now treats this as your open trade. Tap again when you're out."); }
     save(); dkPaint(false); return; }
-  if ((t = e.target.closest(".say"))) { const i = +t.closest("[data-i]").dataset.i, x = dkMsgs(m.k)[i]; if (x) qaSpeak(dkClean(x.t), t); return; }
+  if ((t = e.target.closest(".say"))) { const i = +t.closest("[data-i]").dataset.i, x = dkMsgs(m.k)[i]; if (x) qaSpeak(x.t, t, m.k); return; }
   if ((t = e.target.closest("[data-aldel]"))) { dkAlertDel(t); return; }
   if (e.target.closest("#alr")) { dkAlertsLoad(true); return; }
 }
@@ -351,7 +351,7 @@ function paintVoices() {
   if (QT.tts) { note.textContent = "Claude's own voices, available here."; el.innerHTML = ["buttery", "airy", "glassy", "rounded"].map(v => `<button type="button" data-tv="${v}" aria-pressed="${(s.tvoice || "buttery") === v}"><span>${v[0].toUpperCase() + v.slice(1)}</span><small>Claude</small></button>`).join("");
     $$("[data-tv]", el).forEach(b => b.onclick = () => { s.tvoice = b.dataset.tv; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); }); return; }
   const vs = voiceList().filter(v => /^en/i.test(v.lang)).sort((a, b) => voiceScore(b) - voiceScore(a)), cur = voicePick();
-  note.textContent = "On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. The robotic ones are at the bottom; tap one to hear it.";
+  note.innerHTML = `On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. <b>For a much more human voice, download a Premium one:</b> Settings → Accessibility → Spoken Content (Read &amp; Speak on newer iPhones) → Voices → English, then tap a voice marked Premium, such as Ava, Zoe or Evan (US) or Jamie or Serena (UK), and download it. Come back here and tap it. Robotic voices are at the bottom.`;
   el.innerHTML = vs.length ? vs.map(v => `<button type="button" data-vu="${esc(v.voiceURI || v.name)}" aria-pressed="${!!cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name)}"><span>${esc(v.name.replace(/\s*\(.*\)$/, ""))}${voiceScore(v) < 0 ? " · robotic" : ""}</span><small>${esc(v.lang)}${/premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : `<p class="small" style="padding:10px 12px">No voices are listed yet. Tap Listen on any answer and they'll load.</p>`;
   $$("[data-vu]", el).forEach(b => b.onclick = () => { s.voice = b.dataset.vu; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); });
 }
@@ -374,10 +374,23 @@ function qaStart() {
   ta.addEventListener("focus", () => kbOn(true)); ta.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== ta) kbOn(false); }, 150));
   $("#askf").onsubmit = e => { e.preventDefault(); if (DK.busy) { if (DK.ctl) DK.ctl.abort(); return; } const v = ta.value.trim(); if (!v && !DK.img) return; ta.value = ""; fit();
     if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(v || "Read my chart and give me your call.", DK.img ? { img: DK.img } : {}); DK.img = null; paintImg(); };
+  $("#mic").onclick = () => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); vmToggle(qbVmO()); };
   $("#file").onchange = async e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return; try { DK.img = await qtShrink(f); paintImg(); ta.focus(); } catch (err) { hmToast("That file couldn't be opened as an image."); } };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#scrim").classList.contains("open")) { e.preventDefault(); closeSet(); } });
   window.addEventListener("resize", () => { drawTape(); drawSess(); drawScope(); coreKick(); });
   setInterval(() => { drawSess(); paintVerdict(); paintHead(); }, 30000);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawTape(); drawSess(); drawScope(); coreKick(); });
   paintAll(); coreKick(); qaInit();
+}
+
+function qbVmO() { // voice mode wired to Quint Brain
+  return { input: $("#q"), lang: navigator.language || "en-GB", send: t => { if (QA.view !== "console" && !matchMedia("(min-width: 900px)").matches) setView("console"); dkSend(t); }, speak: (t, done) => { const m = dkM(); qaSpeak(t, null, m ? m.k : "", done); }, hush: qaHush, paint: qbVmPaint };
+}
+function qbVmPaint(V) {
+  const f = $("#askf"), mic = $("#mic"); if (!f) return; let bar = $("#vmbar");
+  if (mic) { mic.setAttribute("aria-pressed", V.on); mic.classList.toggle("live", V.st === "listen"); }
+  if (!V.on) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement("div"); bar.id = "vmbar"; f.before(bar); }
+  bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="btn sm vmx" aria-label="End voice mode">End</button>`;
+  bar.querySelector(".vmx").onclick = vmEnd;
 }
