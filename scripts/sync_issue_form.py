@@ -4,6 +4,8 @@
 The category dropdown lists top-level categories only; sub-categories are a free
 text field checked during review.
 """
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 

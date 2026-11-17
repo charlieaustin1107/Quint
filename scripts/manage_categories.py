@@ -6,6 +6,8 @@ Removing a (sub)category that Active resources still use fails unless --force:
 for a category, --force deactivates those rows (Active=No); for a sub-category,
 it moves them up to the parent category.
 """
+from __future__ import annotations
+
 import argparse
 import sys
 from pathlib import Path
