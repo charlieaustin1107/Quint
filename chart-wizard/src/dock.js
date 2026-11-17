@@ -425,7 +425,7 @@ function dkClick(e) {
   const al = e.target.closest("[data-alert]"); if (al) { dkAlert(al, m); return; }
   if (e.target.closest("#qdkBack")) { DK.view = "chat"; dkPaint(true); return; }
   if (e.target.closest("#qdkAlerts")) { DK.view = "alerts"; dkPaint(true); dkAlertsLoad(false); return; }
-  const sb = e.target.closest(".qtsay"); if (sb) { const i = +sb.closest("[data-i]").dataset.i, x = dkMsgs(m.k)[i]; if (x) qtSpeak(dkClean(x.t), sb); }
+  const sb = e.target.closest(".qtsay"); if (sb) { const i = +sb.closest("[data-i]").dataset.i, x = dkMsgs(m.k)[i]; if (x) qtSpeak(x.t, sb, m.k); }
 }
 function dkExtras(x, i) { // buttons for Pine code and price alerts Quint wrote
   if (x.busy || !x.t) return ""; let h = ""; const code = []; x.t.replace(/```[a-z]*\s*\n([\s\S]*?)```/gi, (_, c) => { if (/\/\/@version\s*=\s*\d/.test(c)) code.push(c); return ""; });

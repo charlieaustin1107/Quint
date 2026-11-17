@@ -319,7 +319,7 @@ function onLog(e) {
   if ((t = e.target.closest("[data-in]"))) { const C = dkCallById(+t.dataset.in); if (!C) return; ST.pos = ST.pos || {}; const P = ST.pos[C.k];
     if (P && P.open && P.cid === C.id) { P.open = false; hmToast("Noted: you're out. Quint won't count it as open."); } else { const z = qaSize(MKDEF[C.k], Math.abs(C.entry - C.stop)); ST.pos[C.k] = { open: true, k: C.k, cid: C.id, dir: C.side, qty: Math.max(1, z ? z.qty : 1), e: C.entry, stop: C.stop, tgt: C.tgt, t0: Date.now() }; hmToast("Noted. Quint now treats this as your open trade. Tap again when you're out."); }
     save(); dkPaint(false); return; }
-  if ((t = e.target.closest(".say"))) { const i = +t.closest("[data-i]").dataset.i, x = dkMsgs(m.k)[i]; if (x) qaSpeak(dkClean(x.t), t); return; }
+  if ((t = e.target.closest(".say"))) { const i = +t.closest("[data-i]").dataset.i, x = dkMsgs(m.k)[i]; if (x) qaSpeak(x.t, t, m.k); return; }
   if ((t = e.target.closest("[data-aldel]"))) { dkAlertDel(t); return; }
   if (e.target.closest("#alr")) { dkAlertsLoad(true); return; }
 }
@@ -351,7 +351,7 @@ function paintVoices() {
   if (QT.tts) { note.textContent = "Claude's own voices, available here."; el.innerHTML = ["buttery", "airy", "glassy", "rounded"].map(v => `<button type="button" data-tv="${v}" aria-pressed="${(s.tvoice || "buttery") === v}"><span>${v[0].toUpperCase() + v.slice(1)}</span><small>Claude</small></button>`).join("");
     $$("[data-tv]", el).forEach(b => b.onclick = () => { s.tvoice = b.dataset.tv; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); }); return; }
   const vs = voiceList().filter(v => /^en/i.test(v.lang)).sort((a, b) => voiceScore(b) - voiceScore(a)), cur = voicePick();
-  note.textContent = "On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. The robotic ones are at the bottom; tap one to hear it.";
+  note.innerHTML = `On iPhone the Claude app doesn't let pages use Claude's own voice, so Quint uses your phone's voices. <b>For a much more human voice, download a Premium one:</b> Settings → Accessibility → Spoken Content (Read &amp; Speak on newer iPhones) → Voices → English, then tap a voice marked Premium, such as Ava, Zoe or Evan (US) or Jamie or Serena (UK), and download it. Come back here and tap it. Robotic voices are at the bottom.`;
   el.innerHTML = vs.length ? vs.map(v => `<button type="button" data-vu="${esc(v.voiceURI || v.name)}" aria-pressed="${!!cur && (cur.voiceURI || cur.name) === (v.voiceURI || v.name)}"><span>${esc(v.name.replace(/\s*\(.*\)$/, ""))}${voiceScore(v) < 0 ? " · robotic" : ""}</span><small>${esc(v.lang)}${/premium/i.test(v.name + v.voiceURI) ? " · premium" : /enhanced/i.test(v.name + v.voiceURI) ? " · enhanced" : ""}</small></button>`).join("") : `<p class="small" style="padding:10px 12px">No voices are listed yet. Tap Listen on any answer and they'll load.</p>`;
   $$("[data-vu]", el).forEach(b => b.onclick = () => { s.voice = b.dataset.vu; save(); paintVoices(); QT.speaking = false; qaSpeak("This is Quint. I'll tell you straight: buy, sell, or stay out.", null); });
 }
