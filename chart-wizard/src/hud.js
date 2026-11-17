@@ -99,7 +99,7 @@ function lgOpen() {
       const map = { bal: "lgBal", peak: "lgPeak", today: "lgToday", best: "lgBest", stop: "lgStop", size: "lgSize", target: "lgTarget", mll: "lgMll", dll: "lgDll", cons: "lgCons" };
       for (const k in map) { const x = v(map[k]); if (x != null) G[k] = x; }
       G.stop = Math.max(0.25, G.stop); G.mll = Math.max(1, G.mll); G.target = Math.max(1, G.target); G.dll = Math.max(0, G.dll); G.cons = clamp(G.cons, 0, 100); G.best = Math.max(0, G.best);
-      G.lock = $("#lgLock", sh).getAttribute("aria-pressed") === "true"; G.at = Date.now(); save(); closeSheet(); lgPaint(); toast("Lucid guard updated");
+      G.lock = $("#lgLock", sh).getAttribute("aria-pressed") === "true"; G.at = Date.now(); save(); closeSheet(); lgPaint(); toast("Lucid guard updated"); sfx(lgCalc().lvl === "ok" ? "right" : "warn");
     };
   });
 }

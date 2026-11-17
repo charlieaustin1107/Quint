@@ -380,7 +380,7 @@ function dkWire(box) { // the parts the chart dock and Quint's own screen share
 }
 /* ---------- Quint's own screen: a full chat, any market, with the desk tools ---------- */
 const QS_MK = () => { const g = FUT_G.filter(([k]) => k !== "all").map(([k, l]) => [l, FUT_KEYS.filter(x => MKDEF[x].grp === k)]).filter(x => x[1].length); return g.concat([["Crypto & stocks", ["BTC"].concat(mkStocks().map(t => "s:" + t)).filter(k => MKDEF[k])]]); };
-const QS_TOOLS = [["shot", "📷", "Read my chart"], ["best", "🏆", "My 3 strategies"], ["prac", "🎯", "Practise"], ["voice", "🔊", "Voice"], ["style", "🎚", "My style"]];
+const QS_TOOLS = [["shot", "📷", "Read my chart"], ["best", "🏆", "My 3 strategies"], ["prac", "🎯", "Practise"], ["voice", "🔊", "Voice &amp; sounds"], ["style", "🎚", "My style"]];
 function qsOpen() {
   const root = $("#hmQuint"); if (!root) return; if (!DK.qkInit) { DK.qkInit = true; if (MKDEF[HS().qk]) DK.qk = HS().qk; } if (!MKDEF[DK.qk]) DK.qk = "MNQ"; DK.k = DK.qk; DK.open = false; DK.view = "chat";
   if (!CO.sample) { root.innerHTML = `<header class="hmh">${DK_ORB}<div class="hctitle"><span><b>Quint</b><small>Your trading analyst</small></span></div></header><div class="hmwrap"><p class="small">Quint needs Claude, so he only works when Chart Wizard is opened inside Claude.</p></div>`; return; }
@@ -447,7 +447,7 @@ async function dkPine(btn) {
 async function dkAlert(btn, m) {
   const [i, k] = btn.dataset.alert.split(":").map(Number), x = dkMsgs(m.k)[i], a = x && dkAlertLines(x.t)[k]; if (!a) return; btn.disabled = true; btn.textContent = "Setting the alert on TradingView…";
   const C = x.c ? dkCallById(x.c) : null, end = C ? C.t + (Math.max(30, C.hold) + (a.act === "EXIT" ? C.hold : 0)) * 6e4 : 0; // tied to the call's own time window when there is one
-  const r = await dkAlertMake(m, a.p, a.dir, a.act, a.note, Object.assign({ cid: x.at, kind: "L" + k }, end ? { min: Math.max(30, (end - Date.now()) / 6e4) } : {})); btn.textContent = r.ok ? `✓ Alert set: ${r.name}. Your phone gets it from the TradingView app.` : `✗ ${r.msg}`; if (!r.ok) btn.disabled = false;
+  const r = await dkAlertMake(m, a.p, a.dir, a.act, a.note, Object.assign({ cid: x.at, kind: "L" + k }, end ? { min: Math.max(30, (end - Date.now()) / 6e4) } : {})); if (r.ok) sfx("alert"); btn.textContent = r.ok ? `✓ Alert set: ${r.name}. Your phone gets it from the TradingView app.` : `✗ ${r.msg}`; if (!r.ok) btn.disabled = false;
 }
 /* ---------- TradingView alerts: Quint's levels to the user's phone ---------- */
 // ALERT: BUY 27420.25 · stop 27380, target 27500   (older form: ALERT: 27420 crossing up)
@@ -548,7 +548,7 @@ function dkMsgHTML(x, i, m) {
   return `<div class="qdkm a" data-i="${i}">${x.now ? `<p class="qnow">⚡ ${esc(x.now)}</p>` : ""}${x.busy && !body ? `<p class="dim qthink">${esc(DK.prog || "Thinking…")}</p>` : ""}${body ? coachMD(body) : ""}${x.busy && body && DK.prog ? `<p class="dim qthink">${esc(DK.prog)}</p>` : ""}${C ? dkCallHTML(C, m) : ""}${dkExtras(x, i)}${x.err ? `<p class="nwerr">${esc(x.err)}</p>` : ""}${!x.busy && body ? `<div class="qdka"><button class="chip qtsay" type="button">🔊 Listen</button></div>` : ""}</div>`;
 }
 function dkPaint(all) {
-  const b = $("#qdkB"); if (!b) return; const m = dkM(); if (!m) return; const L = dkMsgs(m.k); dkHead();
+  const b = $("#qdkB"); if (!b) return; const m = dkM(); if (!m) return; const L = dkMsgs(m.k); dkHead(); $$(".qdkh .qorb, .qsh .qorb").forEach(qcMount);
   const s = $("#qdkS"); if (s) { s.textContent = DK.busy ? "■" : "➤"; s.setAttribute("aria-label", DK.busy ? "Stop" : "Send"); }
   $("#qdkQ").hidden = DK.busy || DK.view !== "chat"; $("#qdkQ").innerHTML = dkChips(m);
   if (DK.view === "rec") { b.innerHTML = dkRecHTML(); return; }
@@ -609,7 +609,7 @@ async function dkSend(text, opt = {}) {
     const tools = !chat && DK.lim && DK.lim.tools && !DK.noTools ? dkTools(m, ctl.signal).slice(0, Math.max(1, DK.lim.tools.maxCount || 10)) : null;
     let r; try { r = await run(tools); } catch (e) { if (e && e.code === "tools_unavailable" && tools) { DK.noTools = true; A.t = ""; r = await run(null); } else throw e; }
     if (r && r.text) A.t = r.text; if (!A.t) throw { code: "empty_completion" };
-    const c = chat ? null : dkParse(A.t); if (c) A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id;
+    const c = chat ? null : dkParse(A.t); if (c) { A.c = dkLog(c, m, br.meta, opt.img ? "shot" : "dock").id; sfx(c.side > 0 ? "buy" : c.side < 0 ? "sell" : "flat", { hap: false }); }
   } catch (e) { const c = e && e.code; if (e && e.text) A.t = e.text; A.err = c === "cancelled" ? (A.t ? null : "Stopped.") : c === "not_ready" ? "Live data isn't connected, so Quint can't read the charts. Reload to reconnect." : c === "image_rejected" ? "Claude couldn't take that image. Try a smaller or clearer screenshot." : NW_ERR[c] || "Something went wrong reaching Quint. Try again in a moment."; }
   finally { A.busy = false; DK.busy = false; DK.ctl = null; DK.prog = ""; while (L.length > 24) L.shift(); save(); dkPaint(true); if (typeof vmAnswer === "function") vmAnswer(A.t ? A.t : A.err || "", m); }
 }
@@ -623,5 +623,5 @@ function dkVmPaint(V) {
   if (!V.on) { if (bar) bar.remove(); return; }
   if (!bar) { bar = document.createElement("div"); bar.id = "qdkVm"; bar.className = "vmbar"; f.parentNode.insertBefore(bar, f); }
   bar.className = "vmbar " + V.st; bar.innerHTML = `<span class="vmorb" aria-hidden="true"><i></i></span><span class="vmt" aria-live="polite">${esc(vmLabel(V))}</span><button type="button" class="chip vmx" aria-label="End voice mode">End</button>`;
-  bar.querySelector(".vmx").onclick = vmEnd;
+  bar.querySelector(".vmx").onclick = vmEnd; qcMount(bar.querySelector(".vmorb"));
 }

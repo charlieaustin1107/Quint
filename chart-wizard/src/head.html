@@ -1250,6 +1250,15 @@ h2, h3, h4, .hmsec > h2, .sec h3, .q .qk, .nav h6, .event .tag, .rsec h4, .kpi s
 .vmbar.listen .vmorb { animation-duration: 1s; } .vmbar.listen .vmorb i { animation: qcore .7s ease-in-out infinite; }
 .vmbar.speak .vmorb i { animation: qcore .45s ease-in-out infinite; } .vmbar.think .vmorb { animation-duration: 1.6s; }
 @media (prefers-reduced-motion: reduce) { .vmorb, .vmorb i, .qdkmic.live { animation: none !important; } }
+
+/* ---------- 3D Quint core + sound settings ---------- */
+.has3d { background: none !important; animation: none !important; box-shadow: none !important; } .has3d > s, .has3d > i { display: none !important; }
+canvas.qcore { position: absolute; left: -35%; top: -35%; width: 170%; height: 170%; pointer-events: none; }
+.vmorb.has3d { overflow: visible; }
+.fxset { display: flex; flex-direction: column; gap: 8px; }
+
+.vsteps { margin: 6px 0 8px; padding-left: 20px; display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; line-height: 1.45; } .vsteps b { color: var(--ink-hi); }
+#qvn p { margin: 0 0 6px; }
 </style>
 </head>
 <body>
