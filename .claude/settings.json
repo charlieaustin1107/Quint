@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "elementalsouls": {
+      "source": {
+        "source": "github",
+        "repo": "elementalsouls/Claude-BugHunter"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "claude-bughunter@elementalsouls": true
+  }
+}
