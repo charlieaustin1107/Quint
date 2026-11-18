@@ -20,6 +20,7 @@
 
 1. The owner gets their Windows computer ready using `SETUP.md` (install NinjaTrader 8, turn on multi-provider mode, connect LucidDaily and check Sim101).
 2. Optional but recommended, before paying for Fable: the cheap one-week proof in `proof/README.md`.
+   Also optional: the bot lab in `botlab/README.md`, with 12 test bots for Strategy Analyzer and Sim101. Run all 12 at once with an optimisation over "Bot".
 3. Start phase 1: paste the master prompt and the phase 1 prompt from `FABLE-PROMPTS.md`.
 
 ## How to resume after an interruption
@@ -59,6 +60,7 @@ Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ co
 - `backtest/pillar_2r.js` and its results are untracked on a separate branch idea (5-pillar fixed-2R test); they are not part of Quint Control.
 - NinjaTrader's "CME US Index Futures RTH" template ends at 16:00 Chicago (17:00 New York), not 16:00 New York. Bots must work out New York time from each bar's time, as `proof/QuintNoiseMomentum.cs` does (NinjaTrader's time zone is `NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo`).
 - The proof strategy's class is `QuintNoiseMomentum`, and the owner copies it into `bin\Custom\Strategies` by hand. Give phase 3's Strategy Analyzer wrapper a different class name, or ask the owner to delete the proof file first, or NinjaTrader won't compile.
+- `botlab/QuintBotLab.cs` hasn't been compiled either (no compiler in the cloud). It holds the same rules as `botlab/botlab.js`; check they still match after any change (a test compares the bot names, candles and trade limits).
 - YouTube pages can't be read from the cloud workspace (rate limited). Ask the owner for titles, screenshots or transcripts.
 - Lucid's microscalping rule (help center, updated 26 Aug 2026): flagged when more than 50% of profits come from trades held 5 seconds or less. The guardian's 30-second minimum hold is stricter than this, on purpose.
 
@@ -71,3 +73,4 @@ Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ co
 | 2026-11-18 | Opus 5.5 | Owner decided one bot per account (no bots sharing an account); added to the plan, phase 2 prompt and scenarios, skill and protocol notes. |
 | 2026-11-18 | Opus 5.5 | Added rules for several bots on one account (replaced by one bot per account, the row above). |
 | 2026-11-18 | Opus 5.5 | Checked the LucidDaily numbers on Lucid's help center and updated the preset, its schema, the plan and 2 new tests (41 pass). Wrote the one-week proof (`proof/`): the NinjaScript strategy, its JavaScript version with 5 tests (46 tests now, three clean runs), the owner's steps and pass rules, and a first read on the saved candles (11 weeks: +$1,456 on 1 MNQ, but only +$31 in the second half; too short to judge; corrected after finding the CSV volume bug). Not tested: the C# (no compiler in the cloud), so the owner's F5 is its first compile. Looked at the Strat v60 dashboard the owner sent and added it to the plan's "left out" table. |
+| 2026-11-18 | Opus 5.5 | Bot lab (`botlab/`): 12 MNQ test bots with fixed rules from the owner's videos (Daxton's inverted fair value gap, the range-breakout bot, Strat v60), Phantom's entry styles (fades, failed breakouts, trend joins) and the plan's bots. Built as a JavaScript reference (10 new tests, 57 in all, three clean runs) and one NinjaScript strategy locked to Sim, Playback and Strategy Analyzer. Fixed a CSV bug: Windows line endings hid the volume column, so VWAP was wrong in the proof's first read (corrected in pull request #14). |
