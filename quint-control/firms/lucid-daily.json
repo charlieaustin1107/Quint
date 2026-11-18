@@ -3,79 +3,102 @@
   "firm": "Lucid Trading",
   "plan": "LucidDaily",
   "lastChecked": "2026-11-18",
-  "about": "Rules the guardian enforces on LucidDaily accounts. Every number can be changed in Settings. Lucid's help center is the source of truth: check it whenever Lucid announces a change, and update lastChecked.",
-  "sources": [
-    "https://intercom.help/lucid-trading/en/articles/11404614-lucid-trading-supported-platforms",
-    "https://damnpropfirms.com/account-plans/lucid-trading-daily-50000/",
-    "https://blog.traderspost.io/article/lucid-trading-review-2025",
-    "https://crosstrade.io/docs/getting-started/prop-firm-connection-guide",
-    "https://crosstrade.io/learn/prop-firm-ai-trading/lucid-trading"
-  ],
+  "about": "Rules the guardian enforces on LucidDaily accounts. Every number can be changed in Settings. Lucid's help center (the support.lucidtrading.com links) is the source of truth: check it whenever Lucid announces a change, and update lastChecked. The 50K numbers were checked against it on 2026-11-18.",
+  "sources": ["https://support.lucidtrading.com/en/articles/15996664-luciddaily-evaluation", "https://support.lucidtrading.com/en/articles/15997244-luciddaily-funded-account", "https://support.lucidtrading.com/en/articles/15998425-luciddaily-drawdown", "https://support.lucidtrading.com/en/articles/16085900-luciddaily-daily-loss-limit", "https://support.lucidtrading.com/en/articles/16033858-luciddaily-customization", "https://support.lucidtrading.com/en/articles/15998336-luciddaily-consistency", "https://support.lucidtrading.com/en/articles/11404617", "https://intercom.help/lucid-trading/en/articles/11404614-lucid-trading-supported-platforms", "https://blog.traderspost.io/article/how-to-get-funded-with-lucid-trading", "https://crosstrade.io/docs/getting-started/prop-firm-connection-guide", "https://crosstrade.io/learn/prop-firm-ai-trading/lucid-trading"],
   "connection": {
-    "platform": "NinjaTrader 8",
-    "route": "Tradovate",
-    "ntConnectionType": "NinjaTrader",
-    "ntAccountType": "Simulation",
-    "severalAtOnce": true,
-    "notes": "Sign in at trader.tradovate.com with the Lucid login first and finish the one-time CME market data certification. Then in NinjaTrader add one 'NinjaTrader' connection per Lucid login."
-  },
-  "costs": {
-    "commissionPerSide": { "MNQ": 0.5 },
-    "slippageTicksPerSide": 1
-  },
+                  "platform": "NinjaTrader 8",
+                  "route": "Tradovate",
+                  "ntConnectionType": "NinjaTrader",
+                  "ntAccountType": "Simulation",
+                  "severalAtOnce": true,
+                  "notes": "Sign in at trader.tradovate.com with the Lucid login first and finish the one-time CME market data certification. Then in NinjaTrader add one 'NinjaTrader' connection per Lucid login."
+                },
+  "costs": { "commissionPerSide": { "MNQ": 0.5 }, "slippageTicksPerSide": 1 },
   "sizes": [
-    {
-      "size": 50000,
-      "profitTarget": 3000,
-      "maxLossLimit": 2000,
-      "drawdownEvaluation": "choice",
-      "drawdownFunded": "intradayTrailing",
-      "dailyLossLimit": null,
-      "maxMicros": 40
-    }
-  ],
+             {
+               "size": 25000,
+               "profitTarget": 1250,
+               "maxLossLimit": 1000,
+               "initialTrailBalance": 26100,
+               "lockedMllBalance": 25100,
+               "drawdownEvaluation": "choice",
+               "drawdownFunded": "intradayTrailing",
+               "dailyLossLimit": 600,
+               "dailyLossLimitOptional": true,
+               "maxMicros": 20,
+               "maxMinis": 2
+             },
+             {
+               "size": 50000,
+               "profitTarget": 3000,
+               "maxLossLimit": 2000,
+               "initialTrailBalance": 52100,
+               "lockedMllBalance": 50100,
+               "drawdownEvaluation": "choice",
+               "drawdownFunded": "intradayTrailing",
+               "dailyLossLimit": 1200,
+               "dailyLossLimitOptional": true,
+               "maxMicros": 40,
+               "maxMinis": 4
+             },
+             {
+               "size": 100000,
+               "profitTarget": 6000,
+               "maxLossLimit": 3000,
+               "initialTrailBalance": 103100,
+               "lockedMllBalance": 100100,
+               "drawdownEvaluation": "choice",
+               "drawdownFunded": "intradayTrailing",
+               "dailyLossLimit": 1800,
+               "dailyLossLimitOptional": true,
+               "maxMicros": 60,
+               "maxMinis": 6
+             },
+             {
+               "size": 150000,
+               "profitTarget": 9000,
+               "maxLossLimit": 4500,
+               "initialTrailBalance": 154600,
+               "lockedMllBalance": 150100,
+               "drawdownEvaluation": "choice",
+               "drawdownFunded": "intradayTrailing",
+               "dailyLossLimit": 2700,
+               "dailyLossLimitOptional": true,
+               "maxMicros": 100,
+               "maxMinis": 10
+             }
+           ],
   "rules": {
-    "botsAllowed": true,
-    "copyTradingAllowed": true,
-    "ownNameOnly": true,
-    "maxFundedAccounts": 5,
-    "news": {
-      "redFolder": "hardBreach",
-      "flatMinutesBefore": 2,
-      "flatMinutesAfter": 2,
-      "blockNewEntries": true,
-      "penalty": "Trading through a red-folder release is a hard breach on LucidDaily (reported: no on-demand payout for 30 days)."
-    },
-    "hedging": {
-      "allowed": false,
-      "acrossAccounts": true,
-      "correlatedGroups": [["NQ", "MNQ", "ES", "MES", "YM", "MYM", "RTY", "M2K"]]
-    },
-    "microscalping": {
-      "shortTradeSeconds": 5,
-      "maxShareOfProfitFromShortTrades": 0.5,
-      "minHoldSeconds": 30
-    },
-    "hft": {
-      "maxOrdersPerMinutePerAccount": 6
-    },
-    "sizing": {
-      "maxStopOutShareOfRoom": 0.25
-    }
-  },
-  "verify": [
-    "sizes[0].profitTarget",
-    "sizes[0].dailyLossLimit",
-    "sizes[0].maxMicros",
-    "rules.maxFundedAccounts",
-    "rules.news.penalty"
-  ],
-  "quintDefaults": [
-    "rules.news.flatMinutesBefore",
-    "rules.news.flatMinutesAfter",
-    "rules.microscalping.minHoldSeconds",
-    "rules.hft.maxOrdersPerMinutePerAccount",
-    "rules.sizing.maxStopOutShareOfRoom",
-    "costs.slippageTicksPerSide"
-  ]
+             "botsAllowed": true,
+             "copyTradingAllowed": true,
+             "ownNameOnly": true,
+             "maxFundedAccounts": 5,
+             "maxEvaluationAccounts": 10,
+             "maxAccountsTotal": 10,
+             "news": {
+                       "redFolder": "hardBreach",
+                       "scope": "High-impact USD releases (red folder) only.",
+                       "firmFlatMinutesBefore": 1,
+                       "firmFlatMinutesAfter": 1,
+                       "flatMinutesBefore": 2,
+                       "flatMinutesAfter": 2,
+                       "blockNewEntries": true,
+                       "penalty": "On a LucidDaily funded account, trading through a high-impact USD release is a hard breach: the account is lost. Lucid's evaluation page doesn't mention news, so Quint applies the same rule to evaluations."
+                     },
+             "hedging": { "allowed": false, "acrossAccounts": true, "correlatedGroups": [["NQ", "MNQ", "ES", "MES", "YM", "MYM", "RTY", "M2K"]] },
+             "microscalping": { "shortTradeSeconds": 5, "maxShareOfProfitFromShortTrades": 0.5, "minHoldSeconds": 30 },
+             "hft": { "maxOrdersPerMinutePerAccount": 6 },
+             "sizing": { "maxStopOutShareOfRoom": 0.25 },
+             "dailyLoss": { "kind": "fixed", "breach": "soft", "resumes": "nextSession", "quintCountsOpenPnl": true },
+             "consistency": {
+                              "evaluation": 0.4,
+                              "evaluationOptions": [0.3, 0.4, 0.5],
+                              "funded": null,
+                              "formula": "Largest single-day profit divided by total profit, at or below the limit to pass.",
+                              "notes": "40% is the standard choice. 50% is an add-on that can't be combined with an end-of-day funded drawdown; 30% is an add-on with end-of-day drawdown in both stages. Lucid's evaluation page (31 Jul 2026) still says 50%, so check the account's own setting."
+                            },
+             "checkoutChoices": ["Daily loss limit: on or off (on is cheaper)", "Evaluation drawdown: end of day or intraday (intraday is cheaper)", "Funded drawdown: intraday, or end of day if the evaluation used end of day", "Consistency: 40% standard, or the 50% or 30% add-ons"]
+           },
+  "verify": ["sizes[0].dailyLossLimit", "sizes[2].dailyLossLimit", "sizes[3].dailyLossLimit", "rules.consistency.evaluation"],
+  "quintDefaults": ["rules.news.flatMinutesBefore", "rules.news.flatMinutesAfter", "rules.microscalping.minHoldSeconds", "rules.hft.maxOrdersPerMinutePerAccount", "rules.sizing.maxStopOutShareOfRoom", "costs.slippageTicksPerSide", "rules.dailyLoss.quintCountsOpenPnl"]
 }

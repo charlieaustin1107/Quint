@@ -77,4 +77,33 @@ test('LucidDaily matches the decisions the owner made', () => {
   assert.equal(l.rules.sizing.maxStopOutShareOfRoom, 0.25);
 });
 
+test('every preset keeps Quint\'s news margin at least as wide as the firm\'s own', () => {
+  for (const f of presets) {
+    const n = JSON.parse(fs.readFileSync(path.join(FIRMS, f), 'utf8')).rules.news;
+    if (n.firmFlatMinutesBefore !== undefined) assert.ok(n.flatMinutesBefore >= n.firmFlatMinutesBefore, f);
+    if (n.firmFlatMinutesAfter !== undefined) assert.ok(n.flatMinutesAfter >= n.firmFlatMinutesAfter, f);
+  }
+});
+
+test('LucidDaily 50K matches Lucid\'s help center (checked 2026-11-18)', () => {
+  const l = JSON.parse(fs.readFileSync(path.join(FIRMS, 'lucid-daily.json'), 'utf8'));
+  const fifty = l.sizes.find((s) => s.size === 50000);
+  assert.equal(fifty.profitTarget, 3000);
+  assert.equal(fifty.maxLossLimit, 2000);
+  assert.equal(fifty.initialTrailBalance, 52100, 'the max loss stops trailing here');
+  assert.equal(fifty.lockedMllBalance, 50100, 'and locks here');
+  assert.equal(fifty.dailyLossLimit, 1200);
+  assert.equal(fifty.dailyLossLimitOptional, true, 'the daily loss limit is chosen at checkout');
+  assert.equal(fifty.maxMicros, 40);
+  assert.equal(fifty.maxMinis, 4);
+  assert.equal(l.rules.dailyLoss.breach, 'soft', 'hitting it pauses trading until the next session');
+  assert.equal(l.rules.maxFundedAccounts, 5);
+  assert.equal(l.rules.maxAccountsTotal, 10);
+  assert.equal(l.rules.news.firmFlatMinutesBefore, 1);
+  assert.equal(l.rules.news.firmFlatMinutesAfter, 1);
+  assert.equal(l.rules.consistency.funded, null, 'no consistency rule once funded');
+  assert.ok(l.rules.consistency.evaluationOptions.includes(l.rules.consistency.evaluation));
+  for (const s of l.sizes) assert.ok(s.lockedMllBalance === s.size + 100 && s.initialTrailBalance === s.size + s.maxLossLimit + 100, s.size + ': trail and lock balances');
+});
+
 module.exports = { getPath };

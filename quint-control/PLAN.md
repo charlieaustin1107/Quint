@@ -57,6 +57,15 @@ A 50K account allows up to 4 minis or 40 micros ([daytradingz](https://daytradin
 
 **Your plan, LucidDaily:** the max loss is $2,000 on a 50K account, the same as Flex and Pro ([LuxAlgo](https://www.luxalgo.com/prop-firms/lucid-trading/)). Its funded drawdown reportedly trails during the day rather than only at the close ([PropTradingVibes](https://proptradingvibes.com/blog/lucid-trading-lucidmaxx)), so the guardian measures room from the day's highest balance, open trades included. Red-folder news is a hard breach, and an account with a news violation can't take on-demand payouts for 30 days ([Lucid help center](https://intercom.help/lucid-trading/en/articles/11404728-other-trading-activities)). Check your plan page for the exact figures.
 
+**Checked on Lucid's own help center (18 Nov 2026), 50K LucidDaily:**
+- **Profit target** $3,000 and **max loss** $2,000. The max loss trails until the balance reaches $52,100, then locks at $50,100 ([drawdown](https://support.lucidtrading.com/en/articles/15998425-luciddaily-drawdown)).
+- **Size** up to 4 minis or 40 micros, in the evaluation and once funded ([evaluation](https://support.lucidtrading.com/en/articles/15996664-luciddaily-evaluation)).
+- **Drawdown type** is chosen at checkout for the evaluation: end of day or intraday. Funded accounts use intraday as standard, and can only be end of day if the evaluation was ([customization](https://support.lucidtrading.com/en/articles/16033858-luciddaily-customization)).
+- **Daily loss limit** is your choice at checkout. If it's on, it's a fixed $1,200 that doesn't trail. Hitting it is a soft breach: no more trades until the next session ([daily loss limit](https://support.lucidtrading.com/en/articles/16085900-luciddaily-daily-loss-limit)).
+- **Consistency** applies only in the evaluation: your best day divided by your total profit. 40% is standard, with 50% and 30% add-ons. Lucid's evaluation page still says 50%, so check your own account ([consistency](https://support.lucidtrading.com/en/articles/15998336-luciddaily-consistency)).
+- **News:** on a funded account, trading a high-impact USD release is a hard breach, so the account is lost. You must be flat from 1 minute before to 1 minute after ([funded account](https://support.lucidtrading.com/en/articles/15997244-luciddaily-funded-account)). Quint stays flat for 2 minutes either side, and does the same in evaluations.
+- **Accounts:** up to 5 funded and 10 evaluation accounts per household, with no more than 10 in total ([maximum number of accounts](https://support.lucidtrading.com/en/articles/11404617)).
+
 **What you can trade:** 36 CME Group contracts ([Lucid's approved products](https://support.lucidtrading.com/en/articles/11508978-approved-products-and-commissions)):
 
 - **Stock indexes:** ES, MES, NQ, MNQ, RTY, M2K, YM, MYM, NKD
