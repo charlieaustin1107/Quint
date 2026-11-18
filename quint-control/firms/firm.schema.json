@@ -7,118 +7,206 @@
   "additionalProperties": false,
   "required": ["id", "firm", "plan", "lastChecked", "about", "sources", "connection", "costs", "sizes", "rules", "verify", "quintDefaults"],
   "properties": {
-    "id": { "type": "string", "pattern": "^[a-z0-9-]{1,48}$" },
-    "firm": { "type": "string", "minLength": 1, "maxLength": 60 },
-    "plan": { "type": "string", "minLength": 1, "maxLength": 60 },
-    "lastChecked": { "type": "string", "format": "date" },
-    "about": { "type": "string", "maxLength": 1000 },
-    "sources": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^https://" } },
-    "connection": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["platform", "route", "ntConnectionType", "ntAccountType", "severalAtOnce", "notes"],
-      "properties": {
-        "platform": { "type": "string" },
-        "route": { "enum": ["Tradovate", "Rithmic", "CQG", "Other"] },
-        "ntConnectionType": { "type": "string" },
-        "ntAccountType": { "enum": ["Simulation", "Live"] },
-        "severalAtOnce": { "type": "boolean", "description": "False for Rithmic: NinjaTrader allows one Rithmic connection at a time." },
-        "notes": { "type": "string", "maxLength": 1000 }
-      }
-    },
-    "costs": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["commissionPerSide", "slippageTicksPerSide"],
-      "properties": {
-        "commissionPerSide": {
-          "type": "object",
-          "additionalProperties": { "type": "number", "minimum": 0, "maximum": 20 }
-        },
-        "slippageTicksPerSide": { "type": "number", "minimum": 0, "maximum": 10 }
-      }
-    },
-    "sizes": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["size", "profitTarget", "maxLossLimit", "drawdownEvaluation", "drawdownFunded", "dailyLossLimit", "maxMicros"],
-        "properties": {
-          "size": { "type": "integer", "minimum": 1000 },
-          "profitTarget": { "type": ["number", "null"], "minimum": 0 },
-          "maxLossLimit": { "type": "number", "exclusiveMinimum": 0 },
-          "drawdownEvaluation": { "enum": ["endOfDayTrailing", "intradayTrailing", "static", "choice"] },
-          "drawdownFunded": { "enum": ["endOfDayTrailing", "intradayTrailing", "static", "choice"] },
-          "dailyLossLimit": { "type": ["number", "null"], "minimum": 0 },
-          "maxMicros": { "type": "integer", "minimum": 1 }
-        }
-      }
-    },
-    "rules": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["botsAllowed", "copyTradingAllowed", "ownNameOnly", "maxFundedAccounts", "news", "hedging", "microscalping", "hft", "sizing"],
-      "properties": {
-        "botsAllowed": { "type": "boolean" },
-        "copyTradingAllowed": { "type": "boolean" },
-        "ownNameOnly": { "type": "boolean" },
-        "maxFundedAccounts": { "type": ["integer", "null"], "minimum": 1 },
-        "news": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["redFolder", "flatMinutesBefore", "flatMinutesAfter", "blockNewEntries", "penalty"],
-          "properties": {
-            "redFolder": { "enum": ["hardBreach", "noEntries", "allowed"] },
-            "flatMinutesBefore": { "type": "number", "minimum": 0, "maximum": 60 },
-            "flatMinutesAfter": { "type": "number", "minimum": 0, "maximum": 60 },
-            "blockNewEntries": { "type": "boolean" },
-            "penalty": { "type": "string", "maxLength": 500 }
-          }
-        },
-        "hedging": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["allowed", "acrossAccounts", "correlatedGroups"],
-          "properties": {
-            "allowed": { "type": "boolean" },
-            "acrossAccounts": { "type": "boolean" },
-            "correlatedGroups": {
-              "type": "array",
-              "items": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "type": "string", "pattern": "^[A-Z0-9]{1,6}$" } }
-            }
-          }
-        },
-        "microscalping": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["shortTradeSeconds", "maxShareOfProfitFromShortTrades", "minHoldSeconds"],
-          "properties": {
-            "shortTradeSeconds": { "type": "number", "minimum": 0 },
-            "maxShareOfProfitFromShortTrades": { "type": "number", "minimum": 0, "maximum": 1 },
-            "minHoldSeconds": { "type": "number", "minimum": 0, "maximum": 3600 }
-          }
-        },
-        "hft": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["maxOrdersPerMinutePerAccount"],
-          "properties": {
-            "maxOrdersPerMinutePerAccount": { "type": "integer", "minimum": 1, "maximum": 120 }
-          }
-        },
-        "sizing": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["maxStopOutShareOfRoom"],
-          "properties": {
-            "maxStopOutShareOfRoom": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
-          }
-        }
-      }
-    },
-    "verify": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
-    "quintDefaults": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
-  }
+                  "id": { "type": "string", "pattern": "^[a-z0-9-]{1,48}$" },
+                  "firm": { "type": "string", "minLength": 1, "maxLength": 60 },
+                  "plan": { "type": "string", "minLength": 1, "maxLength": 60 },
+                  "lastChecked": { "type": "string", "format": "date" },
+                  "about": { "type": "string", "maxLength": 1000 },
+                  "sources": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^https://" } },
+                  "connection": {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": ["platform", "route", "ntConnectionType", "ntAccountType", "severalAtOnce", "notes"],
+                                  "properties": {
+                                                  "platform": { "type": "string" },
+                                                  "route": { "enum": ["Tradovate", "Rithmic", "CQG", "Other"] },
+                                                  "ntConnectionType": { "type": "string" },
+                                                  "ntAccountType": { "enum": ["Simulation", "Live"] },
+                                                  "severalAtOnce": {
+                                                                     "type": "boolean",
+                                                                     "description": "False for Rithmic: NinjaTrader allows one Rithmic connection at a time."
+                                                                   },
+                                                  "notes": { "type": "string", "maxLength": 1000 }
+                                                }
+                                },
+                  "costs": {
+                             "type": "object",
+                             "additionalProperties": false,
+                             "required": ["commissionPerSide", "slippageTicksPerSide"],
+                             "properties": {
+                                             "commissionPerSide": {
+                                                                    "type": "object",
+                                                                    "additionalProperties": { "type": "number", "minimum": 0, "maximum": 20 }
+                                                                  },
+                                             "slippageTicksPerSide": { "type": "number", "minimum": 0, "maximum": 10 }
+                                           }
+                           },
+                  "sizes": {
+                             "type": "array",
+                             "minItems": 1,
+                             "items": {
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "required": ["size", "profitTarget", "maxLossLimit", "drawdownEvaluation", "drawdownFunded", "dailyLossLimit", "maxMicros"],
+                                        "properties": {
+                                                        "size": { "type": "integer", "minimum": 1000 },
+                                                        "profitTarget": { "type": ["number", "null"], "minimum": 0 },
+                                                        "maxLossLimit": { "type": "number", "exclusiveMinimum": 0 },
+                                                        "drawdownEvaluation": { "enum": ["endOfDayTrailing", "intradayTrailing", "static", "choice"] },
+                                                        "drawdownFunded": { "enum": ["endOfDayTrailing", "intradayTrailing", "static", "choice"] },
+                                                        "dailyLossLimit": { "type": ["number", "null"], "minimum": 0 },
+                                                        "maxMicros": { "type": "integer", "minimum": 1 },
+                                                        "maxMinis": { "type": "integer", "minimum": 1 },
+                                                        "initialTrailBalance": {
+                                                                                 "type": "number",
+                                                                                 "description": "Balance at which a trailing max loss stops moving."
+                                                                               },
+                                                        "lockedMllBalance": {
+                                                                              "type": "number",
+                                                                              "description": "Where the max loss level locks once the trail balance is reached."
+                                                                            },
+                                                        "dailyLossLimitOptional": {
+                                                                                    "type": "boolean",
+                                                                                    "description": "True when the trader turns the daily loss limit on or off at checkout; dailyLossLimit is then the amount when it's on."
+                                                                                  }
+                                                      }
+                                      }
+                           },
+                  "rules": {
+                             "type": "object",
+                             "additionalProperties": false,
+                             "required": ["botsAllowed", "copyTradingAllowed", "ownNameOnly", "maxFundedAccounts", "news", "hedging", "microscalping", "hft", "sizing"],
+                             "properties": {
+                                             "botsAllowed": { "type": "boolean" },
+                                             "copyTradingAllowed": { "type": "boolean" },
+                                             "ownNameOnly": { "type": "boolean" },
+                                             "maxFundedAccounts": { "type": ["integer", "null"], "minimum": 1 },
+                                             "news": {
+                                                       "type": "object",
+                                                       "additionalProperties": false,
+                                                       "required": ["redFolder", "flatMinutesBefore", "flatMinutesAfter", "blockNewEntries", "penalty"],
+                                                       "properties": {
+                                                                       "redFolder": { "enum": ["hardBreach", "noEntries", "allowed"] },
+                                                                       "flatMinutesBefore": { "type": "number", "minimum": 0, "maximum": 60 },
+                                                                       "flatMinutesAfter": { "type": "number", "minimum": 0, "maximum": 60 },
+                                                                       "blockNewEntries": { "type": "boolean" },
+                                                                       "penalty": { "type": "string", "maxLength": 500 },
+                                                                       "firmFlatMinutesBefore": {
+                                                                                                  "type": "number",
+                                                                                                  "minimum": 0,
+                                                                                                  "maximum": 60,
+                                                                                                  "description": "The firm's own requirement; flatMinutesBefore is Quint's (wider) margin."
+                                                                                                },
+                                                                       "firmFlatMinutesAfter": { "type": "number", "minimum": 0, "maximum": 60 },
+                                                                       "scope": { "type": "string", "maxLength": 300 }
+                                                                     }
+                                                     },
+                                             "hedging": {
+                                                          "type": "object",
+                                                          "additionalProperties": false,
+                                                          "required": ["allowed", "acrossAccounts", "correlatedGroups"],
+                                                          "properties": {
+                                                                          "allowed": { "type": "boolean" },
+                                                                          "acrossAccounts": { "type": "boolean" },
+                                                                          "correlatedGroups": {
+                                                                                                "type": "array",
+                                                                                                "items": {
+                                                                                                           "type": "array",
+                                                                                                           "minItems": 2,
+                                                                                                           "uniqueItems": true,
+                                                                                                           "items": {
+                                                                                                                      "type": "string",
+                                                                                                                      "pattern": "^[A-Z0-9]{1,6}$"
+                                                                                                                    }
+                                                                                                         }
+                                                                                              }
+                                                                        }
+                                                        },
+                                             "microscalping": {
+                                                                "type": "object",
+                                                                "additionalProperties": false,
+                                                                "required": ["shortTradeSeconds", "maxShareOfProfitFromShortTrades", "minHoldSeconds"],
+                                                                "properties": {
+                                                                                "shortTradeSeconds": { "type": "number", "minimum": 0 },
+                                                                                "maxShareOfProfitFromShortTrades": {
+                                                                                                                     "type": "number",
+                                                                                                                     "minimum": 0,
+                                                                                                                     "maximum": 1
+                                                                                                                   },
+                                                                                "minHoldSeconds": { "type": "number", "minimum": 0, "maximum": 3600 }
+                                                                              }
+                                                              },
+                                             "hft": {
+                                                      "type": "object",
+                                                      "additionalProperties": false,
+                                                      "required": ["maxOrdersPerMinutePerAccount"],
+                                                      "properties": {
+                                                                      "maxOrdersPerMinutePerAccount": {
+                                                                                                        "type": "integer",
+                                                                                                        "minimum": 1,
+                                                                                                        "maximum": 120
+                                                                                                      }
+                                                                    }
+                                                    },
+                                             "sizing": {
+                                                         "type": "object",
+                                                         "additionalProperties": false,
+                                                         "required": ["maxStopOutShareOfRoom"],
+                                                         "properties": {
+                                                                         "maxStopOutShareOfRoom": {
+                                                                                                    "type": "number",
+                                                                                                    "exclusiveMinimum": 0,
+                                                                                                    "maximum": 1
+                                                                                                  }
+                                                                       }
+                                                       },
+                                             "maxEvaluationAccounts": { "type": ["integer", "null"], "minimum": 1 },
+                                             "maxAccountsTotal": {
+                                                                   "type": ["integer", "null"],
+                                                                   "minimum": 1,
+                                                                   "description": "Evaluation and funded accounts together."
+                                                                 },
+                                             "dailyLoss": {
+                                                            "type": "object",
+                                                            "additionalProperties": false,
+                                                            "required": ["kind", "breach", "resumes"],
+                                                            "properties": {
+                                                                            "kind": { "enum": ["fixed", "trailing"] },
+                                                                            "breach": { "enum": ["soft", "hard"] },
+                                                                            "resumes": { "enum": ["nextSession", "never"] },
+                                                                            "quintCountsOpenPnl": {
+                                                                                                    "type": "boolean",
+                                                                                                    "description": "Quint's safe assumption when the firm doesn't say whether open trades count."
+                                                                                                  }
+                                                                          }
+                                                          },
+                                             "consistency": {
+                                                              "type": "object",
+                                                              "additionalProperties": false,
+                                                              "required": ["evaluation", "funded", "formula"],
+                                                              "properties": {
+                                                                              "evaluation": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+                                                                              "evaluationOptions": {
+                                                                                                     "type": "array",
+                                                                                                     "items": {
+                                                                                                                "type": "number",
+                                                                                                                "minimum": 0,
+                                                                                                                "maximum": 1
+                                                                                                              }
+                                                                                                   },
+                                                                              "funded": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+                                                                              "formula": { "type": "string", "maxLength": 300 },
+                                                                              "notes": { "type": "string", "maxLength": 500 }
+                                                                            }
+                                                            },
+                                             "checkoutChoices": {
+                                                                  "type": "array",
+                                                                  "items": { "type": "string", "maxLength": 200 },
+                                                                  "description": "Settings chosen when the account is bought; the owner's own picks go in their account settings."
+                                                                }
+                                           }
+                           },
+                  "verify": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+                  "quintDefaults": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+                }
 }

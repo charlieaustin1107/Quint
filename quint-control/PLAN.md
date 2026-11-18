@@ -57,6 +57,15 @@ A 50K account allows up to 4 minis or 40 micros ([daytradingz](https://daytradin
 
 **Your plan, LucidDaily:** the max loss is $2,000 on a 50K account, the same as Flex and Pro ([LuxAlgo](https://www.luxalgo.com/prop-firms/lucid-trading/)). Its funded drawdown reportedly trails during the day rather than only at the close ([PropTradingVibes](https://proptradingvibes.com/blog/lucid-trading-lucidmaxx)), so the guardian measures room from the day's highest balance, open trades included. Red-folder news is a hard breach, and an account with a news violation can't take on-demand payouts for 30 days ([Lucid help center](https://intercom.help/lucid-trading/en/articles/11404728-other-trading-activities)). Check your plan page for the exact figures.
 
+**Checked on Lucid's own help center (18 Nov 2026), 50K LucidDaily:**
+- **Profit target** $3,000 and **max loss** $2,000. The max loss trails until the balance reaches $52,100, then locks at $50,100 ([drawdown](https://support.lucidtrading.com/en/articles/15998425-luciddaily-drawdown)).
+- **Size** up to 4 minis or 40 micros, in the evaluation and once funded ([evaluation](https://support.lucidtrading.com/en/articles/15996664-luciddaily-evaluation)).
+- **Drawdown type** is chosen at checkout for the evaluation: end of day or intraday. Funded accounts use intraday as standard, and can only be end of day if the evaluation was ([customization](https://support.lucidtrading.com/en/articles/16033858-luciddaily-customization)).
+- **Daily loss limit** is your choice at checkout. If it's on, it's a fixed $1,200 that doesn't trail. Hitting it is a soft breach: no more trades until the next session ([daily loss limit](https://support.lucidtrading.com/en/articles/16085900-luciddaily-daily-loss-limit)).
+- **Consistency** applies only in the evaluation: your best day divided by your total profit. 40% is standard, with 50% and 30% add-ons. Lucid's evaluation page still says 50%, so check your own account ([consistency](https://support.lucidtrading.com/en/articles/15998336-luciddaily-consistency)).
+- **News:** on a funded account, trading a high-impact USD release is a hard breach, so the account is lost. You must be flat from 1 minute before to 1 minute after ([funded account](https://support.lucidtrading.com/en/articles/15997244-luciddaily-funded-account)). Quint stays flat for 2 minutes either side, and does the same in evaluations.
+- **Accounts:** up to 5 funded and 10 evaluation accounts per household, with no more than 10 in total ([maximum number of accounts](https://support.lucidtrading.com/en/articles/11404617)).
+
 **What you can trade:** 36 CME Group contracts ([Lucid's approved products](https://support.lucidtrading.com/en/articles/11508978-approved-products-and-commissions)):
 
 - **Stock indexes:** ES, MES, NQ, MNQ, RTY, M2K, YM, MYM, NKD
@@ -142,6 +151,8 @@ Only two automated strategies have strong, independent evidence of beating costs
 | Long-term trend following | The best evidence of all: trend profits in every one of 58 futures ([AQR](https://www.aqr.com/Insights/Datasets/Time-Series-Momentum-Original-Paper-Data)). But it holds for weeks or months with deep drawdowns, which trailing-drawdown prop accounts punish. A personal-account idea for later |
 | Opening range breakout on "stocks in play" | Over 1,600% after costs with a Sharpe of 2.81 on the top 20 stocks from 2016 to 2023 ([Concretum paper](https://alexandria.unisg.ch/handle/20.500.14171/122125)). But it needs a stock broker, not a futures prop firm, so it's a later add-on |
 | Commercial bots such as Phantom | Results are seller-provided and not audited |
+| Strat v60 (an MNQ scalping bot shown as a [public dashboard](https://milgar7969.github.io/strat-v60-dashboard/), looked at 18 Nov 2026) | Its rules are secret (only trigger codes like LC13), so it can't be built or backtested. The record is 58 days of paper trading, its settings changed 7 times during those days, and $354 of losses were added back. It wins small and loses big (average win $16, average loss $53), so it needs about 76% winners to break even; it had 82%. In its favour: in its last 200 trades only 11% of the winning profit came from trades held 5 seconds or less (Lucid flags over 50%), and its worst day was −$408 |
+| Trading-bot videos on YouTube (sent 18 Nov 2026) | The titles and screenshots showed no rules or trade logs to test, and screenshots of profits aren't evidence. Get the rules first, then test them here with Lucid's costs |
 
 **The reality check:** among people in Brazil's equity futures market who day traded for more than 300 days, 97% lost money ([Chague, De-Losso & Giovannetti](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3423101)). That's why every bot starts in Testing, whoever wrote it.
 
