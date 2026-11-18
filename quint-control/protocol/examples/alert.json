@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "type": "alert",
+  "seq": 12,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "id": "a-20261118-0003",
+    "time": "2026-11-18T14:35:02.120Z",
+    "severity": "warn",
+    "title": "News in 10 minutes",
+    "text": "Red-folder release at 15:00 UK / 10:00 New York. New entries stop at 14:58 UK.",
+    "account": null,
+    "botId": null,
+    "channels": [
+      "dashboard",
+      "telegram"
+    ],
+    "ack": false
+  }
+}

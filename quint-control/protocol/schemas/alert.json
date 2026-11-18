@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "alert.json",
+  "title": "Alert",
+  "description": "Something the owner should know about. Critical alerts also go to the phone. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "alert"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "time": {
+          "$ref": "common.json#/$defs/ts"
+        },
+        "severity": {
+          "$ref": "common.json#/$defs/severity"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "account": {
+          "$ref": "common.json#/$defs/nullableAccount"
+        },
+        "botId": {
+          "$ref": "common.json#/$defs/nullableBotId"
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "dashboard",
+              "sound",
+              "telegram",
+              "healthchecks"
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "ack": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "time",
+        "severity",
+        "title",
+        "text",
+        "account",
+        "botId",
+        "channels",
+        "ack"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

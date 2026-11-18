@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "command_result.json",
+  "title": "Command result",
+  "description": "The answer to one command. rejected = the guardian or a rule said no (message says why); failed = something went wrong. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "command_result"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "commandId": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "needs_confirm",
+            "rejected",
+            "failed"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "confirm": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{16,128}$"
+                },
+                "expiresAt": {
+                  "$ref": "common.json#/$defs/ts"
+                },
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                },
+                "requireTyped": {
+                  "$ref": "common.json#/$defs/nullableString"
+                }
+              },
+              "required": [
+                "token",
+                "expiresAt",
+                "summary",
+                "requireTyped"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "commandId",
+        "status",
+        "message",
+        "confirm",
+        "result"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

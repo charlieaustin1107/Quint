@@ -1,0 +1,15 @@
+{
+  "v": 1,
+  "type": "command",
+  "id": "c-5",
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "name": "bot.goLive",
+    "args": {
+      "botId": "noise-area",
+      "account": "LDY50-EXAMPLE-1"
+    },
+    "confirmToken": "cf_8Hq2Lw9Zr4Tx7Pm1",
+    "typedConfirm": "LDY50-EXAMPLE-1"
+  }
+}

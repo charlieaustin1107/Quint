@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fill.json",
+  "title": "Fill",
+  "description": "An order filled, fully or partly. Commission is the estimate the engine uses ($0.50 a side for MNQ on LucidDaily). Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "fill"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "executionId": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "orderId": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "account": {
+          "$ref": "common.json#/$defs/accountName"
+        },
+        "instrument": {
+          "$ref": "common.json#/$defs/instrument"
+        },
+        "side": {
+          "$ref": "common.json#/$defs/side"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "price": {
+          "$ref": "common.json#/$defs/price"
+        },
+        "time": {
+          "$ref": "common.json#/$defs/ts"
+        },
+        "commission": {
+          "$ref": "common.json#/$defs/money"
+        },
+        "botId": {
+          "$ref": "common.json#/$defs/nullableBotId"
+        },
+        "groupId": {
+          "$ref": "common.json#/$defs/nullableId"
+        },
+        "role": {
+          "$ref": "common.json#/$defs/orderRole"
+        }
+      },
+      "required": [
+        "executionId",
+        "orderId",
+        "account",
+        "instrument",
+        "side",
+        "quantity",
+        "price",
+        "time",
+        "commission",
+        "botId",
+        "groupId",
+        "role"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "error.json",
+  "title": "Error",
+  "description": "Something was wrong with a message or the connection. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "error"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "enum": [
+            "bad_token",
+            "bad_message",
+            "unknown_type",
+            "version_mismatch",
+            "rate_limited",
+            "not_ready",
+            "internal"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "fatal": {
+          "type": "boolean",
+          "description": "True when the engine is about to close the connection."
+        },
+        "ref": {
+          "$ref": "common.json#/$defs/nullableId"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "fatal",
+        "ref"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

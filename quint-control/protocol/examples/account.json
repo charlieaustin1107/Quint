@@ -1,0 +1,23 @@
+{
+  "v": 1,
+  "type": "account",
+  "seq": 4,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "name": "LDY50-EXAMPLE-1",
+    "connection": "Lucid 1",
+    "status": "Connected",
+    "kind": "prop",
+    "firmPreset": "lucid-daily",
+    "balance": 50412.5,
+    "realizedPnl": 187.0,
+    "unrealizedPnl": -22.0,
+    "dayHighBalance": 50640.0,
+    "lossFloor": 48640.0,
+    "roomLeft": 1750.5,
+    "tradingAllowed": true,
+    "blockedReason": null,
+    "follower": false,
+    "updatedAt": "2026-11-18T14:35:02.120Z"
+  }
+}

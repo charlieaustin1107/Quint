@@ -1,0 +1,21 @@
+{
+  "v": 1,
+  "type": "journal",
+  "seq": 11,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "id": "j-20261118-0042",
+    "time": "2026-11-18T14:33:40.000Z",
+    "kind": "entry",
+    "account": "LDY50-EXAMPLE-1",
+    "botId": "noise-area",
+    "instrument": "MNQ 12-26",
+    "side": "Buy",
+    "quantity": 1,
+    "price": 21458.25,
+    "pnl": null,
+    "holdSeconds": null,
+    "groupId": "g-20261118-0007",
+    "text": "Bought 1 MNQ at 21,458.25. Stop 21,440.00 (-$36.50), target 21,494.75 (+$73.00)."
+  }
+}

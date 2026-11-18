@@ -1,0 +1,12 @@
+{
+  "name": "quint-control",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Quint Control: NinjaTrader 8 trading engine, dashboard website and Quint assistant. Tests only; nothing to install.",
+  "license": "UNLICENSED",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test \"reference/test/**/*.test.js\" \"tests/**/*.test.js\" \"web/test/**/*.test.js\"",
+    "test:3": "node tests/run3.js"
+  }
+}

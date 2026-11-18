@@ -1,0 +1,29 @@
+{
+  "v": 1,
+  "type": "bot",
+  "seq": 9,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "id": "noise-area",
+    "name": "Noise-area momentum",
+    "version": "1.0",
+    "state": "inTrade",
+    "mode": "sim",
+    "approved": false,
+    "accounts": [
+      "Sim101"
+    ],
+    "contracts": 1,
+    "lastSignal": {
+      "time": "2026-11-18T14:33:00.000Z",
+      "action": "BUY",
+      "entry": 21458.0,
+      "stop": 21440.0,
+      "target": 21494.75,
+      "reason": "Price closed above the upper noise band with VWAP rising."
+    },
+    "todayPnl": -22.0,
+    "tradesToday": 1,
+    "message": null
+  }
+}

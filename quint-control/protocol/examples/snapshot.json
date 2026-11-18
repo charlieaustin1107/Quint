@@ -1,0 +1,183 @@
+{
+  "v": 1,
+  "type": "snapshot",
+  "seq": 1,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "engine": {
+      "version": "0.1.0",
+      "startedAt": "2026-11-18T13:58:11.000Z",
+      "mode": "bots",
+      "kill": {
+        "all": false,
+        "accounts": []
+      },
+      "selfTest": {
+        "ranAt": "2026-11-18T13:59:02.000Z",
+        "passed": 48,
+        "failed": 0
+      }
+    },
+    "connections": [
+      {
+        "name": "Lucid 1",
+        "provider": "NinjaTrader (Tradovate)",
+        "status": "Connected"
+      },
+      {
+        "name": "Simulated Data Feed",
+        "provider": "Simulator",
+        "status": "Connected"
+      }
+    ],
+    "market": {
+      "instrument": "MNQ 12-26",
+      "last": 21447.25,
+      "bid": 21447.0,
+      "ask": 21447.25,
+      "lastTickAt": "2026-11-18T14:35:02.010Z",
+      "feed": "Live"
+    },
+    "accounts": [
+      {
+        "name": "LDY50-EXAMPLE-1",
+        "connection": "Lucid 1",
+        "status": "Connected",
+        "kind": "prop",
+        "firmPreset": "lucid-daily",
+        "balance": 50412.5,
+        "realizedPnl": 187.0,
+        "unrealizedPnl": -22.0,
+        "dayHighBalance": 50640.0,
+        "lossFloor": 48640.0,
+        "roomLeft": 1750.5,
+        "tradingAllowed": true,
+        "blockedReason": null,
+        "follower": false,
+        "updatedAt": "2026-11-18T14:35:02.120Z"
+      },
+      {
+        "name": "Sim101",
+        "connection": "Simulated Data Feed",
+        "status": "Connected",
+        "kind": "sim",
+        "firmPreset": null,
+        "balance": 100000.0,
+        "realizedPnl": 0.0,
+        "unrealizedPnl": 0.0,
+        "dayHighBalance": null,
+        "lossFloor": null,
+        "roomLeft": null,
+        "tradingAllowed": true,
+        "blockedReason": null,
+        "follower": false,
+        "updatedAt": "2026-11-18T14:35:02.120Z"
+      }
+    ],
+    "positions": [
+      {
+        "account": "LDY50-EXAMPLE-1",
+        "instrument": "MNQ 12-26",
+        "marketPosition": "Long",
+        "quantity": 1,
+        "avgPrice": 21458.25,
+        "unrealizedPnl": -22.0,
+        "openedAt": "2026-11-18T14:33:40.000Z",
+        "botId": "noise-area",
+        "stop": 21440.0,
+        "target": 21494.75,
+        "protected": true,
+        "groupId": "g-20261118-0007"
+      }
+    ],
+    "orders": [
+      {
+        "orderId": "o-88213",
+        "account": "LDY50-EXAMPLE-1",
+        "instrument": "MNQ 12-26",
+        "side": "Sell",
+        "type": "StopMarket",
+        "role": "stop",
+        "quantity": 1,
+        "filled": 0,
+        "limitPrice": null,
+        "stopPrice": 21440.0,
+        "avgFillPrice": null,
+        "state": "Accepted",
+        "botId": "noise-area",
+        "ocoId": "oco-20261118-0007",
+        "groupId": "g-20261118-0007",
+        "reason": null,
+        "time": "2026-11-18T14:35:02.120Z"
+      }
+    ],
+    "bots": [
+      {
+        "id": "noise-area",
+        "name": "Noise-area momentum",
+        "version": "1.0",
+        "state": "inTrade",
+        "mode": "sim",
+        "approved": false,
+        "accounts": [
+          "Sim101"
+        ],
+        "contracts": 1,
+        "lastSignal": {
+          "time": "2026-11-18T14:33:00.000Z",
+          "action": "BUY",
+          "entry": 21458.0,
+          "stop": 21440.0,
+          "target": 21494.75,
+          "reason": "Price closed above the upper noise band with VWAP rising."
+        },
+        "todayPnl": -22.0,
+        "tradesToday": 1,
+        "message": null
+      }
+    ],
+    "copier": {
+      "leader": "LDY50-EXAMPLE-1",
+      "followers": [
+        {
+          "account": "LDY50-EXAMPLE-2",
+          "ratio": 1,
+          "enabled": true
+        }
+      ]
+    },
+    "alerts": [
+      {
+        "id": "a-20261118-0003",
+        "time": "2026-11-18T14:35:02.120Z",
+        "severity": "warn",
+        "title": "News in 10 minutes",
+        "text": "Red-folder release at 15:00 UK / 10:00 New York. New entries stop at 14:58 UK.",
+        "account": null,
+        "botId": null,
+        "channels": [
+          "dashboard",
+          "telegram"
+        ],
+        "ack": false
+      }
+    ],
+    "journalTail": [
+      {
+        "id": "j-20261118-0042",
+        "time": "2026-11-18T14:33:40.000Z",
+        "kind": "entry",
+        "account": "LDY50-EXAMPLE-1",
+        "botId": "noise-area",
+        "instrument": "MNQ 12-26",
+        "side": "Buy",
+        "quantity": 1,
+        "price": 21458.25,
+        "pnl": null,
+        "holdSeconds": null,
+        "groupId": "g-20261118-0007",
+        "text": "Bought 1 MNQ at 21,458.25. Stop 21,440.00 (-$36.50), target 21,494.75 (+$73.00)."
+      }
+    ]
+  }
+}

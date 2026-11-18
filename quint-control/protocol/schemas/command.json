@@ -1,0 +1,726 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "command.json",
+  "title": "Command",
+  "description": "Asks the engine to do something. Risk-raising commands need two steps: send it, get needs_confirm with a one-time token, show the owner a confirm screen, then send the same command again with confirmToken (and typedConfirm when asked). Sent by the website.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "id",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "command"
+    },
+    "id": {
+      "$ref": "common.json#/$defs/id"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Raises risk: the engine replies needs_confirm first. On a prop account it also needs typedConfirm = the account name if the bot is live.",
+          "properties": {
+            "name": {
+              "const": "bot.start"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "botId": {
+                  "$ref": "common.json#/$defs/botId"
+                }
+              },
+              "required": [
+                "botId"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm.",
+          "properties": {
+            "name": {
+              "const": "bot.stop"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "botId": {
+                  "$ref": "common.json#/$defs/botId"
+                },
+                "flatten": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "botId",
+                "flatten"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Raises risk: the engine replies needs_confirm first. Always needs typedConfirm = the account name.",
+          "properties": {
+            "name": {
+              "const": "bot.goLive"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "botId": {
+                  "$ref": "common.json#/$defs/botId"
+                },
+                "account": {
+                  "$ref": "common.json#/$defs/accountName"
+                }
+              },
+              "required": [
+                "botId",
+                "account"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm.",
+          "properties": {
+            "name": {
+              "const": "bot.setSim"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "botId": {
+                  "$ref": "common.json#/$defs/botId"
+                }
+              },
+              "required": [
+                "botId"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Raises risk: the engine replies needs_confirm first.",
+          "properties": {
+            "name": {
+              "const": "bot.setAccounts"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "botId": {
+                  "$ref": "common.json#/$defs/botId"
+                },
+                "accounts": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "common.json#/$defs/accountName"
+                  },
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "botId",
+                "accounts"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Raises risk: the engine replies needs_confirm first. Lowering contracts skips the confirm.",
+          "properties": {
+            "name": {
+              "const": "bot.setContracts"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "botId": {
+                  "$ref": "common.json#/$defs/botId"
+                },
+                "contracts": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              },
+              "required": [
+                "botId",
+                "contracts"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Raises risk: the engine replies needs_confirm first.",
+          "properties": {
+            "name": {
+              "const": "copier.setLeader"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "$ref": "common.json#/$defs/nullableAccount"
+                }
+              },
+              "required": [
+                "account"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Raises risk: the engine replies needs_confirm first. Switching a follower off skips the confirm.",
+          "properties": {
+            "name": {
+              "const": "copier.setFollower"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "$ref": "common.json#/$defs/accountName"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "ratio": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 10
+                }
+              },
+              "required": [
+                "account",
+                "enabled",
+                "ratio"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Raises risk: the engine replies needs_confirm first. Refused while any bot is on.",
+          "properties": {
+            "name": {
+              "const": "manualCopy.start"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "leader": {
+                  "$ref": "common.json#/$defs/accountName"
+                }
+              },
+              "required": [
+                "leader"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm.",
+          "properties": {
+            "name": {
+              "const": "manualCopy.stop"
+            },
+            "args": {
+              "type": "object",
+              "properties": {},
+              "required": [],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm. Cancels working entries, stops every bot and Manual Copy; flatten also closes every position.",
+          "properties": {
+            "name": {
+              "const": "kill.all"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "flatten": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "flatten"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm.",
+          "properties": {
+            "name": {
+              "const": "kill.account"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "$ref": "common.json#/$defs/accountName"
+                },
+                "flatten": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "account",
+                "flatten"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Raises risk: the engine replies needs_confirm first. Turns trading back on.",
+          "properties": {
+            "name": {
+              "const": "kill.reset"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "$ref": "common.json#/$defs/nullableAccount"
+                }
+              },
+              "required": [
+                "account"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm.",
+          "properties": {
+            "name": {
+              "const": "account.flatten"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "$ref": "common.json#/$defs/accountName"
+                }
+              },
+              "required": [
+                "account"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Needs confirm when it loosens a guardian limit or touches live trading; otherwise runs at once.",
+          "properties": {
+            "name": {
+              "const": "settings.update"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.]{1,120}$"
+                },
+                "value": {}
+              },
+              "required": [
+                "path",
+                "value"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm.",
+          "properties": {
+            "name": {
+              "const": "selftest.run"
+            },
+            "args": {
+              "type": "object",
+              "properties": {},
+              "required": [],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm.",
+          "properties": {
+            "name": {
+              "const": "backtest.run"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "botId": {
+                  "$ref": "common.json#/$defs/botId"
+                },
+                "from": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "to": {
+                  "type": "string",
+                  "format": "date"
+                }
+              },
+              "required": [
+                "botId",
+                "from",
+                "to"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm.",
+          "properties": {
+            "name": {
+              "const": "alert.ack"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "alertId": {
+                  "$ref": "common.json#/$defs/id"
+                }
+              },
+              "required": [
+                "alertId"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "args"
+          ],
+          "additionalProperties": false,
+          "description": "Lowers risk: runs at once, no confirm.",
+          "properties": {
+            "name": {
+              "const": "journal.query"
+            },
+            "args": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "$ref": "common.json#/$defs/ts"
+                },
+                "to": {
+                  "$ref": "common.json#/$defs/ts"
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5000
+                }
+              },
+              "required": [
+                "from",
+                "to",
+                "limit"
+              ],
+              "additionalProperties": false
+            },
+            "confirmToken": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,128}$"
+            },
+            "typedConfirm": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        }
+      ]
+    }
+  }
+}

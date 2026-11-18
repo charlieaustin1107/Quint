@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "type": "position",
+  "seq": 6,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "account": "LDY50-EXAMPLE-1",
+    "instrument": "MNQ 12-26",
+    "marketPosition": "Flat",
+    "quantity": 0,
+    "avgPrice": null,
+    "unrealizedPnl": 0.0,
+    "openedAt": null,
+    "botId": "noise-area",
+    "stop": null,
+    "target": null,
+    "protected": false,
+    "groupId": "g-20261118-0007"
+  }
+}

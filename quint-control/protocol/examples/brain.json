@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "type": "brain",
+  "seq": 10,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "id": "b-20261118-0310",
+    "time": "2026-11-18T14:35:02.120Z",
+    "kind": "block",
+    "botId": "noise-area",
+    "account": "LDY50-EXAMPLE-2",
+    "text": "Skipped the copy to LDY50-EXAMPLE-2: a full stop-out would use 31% of the room left (limit 25%).",
+    "confidence": null,
+    "tags": [
+      "guardian",
+      "sizing"
+    ]
+  }
+}

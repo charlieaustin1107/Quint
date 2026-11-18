@@ -1,0 +1,18 @@
+{
+  "v": 1,
+  "type": "command_result",
+  "seq": 13,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "commandId": "c-4",
+    "status": "needs_confirm",
+    "message": "Confirm going live.",
+    "confirm": {
+      "token": "cf_8Hq2Lw9Zr4Tx7Pm1",
+      "expiresAt": "2026-11-18T14:36:02.120Z",
+      "summary": "Noise-area momentum will trade 1 MNQ on LDY50-EXAMPLE-1 (real prop account). It has not passed its backtest goals. Guardian rules stay on.",
+      "requireTyped": "LDY50-EXAMPLE-1"
+    },
+    "result": null
+  }
+}

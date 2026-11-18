@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "heartbeat.json",
+  "title": "Heartbeat",
+  "description": "Once a second. If none arrives for 3 seconds the website shows Delayed; after 10 seconds, Disconnected, and it stops showing numbers as live. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "heartbeat"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "serverTime": {
+          "$ref": "common.json#/$defs/ts"
+        },
+        "uptimeSec": {
+          "type": "number",
+          "minimum": 0
+        },
+        "feed": {
+          "$ref": "common.json#/$defs/feed"
+        },
+        "lastTickAt": {
+          "$ref": "common.json#/$defs/nullableTs"
+        },
+        "mode": {
+          "$ref": "common.json#/$defs/engineMode"
+        }
+      },
+      "required": [
+        "serverTime",
+        "uptimeSec",
+        "feed",
+        "lastTickAt",
+        "mode"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

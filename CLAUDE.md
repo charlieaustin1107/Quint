@@ -14,6 +14,7 @@ Read this first in every session. It says what this project is for and how to wo
 | `quint-brain/` | **Quint Brain**: Quint's own app: the 3D brain, live market read, matrix, 5-pillar check, record and alerts. Source and tests in `quint-brain/src/` | Artifact `cd485103-4fb2-4d50-8aeb-2237b4ef142f` |
 | `quint/` | **Quint**: the first standalone Quint app (no source here; superseded by Quint Brain) | Artifact `41275d03-b425-4aa9-95ef-f85de223da67` (public) |
 | `backtest/` | Code that backtests the strategies on real MNQ candles, outside the browser | Runs with `node` and `python3` |
+| `quint-control/` | **Quint Control**: the NinjaTrader 8 trading engine (bots, guardian, copier, Manual Copy), its local black dashboard website and the Quint assistant. Plan in `quint-control/PLAN.md`, progress in `quint-control/STATUS.md` | NinjaTrader 8 on the owner's Windows computer; tests run with `node` |
 
 Each app runs as a single self-contained `index.html`. The artifacts are where the apps actually run, because Quint's AI chat and the TradingView/market connectors work there without an API key. **This repo is the master copy.** Change it here, then publish the built `index.html` to the matching artifact.
 
@@ -58,4 +59,10 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 - Don't add API keys, passwords or account numbers to the repo.
 - Don't delete the 5-pillar strategy or Quint, and don't swap them for something else.
 - Before publishing, check the page still loads and works on a phone-sized screen.
-- This is for learning and practice. Nothing here is financial advice, and the apps should never place real orders.
+- Nothing here is financial advice. Chart Wizard, Quint Brain and Quint never place orders. **Only the Quint Engine (`quint-control/`) places orders, and every bot needs the owner's confirm before it trades a live account. Simulation first is recommended, not required.** The guardian's firm rules and kill switches can never be skipped.
+
+## Quint Control
+- Read `quint-control/STATUS.md` first: it says which phase is in progress and what to do next. Update it at the end of every session, and commit and push often so work survives a session ending early.
+- The rules, decisions and testing protocol are in the `quint-control` skill (`.claude/skills/quint-control/SKILL.md`). The phase prompts are in `quint-control/FABLE-PROMPTS.md`.
+- Nothing is done until it's tested: JavaScript reference and `node --test` in the cloud, golden files, the engine's self-tests inside NinjaTrader, Playwright for the website, and the owner's checklist. Run the suites three times before calling a phase done.
+- Run the Quint Control tests with `cd quint-control && npm test`.

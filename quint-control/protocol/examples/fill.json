@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "type": "fill",
+  "seq": 8,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "executionId": "x-55120",
+    "orderId": "o-88212",
+    "account": "LDY50-EXAMPLE-1",
+    "instrument": "MNQ 12-26",
+    "side": "Buy",
+    "quantity": 1,
+    "price": 21458.25,
+    "time": "2026-11-18T14:33:40.000Z",
+    "commission": 0.5,
+    "botId": "noise-area",
+    "groupId": "g-20261118-0007",
+    "role": "entry"
+  }
+}

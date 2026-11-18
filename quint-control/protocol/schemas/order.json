@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order.json",
+  "title": "Order update",
+  "description": "An order changed state. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "order"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "account": {
+          "$ref": "common.json#/$defs/accountName"
+        },
+        "instrument": {
+          "$ref": "common.json#/$defs/instrument"
+        },
+        "side": {
+          "$ref": "common.json#/$defs/side"
+        },
+        "type": {
+          "$ref": "common.json#/$defs/orderType"
+        },
+        "role": {
+          "$ref": "common.json#/$defs/orderRole"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "filled": {
+          "$ref": "common.json#/$defs/qty"
+        },
+        "limitPrice": {
+          "$ref": "common.json#/$defs/nullablePrice"
+        },
+        "stopPrice": {
+          "$ref": "common.json#/$defs/nullablePrice"
+        },
+        "avgFillPrice": {
+          "$ref": "common.json#/$defs/nullablePrice"
+        },
+        "state": {
+          "$ref": "common.json#/$defs/orderState"
+        },
+        "botId": {
+          "$ref": "common.json#/$defs/nullableBotId"
+        },
+        "ocoId": {
+          "$ref": "common.json#/$defs/nullableId"
+        },
+        "groupId": {
+          "$ref": "common.json#/$defs/nullableId"
+        },
+        "reason": {
+          "$ref": "common.json#/$defs/nullableString"
+        },
+        "time": {
+          "$ref": "common.json#/$defs/ts"
+        }
+      },
+      "required": [
+        "orderId",
+        "account",
+        "instrument",
+        "side",
+        "type",
+        "role",
+        "quantity",
+        "filled",
+        "limitPrice",
+        "stopPrice",
+        "avgFillPrice",
+        "state",
+        "botId",
+        "ocoId",
+        "groupId",
+        "reason",
+        "time"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

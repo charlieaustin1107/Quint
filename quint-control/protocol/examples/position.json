@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "type": "position",
+  "seq": 5,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "account": "LDY50-EXAMPLE-1",
+    "instrument": "MNQ 12-26",
+    "marketPosition": "Long",
+    "quantity": 1,
+    "avgPrice": 21458.25,
+    "unrealizedPnl": -22.0,
+    "openedAt": "2026-11-18T14:33:40.000Z",
+    "botId": "noise-area",
+    "stop": 21440.0,
+    "target": 21494.75,
+    "protected": true,
+    "groupId": "g-20261118-0007"
+  }
+}
