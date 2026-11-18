@@ -205,6 +205,7 @@ function mkBoot() {
   document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(mkTick, 400); });
 }
 async function mkConnect() {
+  if (+HS().tvUntil > Date.now()) TVQ.until = +HS().tvUntil; // a cooldown carries over a reload: calling during one only starts it again
   MK.tvLive = !!HS().tvLive; // remembered from the last visit, then confirmed by the first TradingView price
   if (!HS().tvPlanSet && HS().tvPlan) delete HS().tvPlan; // an earlier version guessed the plan from its own (incomplete) count: only the one you pick counts
   if (!MK.mcp) return; MK.st = "wait"; MK.why = null; mkRenderSoon();
@@ -271,18 +272,32 @@ function tvLogHTML() {
   return `<p class="small">${esc(tvApp())} made <b>${nToday}</b> TradingView call${nToday === 1 ? "" : "s"} today. Each app keeps its own list on this phone; calls from Claude chats don't show here but count towards the same TradingView allowance.</p><ul class="tvlog">${rows}</ul>`;
 }
 const tvCooling = () => Date.now() < TVQ.until;
+// One TradingView call at a time, at least 3 seconds apart and at most 6 a minute. A burst of calls when an app opens is what sets off
+// TradingView's cooldowns, even on a day with calls left. During a cooldown nothing is sent until it ends, and that holds across reloads.
+const TV_GAP = 3000, TV_PER_MIN = 6;
+function tvSlot() { // resolves when this call may go; with the time it went, so a saved copy can hand its slot back
+  const p = (TVQ.chain || Promise.resolve()).then(async () => {
+    for (let k = 0; k < 60; k++) { if (tvCooling()) throw { code: "cooldown", message: tvCoolMsg() };
+      const now = Date.now(), fast = window.__tvFast; TVQ.hist = TVQ.hist.filter(t => now - t < 6e4); // __tvFast: the tests' fake TradingView needs no spacing
+      const wait = fast ? 0 : Math.max(0, (TVQ.last || 0) + TV_GAP - now, TVQ.hist.length >= TV_PER_MIN ? TVQ.hist[0] + 61e3 - now : 0);
+      if (wait <= 0) break; await new Promise(r => setTimeout(r, wait + 25)); }
+    const t = TVQ.last = Date.now(); TVQ.hist.push(t); tvCount(); return t; });
+  TVQ.chain = p.catch(() => {}); return p;
+}
+const tvUnslot = t => { const i = TVQ.hist.indexOf(t); if (i >= 0) TVQ.hist.splice(i, 1); if (TVQ.last === t) TVQ.last = 0; }; // the connector answered from its saved copy: TradingView never saw it
 const tvCoolMsg = () => tvOut() ? `TradingView says your connector calls for today are used up. It counts every call on your TradingView account (Chart Wizard, Quint Brain and Claude chats, plus any earlier today), so its total is higher than the ${tvUsed()} this app counted. Quint still answers from the candles saved on this phone, or from a screenshot of your chart.` : `TradingView's connector is cooling down after too many calls. Live prices and Quint's charts come back at ${new Date(TVQ.until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}.`;
 function tvQuotaHit(e) {
   const s = typeof e === "string" ? e : String((e && (e.message || e.text || e.error)) || ""); if (!/quota|cooldown|cool(ing)? down|TOOL_QUOTA|too many (calls|requests)|usage limit/i.test(s)) return false;
   if (/daily|per day/i.test(s)) HS().tvOut = tvDay(); // the day's calls are gone (TradingView's count, which includes calls this app never saw)
-  const m = /(\d+)[\s-]*min/i.exec(s); TVQ.until = Date.now() + (m ? +m[1] + 0.5 : 6) * 6e4; save();
+  const m = /(\d+)[\s-]*min/i.exec(s); TVQ.until = Date.now() + (m ? +m[1] + 0.5 : 6) * 6e4; HS().tvUntil = TVQ.until; save();
   setTimeout(() => { mkSync(); if (MK.screen === "chart") hcLive(); mkRenderSoon(); }, 0); setTimeout(() => { mkSync(); mkRenderSoon(); }, TVQ.until - Date.now() + 1500); return true;
 }
 function tvGate(ns) { // the page's own wrapper around the connector namespace (the namespace itself is never changed)
   tvLogInit();
   const call = (srv, tool, input, opt) => { if (srv !== TV_SERVER) return ns.callTool(srv, tool, input, opt);
-    if (tvCooling()) { tvLogAdd(tool, input, "blocked"); return Promise.reject({ code: "cooldown", message: tvCoolMsg() }); } const now = Date.now(); TVQ.hist.push(now); TVQ.hist = TVQ.hist.filter(t => now - t < 6e4); tvCount(); const L = tvLogAdd(tool, input);
-    return ns.callTool(srv, tool, input, opt).then(r => { if (r && r.cache) tvLogEnd(L, "saved"); const p = r && r.payload; if ((typeof p === "string" && tvQuotaHit(p)) || (p && typeof p === "object" && p.success === false && tvQuotaHit(p.error || p.message))) { tvLogEnd(L, "refused"); throw { code: "cooldown", message: tvCoolMsg() }; } return r; }, e => { if (tvQuotaHit(e)) { tvLogEnd(L, "refused"); throw { code: "cooldown", message: tvCoolMsg() }; } tvLogEnd(L, "error"); throw e; }); };
+    if (tvCooling()) { tvLogAdd(tool, input, "blocked"); return Promise.reject({ code: "cooldown", message: tvCoolMsg() }); }
+    return tvSlot().then(ts => { const L = tvLogAdd(tool, input);
+    return ns.callTool(srv, tool, input, opt).then(r => { if (r && r.cache) { tvLogEnd(L, "saved"); tvUnslot(ts); } const p = r && r.payload; if ((typeof p === "string" && tvQuotaHit(p)) || (p && typeof p === "object" && p.success === false && tvQuotaHit(p.error || p.message))) { tvLogEnd(L, "refused"); throw { code: "cooldown", message: tvCoolMsg() }; } return r; }, e => { if (tvQuotaHit(e)) { tvLogEnd(L, "refused"); throw { code: "cooldown", message: tvCoolMsg() }; } tvLogEnd(L, "error"); throw e; }); }, e => { if (e && e.code === "cooldown") tvLogAdd(tool, input, "blocked"); throw e; }); };
   return { callTool: call, watchTool: (...a) => ns.watchTool(...a), listTools: (...a) => ns.listTools(...a) };
 }
 function mkPoller(w) { // used only if FMP's tools say they aren't read-only (watches refuse those): call now if nothing recent, then on the interval, skipping while hidden
