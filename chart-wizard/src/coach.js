@@ -5,7 +5,7 @@
 const CO = { sample: null, imgs: false, open: false, msgs: [], busy: false, ctl: null, pausedPlay: false, pausedTmr: false, roundKey: null, drawn: 0, tick: 0 };
 const coachEl = () => $("#coach");
 const coachWide = () => window.innerWidth >= 1280;
-const AI_COL = "#b39ddb", LIST_N = 80;
+const AI_COL = "#a7a7a7", LIST_N = 80;
 
 function initCoach(tries = 0) {
   const c = window.claude;

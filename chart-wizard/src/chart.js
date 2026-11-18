@@ -2,7 +2,7 @@
 const css = getComputedStyle(document.documentElement);
 const C = {}; ["bg","grid","line","line2","ink","ink-hi","muted","up","down","ema","sma","rsi","amber","acc","acc2","card","card2"].forEach(k => C[k] = css.getPropertyValue("--" + k).trim());
 const FONT = css.getPropertyValue("--font");
-const DCOLS = ["#22d3ee", "#f5f5f5", "#ffb74d", "#ef5350", "#26a69a", "#b39ddb"];
+const DCOLS = ["#f5f5f5", "#ffb547", "#2fd9a8", "#ff4f6e", "#a3a3a3", "#ffd166"]; // white first: drawings read as chalk on the black chart
 const FIBS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
 const ONEPT = new Set(["hline", "hray"]);
 function niceStep(raw) { const p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p; }
@@ -293,7 +293,7 @@ class Chart {
     if (this.future) {
       const xa = this.bx(this.future.t0, g), xb = this.bx(this.future.t1, g);
       if (xb > xa) {
-        const grd = ctx.createLinearGradient(xa, 0, xb, 0); grd.addColorStop(0, "rgba(34,211,238,0.07)"); grd.addColorStop(1, "rgba(139,92,246,0.10)");
+        const grd = ctx.createLinearGradient(xa, 0, xb, 0); grd.addColorStop(0, "rgba(193,193,193,0.07)"); grd.addColorStop(1, "rgba(123,123,123,0.10)");
         ctx.fillStyle = grd; ctx.fillRect(xa, g.T, xb - xa, g.B - g.T);
         if (this.future.label && xb - xa > 26) { const cx = (xa + Math.min(xb, g.R)) / 2; ctx.fillStyle = C.muted; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "600 12px " + FONT; if (xb - xa > 80) ctx.fillText(this.future.label, cx, (g.T + g.PB) / 2 - 12); ctx.font = "26px " + FONT; ctx.fillStyle = "#5eead4"; ctx.fillText("?", cx, (g.T + g.PB) / 2 + 14); }
       }
@@ -358,7 +358,7 @@ class Chart {
     ctx.textAlign = "center"; for (const L of tl) { ctx.fillStyle = L.strong ? C.ink : C.muted; ctx.font = (L.strong ? "600 " : "") + "11px " + FONT; ctx.fillText(L.text, L.x, g.B + 11); }
     // axis tags for horizontal drawings and levels
     ctx.font = "600 11px " + FONT;
-    for (const d of this.drawings) if (d.type === "hline" || d.type === "hray") { const y = Y(d.pts[0].p); if (y > g.T && y < g.PB) { ctx.fillStyle = d.color; ctx.fillRect(g.R + 1, y - 9, 63, 18); ctx.fillStyle = "#04121a"; ctx.textAlign = "left"; ctx.fillText(fnum(I, d.pts[0].p), g.R + 5, y); } }
+    for (const d of this.drawings) if (d.type === "hline" || d.type === "hray") { const y = Y(d.pts[0].p); if (y > g.T && y < g.PB) { ctx.fillStyle = d.color; ctx.fillRect(g.R + 1, y - 9, 63, 18); ctx.fillStyle = "#101010"; ctx.textAlign = "left"; ctx.fillText(fnum(I, d.pts[0].p), g.R + 5, y); } }
     // last price
     const li = S.n - 1, lc = S.c[li], ly = Math.round(Y(lc)) + .5, lcol = S.c[li] >= S.o[li] ? C.up : C.down;
     if (ly > g.T && ly < g.PB) { ctx.strokeStyle = lcol; ctx.globalAlpha = .65; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(g.L, ly); ctx.lineTo(g.R, ly); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
@@ -370,10 +370,10 @@ class Chart {
     // crosshair
     if (this.cross) {
       const ci = clamp(this.cross.i, 0, S.n - 1), x = Math.round(this.x(ci, g)) + .5, y = this.cross.y;
-      ctx.strokeStyle = "#9aa4bb"; ctx.globalAlpha = .65; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x, g.T); ctx.lineTo(x, g.B); if (y > g.T && y < g.PB) { ctx.moveTo(g.L, Math.round(y) + .5); ctx.lineTo(g.R, Math.round(y) + .5); } ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
-      if (y > g.T && y < g.PB) { ctx.fillStyle = "#2a3758"; ctx.fillRect(g.R + 1, y - 9, 63, 18); ctx.fillStyle = C["ink-hi"]; ctx.textAlign = "left"; ctx.font = "11px " + FONT; ctx.fillText(fnum(I, this.P(y, g)), g.R + 5, y); }
+      ctx.strokeStyle = "#a4a4a4"; ctx.globalAlpha = .65; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x, g.T); ctx.lineTo(x, g.B); if (y > g.T && y < g.PB) { ctx.moveTo(g.L, Math.round(y) + .5); ctx.lineTo(g.R, Math.round(y) + .5); } ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      if (y > g.T && y < g.PB) { ctx.fillStyle = "#383838"; ctx.fillRect(g.R + 1, y - 9, 63, 18); ctx.fillStyle = C["ink-hi"]; ctx.textAlign = "left"; ctx.font = "11px " + FONT; ctx.fillText(fnum(I, this.P(y, g)), g.R + 5, y); }
       const lab = this.barLabel(ci); ctx.font = "11px " + FONT; const w = ctx.measureText(lab).width + 12;
-      ctx.fillStyle = "#2a3758"; ctx.fillRect(clamp(x - w / 2, 0, W - w), g.B + 1, w, 20); ctx.fillStyle = C["ink-hi"]; ctx.textAlign = "center"; ctx.fillText(lab, clamp(x, w / 2, W - w / 2), g.B + 11);
+      ctx.fillStyle = "#383838"; ctx.fillRect(clamp(x - w / 2, 0, W - w), g.B + 1, w, 20); ctx.fillStyle = C["ink-hi"]; ctx.textAlign = "center"; ctx.fillText(lab, clamp(x, w / 2, W - w / 2), g.B + 11);
     }
   }
   barLabel(i) { const S = this.S, t = S.ts[i]; if (isIntra(S.tf)) return fWallS(t); const d = S.I.d[S.di[i]]; if (S.tf === "1D") return fDayS(d) + " '" + d.slice(2, 4); if (S.tf === "1W") { const d0 = S.I.d[this.firstDayOf(i)]; return "wk " + fDayS(d0) + " '" + d0.slice(2, 4); } return MON[Number(d.slice(5, 7)) - 1] + " " + d.slice(0, 4); }
@@ -440,7 +440,7 @@ class Chart {
       if (o.label) pill(ctx, o.label, Math.min(Math.max(x0 + 4, 6), g.R - 150), y + (o.below ? 11 : -11), o.color);
     } else if (o.type === "zig") {
       ctx.strokeStyle = o.color || C.amber; ctx.lineWidth = 1.6; ctx.globalAlpha = .9; ctx.beginPath(); o.pts.forEach((q, k) => { const x = this.tx(q.t, g), y = Y(q.p); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke(); ctx.globalAlpha = 1; ctx.lineWidth = 1;
-      for (const q of o.pts) if (q.lab) { const x = this.tx(q.t, g), y = Y(q.p), c = q.lab === "HH" || q.lab === "HL" ? C.up : q.lab === "LH" || q.lab === "LL" ? C.down : "#55607a"; pill(ctx, q.lab, x, y + (q.k === "H" ? -13 : 13), c, "center"); }
+      for (const q of o.pts) if (q.lab) { const x = this.tx(q.t, g), y = Y(q.p), c = q.lab === "HH" || q.lab === "HL" ? C.up : q.lab === "LH" || q.lab === "LL" ? C.down : "#606060"; pill(ctx, q.lab, x, y + (q.k === "H" ? -13 : 13), c, "center"); }
     } else if (o.type === "box") {
       const xa = this.bx(o.t0, g), xb = this.bx(o.t1, g) + 0; let hi = -Infinity, lo = Infinity; const S = this.S;
       for (let i = Math.max(0, Math.round(this.tIdx(o.t0))); i <= Math.min(S.n - 1, Math.round(this.tIdx(o.t1)) - 1); i++) { hi = Math.max(hi, S.h[i]); lo = Math.min(lo, S.l[i]); }
@@ -472,7 +472,7 @@ class Chart {
   }
   drawRSI(g, ctx, i0, i1) {
     const S = this.S, Yr = v => g.rB - v / 100 * (g.rB - g.rT);
-    ctx.fillStyle = "rgba(149,117,205,0.07)"; ctx.fillRect(g.L, Yr(70), g.R - g.L, Yr(30) - Yr(70));
+    ctx.fillStyle = "rgba(133,133,133,0.07)"; ctx.fillRect(g.L, Yr(70), g.R - g.L, Yr(30) - Yr(70));
     ctx.strokeStyle = C.line2; ctx.setLineDash([4, 4]); ctx.beginPath(); [30, 70].forEach(v => { ctx.moveTo(g.L, Math.round(Yr(v)) + .5); ctx.lineTo(g.R, Math.round(Yr(v)) + .5); }); ctx.stroke(); ctx.setLineDash([]);
     ctx.save(); ctx.beginPath(); ctx.rect(g.L, g.rT, g.R - g.L, g.rB - g.rT); ctx.clip();
     ctx.strokeStyle = C.rsi; ctx.lineWidth = 1.6; ctx.beginPath(); let s = false;
@@ -482,7 +482,7 @@ class Chart {
     ctx.restore();
     ctx.font = "11px " + FONT; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillStyle = C.muted; ctx.fillText("70", g.R + 7, Yr(70)); ctx.fillText("30", g.R + 7, Yr(30));
     const v = S.rsi[this.cross ? clamp(this.cross.i, 0, S.n - 1) : S.n - 1];
-    ctx.fillStyle = "#b39ddb"; ctx.textBaseline = "top"; ctx.fillText("RSI 14  " + (v == null ? "—" : v.toFixed(1)), g.L + 8, g.rT + 3);
+    ctx.fillStyle = "#a7a7a7"; ctx.textBaseline = "top"; ctx.fillText("RSI 14  " + (v == null ? "—" : v.toFixed(1)), g.L + 8, g.rT + 3);
     if (S.rsi[S.n - 1] != null) { const y = Yr(S.rsi[S.n - 1]); ctx.fillStyle = C.rsi; ctx.fillRect(g.R + 1, y - 9, 63, 18); ctx.fillStyle = "#fff"; ctx.textBaseline = "middle"; ctx.fillText(S.rsi[S.n - 1].toFixed(1), g.R + 5, y); }
   }
 }

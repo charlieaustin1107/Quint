@@ -98,7 +98,7 @@ function locQ() {
   let opts = ev.poi ? [ev.poi] : [];
   for (const p of pool) { if (opts.length >= 3) break; if (!opts.includes(p) && !opts.some(o => Math.abs(mid(o) - mid(p)) < 0.4 * A)) opts.push(p); }
   opts = shuffle(opts); const L = "ABC";
-  G.prep = opts.map((p, i) => ({ type: "zone", lo: p.lo, hi: p.hi, t0: Math.max(p.from, G.Sv.ts[0]), color: "#8b9bc4", label: `${L[i]} · ${p.kind}`, prep: true }));
+  G.prep = opts.map((p, i) => ({ type: "zone", lo: p.lo, hi: p.hi, t0: Math.max(p.from, G.Sv.ts[0]), color: "#9b9b9b", label: `${L[i]} · ${p.kind}`, prep: true }));
   for (const z of G.prep) G.overlays.push(z);
   const x = ev.d > 0 ? G.Sv.l[ev.s] : G.Sv.h[ev.s], nearest = pool[0];
   return { key: "loc", skill: "levels", kind: "mc", tag: "Pillar 1 · Location", switchTF: G.tf === "15m" ? "4h" : "1h",

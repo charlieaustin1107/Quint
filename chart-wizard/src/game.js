@@ -23,7 +23,7 @@ const SKILLS = [["mtf", "Top-down (timeframes)"], ["trend", "Trend & averages"],
 function mastery(k) { const s = ST.skills[k]; if (!s || !s.r.length) return 0; const r = s.r.slice(-12); return r.reduce((a, b) => a + b, 0) / r.length; }
 function recordSkill(k, score) { const s = ST.skills[k] || (ST.skills[k] = { n: 0, sum: 0, r: [] }); s.n++; s.sum += score; s.r.push(Math.round(score * 100) / 100); if (s.r.length > 30) s.r.shift(); }
 function hexIcon(lv, size = 30) {
-  return `<svg width="${size}" height="${size}" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="hg${size}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><path d="M20 2 36 11v18L20 38 4 29V11z" fill="#0b1020" stroke="url(#hg${size})" stroke-width="2.5"/><text x="20" y="25.5" text-anchor="middle" font-size="14" font-weight="800" fill="#f2f6ff" font-family="system-ui, sans-serif">${lv}</text></svg>`;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="hg${size}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c1c1c1"/><stop offset="1" stop-color="#7b7b7b"/></linearGradient></defs><path d="M20 2 36 11v18L20 38 4 29V11z" fill="#111111" stroke="url(#hg${size})" stroke-width="2.5"/><text x="20" y="25.5" text-anchor="middle" font-size="14" font-weight="800" fill="#f2f6ff" font-family="system-ui, sans-serif">${lv}</text></svg>`;
 }
 function renderRank() {
   const r = rankOf(ST.xp), lo = RANKS[r][0], hi = r + 1 < RANKS.length ? RANKS[r + 1][0] : lo;
@@ -167,7 +167,7 @@ function gainXP(n, el) {
   const after = rankOf(ST.xp), ta = tierOf();
   if (after > before) {
     const d = document.createElement("div"); d.className = "rankup";
-    d.innerHTML = `<small>Rank up</small>${hexIcon(after + 1, 54)}<div><b>${RANKS[after][1]}</b></div>${ta > tb ? `<div class="small" style="max-width:260px;margin-top:6px"><b style="color:#a5f3fc">Difficulty up: Tier ${ta + 1} · ${TIERS[ta].name}</b><br>${esc(TIERS[ta].unlock)}</div>` : ""}`;
+    d.innerHTML = `<small>Rank up</small>${hexIcon(after + 1, 54)}<div><b>${RANKS[after][1]}</b></div>${ta > tb ? `<div class="small" style="max-width:260px;margin-top:6px"><b style="color:#e6e6e6">Difficulty up: Tier ${ta + 1} · ${TIERS[ta].name}</b><br>${esc(TIERS[ta].unlock)}</div>` : ""}`;
     document.body.appendChild(d); setTimeout(() => d.remove(), ta > tb ? 5200 : 2600);
   }
 }

@@ -120,7 +120,7 @@ function pbMarks() {
   const ev = G.pb.ev, S = G.Sv, t = G.t, I = G.I, d = ev.d, out = [], R = G.pb.rules;
   if (!ev.loc) return out;
   if (R.includes("sweep") && ev.sw) out.push({ type: "level", p: ev.sw.lvl, t0: S.ts[Math.max(0, ev.s - 12)], color: C.amber, label: `liquidity ${fnum(I, ev.sw.lvl)}`, below: d > 0, dash: [2, 3] });
-  if (R.includes("cisd") && ev.ci && ev.ci.lvl != null) out.push({ type: "level", p: ev.ci.lvl, t0: S.ts[Math.max(0, ev.ci.r0)], color: "#9aa4bb", label: ev.cisd ? "CISD ✓" : "CISD level", below: d < 0, dash: [6, 3] });
+  if (R.includes("cisd") && ev.ci && ev.ci.lvl != null) out.push({ type: "level", p: ev.ci.lvl, t0: S.ts[Math.max(0, ev.ci.r0)], color: "#a4a4a4", label: ev.cisd ? "CISD ✓" : "CISD level", below: d < 0, dash: [6, 3] });
   if (R.includes("disp") && ev.dp && ev.dp.i > 0) out.push({ type: "box", t0: S.ts[ev.dp.i], t1: S.te[ev.dp.i], color: d > 0 ? C.up : C.down, label: "displacement" });
   if (R.includes("exec") && ev.ex) { if (ev.ex.z) out.push({ type: "zone", lo: ev.ex.z.lo, hi: ev.ex.z.hi, t0: ev.ex.z.t0, color: d > 0 ? C.up : C.down, label: `entry ${ev.ex.z.kind.split(" (")[0]}` }); out.push({ type: "level", p: ev.ex.tgt, t0: S.ts[Math.max(0, ev.a - 20)], color: C.up, label: "other side of range", below: d < 0, dash: [4, 4] }); }
   return out;
@@ -134,7 +134,7 @@ const modelSVG = () => `<figure><svg width="300" height="150" viewBox="0 0 300 1
   <rect x="0" y="104" width="300" height="18" fill="rgba(38,166,154,.16)" stroke="${C.up}" stroke-dasharray="3 3"/><text x="6" y="117" font-size="10" fill="${C.ink}" font-family="system-ui">1 · HTF point of interest</text>
   <polyline points="10,20 40,40 60,34 90,70 110,62 130,96 140,118 150,92 165,98 178,70 200,40 215,52 228,58 245,30 270,14" fill="none" stroke="${C.ink}" stroke-width="2"/>
   <circle cx="140" cy="118" r="4" fill="${C.amber}"/><text x="146" y="138" font-size="10" fill="${C.amber}" font-family="system-ui">2 · sweep</text>
-  <line x1="110" y1="62" x2="210" y2="62" stroke="#9aa4bb" stroke-dasharray="5 3"/><text x="214" y="66" font-size="10" fill="#9aa4bb" font-family="system-ui">3 · CISD</text>
+  <line x1="110" y1="62" x2="210" y2="62" stroke="#a4a4a4" stroke-dasharray="5 3"/><text x="214" y="66" font-size="10" fill="#a4a4a4" font-family="system-ui">3 · CISD</text>
   <rect x="174" y="40" width="10" height="32" fill="${C.up}"/><text x="150" y="34" font-size="10" fill="${C.up}" font-family="system-ui">4 · displacement</text>
   <circle cx="228" cy="58" r="4" fill="${C.acc}"/><text x="234" y="84" font-size="10" fill="${C.acc}" font-family="system-ui">5 · entry on pullback</text>
   <line x1="0" y1="14" x2="300" y2="14" stroke="${C.up}" stroke-dasharray="4 4"/><text x="200" y="10" font-size="10" fill="${C.up}" font-family="system-ui">target: other side</text></svg></figure>`;

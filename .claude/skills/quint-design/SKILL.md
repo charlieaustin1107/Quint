@@ -1,25 +1,27 @@
 ---
 name: quint-design
-description: The Neon HUD design system and phone-first rules for Chart Wizard and Quint Brain pages, plus how to change, build, test and publish them. Use for any visual, layout, page or UI change in this repo, together with the frontend-design skill.
+description: The Obsidian & chrome (black) design system and phone-first rules for Chart Wizard and Quint Brain pages, plus how to change, build, test and publish them. Use for any visual, layout, page or UI change in this repo, together with the frontend-design skill.
 ---
 
 # Designing pages for Chart Wizard and Quint Brain
 
 The owner uses **only an iPhone**. Every screen is designed at 390×844 first, then checked wider. Plain English everywhere.
 
-## The look: Neon HUD (shared by both apps)
-- Void-black glass: backgrounds `#02040a` → panels `#070c18`, cards are translucent gradients with hairline borders `rgba(41,216,255,.14–.2)` and **corner brackets** (cyan top-left, violet bottom-right).
-- Wiring: electric cyan `#29d8ff` and violet `#9b6bff`. Mint `#2fd9a8` = buy/up, rose `#ff4f6e` = sell/down, amber `#ffb547` = warning.
-- Type: **Chakra Petch** (display, letter-spaced uppercase labels), **Martian Mono** (every price and number), **IBM Plex Sans** (body). Loaded from Google Fonts with system fallbacks.
-- Glow is for meaning (live, selected, the latest price), not decoration everywhere.
-- Tokens live in `:root` of `chart-wizard/src/head.html` (`--acc`, `--acc2`, `--up`, `--down`, …) and `quint-brain/src/head.html` (`--amber` is Quint Brain's cyan, `--violet`). Chart canvases read their colours from these tokens, so keep them 6-digit hex.
+## The look: Obsidian & chrome (shared by both apps; the owner asked for black, not blue)
+- **True black** `#000` is the base, like an OLED screen switched off. Raised surfaces are only a shade lighter (`#050505`–`#141414`) for hierarchy; never a navy or tinted near-black.
+- **No blue or violet anywhere.** Where accents are needed, use white and **liquid chrome** silver (`--chrome`: a white → light grey → mid grey → light grey gradient), with black text on chrome buttons.
+- **Colour only means something**: mint `#2fd9a8` = buy/up, rose `#ff4f6e` = sell/down, amber `#ffb547` = warning or the VWAP line. Nothing else is coloured.
+- **Crisp, not glowing**: hairlines in `rgba(255,255,255,.09)` (half a pixel on Retina), an inner top highlight on cards, white corner brackets fading to grey. No text glow, no colour haze, no background grid.
+- Type: **Chakra Petch** (display labels), **Martian Mono** (prices and numbers), **IBM Plex Sans** (body). Loaded from Google Fonts with system fallbacks.
+- **Bold in two places only**: the lit chrome **Quint core** (`qcDraw` in `chart-wizard/src/quint.js`) and the **price landscape** of real MNQ closes behind the main market card (`chart-wizard/src/land.js`). Everything else stays quiet.
+- Tokens live in `:root` of `chart-wizard/src/head.html` and `quint-brain/src/head.html`; the last "OBSIDIAN & CHROME" block in each file is the finish layer. Chart canvases read their colours from these tokens, so keep them 6-digit hex.
 
 ## Phone rules
 - Tap targets ≥ 44 px; inputs at 16 px so iOS doesn't zoom; respect `env(safe-area-inset-*)`.
 - No horizontal page scroll; grids use `minmax(0, 1fr)`; long text ellipsises.
 - Charts inside scrolling sheets use `touch-action: pan-y` in cursor mode so the page still scrolls; drawing modes take `none`.
 - Respect `prefers-reduced-motion` for every animation.
-- Use the frontend-design skill for direction, but stay inside this system: the two apps must feel like one product.
+- Use the frontend-design skill for direction, but stay inside this system: the two apps must feel like one product. Never bring blue back.
 
 ## Building (never hand-edit a built `index.html`)
 - Chart Wizard: `cd chart-wizard/src && python3 build.py && python3 build.py --prod`. Script order is in `build.py`.

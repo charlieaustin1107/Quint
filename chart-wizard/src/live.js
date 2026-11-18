@@ -442,7 +442,7 @@ function mkPaintHome() {
   mkPaintAcct(); ltPaintHome(); qtPaintHome(); if (typeof hudPaint === "function") { hudPaint(); lgPaint(); }
   const hero = $("#hmHero"), mb = MKDEF[HERO_K];
   if (!hero.firstChild) hero.innerHTML = `<button class="hero" data-k="${HERO_K}" aria-label="${esc(mb.name)}: open the live chart"></button>`;
-  const hb = hero.firstChild; hb.innerHTML = heroInner(mb); mkFlash(hb, HERO_K);
+  const hb = hero.firstChild; hb.innerHTML = heroInner(mb); mkFlash(hb, HERO_K); if (typeof landMount === "function") landMount(hero, HERO_K);
   const fs = mktStatus("fut", now), ss = mktStatus("stk", now);
   $("#hmFutSt").className = "mkst " + fs.cls; $("#hmFutSt").textContent = stLabel(fs);
   $("#hmStkSt").className = "mkst " + ss.cls; $("#hmStkSt").textContent = stLabel(ss);
@@ -695,7 +695,7 @@ class LiveChart {
       ctx.fillStyle = col; ctx.fillRect(x - body / 2, Math.min(yo, yc), body, Math.max(1, Math.abs(yc - yo)));
       if (i === B.n - 1 && w.b === B.n - 1) { ctx.strokeStyle = "rgba(242,246,255,.55)"; ctx.setLineDash([2, 2]); ctx.strokeRect(x - body / 2 - 2.5, this.yOf(B.h[i]) - 2.5, body + 5, this.yOf(B.l[i]) - this.yOf(B.h[i]) + 5); ctx.setLineDash([]); }
     }
-    ctx.strokeStyle = "#6f94ff"; ctx.lineWidth = 1.5; ctx.beginPath(); let on = false;
+    ctx.strokeStyle = "#999999"; ctx.lineWidth = 1.5; ctx.beginPath(); let on = false;
     for (let i = w.a; i <= w.b; i++) { const v = this.ema[i]; if (v == null) { on = false; continue; } const x = this.xOf(i), y = this.yOf(v); if (!on) { ctx.moveTo(x, y); on = true; } else ctx.lineTo(x, y); }
     ctx.stroke(); ctx.lineWidth = 1;
     const tag = (y, text, bg, fg) => { ctx.fillStyle = bg; ctx.fillRect(g.R + 1, y - 9, g.W - g.R - 2, 18); ctx.fillStyle = fg; ctx.textAlign = "left"; ctx.fillText(text, g.R + 6, y); };
@@ -703,22 +703,22 @@ class LiveChart {
     ctx.strokeStyle = lcol; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(0, Math.round(ly) + 0.5); ctx.lineTo(g.R, Math.round(ly) + 0.5); ctx.stroke(); ctx.setLineDash([]);
     if (P) {
       const line = (v, col, dash, label, wgt) => { if (v == null) return; const y = Math.round(this.yOf(v)) + 0.5; ctx.strokeStyle = col; ctx.lineWidth = wgt || 1.5; ctx.setLineDash(dash || []); ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(g.R, y); ctx.stroke(); ctx.setLineDash([]); ctx.lineWidth = 1;
-        ctx.font = "700 11px " + FONT; const tw = ctx.measureText(label).width; ctx.fillStyle = "rgba(11,16,32,.92)"; ctx.fillRect(6, y - 10, tw + 14, 20); ctx.strokeStyle = col; ctx.strokeRect(6.5, y - 9.5, tw + 13, 19); ctx.fillStyle = col; ctx.textAlign = "left"; ctx.fillText(label, 13, y); ctx.font = "11px " + FONT;
-        tag(y, fnum(S, v), col, "#04121a"); };
-      line(P.e, "#c9d3e6", [5, 4], P.lab ? P.lab("e") : "ENTRY", 1);
+        ctx.font = "700 11px " + FONT; const tw = ctx.measureText(label).width; ctx.fillStyle = "rgba(17,17,17,.92)"; ctx.fillRect(6, y - 10, tw + 14, 20); ctx.strokeStyle = col; ctx.strokeRect(6.5, y - 9.5, tw + 13, 19); ctx.fillStyle = col; ctx.textAlign = "left"; ctx.fillText(label, 13, y); ctx.font = "11px " + FONT;
+        tag(y, fnum(S, v), col, "#101010"); };
+      line(P.e, "#d2d2d2", [5, 4], P.lab ? P.lab("e") : "ENTRY", 1);
       line(P.stop, C.down, null, P.lab ? P.lab("stop") : "STOP", this.drag && this.drag.w === "stop" ? 2.5 : 1.5);
       line(P.tgt, C.up, null, P.lab ? P.lab("tgt") : "TARGET", this.drag && this.drag.w === "tgt" ? 2.5 : 1.5);
     }
     for (const L of this.lv || []) { // levels Quint drew
-      if (!(L.p > lo && L.p < hi)) continue; const y = Math.round(this.yOf(L.p)) + 0.5, col = L.col || "#c4b5fd";
+      if (!(L.p > lo && L.p < hi)) continue; const y = Math.round(this.yOf(L.p)) + 0.5, col = L.col || "#bfbfbf";
       ctx.strokeStyle = col; ctx.lineWidth = 1.3; ctx.setLineDash([7, 4]); ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(g.R, y); ctx.stroke(); ctx.setLineDash([]); ctx.lineWidth = 1;
-      ctx.font = "700 10.5px " + FONT; const t = "✦ " + L.lab, tw = ctx.measureText(t).width; ctx.fillStyle = "rgba(11,16,32,.88)"; ctx.fillRect(g.R - tw - 14, y - 9, tw + 10, 18); ctx.fillStyle = col; ctx.textAlign = "left"; ctx.fillText(t, g.R - tw - 9, y); ctx.font = "11px " + FONT;
-      tag(y, fnum(S, L.p), col, "#0b1020");
+      ctx.font = "700 10.5px " + FONT; const t = "✦ " + L.lab, tw = ctx.measureText(t).width; ctx.fillStyle = "rgba(17,17,17,.88)"; ctx.fillRect(g.R - tw - 14, y - 9, tw + 10, 18); ctx.fillStyle = col; ctx.textAlign = "left"; ctx.fillText(t, g.R - tw - 9, y); ctx.font = "11px " + FONT;
+      tag(y, fnum(S, L.p), col, "#111111");
     }
     tag(ly, fnum(S, last), lcol, "#fff");
     if (this.cross) {
       const i = this.iOf(this.cross.x), x = Math.round(this.xOf(i)) + 0.5, y = clamp(this.cross.y, g.T, g.V);
-      ctx.strokeStyle = "rgba(201,211,230,.45)"; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x, g.T - 6); ctx.lineTo(x, g.B); ctx.moveTo(0, y + 0.5); ctx.lineTo(g.R, y + 0.5); ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle = "rgba(210,210,210,.45)"; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x, g.T - 6); ctx.lineTo(x, g.B); ctx.moveTo(0, y + 0.5); ctx.lineTo(g.R, y + 0.5); ctx.stroke(); ctx.setLineDash([]);
       tag(y, fnum(S, this.pOf(y)), C.card2, C["ink-hi"]);
       const dl = this.lab(i, 2); ctx.font = "11px " + FONT; const tw = ctx.measureText(dl).width + 12; ctx.fillStyle = C.card2; ctx.fillRect(clamp(x - tw / 2, 0, g.R - tw), g.B + 2, tw, 18); ctx.fillStyle = C["ink-hi"]; ctx.textAlign = "center"; ctx.fillText(dl, clamp(x, tw / 2, g.R - tw / 2), g.B + 11);
     }
