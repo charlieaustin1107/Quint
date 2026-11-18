@@ -69,11 +69,11 @@ Commands that **raise risk need two steps**, so a stray click or a script can't 
 
 | Command | Risk | Notes |
 |---|---|---|
-| `bot.start` | raises | A live bot on a prop account also needs the account name typed |
+| `bot.start` | raises | A live bot on a prop account also needs the account name typed. Refused if another bot is already on one of its accounts |
 | `bot.stop` | lowers | `flatten: true` also closes the bot's positions |
 | `bot.goLive` | raises | Always needs the account name typed; works for unapproved bots too (Go Live Now) |
 | `bot.setSim` | lowers | Back to simulation only |
-| `bot.setAccounts` | raises | Which accounts the bot trades |
+| `bot.setAccounts` | raises | Which accounts the bot trades. Refused for an account that already has another bot on |
 | `bot.setContracts` | raises | Lowering contracts skips the confirm |
 | `copier.setLeader` | raises | The account Manual Copy copies from |
 | `copier.setFollower` | raises | Switching a follower off skips the confirm |

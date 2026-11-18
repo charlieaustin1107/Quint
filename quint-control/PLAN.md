@@ -290,6 +290,8 @@ public class NoiseAreaMomentum : QuintStrategy
 - **A cap on trades open at once** per account (a setting, default 2).
 - Every bot's trades and profit are tracked separately, so you can see which bot is earning.
 
+**One bot per account.** Each account runs one bot at a time. Switching on a second bot for an account asks you to turn the first one off. Different accounts can run different bots, and the guardian still blocks opposite positions across accounts.
+
 **Backtesting, from quick to exact:**
 
 - **Quick research:** the repo's backtester runs new ideas on saved MNQ candles in seconds.
