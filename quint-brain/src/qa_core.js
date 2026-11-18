@@ -57,9 +57,10 @@ function qaQuotaHit(e) {
   const m = /(\d+)[\s-]*min/i.exec(s); TVQ.until = Date.now() + (m ? +m[1] + 0.5 : 6) * 6e4; save(); qaPace(); setTimeout(() => { paintAll(); }, 0); setTimeout(() => { qaPace(); paintAll(); }, TVQ.until - Date.now() + 1500); return true;
 }
 function qaGate(ns) { // the page's own wrapper; the connector namespace itself is never changed. Every TradingView call is counted against the day's allowance
-  return { callTool: (srv, tool, input, opt) => { if (srv !== TV_SERVER) return ns.callTool(srv, tool, input, opt); if (tvCooling()) return Promise.reject({ code: "cooldown", message: tvCoolMsg() });
-    tvCount(); const now = Date.now(); TVQ.hist.push(now); if (TVQ.hist.length > 200) TVQ.hist = TVQ.hist.filter(x => x > now - 9e5);
-    return ns.callTool(srv, tool, input, opt).then(r => { const p = r && r.payload; if ((typeof p === "string" && qaQuotaHit(p)) || (p && typeof p === "object" && p.success === false && qaQuotaHit(p.error || p.message))) throw { code: "cooldown", message: tvCoolMsg() }; return r; }, e => { if (qaQuotaHit(e)) throw { code: "cooldown", message: tvCoolMsg() }; throw e; }); } };
+  tvLogInit();
+  return { callTool: (srv, tool, input, opt) => { if (srv !== TV_SERVER) return ns.callTool(srv, tool, input, opt); if (tvCooling()) { tvLogAdd(tool, input, "blocked"); return Promise.reject({ code: "cooldown", message: tvCoolMsg() }); }
+    tvCount(); const L = tvLogAdd(tool, input); const now = Date.now(); TVQ.hist.push(now); if (TVQ.hist.length > 200) TVQ.hist = TVQ.hist.filter(x => x > now - 9e5);
+    return ns.callTool(srv, tool, input, opt).then(r => { if (r && r.cache) tvLogEnd(L, "saved"); const p = r && r.payload; if ((typeof p === "string" && qaQuotaHit(p)) || (p && typeof p === "object" && p.success === false && qaQuotaHit(p.error || p.message))) { tvLogEnd(L, "refused"); throw { code: "cooldown", message: tvCoolMsg() }; } return r; }, e => { if (qaQuotaHit(e)) { tvLogEnd(L, "refused"); throw { code: "cooldown", message: tvCoolMsg() }; } tvLogEnd(L, "error"); throw e; }); } };
 }
 async function qaConnect() {
   if (!HS().tvPlanSet && HS().tvPlan) { delete HS().tvPlan; save(); } // an earlier version guessed the plan from its own count: only the one you pick counts
