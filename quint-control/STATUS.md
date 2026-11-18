@@ -6,7 +6,7 @@
 
 | Phase | What it is | Status |
 |---|---|---|
-| 0 | Project set-up: plan, structure, protocol, skill, install scripts, tests | In review (branch `quint-control/phase-0`) |
+| 0 | Project set-up: plan, structure, protocol, skill, install scripts, tests | In review: pull request #13 (branch `quint-control/phase-0`) |
 | 1 | Engine and website shell (read-only) | Not started |
 | 2 | Guardian, order router, copier and Manual Copy (simulation only) | Not started |
 | 3 | Strategy plug-ins and the first bots | Not started |
@@ -18,7 +18,7 @@
 
 ## Next step
 
-1. The owner reviews and merges the phase 0 pull request.
+1. The owner reviews and merges the phase 0 pull request (#13).
 2. The owner gets their Windows computer ready using `SETUP.md` (install NinjaTrader 8, turn on multi-provider mode, connect LucidDaily and check Sim101).
 3. Start phase 1: paste the master prompt and the phase 1 prompt from `FABLE-PROMPTS.md`.
 
