@@ -40,7 +40,7 @@
 - [x] LucidDaily firm preset (numbers marked "verify" where Lucid's figures aren't confirmed)
 - [x] `SETUP.md` for the owner
 - [x] `Install-Quint.ps1` and `Uninstall-Quint.ps1`
-- [x] `npm test`: protocol, firm preset and structure tests, run three times
+- [x] `npm test`: 39 tests (schema checker, protocol, firm preset, structure and install-script safety), passed three runs in a row with `npm run test:3`
 - [ ] Owner reviews and merges the pull request
 
 ## Decisions (settled, don't re-ask)
@@ -50,9 +50,15 @@ Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ co
 ## Still open
 
 - How many LucidDaily accounts, and what size (the bot works with one).
+- LucidDaily numbers marked `verify` in `firms/lucid-daily.json` (profit target, daily loss limit, max micros, max funded accounts, news penalty): check them on Lucid's rules page before going live.
+
+## Notes for the next session
+
+- No `dotnet` or PowerShell in the cloud workspace and package installs are off, so: C# is checked by the self-tests inside NinjaTrader, the schema checker is hand-written (`reference/lib/schema.js`), and the install scripts are checked by static tests only.
+- `backtest/pillar_2r.js` and its results are untracked on a separate branch idea (5-pillar fixed-2R test); they are not part of Quint Control.
 
 ## Session log
 
 | Date | Model | What happened |
 |---|---|---|
-| 2026-11-18 | Opus 5.5 | Phase 0 built: plan, prompts, structure, protocol and schemas, skill, firm preset, setup guide, install scripts, tests. Pull request opened. |
+| 2026-11-18 | Opus 5.5 | Phase 0 built: plan, prompts, structure, protocol and schemas, skill, firm preset, setup guide, install scripts, tests (39, three clean runs). Pull request opened. Not tested: the PowerShell scripts (no PowerShell in the cloud); they get their first real run on the owner's computer in phase 1. |

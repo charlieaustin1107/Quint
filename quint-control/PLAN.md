@@ -16,7 +16,23 @@ Copy-paste prompts for every build phase are in Fable prompts.
 
 ## How it fits together
 
-&#91;embedded content: how Quint Control fits together · 5 parts\]
+```
+ Your Lucid accounts (Tradovate)          Your phone
+            |                              |  Telegram alerts, Remote Desktop
+            v                              |
+ +---------------- NinjaTrader 8 on your Windows computer ----------------+
+ |  Live MNQ candles, orders, Strategy Analyzer                            |
+ |                                                                         |
+ |  Quint Engine (add-on)                                                  |
+ |    bots -> Guardian.Check -> OrderRouter -> every switched-on account    |
+ |    copier / Manual Copy, kill switches, journal, self-tests             |
+ |    local server on 127.0.0.1:8765                                       |
+ +-----------------------------------|-------------------------------------+
+                                     | WebSocket (protocol.md)
+                                     v
+ Quint Control website in your browser: Command, Bots, Accounts, Journal,
+ Backtests, Brain, Settings, setup wizard, Quint assistant (your Claude API key)
+```
 
 The Quint Engine lives inside NinjaTrader and does all the trading. The website is its screen and remote control, and your phone can reach the whole computer through Remote Desktop.
 
