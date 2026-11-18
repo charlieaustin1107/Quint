@@ -16,6 +16,7 @@ Read this first in every session. It says what this project is for and how to wo
 | `backtest/` | Code that backtests the strategies on real MNQ candles, outside the browser | Runs with `node` and `python3` |
 | `quint-control/` | **Quint Control**: the NinjaTrader 8 trading engine (bots, guardian, copier, Manual Copy), its local black dashboard website and the Quint assistant. Plan in `quint-control/PLAN.md`, progress in `quint-control/STATUS.md` | NinjaTrader 8 on the owner's Windows computer; tests run with `node` |
 | `system-design-primer/` | A copy of Donne Martin's **System Design Primer** (CC BY 4.0), for reference reading only. See `system-design-primer/SOURCE.md` | Not used by any app |
+| `material-icons/` | Every Google **Material Symbols** icon (Apache 2.0), outlined 24px, in `outlined/` and `filled/`. See `material-icons/SOURCE.md` | Not used by any app yet |
 
 Each app runs as a single self-contained `index.html`. The artifacts are where the apps actually run, because Quint's AI chat and the TradingView/market connectors work there without an API key. **This repo is the master copy.** Change it here, then publish the built `index.html` to the matching artifact.
 
