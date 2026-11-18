@@ -3,7 +3,7 @@
 // then what comes out (the call, the plan, his record, your alerts, the session). Wires from the inputs carry their signal: green bullish, red bearish.
 const BR = { nodes: [], layers: [], edges: [], sig: "", pts: new Map(), yaw: 0, pitch: -0.1, vy: 0, vp: 0, moved: 0, lastTap: 0, dirty: true, auto: 1 };
 const BR_HID = [[24, "HL 1", "Pattern", "ReLU"], [32, "HL 2", "Structure", "ReLU"], [37, "HL 3", "Resonance", "ReLU"], [28, "HL 4", "Judgement", "GELU"]];
-const BR_COL = ["#4d8dff", "#9b6bff", "#ff6ec7", "#ffa14a", "#ff7f8a", "#56d4ff"];
+const BR_COL = ["#f2f2f2", "#cfcfcf", "#b0b0b0", "#e0e0e0", "#bdbdbd", "#ffffff"]; // six layers in shades of silver; only the signal wires carry mint and rose
 function brRng(seed) { let s = (seed * 2654435761) >>> 0 || 1; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
 const brHash = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 // every node carries a short label (zoomed out), a long one (zoomed in) and the lines shown when tapped
@@ -72,9 +72,9 @@ function brProj(p, P) { const cy = Math.cos(BR.yaw), sy = Math.sin(BR.yaw), cp =
 function brDraw(cv, t, big) {
   const { x, w, h } = fitCanvas(cv), C = cols(); if (!BR.nodes.length) brBuild(); const busy = DK.busy, s = t / 1000;
   const P = { cx: w / 2, cy: h * (big ? 0.5 : 0.5), S: Math.min(w * (big ? 0.29 : 0.3), h * (big ? 0.29 : 0.31)), D: 4.6 };
-  x.clearRect(0, 0, w, h); const g = x.createRadialGradient(P.cx, P.cy, 0, P.cx, P.cy, Math.max(w, h) * 0.75); g.addColorStop(0, "rgba(110,60,200,.16)"); g.addColorStop(0.5, "rgba(30,60,140,.08)"); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, w, h);
+  x.clearRect(0, 0, w, h); const g = x.createRadialGradient(P.cx, P.cy, 0, P.cx, P.cy, Math.max(w, h) * 0.75); g.addColorStop(0, "rgba(92,92,92,.16)"); g.addColorStop(0.5, "rgba(66,66,66,.08)"); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, w, h);
   for (const n of BR.nodes) n.q = brProj(n.p, P);
-  if (big && BR.dust) { x.fillStyle = "rgba(200,180,255,.35)"; for (const d of BR.dust) { const q = brProj(d, P); x.fillRect(q[0], q[1], 1.2 * q[3], 1.2 * q[3]); } }
+  if (big && BR.dust) { x.fillStyle = "rgba(191,191,191,.35)"; for (const d of BR.dust) { const q = brProj(d, P); x.fillRect(q[0], q[1], 1.2 * q[3], 1.2 * q[3]); } }
   const cols6 = BR_COL.concat([C.buy, C.sell]), bk = cols6.map(() => [[], []]), step = big ? 1 : 2;
   for (let i = 0; i < BR.edges.length; i += step) { const e = BR.edges[i], cq = brProj(e.c, P); e.cq = cq; bk[e.col][(e.a.q[2] + e.b.q[2]) / 2 > -0.2 ? 0 : 1].push(e); }
   x.globalCompositeOperation = "lighter"; x.lineWidth = big ? 1 : 0.7; const lift = busy ? 0.1 + 0.07 * Math.sin(s * 7) : 0;
@@ -90,9 +90,9 @@ function brDraw(cv, t, big) {
     BR[K] = Lp.filter(p => p.t < 1); }
   x.globalCompositeOperation = "source-over";
   // the neurons
-  const call = liveCall(), hue = call && call.side ? (call.side > 0 ? C.buy : C.sell) : "#ffd0f0";
+  const call = liveCall(), hue = call && call.side ? (call.side > 0 ? C.buy : C.sell) : "#dddddd";
   for (const n of BR.nodes) { const [sx, sy, z, f] = n.q, front = z > -0.2, r = (n.hid ? 1.6 : n.big ? 4.5 : 2.8) * f * (big ? 1 : 0.7);
-    const col = n.hid ? "#f4d9ff" : n.warn ? C.warn : n.tone > 0 ? C.buy : n.tone < 0 ? C.sell : n.big ? hue : "#cfe6ff"; x.globalAlpha = front ? 0.95 : 0.4; x.beginPath(); x.arc(sx, sy, r, 0, Math.PI * 2); x.fillStyle = col; x.fill();
+    const col = n.hid ? "#e2e2e2" : n.warn ? C.warn : n.tone > 0 ? C.buy : n.tone < 0 ? C.sell : n.big ? hue : "#e3e3e3"; x.globalAlpha = front ? 0.95 : 0.4; x.beginPath(); x.arc(sx, sy, r, 0, Math.PI * 2); x.fillStyle = col; x.fill();
     if (n.big && big) { x.beginPath(); x.arc(sx, sy, r + 6 + (call ? 3 * Math.sin(s * 3) : 0), 0, Math.PI * 2); x.strokeStyle = hue; x.lineWidth = 1.4; x.stroke(); } }
   x.globalAlpha = 1; if (!big) return;
   // layer names over each column, and the words on the inputs and outputs that face you
@@ -101,11 +101,11 @@ function brDraw(cv, t, big) {
   const heads = BR.layers.map(Ly => ({ Ly, q: brProj(Ly.top, P) })).sort((a, b) => b.q[2] - a.q[2]), placed = [];
   for (const { Ly, q } of heads) { const z = q[2], sy = q[1], sx = clamp(q[0], 34, w - 34); if (placed.some(px => Math.abs(px - sx) < 62)) continue; placed.push(sx); x.globalAlpha = clamp(0.35 + (z + 0.6), 0.15, 1);
     x.font = "700 10px 'Martian Mono', monospace"; x.fillStyle = "#f2ecff"; x.fillText(Ly.name, sx, sy - 30);
-    x.font = "500 8.5px 'Martian Mono', monospace"; x.fillStyle = "#b9a6ff"; x.fillText(`(${Ly.sub})`, sx, sy - 19); x.fillStyle = "#c9b8ff"; x.fillText(String(Ly.nodes.length), sx, sy - 8); x.fillStyle = "#ff8fb1"; x.fillText(`[${Ly.act}]`, sx, sy + 3); }
+    x.font = "500 8.5px 'Martian Mono', monospace"; x.fillStyle = "#b3b3b3"; x.fillText(`(${Ly.sub})`, sx, sy - 19); x.fillStyle = "#c2c2c2"; x.fillText(String(Ly.nodes.length), sx, sy - 8); x.fillStyle = "#b1b1b1"; x.fillText(`[${Ly.act}]`, sx, sy + 3); }
   x.globalAlpha = 1;
   for (const Ly of [BR.layers[0], BR.layers[BR.layers.length - 1]]) { const [lx, , lz] = brProj(Ly.top, P); if (lz < -1.1) continue; const right = lx < P.cx, a = clamp((lz + 1.1) * 1.2, 0, 1);
     for (const n of Ly.nodes) { const [sx, sy] = n.q; x.globalAlpha = a; x.font = `${n.big ? 700 : 500} ${n.big ? 12.5 : 9.5}px ${n.big ? "'Chakra Petch', sans-serif" : "'Martian Mono', monospace"}`; x.textAlign = right ? "left" : "right";
-      const tw = x.measureText(n.s).width, tx = right ? sx + 8 : sx - 8; x.fillStyle = "rgba(2,4,10,.62)"; x.fillRect(right ? tx - 2 : tx - tw - 2, sy - 6.5, tw + 4, 13);
+      const tw = x.measureText(n.s).width, tx = right ? sx + 8 : sx - 8; x.fillStyle = "rgba(4,4,4,.62)"; x.fillRect(right ? tx - 2 : tx - tw - 2, sy - 6.5, tw + 4, 13);
       x.fillStyle = n.warn ? C.warn : n.tone > 0 ? C.buy : n.tone < 0 ? C.sell : n.big ? hue : C.ink; x.fillText(n.s, tx, sy); } }
   x.globalAlpha = 1;
 }

@@ -200,20 +200,37 @@ const QC_V = (() => { const p = (1 + Math.sqrt(5)) / 2, v = [[-1, p, 0], [1, p, 
 const QC_E = (() => { const e = []; for (let i = 0; i < 12; i++) for (let j = i + 1; j < 12; j++) { const d = Math.hypot(QC_V[i][0] - QC_V[j][0], QC_V[i][1] - QC_V[j][1], QC_V[i][2] - QC_V[j][2]); if (d < 1.1) e.push([i, j]); } return e; })();
 const QC_P = Array.from({ length: 42 }, (_, k) => { const y = 1 - (k + .5) / 21, r = Math.sqrt(Math.max(0, 1 - y * y)), a = k * 2.39996; return [Math.cos(a) * r, y, Math.sin(a) * r]; }); // Fibonacci sphere
 function qcState() { return typeof VM !== "undefined" && VM.on && VM.st !== "idle" && VM.st !== "type" ? VM.st : (typeof DK !== "undefined" && DK.busy) ? "think" : (QT && QT.speaking) ? "speak" : "idle"; }
-function qcDraw(cv, now) {
+const QC_F = (() => { const f = [], E = new Set(QC_E.map(([i, j]) => i + "," + j)), has = (i, j) => E.has(Math.min(i, j) + "," + Math.max(i, j)); for (let i = 0; i < 12; i++) for (let j = i + 1; j < 12; j++) for (let k = j + 1; k < 12; k++) if (has(i, j) && has(j, k) && has(i, k)) f.push([i, j, k]); return f; })(); // the 20 triangles
+function qcTint() { try { const L = typeof dkCalls === "function" ? dkCalls() : []; const c = L && L[0]; return c && c.side && Date.now() - c.t < 2 * 36e5 ? (c.side > 0 ? [47, 217, 168] : [255, 79, 110]) : null; } catch (e) { return null; } }
+function qcDraw(cv, now) { // a polished chrome crystal: each face lit by a key light and a reflected sky, white edges, an orbit of points
   const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return; const dpr = Math.min(2, window.devicePixelRatio || 1);
   if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
-  const x = cv.getContext("2d"), st = qcState(), t = now / 1000, sp = st === "think" ? 2.6 : st === "speak" ? 1.4 : st === "listen" ? 1 : .45;
-  QCORE.ang = (QCORE.ang || 0) + sp * Math.min(.05, (now - (QCORE.last || now)) / 1000); QCORE.last = now; const a = QCORE.ang, b = a * .63 + .4;
-  const pulse = st === "speak" ? 1 + .1 * Math.sin(t * 17) * Math.sin(t * 5.3) : st === "listen" ? 1 + .06 * Math.sin(t * 4) : 1, R = Math.min(W, H) * .36 * pulse, cx = W / 2, cy = H / 2;
-  const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b), pr = v => { const x1 = v[0] * ca + v[2] * sa, z1 = -v[0] * sa + v[2] * ca, y1 = v[1] * cb - z1 * sb, z2 = v[1] * sb + z1 * cb, k = 2.6 / (2.6 + z2); return [cx + x1 * R * k, cy + y1 * R * k, z2]; };
-  const c1 = st === "think" ? "155,107,255" : "41,216,255", c2 = st === "think" ? "41,216,255" : "155,107,255";
+  const x = cv.getContext("2d"), st = qcState(), t = now / 1000, sp = st === "think" ? 2.4 : st === "speak" ? 1.3 : st === "listen" ? .9 : .4;
+  QCORE.ang = (QCORE.ang || 0) + sp * Math.min(.05, (now - (QCORE.last || now)) / 1000); QCORE.last = now; const a = QCORE.ang, b = a * .61 + .5;
+  const pulse = st === "speak" ? 1 + .08 * Math.sin(t * 17) * Math.sin(t * 5.3) : st === "listen" ? 1 + .05 * Math.sin(t * 4) : 1, R = Math.min(W, H) * .34 * pulse, cx = W / 2, cy = H / 2;
+  const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b);
+  const rot = v => { const x1 = v[0] * ca + v[2] * sa, z1 = -v[0] * sa + v[2] * ca, y1 = v[1] * cb - z1 * sb, z2 = v[1] * sb + z1 * cb; return [x1, y1, z2]; };
+  const pr = r => { const k = 2.8 / (2.8 + r[2]); return [cx + r[0] * R * k, cy + r[1] * R * k, r[2]]; };
+  const tint = qcTint(), Lx = -.45, Ly = -.7, Lz = -.55, Ln = Math.hypot(Lx, Ly, Lz), L = [Lx / Ln, Ly / Ln, Lz / Ln], Hh = [L[0], L[1], L[2] - 1], Hn = Math.hypot(...Hh), Hv = Hh.map(v => v / Hn);
   x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
-  const g = x.createRadialGradient(cx, cy, 0, cx, cy, R * 1.5); g.addColorStop(0, `rgba(${c1},.32)`); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, W, H);
-  const P = QC_V.map(pr); x.lineWidth = Math.max(.8, R / 22);
-  for (const [i, j] of QC_E) { const z = (P[i][2] + P[j][2]) / 2, al = .35 + .5 * (1 - (z + 1) / 2); x.strokeStyle = `rgba(${c1},${al.toFixed(2)})`; x.beginPath(); x.moveTo(P[i][0], P[i][1]); x.lineTo(P[j][0], P[j][1]); x.stroke(); }
-  for (const p of QC_P.map(v => pr([v[0] * 1.35, v[1] * .25 * 1.35, v[2] * 1.35]))) { const al = .3 + .6 * (1 - (p[2] + 1.4) / 2.8); x.fillStyle = `rgba(${c2},${al.toFixed(2)})`; x.beginPath(); x.arc(p[0], p[1], Math.max(.7, R / 26), 0, Math.PI * 2); x.fill(); }
-  x.fillStyle = "#fff"; x.globalAlpha = .9; x.beginPath(); x.arc(cx, cy, Math.max(1.2, R * .16), 0, Math.PI * 2); x.fill(); x.globalAlpha = 1;
+  const g = x.createRadialGradient(cx, cy, R * .2, cx, cy, R * 1.6); g.addColorStop(0, tint ? `rgba(${tint},.22)` : "rgba(255,255,255,.12)"); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  const V = QC_V.map(rot), P = V.map(pr), faces = [];
+  for (const [i, j, k] of QC_F) { const A = V[i], B = V[j], Cc = V[k], u = [B[0] - A[0], B[1] - A[1], B[2] - A[2]], w = [Cc[0] - A[0], Cc[1] - A[1], Cc[2] - A[2]];
+    let n = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]]; const m = Math.hypot(...n); n = n.map(v => v / m);
+    const c = [(A[0] + B[0] + Cc[0]) / 3, (A[1] + B[1] + Cc[1]) / 3, (A[2] + B[2] + Cc[2]) / 3]; if (n[0] * c[0] + n[1] * c[1] + n[2] * c[2] < 0) n = n.map(v => -v);
+    if (n[2] > .05) continue; // facing away
+    const dif = Math.max(0, n[0] * L[0] + n[1] * L[1] + n[2] * L[2]), spec = Math.pow(Math.max(0, n[0] * Hv[0] + n[1] * Hv[1] + n[2] * Hv[2]), 28);
+    const ry = 2 * n[2] * n[1], sky = .5 - .5 * ry, env = sky * sky * (3 - 2 * sky); // reflected view ray: bright sky above, dark floor below
+    const v = Math.min(1, .05 + .62 * env * (.35 + .65 * dif) + 1.1 * spec); faces.push({ i, j, k, z: c[2], v });
+  }
+  faces.sort((p, q) => q.z - p.z);
+  const dot = Math.max(.6, R / 30), ring = tint ? tint.join(",") : "255,255,255", orb = QC_P.map(v => pr(rot([v[0] * 1.42, v[1] * .22 * 1.42, v[2] * 1.42])));
+  const dots = far => { for (const p of orb) if ((p[2] > 0) === far) { x.globalAlpha = far ? .28 : .9; x.fillStyle = `rgb(${ring})`; x.beginPath(); x.arc(p[0], p[1], far ? dot * .8 : dot, 0, Math.PI * 2); x.fill(); } x.globalAlpha = 1; };
+  dots(true); // the far side of the orbit, behind the crystal
+  for (const f of faces) { const A = P[f.i], B = P[f.j], Cc = P[f.k], s = Math.round(f.v * 255);
+    x.beginPath(); x.moveTo(A[0], A[1]); x.lineTo(B[0], B[1]); x.lineTo(Cc[0], Cc[1]); x.closePath();
+    x.fillStyle = `rgb(${s},${s},${s})`; x.fill(); x.strokeStyle = `rgba(255,255,255,${(.25 + .5 * f.v).toFixed(2)})`; x.lineWidth = Math.max(.5, R / 40); x.stroke(); }
+  dots(false); // the near side, in front
 }
 function qcLoop(now) {
   QCORE.raf = 0; for (const cv of [...QCORE.cvs]) if (!cv.isConnected) QCORE.cvs.delete(cv); if (!QCORE.cvs.size || document.hidden) return;
@@ -585,7 +602,7 @@ function prPaint() {
     <p class="small">ATR here is ${fnum(MKSPEC[P.k], P.A[i])}, so a ${P.stop}× stop is ${fnum(MKSPEC[P.k], P.stop * P.A[i])} away ($${(P.stop * P.A[i] * MKSPEC[P.k].mpv).toFixed(0)} per ${esc(MKSPEC[P.k].micro)}).</p>
     <button class="btn pri qtwide" id="prGo" ${P.dir && P.side ? "" : "disabled"}>Reveal</button>`}`;
   const hi = qtAgg(B, big, i + 1); qtDraw($("#prCv2"), hi, hi.c.length - 60, hi.c.length, { h: 150, S: MKSPEC[P.k] });
-  if (P.done) { const m = R.mine, lines = m ? [{ p: m.e, col: "#9fb3d9", lab: "entry" }, { p: m.st, col: "#ef5350", lab: "stop" }, { p: m.tg, col: "#26a69a", lab: "target" }] : []; qtDraw($("#prCv"), B, i - 99, R.end + 1, { h: 300, mark: i + 1, lines, S: MKSPEC[P.k], tf: P.tf }); }
+  if (P.done) { const m = R.mine, lines = m ? [{ p: m.e, col: "#b2b2b2", lab: "entry" }, { p: m.st, col: "#ef5350", lab: "stop" }, { p: m.tg, col: "#26a69a", lab: "target" }] : []; qtDraw($("#prCv"), B, i - 99, R.end + 1, { h: 300, mark: i + 1, lines, S: MKSPEC[P.k], tf: P.tf }); }
   else qtDraw($("#prCv"), B, i - 99, i + 1, { h: 300, S: MKSPEC[P.k], tf: P.tf });
   $$("#prBody [data-g]").forEach(b => b.onclick = () => { const g = b.dataset.g; P[g] = g === "stop" || g === "tgt" ? +b.dataset.k : b.dataset.k; prPaint(); });
   const go = $("#prGo"); if (go) go.onclick = () => { prReveal(); sfx(P.res && P.dir === P.res.truth ? "right" : "wrong"); prPaint(); };

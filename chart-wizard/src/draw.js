@@ -3,7 +3,7 @@
    with select, drag, delete and undo. The same chart (candles, volume, EMA 20, crosshair, pan and pinch)
    now also draws the practice and "Spot it" questions, cut off at the question candle so the future stays hidden. */
 const LC_TOOLS = [["cur", "✥", "Move and select"], ["h", "—", "Level (horizontal line)"], ["t", "╱", "Trend line"], ["z", "▭", "Zone"], ["m", "⇕", "Measure"]];
-const LC_COL = { h: "#ffb547", t: "#29d8ff", z: "#9b6bff" };
+const LC_COL = { h: "#ffb547", t: "#f2f2f2", z: "#bdbdbd" };
 (() => {
   const P = LiveChart.prototype, down0 = P.down, move0 = P.move, up0 = P.up, draw0 = P.draw;
   P.fi = function (x) { const g = this.geo(), w = this.win(); return w.b - (g.R - 8 - x) / this.bw() - 0.5; }; // x -> fractional candle index
@@ -63,15 +63,15 @@ const LC_COL = { h: "#ffb547", t: "#29d8ff", z: "#9b6bff" };
   P.draw = function () {
     draw0.call(this); const B = this.B; if (!B || !B.n || !this.sc) return; const ctx = this.ctx, g = this.geo(), S = this.S, f = v => fnum(S, v);
     ctx.save(); ctx.beginPath(); ctx.rect(0, g.T - 8, g.W, g.B - g.T + 8); ctx.clip();
-    if (this.mark != null && this.mark > 0 && this.mark < B.n) { const mx = this.xOf(this.mark) - this.bw() / 2; ctx.fillStyle = "rgba(155,107,255,.09)"; ctx.fillRect(mx, g.T - 8, g.R - mx, g.B - g.T + 8); ctx.strokeStyle = "rgba(155,107,255,.8)"; ctx.setLineDash([4, 3]); ctx.beginPath(); ctx.moveTo(Math.round(mx) + 0.5, g.T - 8); ctx.lineTo(Math.round(mx) + 0.5, g.B); ctx.stroke(); ctx.setLineDash([]);
-      ctx.font = "700 10px " + FONT; ctx.fillStyle = "#c4b5fd"; ctx.textAlign = "left"; ctx.fillText("WHAT HAPPENED NEXT", mx + 6, g.T + 4); }
+    if (this.mark != null && this.mark > 0 && this.mark < B.n) { const mx = this.xOf(this.mark) - this.bw() / 2; ctx.fillStyle = "rgba(136,136,136,.09)"; ctx.fillRect(mx, g.T - 8, g.R - mx, g.B - g.T + 8); ctx.strokeStyle = "rgba(136,136,136,.8)"; ctx.setLineDash([4, 3]); ctx.beginPath(); ctx.moveTo(Math.round(mx) + 0.5, g.T - 8); ctx.lineTo(Math.round(mx) + 0.5, g.B); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font = "700 10px " + FONT; ctx.fillStyle = "#bfbfbf"; ctx.textAlign = "left"; ctx.fillText("WHAT HAPPENED NEXT", mx + 6, g.T + 4); }
     const tag = (y, text, bg, fg) => { ctx.fillStyle = bg; ctx.fillRect(g.R + 1, y - 9, g.W - g.R - 2, 18); ctx.fillStyle = fg; ctx.textAlign = "left"; ctx.font = "11px " + FONT; ctx.fillText(text, g.R + 6, y); };
     const handle = (x, y, col) => { ctx.fillStyle = C.bg; ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.lineWidth = 1; };
     const one = (d, sel, ghost) => {
-      const col = LC_COL[d.k] || "#29d8ff", A = this.xy(d.a), Bp = d.b ? this.xy(d.b) : null; ctx.globalAlpha = ghost ? 0.7 : 1; ctx.textBaseline = "middle";
+      const col = LC_COL[d.k] || "#c7c7c7", A = this.xy(d.a), Bp = d.b ? this.xy(d.b) : null; ctx.globalAlpha = ghost ? 0.7 : 1; ctx.textBaseline = "middle";
       if (d.k === "h") { const y = Math.round(A.y) + 0.5; ctx.strokeStyle = col; ctx.lineWidth = sel ? 2.4 : 1.6; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(g.R, y); ctx.stroke(); ctx.lineWidth = 1; tag(y, f(d.a.p), col, "#140c00"); if (sel) handle(g.R - 14, y, col); }
       else if (d.k === "t") { ctx.strokeStyle = col; ctx.lineWidth = sel ? 2.4 : 1.8; ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(Bp.x, Bp.y); ctx.stroke(); ctx.lineWidth = 1; if (sel || ghost) { handle(A.x, A.y, col); handle(Bp.x, Bp.y, col); } }
-      else if (d.k === "z") { const x0 = Math.min(A.x, Bp.x), y0 = Math.min(A.y, Bp.y), w = Math.abs(Bp.x - A.x), h = Math.abs(Bp.y - A.y); ctx.fillStyle = "rgba(155,107,255,.14)"; ctx.fillRect(x0, y0, w, h); ctx.strokeStyle = col; ctx.lineWidth = sel ? 2 : 1.2; ctx.strokeRect(x0 + 0.5, y0 + 0.5, w, h); ctx.lineWidth = 1;
+      else if (d.k === "z") { const x0 = Math.min(A.x, Bp.x), y0 = Math.min(A.y, Bp.y), w = Math.abs(Bp.x - A.x), h = Math.abs(Bp.y - A.y); ctx.fillStyle = "rgba(136,136,136,.14)"; ctx.fillRect(x0, y0, w, h); ctx.strokeStyle = col; ctx.lineWidth = sel ? 2 : 1.2; ctx.strokeRect(x0 + 0.5, y0 + 0.5, w, h); ctx.lineWidth = 1;
         ctx.font = "600 10px " + FONT; ctx.fillStyle = col; ctx.textAlign = "left"; ctx.fillText(`${f(Math.max(d.a.p, d.b.p))} – ${f(Math.min(d.a.p, d.b.p))}`, x0 + 5, y0 + 9); if (sel || ghost) { handle(A.x, A.y, col); handle(Bp.x, Bp.y, col); } }
       ctx.globalAlpha = 1;
     };
@@ -83,7 +83,7 @@ const LC_COL = { h: "#ffb547", t: "#29d8ff", z: "#9b6bff" };
       ctx.strokeStyle = col; ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(Bp.x, Bp.y); ctx.stroke();
       const txt = `${dp >= 0 ? "+" : "−"}${f(Math.abs(dp))} (${fpct(dp / M.a.p * 100, 2)}) · ${bars} bars · ${dp >= 0 ? "+" : "−"}$${nf(0).format(Math.abs(usd))}/${S.micro || "contract"}`;
       ctx.font = "700 11px " + FONT; const tw = ctx.measureText(txt).width + 14, bx = clamp((A.x + Bp.x) / 2 - tw / 2, 2, g.R - tw - 2), by = clamp(Math.min(A.y, Bp.y) - 26, g.T, g.V - 20);
-      ctx.fillStyle = "rgba(4,9,20,.94)"; ctx.fillRect(bx, by, tw, 20); ctx.strokeStyle = col; ctx.strokeRect(bx + 0.5, by + 0.5, tw - 1, 19); ctx.fillStyle = col; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 7, by + 10); }
+      ctx.fillStyle = "rgba(9,9,9,.94)"; ctx.fillRect(bx, by, tw, 20); ctx.strokeStyle = col; ctx.strokeRect(bx + 0.5, by + 0.5, tw - 1, 19); ctx.fillStyle = col; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 7, by + 10); }
     ctx.restore();
   };
 })();

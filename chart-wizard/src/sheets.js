@@ -144,14 +144,14 @@ function mcEval(rs, riskPct, size = ST.acct.size, sims = 4000, maxT = 400, keep 
 function mcPathsSVG(m) {
   const W = 340, H = 150, C = m.C, lo = -C.dd * 1.15, hi = C.target * 1.15, maxT = Math.max(10, ...m.paths.map(p => p.path.length - 1));
   const X = i => 30 + i / maxT * (W - 36), Y = v => 8 + (hi - Math.max(lo, Math.min(hi, v))) / (hi - lo) * (H - 22);
-  const col = r => r > 0 ? "var(--up)" : r < 0 ? "var(--down)" : "#7d8aa8";
+  const col = r => r > 0 ? "var(--up)" : r < 0 ? "var(--down)" : "#8a8a8a";
   const lines = m.paths.map(p => `<polyline fill="none" stroke="${col(p.res)}" stroke-opacity=".55" stroke-width="1.2" points="${p.path.map((v, i) => X(i).toFixed(1) + "," + Y(v).toFixed(1)).join(" ")}"/>`).join("");
   return `<svg class="mcsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${m.paths.length} simulated evaluations: green passed, red hit the loss limit">
     <line x1="30" x2="${W - 6}" y1="${Y(C.target)}" y2="${Y(C.target)}" stroke="var(--up)" stroke-dasharray="4 3"/><text x="2" y="${Y(C.target) + 4}" font-size="9" fill="var(--muted)">+${Math.round(C.target / 1000)}K</text>
     <line x1="30" x2="${W - 6}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line2)"/><text x="2" y="${Y(0) + 4}" font-size="9" fill="var(--muted)">start</text>
     <line x1="30" x2="${W - 6}" y1="${Y(-C.dd)}" y2="${Y(-C.dd)}" stroke="var(--down)" stroke-dasharray="4 3"/><text x="2" y="${Y(-C.dd) + 4}" font-size="9" fill="var(--muted)">−${(C.dd / 1000).toFixed(1).replace(".0", "")}K</text>
     ${lines}<text x="${W - 6}" y="${H - 2}" font-size="9" fill="var(--muted)" text-anchor="end">trades →</text></svg>
-    <div class="mclegend"><span><i style="background:var(--up)"></i>Passed</span><span><i style="background:var(--down)"></i>Hit the loss limit</span><span><i style="background:#7d8aa8"></i>Still going</span></div>`;
+    <div class="mclegend"><span><i style="background:var(--up)"></i>Passed</span><span><i style="background:var(--down)"></i>Hit the loss limit</span><span><i style="background:#8a8a8a"></i>Still going</span></div>`;
 }
 const DRILL_FOR_SKILL = { trend: "trend", structure: "structure", levels: "levels", candles: "candles", momentum: "rsi", risk: "stop", volume: "volume", mtf: "mtf", tlines: "tlines", divergence: "div" };
 function openEdge() {
