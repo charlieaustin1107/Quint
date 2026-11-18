@@ -1,0 +1,13 @@
+{
+  "v": 1,
+  "type": "heartbeat",
+  "seq": 2,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "serverTime": "2026-11-18T14:35:02.120Z",
+    "uptimeSec": 2211.1,
+    "feed": "Live",
+    "lastTickAt": "2026-11-18T14:35:02.010Z",
+    "mode": "bots"
+  }
+}

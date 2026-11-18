@@ -1,0 +1,13 @@
+{
+  "v": 1,
+  "type": "command_result",
+  "seq": 15,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "commandId": "c-6",
+    "status": "rejected",
+    "message": "Manual Copy can't start while a bot is on. Stop all bots first.",
+    "confirm": null,
+    "result": null
+  }
+}

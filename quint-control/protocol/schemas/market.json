@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "market.json",
+  "title": "Market",
+  "description": "The live front-month MNQ price. At most 4 a second; the website never needs every tick. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "market"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "instrument": {
+          "$ref": "common.json#/$defs/instrument"
+        },
+        "last": {
+          "$ref": "common.json#/$defs/nullablePrice"
+        },
+        "bid": {
+          "$ref": "common.json#/$defs/nullablePrice"
+        },
+        "ask": {
+          "$ref": "common.json#/$defs/nullablePrice"
+        },
+        "lastTickAt": {
+          "$ref": "common.json#/$defs/nullableTs"
+        },
+        "feed": {
+          "$ref": "common.json#/$defs/feed"
+        }
+      },
+      "required": [
+        "instrument",
+        "last",
+        "bid",
+        "ask",
+        "lastTickAt",
+        "feed"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

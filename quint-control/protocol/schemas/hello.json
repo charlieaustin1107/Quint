@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hello.json",
+  "title": "Hello",
+  "description": "The first message on every connection. Must arrive within 5 seconds with the right session token, or the engine closes the connection. Sent by the website.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "id",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "hello"
+    },
+    "id": {
+      "$ref": "common.json#/$defs/id"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{32,128}$",
+          "description": "The per-session token from the address bar (#t=...)."
+        },
+        "client": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "version": {
+              "type": "string",
+              "maxLength": 20
+            }
+          },
+          "required": [
+            "name",
+            "version"
+          ],
+          "additionalProperties": false
+        },
+        "protocol": {
+          "$ref": "common.json#/$defs/version"
+        }
+      },
+      "required": [
+        "token",
+        "client",
+        "protocol"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

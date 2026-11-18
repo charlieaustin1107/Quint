@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bot.json",
+  "title": "Bot status",
+  "description": "A bot changed state, signalled, or its P&L moved. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "bot"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.json#/$defs/botId"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+        },
+        "state": {
+          "enum": [
+            "off",
+            "warmingUp",
+            "waiting",
+            "inTrade",
+            "paused",
+            "blocked",
+            "error"
+          ]
+        },
+        "mode": {
+          "$ref": "common.json#/$defs/tradeMode"
+        },
+        "approved": {
+          "type": "boolean",
+          "description": "True when the bot passed its backtest goals (the Approved rule)."
+        },
+        "accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "common.json#/$defs/accountName"
+          },
+          "uniqueItems": true
+        },
+        "contracts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "lastSignal": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "time": {
+                  "$ref": "common.json#/$defs/ts"
+                },
+                "action": {
+                  "enum": [
+                    "BUY",
+                    "SELL",
+                    "NONE"
+                  ]
+                },
+                "entry": {
+                  "$ref": "common.json#/$defs/nullablePrice"
+                },
+                "stop": {
+                  "$ref": "common.json#/$defs/nullablePrice"
+                },
+                "target": {
+                  "$ref": "common.json#/$defs/nullablePrice"
+                },
+                "reason": {
+                  "type": "string",
+                  "maxLength": 500
+                }
+              },
+              "required": [
+                "time",
+                "action",
+                "entry",
+                "stop",
+                "target",
+                "reason"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "todayPnl": {
+          "$ref": "common.json#/$defs/money"
+        },
+        "tradesToday": {
+          "$ref": "common.json#/$defs/qty"
+        },
+        "message": {
+          "$ref": "common.json#/$defs/nullableString"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "version",
+        "state",
+        "mode",
+        "approved",
+        "accounts",
+        "contracts",
+        "lastSignal",
+        "todayPnl",
+        "tradesToday",
+        "message"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "lucid-daily",
+  "firm": "Lucid Trading",
+  "plan": "LucidDaily",
+  "lastChecked": "2026-11-18",
+  "about": "Rules the guardian enforces on LucidDaily accounts. Every number can be changed in Settings. Lucid's help center is the source of truth: check it whenever Lucid announces a change, and update lastChecked.",
+  "sources": [
+    "https://intercom.help/lucid-trading/en/articles/11404614-lucid-trading-supported-platforms",
+    "https://damnpropfirms.com/account-plans/lucid-trading-daily-50000/",
+    "https://blog.traderspost.io/article/lucid-trading-review-2025",
+    "https://crosstrade.io/docs/getting-started/prop-firm-connection-guide",
+    "https://crosstrade.io/learn/prop-firm-ai-trading/lucid-trading"
+  ],
+  "connection": {
+    "platform": "NinjaTrader 8",
+    "route": "Tradovate",
+    "ntConnectionType": "NinjaTrader",
+    "ntAccountType": "Simulation",
+    "severalAtOnce": true,
+    "notes": "Sign in at trader.tradovate.com with the Lucid login first and finish the one-time CME market data certification. Then in NinjaTrader add one 'NinjaTrader' connection per Lucid login."
+  },
+  "costs": {
+    "commissionPerSide": { "MNQ": 0.5 },
+    "slippageTicksPerSide": 1
+  },
+  "sizes": [
+    {
+      "size": 50000,
+      "profitTarget": 3000,
+      "maxLossLimit": 2000,
+      "drawdownEvaluation": "choice",
+      "drawdownFunded": "intradayTrailing",
+      "dailyLossLimit": null,
+      "maxMicros": 40
+    }
+  ],
+  "rules": {
+    "botsAllowed": true,
+    "copyTradingAllowed": true,
+    "ownNameOnly": true,
+    "maxFundedAccounts": 5,
+    "news": {
+      "redFolder": "hardBreach",
+      "flatMinutesBefore": 2,
+      "flatMinutesAfter": 2,
+      "blockNewEntries": true,
+      "penalty": "Trading through a red-folder release is a hard breach on LucidDaily (reported: no on-demand payout for 30 days)."
+    },
+    "hedging": {
+      "allowed": false,
+      "acrossAccounts": true,
+      "correlatedGroups": [["NQ", "MNQ", "ES", "MES", "YM", "MYM", "RTY", "M2K"]]
+    },
+    "microscalping": {
+      "shortTradeSeconds": 5,
+      "maxShareOfProfitFromShortTrades": 0.5,
+      "minHoldSeconds": 30
+    },
+    "hft": {
+      "maxOrdersPerMinutePerAccount": 6
+    },
+    "sizing": {
+      "maxStopOutShareOfRoom": 0.25
+    }
+  },
+  "verify": [
+    "sizes[0].profitTarget",
+    "sizes[0].dailyLossLimit",
+    "sizes[0].maxMicros",
+    "rules.maxFundedAccounts",
+    "rules.news.penalty"
+  ],
+  "quintDefaults": [
+    "rules.news.flatMinutesBefore",
+    "rules.news.flatMinutesAfter",
+    "rules.microscalping.minHoldSeconds",
+    "rules.hft.maxOrdersPerMinutePerAccount",
+    "rules.sizing.maxStopOutShareOfRoom",
+    "costs.slippageTicksPerSide"
+  ]
+}

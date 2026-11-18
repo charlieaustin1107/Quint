@@ -1,0 +1,12 @@
+{
+  "v": 1,
+  "type": "error",
+  "seq": 16,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "code": "bad_token",
+    "message": "The session token is wrong or missing. Open Quint Control from NinjaTrader again.",
+    "fatal": true,
+    "ref": null
+  }
+}

@@ -1,0 +1,727 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "snapshot.json",
+  "title": "Snapshot",
+  "description": "Everything the website needs to draw every screen. Sent after welcome and whenever the engine thinks the website may be out of step. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "snapshot"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "engine": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string",
+              "maxLength": 20
+            },
+            "startedAt": {
+              "$ref": "common.json#/$defs/ts"
+            },
+            "mode": {
+              "$ref": "common.json#/$defs/engineMode"
+            },
+            "kill": {
+              "type": "object",
+              "properties": {
+                "all": {
+                  "type": "boolean"
+                },
+                "accounts": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "common.json#/$defs/accountName"
+                  },
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "all",
+                "accounts"
+              ],
+              "additionalProperties": false
+            },
+            "selfTest": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "ranAt": {
+                      "$ref": "common.json#/$defs/ts"
+                    },
+                    "passed": {
+                      "$ref": "common.json#/$defs/qty"
+                    },
+                    "failed": {
+                      "$ref": "common.json#/$defs/qty"
+                    }
+                  },
+                  "required": [
+                    "ranAt",
+                    "passed",
+                    "failed"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "version",
+            "startedAt",
+            "mode",
+            "kill",
+            "selfTest"
+          ],
+          "additionalProperties": false
+        },
+        "connections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "provider": {
+                "type": "string",
+                "maxLength": 40
+              },
+              "status": {
+                "$ref": "common.json#/$defs/connectionStatus"
+              }
+            },
+            "required": [
+              "name",
+              "provider",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "market": {
+          "type": "object",
+          "properties": {
+            "instrument": {
+              "$ref": "common.json#/$defs/instrument"
+            },
+            "last": {
+              "$ref": "common.json#/$defs/nullablePrice"
+            },
+            "bid": {
+              "$ref": "common.json#/$defs/nullablePrice"
+            },
+            "ask": {
+              "$ref": "common.json#/$defs/nullablePrice"
+            },
+            "lastTickAt": {
+              "$ref": "common.json#/$defs/nullableTs"
+            },
+            "feed": {
+              "$ref": "common.json#/$defs/feed"
+            }
+          },
+          "required": [
+            "instrument",
+            "last",
+            "bid",
+            "ask",
+            "lastTickAt",
+            "feed"
+          ],
+          "additionalProperties": false
+        },
+        "accounts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "common.json#/$defs/accountName"
+              },
+              "connection": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "description": "NinjaTrader connection name."
+              },
+              "status": {
+                "$ref": "common.json#/$defs/connectionStatus"
+              },
+              "kind": {
+                "enum": [
+                  "sim",
+                  "prop",
+                  "personal"
+                ],
+                "description": "sim = NinjaTrader simulation (Sim101 etc); prop = a prop firm account; personal = own broker money."
+              },
+              "firmPreset": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-]{1,48}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "balance": {
+                "$ref": "common.json#/$defs/money"
+              },
+              "realizedPnl": {
+                "$ref": "common.json#/$defs/money"
+              },
+              "unrealizedPnl": {
+                "$ref": "common.json#/$defs/money"
+              },
+              "dayHighBalance": {
+                "$ref": "common.json#/$defs/nullableMoney"
+              },
+              "lossFloor": {
+                "$ref": "common.json#/$defs/nullableMoney"
+              },
+              "roomLeft": {
+                "$ref": "common.json#/$defs/nullableMoney"
+              },
+              "tradingAllowed": {
+                "type": "boolean"
+              },
+              "blockedReason": {
+                "$ref": "common.json#/$defs/nullableString"
+              },
+              "follower": {
+                "type": "boolean",
+                "description": "True when the copier is switched on for this account."
+              },
+              "updatedAt": {
+                "$ref": "common.json#/$defs/ts"
+              }
+            },
+            "required": [
+              "name",
+              "connection",
+              "status",
+              "kind",
+              "firmPreset",
+              "balance",
+              "realizedPnl",
+              "unrealizedPnl",
+              "dayHighBalance",
+              "lossFloor",
+              "roomLeft",
+              "tradingAllowed",
+              "blockedReason",
+              "follower",
+              "updatedAt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "positions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "account": {
+                "$ref": "common.json#/$defs/accountName"
+              },
+              "instrument": {
+                "$ref": "common.json#/$defs/instrument"
+              },
+              "marketPosition": {
+                "$ref": "common.json#/$defs/marketPosition"
+              },
+              "quantity": {
+                "$ref": "common.json#/$defs/qty"
+              },
+              "avgPrice": {
+                "$ref": "common.json#/$defs/nullablePrice"
+              },
+              "unrealizedPnl": {
+                "$ref": "common.json#/$defs/money"
+              },
+              "openedAt": {
+                "$ref": "common.json#/$defs/nullableTs"
+              },
+              "botId": {
+                "$ref": "common.json#/$defs/nullableBotId"
+              },
+              "stop": {
+                "$ref": "common.json#/$defs/nullablePrice"
+              },
+              "target": {
+                "$ref": "common.json#/$defs/nullablePrice"
+              },
+              "protected": {
+                "type": "boolean",
+                "description": "True when a working stop at the broker covers the whole position."
+              },
+              "groupId": {
+                "$ref": "common.json#/$defs/nullableId"
+              }
+            },
+            "required": [
+              "account",
+              "instrument",
+              "marketPosition",
+              "quantity",
+              "avgPrice",
+              "unrealizedPnl",
+              "openedAt",
+              "botId",
+              "stop",
+              "target",
+              "protected",
+              "groupId"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "orderId": {
+                "$ref": "common.json#/$defs/id"
+              },
+              "account": {
+                "$ref": "common.json#/$defs/accountName"
+              },
+              "instrument": {
+                "$ref": "common.json#/$defs/instrument"
+              },
+              "side": {
+                "$ref": "common.json#/$defs/side"
+              },
+              "type": {
+                "$ref": "common.json#/$defs/orderType"
+              },
+              "role": {
+                "$ref": "common.json#/$defs/orderRole"
+              },
+              "quantity": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "filled": {
+                "$ref": "common.json#/$defs/qty"
+              },
+              "limitPrice": {
+                "$ref": "common.json#/$defs/nullablePrice"
+              },
+              "stopPrice": {
+                "$ref": "common.json#/$defs/nullablePrice"
+              },
+              "avgFillPrice": {
+                "$ref": "common.json#/$defs/nullablePrice"
+              },
+              "state": {
+                "$ref": "common.json#/$defs/orderState"
+              },
+              "botId": {
+                "$ref": "common.json#/$defs/nullableBotId"
+              },
+              "ocoId": {
+                "$ref": "common.json#/$defs/nullableId"
+              },
+              "groupId": {
+                "$ref": "common.json#/$defs/nullableId"
+              },
+              "reason": {
+                "$ref": "common.json#/$defs/nullableString"
+              },
+              "time": {
+                "$ref": "common.json#/$defs/ts"
+              }
+            },
+            "required": [
+              "orderId",
+              "account",
+              "instrument",
+              "side",
+              "type",
+              "role",
+              "quantity",
+              "filled",
+              "limitPrice",
+              "stopPrice",
+              "avgFillPrice",
+              "state",
+              "botId",
+              "ocoId",
+              "groupId",
+              "reason",
+              "time"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "bots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "common.json#/$defs/botId"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "version": {
+                "type": "string",
+                "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+              },
+              "state": {
+                "enum": [
+                  "off",
+                  "warmingUp",
+                  "waiting",
+                  "inTrade",
+                  "paused",
+                  "blocked",
+                  "error"
+                ]
+              },
+              "mode": {
+                "$ref": "common.json#/$defs/tradeMode"
+              },
+              "approved": {
+                "type": "boolean",
+                "description": "True when the bot passed its backtest goals (the Approved rule)."
+              },
+              "accounts": {
+                "type": "array",
+                "items": {
+                  "$ref": "common.json#/$defs/accountName"
+                },
+                "uniqueItems": true
+              },
+              "contracts": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "lastSignal": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "time": {
+                        "$ref": "common.json#/$defs/ts"
+                      },
+                      "action": {
+                        "enum": [
+                          "BUY",
+                          "SELL",
+                          "NONE"
+                        ]
+                      },
+                      "entry": {
+                        "$ref": "common.json#/$defs/nullablePrice"
+                      },
+                      "stop": {
+                        "$ref": "common.json#/$defs/nullablePrice"
+                      },
+                      "target": {
+                        "$ref": "common.json#/$defs/nullablePrice"
+                      },
+                      "reason": {
+                        "type": "string",
+                        "maxLength": 500
+                      }
+                    },
+                    "required": [
+                      "time",
+                      "action",
+                      "entry",
+                      "stop",
+                      "target",
+                      "reason"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "todayPnl": {
+                "$ref": "common.json#/$defs/money"
+              },
+              "tradesToday": {
+                "$ref": "common.json#/$defs/qty"
+              },
+              "message": {
+                "$ref": "common.json#/$defs/nullableString"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "version",
+              "state",
+              "mode",
+              "approved",
+              "accounts",
+              "contracts",
+              "lastSignal",
+              "todayPnl",
+              "tradesToday",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "copier": {
+          "type": "object",
+          "properties": {
+            "leader": {
+              "$ref": "common.json#/$defs/nullableAccount"
+            },
+            "followers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "account": {
+                    "$ref": "common.json#/$defs/accountName"
+                  },
+                  "ratio": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 10
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "account",
+                  "ratio",
+                  "enabled"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "leader",
+            "followers"
+          ],
+          "additionalProperties": false
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "common.json#/$defs/id"
+              },
+              "time": {
+                "$ref": "common.json#/$defs/ts"
+              },
+              "severity": {
+                "$ref": "common.json#/$defs/severity"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "text": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "account": {
+                "$ref": "common.json#/$defs/nullableAccount"
+              },
+              "botId": {
+                "$ref": "common.json#/$defs/nullableBotId"
+              },
+              "channels": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "dashboard",
+                    "sound",
+                    "telegram",
+                    "healthchecks"
+                  ]
+                },
+                "uniqueItems": true,
+                "minItems": 1
+              },
+              "ack": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "time",
+              "severity",
+              "title",
+              "text",
+              "account",
+              "botId",
+              "channels",
+              "ack"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 50
+        },
+        "journalTail": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "common.json#/$defs/id"
+              },
+              "time": {
+                "$ref": "common.json#/$defs/ts"
+              },
+              "kind": {
+                "enum": [
+                  "entry",
+                  "exit",
+                  "stopMoved",
+                  "targetMoved",
+                  "blocked",
+                  "guardian",
+                  "copy",
+                  "manual",
+                  "kill",
+                  "system"
+                ]
+              },
+              "account": {
+                "$ref": "common.json#/$defs/nullableAccount"
+              },
+              "botId": {
+                "$ref": "common.json#/$defs/nullableBotId"
+              },
+              "instrument": {
+                "anyOf": [
+                  {
+                    "$ref": "common.json#/$defs/instrument"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "side": {
+                "anyOf": [
+                  {
+                    "$ref": "common.json#/$defs/side"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "quantity": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "price": {
+                "$ref": "common.json#/$defs/nullablePrice"
+              },
+              "pnl": {
+                "$ref": "common.json#/$defs/nullableMoney"
+              },
+              "holdSeconds": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "groupId": {
+                "$ref": "common.json#/$defs/nullableId"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "id",
+              "time",
+              "kind",
+              "account",
+              "botId",
+              "instrument",
+              "side",
+              "quantity",
+              "price",
+              "pnl",
+              "holdSeconds",
+              "groupId",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 200
+        }
+      },
+      "required": [
+        "engine",
+        "connections",
+        "market",
+        "accounts",
+        "positions",
+        "orders",
+        "bots",
+        "copier",
+        "alerts",
+        "journalTail"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

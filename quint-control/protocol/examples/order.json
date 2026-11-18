@@ -1,0 +1,25 @@
+{
+  "v": 1,
+  "type": "order",
+  "seq": 7,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "orderId": "o-88213",
+    "account": "LDY50-EXAMPLE-1",
+    "instrument": "MNQ 12-26",
+    "side": "Sell",
+    "type": "StopMarket",
+    "role": "stop",
+    "quantity": 1,
+    "filled": 0,
+    "limitPrice": null,
+    "stopPrice": 21440.0,
+    "avgFillPrice": null,
+    "state": "Accepted",
+    "botId": "noise-area",
+    "ocoId": "oco-20261118-0007",
+    "groupId": "g-20261118-0007",
+    "reason": null,
+    "time": "2026-11-18T14:35:02.120Z"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "v": 1,
+  "type": "command_result",
+  "seq": 14,
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "commandId": "c-5",
+    "status": "ok",
+    "message": "Noise-area momentum is live on LDY50-EXAMPLE-1.",
+    "confirm": null,
+    "result": {
+      "botId": "noise-area",
+      "mode": "live"
+    }
+  }
+}

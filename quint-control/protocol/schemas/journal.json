@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "journal.json",
+  "title": "Journal entry",
+  "description": "One line of the journal, also appended to the journal file. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "journal"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "time": {
+          "$ref": "common.json#/$defs/ts"
+        },
+        "kind": {
+          "enum": [
+            "entry",
+            "exit",
+            "stopMoved",
+            "targetMoved",
+            "blocked",
+            "guardian",
+            "copy",
+            "manual",
+            "kill",
+            "system"
+          ]
+        },
+        "account": {
+          "$ref": "common.json#/$defs/nullableAccount"
+        },
+        "botId": {
+          "$ref": "common.json#/$defs/nullableBotId"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "$ref": "common.json#/$defs/instrument"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "side": {
+          "anyOf": [
+            {
+              "$ref": "common.json#/$defs/side"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "price": {
+          "$ref": "common.json#/$defs/nullablePrice"
+        },
+        "pnl": {
+          "$ref": "common.json#/$defs/nullableMoney"
+        },
+        "holdSeconds": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "groupId": {
+          "$ref": "common.json#/$defs/nullableId"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "id",
+        "time",
+        "kind",
+        "account",
+        "botId",
+        "instrument",
+        "side",
+        "quantity",
+        "price",
+        "pnl",
+        "holdSeconds",
+        "groupId",
+        "text"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

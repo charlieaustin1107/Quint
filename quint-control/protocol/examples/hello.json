@@ -1,0 +1,14 @@
+{
+  "v": 1,
+  "type": "hello",
+  "id": "c-1",
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "token": "Zq3kP9vX2mL8nR4tW6yB1cD5fG7hJ0sA",
+    "client": {
+      "name": "Quint Control web",
+      "version": "0.1.0"
+    },
+    "protocol": 1
+  }
+}

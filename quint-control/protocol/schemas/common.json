@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common.json",
+  "title": "Shared pieces of every Quint Control message",
+  "$defs": {
+    "version": {
+      "const": 1,
+      "description": "Protocol version. Bump only for a breaking change."
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Counts up by 1 for every message the engine sends on this connection."
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC time, ISO 8601, e.g. 2026-11-18T14:30:00.000Z. The website shows UK and New York time."
+    },
+    "money": {
+      "type": "number",
+      "description": "US dollars."
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0
+    },
+    "qty": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,64}$"
+    },
+    "accountName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "The account name exactly as NinjaTrader shows it."
+    },
+    "instrument": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{1,6}( [0-9]{2}-[0-9]{2})?$",
+      "description": "NinjaTrader instrument name, e.g. \"MNQ 12-26\", or a root such as \"MNQ\"."
+    },
+    "side": {
+      "enum": [
+        "Buy",
+        "Sell"
+      ]
+    },
+    "marketPosition": {
+      "enum": [
+        "Long",
+        "Short",
+        "Flat"
+      ]
+    },
+    "connectionStatus": {
+      "enum": [
+        "Connected",
+        "Connecting",
+        "ConnectionLost",
+        "Disconnected"
+      ]
+    },
+    "feed": {
+      "enum": [
+        "Live",
+        "Delayed",
+        "Disconnected"
+      ],
+      "description": "Live: a tick in the last 5 s during market hours. Delayed: older. Disconnected: no data connection."
+    },
+    "botId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,47}$"
+    },
+    "tradeMode": {
+      "enum": [
+        "sim",
+        "live"
+      ],
+      "description": "sim = simulation accounts only; live = allowed on prop accounts after Go Live Now."
+    },
+    "engineMode": {
+      "enum": [
+        "idle",
+        "bots",
+        "manualCopy",
+        "killed"
+      ],
+      "description": "Bots and Manual Copy never run together. killed = a kill switch is on."
+    },
+    "orderState": {
+      "enum": [
+        "Initialized",
+        "Submitted",
+        "Accepted",
+        "TriggerPending",
+        "Working",
+        "ChangePending",
+        "ChangeSubmitted",
+        "CancelPending",
+        "CancelSubmitted",
+        "Cancelled",
+        "PartFilled",
+        "Filled",
+        "Rejected",
+        "Unknown"
+      ],
+      "description": "NinjaTrader OrderState names."
+    },
+    "orderType": {
+      "enum": [
+        "Market",
+        "Limit",
+        "StopMarket",
+        "StopLimit",
+        "MIT"
+      ]
+    },
+    "orderRole": {
+      "enum": [
+        "entry",
+        "stop",
+        "target",
+        "exit",
+        "flatten"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "info",
+        "warn",
+        "critical"
+      ]
+    },
+    "nullableMoney": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullablePrice": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableString": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 2000
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableBotId": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/botId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableAccount": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/accountName"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableTs": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ts"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableId": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

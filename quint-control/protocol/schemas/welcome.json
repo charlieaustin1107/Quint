@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "welcome.json",
+  "title": "Welcome",
+  "description": "Reply to a good hello. A full snapshot follows straight after. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "welcome"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "protocol": {
+          "$ref": "common.json#/$defs/version"
+        },
+        "engineVersion": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "ntVersion": {
+          "$ref": "common.json#/$defs/nullableString"
+        },
+        "serverTime": {
+          "$ref": "common.json#/$defs/ts"
+        },
+        "heartbeatMs": {
+          "type": "integer",
+          "minimum": 250,
+          "maximum": 10000
+        },
+        "timezones": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "Europe/London",
+              "America/New_York"
+            ]
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "sessionId",
+        "protocol",
+        "engineVersion",
+        "ntVersion",
+        "serverTime",
+        "heartbeatMs",
+        "timezones"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

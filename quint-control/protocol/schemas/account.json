@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "account.json",
+  "title": "Account update",
+  "description": "One account changed: balance, P&L, room left, connection or blocks. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "account"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "common.json#/$defs/accountName"
+        },
+        "connection": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "NinjaTrader connection name."
+        },
+        "status": {
+          "$ref": "common.json#/$defs/connectionStatus"
+        },
+        "kind": {
+          "enum": [
+            "sim",
+            "prop",
+            "personal"
+          ],
+          "description": "sim = NinjaTrader simulation (Sim101 etc); prop = a prop firm account; personal = own broker money."
+        },
+        "firmPreset": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9-]{1,48}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "balance": {
+          "$ref": "common.json#/$defs/money"
+        },
+        "realizedPnl": {
+          "$ref": "common.json#/$defs/money"
+        },
+        "unrealizedPnl": {
+          "$ref": "common.json#/$defs/money"
+        },
+        "dayHighBalance": {
+          "$ref": "common.json#/$defs/nullableMoney"
+        },
+        "lossFloor": {
+          "$ref": "common.json#/$defs/nullableMoney"
+        },
+        "roomLeft": {
+          "$ref": "common.json#/$defs/nullableMoney"
+        },
+        "tradingAllowed": {
+          "type": "boolean"
+        },
+        "blockedReason": {
+          "$ref": "common.json#/$defs/nullableString"
+        },
+        "follower": {
+          "type": "boolean",
+          "description": "True when the copier is switched on for this account."
+        },
+        "updatedAt": {
+          "$ref": "common.json#/$defs/ts"
+        }
+      },
+      "required": [
+        "name",
+        "connection",
+        "status",
+        "kind",
+        "firmPreset",
+        "balance",
+        "realizedPnl",
+        "unrealizedPnl",
+        "dayHighBalance",
+        "lossFloor",
+        "roomLeft",
+        "tradingAllowed",
+        "blockedReason",
+        "follower",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

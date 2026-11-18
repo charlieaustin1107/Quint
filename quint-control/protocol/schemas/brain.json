@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "brain.json",
+  "title": "Brain event",
+  "description": "What the engine is thinking, in plain English, for the Brain screen. Sent by the engine.",
+  "type": "object",
+  "required": [
+    "v",
+    "type",
+    "seq",
+    "ts",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "$ref": "common.json#/$defs/version"
+    },
+    "type": {
+      "const": "brain"
+    },
+    "seq": {
+      "$ref": "common.json#/$defs/seq"
+    },
+    "ts": {
+      "$ref": "common.json#/$defs/ts"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.json#/$defs/id"
+        },
+        "time": {
+          "$ref": "common.json#/$defs/ts"
+        },
+        "kind": {
+          "enum": [
+            "thought",
+            "decision",
+            "block",
+            "news",
+            "regime",
+            "copy",
+            "health"
+          ]
+        },
+        "botId": {
+          "$ref": "common.json#/$defs/nullableBotId"
+        },
+        "account": {
+          "$ref": "common.json#/$defs/nullableAccount"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "maxItems": 12
+        }
+      },
+      "required": [
+        "id",
+        "time",
+        "kind",
+        "botId",
+        "account",
+        "text",
+        "confidence",
+        "tags"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

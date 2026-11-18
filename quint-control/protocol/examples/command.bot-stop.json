@@ -1,0 +1,13 @@
+{
+  "v": 1,
+  "type": "command",
+  "id": "c-2",
+  "ts": "2026-11-18T14:35:02.120Z",
+  "data": {
+    "name": "bot.stop",
+    "args": {
+      "botId": "noise-area",
+      "flatten": false
+    }
+  }
+}
