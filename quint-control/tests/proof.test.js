@@ -54,3 +54,15 @@ test('costs: $0.50 a side and a tick of slippage each way come off every MNQ tra
   const clean = run(bars, { slippageTicksPerSide: 0, commissionPerSide: 0 }).trades[0].usd, real = run(bars).trades[0].usd;
   assert.equal(Math.round((clean - real) * 100) / 100, 2 * 0.25 * 2 + 2 * 0.5, '1 tick each way on MNQ is $1, commission is $1');
 });
+
+test('candle files saved with Windows line endings still read the volume column', () => {
+  const fs = require('fs'), os = require('os'), path = require('path');
+  const { readCsv } = require('../proof/noise_momentum');
+  const file = path.join(os.tmpdir(), 'quint-crlf-test.csv');
+  fs.writeFileSync(file, 't,o,h,l,c,v\r\n1793640600,100,101,99,100.5,1200\r\n1793640660,100.5,101,100,100.75,800\r\n');
+  const rows = readCsv(file);
+  fs.unlinkSync(file);
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].v, 1200);
+  assert.equal(rows[1].v, 800);
+});

@@ -28,8 +28,8 @@ function nyTime(sec) { // the New York date and minute of the day for a unix tim
 }
 
 function readCsv(file) {
-  const rows = fs.readFileSync(file, 'utf8').trim().split('\n');
-  const head = rows.shift().split(',');
+  const rows = fs.readFileSync(file, 'utf8').trim().split(/\r?\n/); // files saved on Windows end each line with \r\n
+  const head = rows.shift().split(',').map((h) => h.trim());
   return rows.map((r) => { const v = r.split(',').map(Number); const o = {}; head.forEach((h, i) => { o[h] = v[i]; }); return o; });
 }
 
@@ -98,7 +98,7 @@ function stats(trades) {
     long: side.long, short: side.short, worstDay: days.length ? Math.min(...days) : 0, daysBelow1200: days.filter((x) => x <= -1200).length, tradingDays: days.length };
 }
 
-module.exports = { run, stats, sessions, nyTime, DEFAULTS };
+module.exports = { run, stats, sessions, nyTime, readCsv, DEFAULTS };
 
 if (require.main === module) {
   const file = process.argv[2];
