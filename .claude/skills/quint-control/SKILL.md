@@ -38,7 +38,6 @@ Goal: beat Phantom Trader AI on every row of the plan's "Match Phantom, then bea
 - No HFT: cap orders per minute per account (default 6).
 - Size so a full stop-out costs under a quarter of the room left.
 - One bot per account at a time (the owner decided against several bots sharing an account); different accounts can run different bots.
-- Several bots per account are allowed: one trade per market per account at a time (others skipped and logged, priority order for ties), no opposite correlated positions even between bots, combined open risk under a quarter of the room left, max open trades per account (default 2).
 
 ## Engineering rules
 1. Every order goes through `Guardian.Check` and one sender, `OrderRouter`. Nothing else calls Account.Submit, Cancel or Flatten.

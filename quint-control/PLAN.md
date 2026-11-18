@@ -282,14 +282,6 @@ public class NoiseAreaMomentum : QuintStrategy
 - The guardian sizes each trade from the bot's stop distance, so a wider stop means fewer contracts.
 - Stops and targets must be orders held by the broker (Tradovate), not stops simulated inside NinjaTrader, so they keep protecting the trade if your computer or connection drops. Fable must confirm how NinjaTrader sends stop-and-target brackets over the Tradovate connection.
 
-**Several bots on one account.** You can switch on as many bots as you like for the same account. The guardian keeps them from tripping over each other:
-
-- **One trade per market per account at a time.** NinjaTrader keeps a single position per market on each account, so two bots in MNQ on the same account would cancel each other out and tangle the stops. While one bot is in an MNQ trade on an account, other bots' MNQ signals on that account are skipped and logged ("another bot is in a trade"). If two signal on the same candle, the one higher in your priority list on the Bots screen goes first.
-- **No hedging, even between bots:** no opposite directions in related markets (long MNQ and short MES, say) on the same account or across accounts.
-- **Shared risk:** if every open trade on the account hit its stop at once, the total loss must stay under a quarter of the room left. A new signal that breaks that is made smaller or skipped.
-- **A cap on trades open at once** per account (a setting, default 2).
-- Every bot's trades and profit are tracked separately, so you can see which bot is earning.
-
 **One bot per account.** Each account runs one bot at a time. Switching on a second bot for an account asks you to turn the first one off. Different accounts can run different bots, and the guardian still blocks opposite positions across accounts.
 
 **Backtesting, from quick to exact:**

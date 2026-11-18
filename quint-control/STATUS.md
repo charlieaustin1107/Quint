@@ -45,7 +45,7 @@
 
 ## Decisions (settled, don't re-ask)
 
-Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ commission plus 1 tick slippage each way · 25% Monte Carlo limit · simulation optional, Go Live Now with a typed confirm · unapproved bots default to 1 MNQ · guardian rules and kill switches can never be skipped · Quint uses the owner's own Claude API key (Haiku 5.5 for help, Sonnet 5.5 for "why") · Manual Copy mode with all bots off · one bot per account at a time · several bots per account allowed (one trade per market per account at a time) · every bot sets its own stop and target · Telegram alerts plus a Healthchecks.io offline alarm · accounts in the owner's name only.
+Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ commission plus 1 tick slippage each way · 25% Monte Carlo limit · simulation optional, Go Live Now with a typed confirm · unapproved bots default to 1 MNQ · guardian rules and kill switches can never be skipped · Quint uses the owner's own Claude API key (Haiku 5.5 for help, Sonnet 5.5 for "why") · Manual Copy mode with all bots off · one bot per account at a time · every bot sets its own stop and target · Telegram alerts plus a Healthchecks.io offline alarm · accounts in the owner's name only.
 
 ## Still open
 
@@ -64,4 +64,4 @@ Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ co
 | 2026-11-18 | Opus 5.5 | Phase 0 built: plan, prompts, structure, protocol and schemas, skill, firm preset, setup guide, install scripts, tests (39, three clean runs). Pull request opened. Not tested: the PowerShell scripts (no PowerShell in the cloud); they get their first real run on the owner's computer in phase 1. |
 | 2026-11-18 | Opus 5.5 | Added gap fade as bot 9 (Testing, lowest priority) with fixed rules in the phase 3 prompt; EMA pullback and ATR trailing trend left out (both lost money walk-forward). PLAN.md is now the up-to-date copy of the plan. |
 | 2026-11-18 | Opus 5.5 | Owner decided one bot per account (no bots sharing an account); added to the plan, phase 2 prompt and scenarios, skill and protocol notes. |
-| 2026-11-18 | Opus 5.5 | Added the rules for several bots on one account (plan, phase 2 prompt and scenarios, skill). |
+| 2026-11-18 | Opus 5.5 | Added rules for several bots on one account (replaced by one bot per account, the row above). |
