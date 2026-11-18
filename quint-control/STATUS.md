@@ -62,3 +62,4 @@ Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ co
 | Date | Model | What happened |
 |---|---|---|
 | 2026-11-18 | Opus 5.5 | Phase 0 built: plan, prompts, structure, protocol and schemas, skill, firm preset, setup guide, install scripts, tests (39, three clean runs). Pull request opened. Not tested: the PowerShell scripts (no PowerShell in the cloud); they get their first real run on the owner's computer in phase 1. |
+| 2026-11-18 | Opus 5.5 | Added gap fade as bot 9 (Testing, lowest priority) with fixed rules in the phase 3 prompt; EMA pullback and ATR trailing trend left out (both lost money walk-forward). PLAN.md is now the up-to-date copy of the plan. |
