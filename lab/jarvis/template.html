@@ -1,0 +1,331 @@
+<title>Quint HQ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Martian+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one phone column (390px first) of quiet black panels under a lit chrome Quint core; two columns from 900px.
+   Obsidian & chrome (quint-design skill): true black, chrome silver, and colour only where it means something. */
+:root {
+  --bg: #000000; --s1: #060606; --s2: #0c0c0c; --s3: #141414;
+  --line: rgba(255,255,255,.09); --hi: rgba(255,255,255,.06);
+  --fg: #f1f1f1; --mut: #a3a3a3; --dim: #6b6b6b;
+  --mint: #2fd9a8; --rose: #ff4f6e; --amber: #ffb547;
+  --chrome: linear-gradient(180deg, #ffffff 0%, #dcdcdc 34%, #8f8f8f 62%, #d4d4d4 100%);
+  --display: "Chakra Petch", "Avenir Next Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--body); -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px 40px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 14px; }
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-block: 10px; border-bottom: 1px solid var(--line); }
+.brand { font: 600 15px/1 var(--display); letter-spacing: .22em; text-transform: uppercase; white-space: nowrap; flex: none; background: var(--chrome); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.asof { font: 400 10px/1.3 var(--mono); color: var(--dim); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.panel { background: var(--s1); border: 1px solid var(--line); border-radius: 14px; box-shadow: inset 0 1px 0 var(--hi); padding: 16px; min-width: 0; }
+.label { font: 600 11px/1 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--mut); margin: 0 0 12px; }
+h2 { font: 600 19px/1.25 var(--display); letter-spacing: .02em; margin: 0; text-wrap: balance; }
+.hero { display: grid; justify-items: center; gap: 12px; text-align: center; padding-block: 22px 18px; }
+#core { width: 176px; height: 176px; max-width: 100%; display: block; }
+.headline { font: 600 20px/1.3 var(--display); max-width: 30ch; text-wrap: balance; margin: 0; }
+.btn { appearance: none; border: 0; border-radius: 999px; min-height: 48px; padding: 0 22px; font: 600 14px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; color: #000; background: var(--chrome); box-shadow: inset 0 1px 0 #fff, 0 1px 0 rgba(255,255,255,.08); }
+.btn:focus-visible, .ghost:focus-visible, .chip-q:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.btn[aria-pressed="true"] { background: var(--s3); color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); }
+.ghost { appearance: none; background: var(--s2); color: var(--fg); border: 1px solid var(--line); border-radius: 12px; min-height: 48px; min-width: 48px; padding: 0 14px; font: 500 14px/1 var(--body); cursor: pointer; display: inline-grid; place-items: center; }
+.ghost[aria-pressed="true"] { color: #000; background: var(--chrome); }
+.voice-note { font-size: 12px; color: var(--dim); margin: 0; }
+.lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lines li { padding: 10px 12px; border-radius: 10px; background: var(--s2); border: 1px solid transparent; color: var(--mut); transition: color .2s, border-color .2s; }
+.lines li.on { color: var(--fg); border-color: rgba(255,255,255,.28); }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tile { background: var(--s2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-width: 0; }
+.tile b { display: block; font: 500 20px/1.2 var(--mono); font-variant-numeric: tabular-nums; }
+.tile span { display: block; font-size: 12px; color: var(--mut); margin-top: 4px; }
+.ask form { display: flex; gap: 8px; }
+.ask input { flex: 1; min-width: 0; min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--s2); color: var(--fg); font: 16px var(--body); padding: 0 14px; }
+.ask input::placeholder { color: var(--dim); }
+.qs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.chip-q { appearance: none; border: 1px solid var(--line); background: transparent; color: var(--mut); border-radius: 999px; min-height: 36px; padding: 0 12px; font: 13px var(--body); cursor: pointer; }
+.chat { display: grid; gap: 10px; margin-top: 12px; }
+.msg { padding: 10px 12px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.you { background: var(--s3); justify-self: end; max-width: 88%; }
+.msg.quint { background: var(--s2); border: 1px solid var(--line); }
+.msg.err { color: var(--amber); }
+.rows { display: grid; gap: 8px; }
+.row { display: grid; gap: 4px; padding: 10px 12px; background: var(--s2); border-radius: 10px; min-width: 0; }
+.row .t { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.row .n { font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+.row .m { font: 400 12px/1.6 var(--mono); color: var(--mut); font-variant-numeric: tabular-nums; }
+.up { color: var(--mint); } .down { color: var(--rose); }
+.pill { flex: none; font: 600 10px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; padding: 6px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--mut); white-space: nowrap; }
+.pill.good { color: var(--mint); border-color: rgba(47,217,168,.45); }
+.pill.warn { color: var(--amber); border-color: rgba(255,181,71,.45); }
+.pill.bad { color: var(--rose); border-color: rgba(255,79,110,.45); }
+details { background: var(--s2); border-radius: 10px; padding: 10px 12px; }
+details + details { margin-top: 8px; }
+summary { cursor: pointer; display: flex; justify-content: space-between; gap: 10px; align-items: center; list-style: none; min-height: 28px; }
+summary::-webkit-details-marker { display: none; }
+details p { margin: 8px 0 0; color: var(--mut); font-size: 14px; }
+.counts { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+ol.next, ul.lessons { margin: 0; padding-left: 20px; display: grid; gap: 8px; color: var(--mut); }
+ol.next b, ul.lessons b { color: var(--fg); font-weight: 500; }
+.small { font-size: 12px; color: var(--dim); }
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+.links a { text-decoration: none; display: inline-flex; align-items: center; }
+.foot { text-align: center; font-size: 12px; color: var(--dim); padding-top: 6px; }
+@media (min-width: 900px) {
+  .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  .top, .hero, .wide { grid-column: 1 / -1; }
+}
+@media (max-width: 380px) { .tiles { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .lines li { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Quint HQ</div>
+    <div class="asof" id="asof"></div>
+  </header>
+
+  <section class="panel hero" aria-label="Roundup">
+    <canvas id="core" width="352" height="352" aria-hidden="true"></canvas>
+    <p class="headline" id="headline"></p>
+    <button class="btn" id="play" type="button" aria-pressed="false">Play roundup</button>
+    <p class="voice-note" id="voiceNote">Quint reads this out loud.</p>
+  </section>
+
+  <section class="panel">
+    <div class="label">Today's roundup</div>
+    <ol class="lines" id="lines"></ol>
+  </section>
+
+  <section class="panel ask" aria-label="Ask Quint">
+    <div class="label">Ask Quint</div>
+    <form id="askForm" autocomplete="off">
+      <input id="q" name="q" type="text" placeholder="Which bot is closest to ready?" enterkeyhint="send" aria-label="Your question for Quint">
+      <button class="ghost" id="mic" type="button" aria-label="Speak your question" aria-pressed="false" hidden><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg></button>
+      <button class="btn" type="submit">Ask</button>
+    </form>
+    <div class="qs" id="quick"></div>
+    <p class="small" id="askNote">On iPhone, tap the box and use the microphone on your keyboard to talk.</p>
+    <div class="chat" id="chat" aria-live="polite"></div>
+  </section>
+
+  <section class="panel wide">
+    <div class="label">Money</div>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section class="panel">
+    <div class="label">Scoreboard · saved MNQ candles · 1 MNQ after costs</div>
+    <div class="rows" id="board"></div>
+    <p class="small" id="boardNote"></p>
+  </section>
+
+  <section class="panel">
+    <div class="label">Quint's memory · every strategy tried</div>
+    <div class="counts" id="counts"></div>
+    <div id="memory"></div>
+  </section>
+
+  <section class="panel">
+    <div class="label">Lessons learned</div>
+    <ul class="lessons" id="lessons"></ul>
+  </section>
+
+  <section class="panel">
+    <div class="label">Next experiments</div>
+    <ol class="next" id="next"></ol>
+  </section>
+
+  <section class="panel wide">
+    <div class="label">Repository · how this page stays up to date</div>
+    <p class="small" style="margin:0 0 12px">Every weeknight at 22:40 UK time, the Quint Lab nightly session adds the day's MNQ candles, re-runs every bot, updates the paper test and this page, and saves the changes to your GitHub repo for you to review. On Fridays it also reviews the week and queues new experiments.</p>
+    <div class="links">
+      <a class="ghost" href="https://github.com/charlieaustin1107/Quint/pulls?q=is%3Apr+head%3Alab%2Fnightly" target="_blank" rel="noopener">Tonight's changes</a>
+      <a class="ghost" href="https://github.com/charlieaustin1107/Quint/pull/17" target="_blank" rel="noopener">The lab's code</a>
+      <a class="ghost" href="https://github.com/charlieaustin1107/Quint" target="_blank" rel="noopener">Quint repo</a>
+    </div>
+  </section>
+
+  <p class="foot wide">For learning and practice. Nothing here places orders or is financial advice.</p>
+</div>
+
+<script id="lab-data" type="application/json">/*LAB_DATA*/</script>
+<script>
+(function () {
+  'use strict';
+  const D = JSON.parse(document.getElementById('lab-data').textContent);
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+  const money = (x) => (x < 0 ? '-$' : '+$') + Math.abs(Math.round(x)).toLocaleString('en-US');
+  const pct = (x) => (x === null || x === undefined ? 'n/a' : Math.round(x * 100) + '%');
+  const sign = (x) => (x > 0 ? 'up' : x < 0 ? 'down' : '');
+  const nice = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  const gradeTone = (g) => (g === 'Candidate' || g === 'Promising' ? 'good' : g === 'Loses money' ? 'bad' : g === 'No trades' ? '' : 'warn');
+  const statusTone = (s) => (s === 'Approved' ? 'good' : s === 'Rejected' ? 'bad' : '');
+
+  // ---------- render the record ----------
+  $('asof').textContent = `${nice(D.date)} · candles to ${nice(D.dataTo)}`;
+  $('headline').textContent = D.headline;
+  D.spoken.forEach((s) => $('lines').appendChild(el('li', '', s)));
+
+  const tiles = [
+    [D.realMoney.liveBots ? `${D.realMoney.liveBots} live` : '$0', D.realMoney.liveBots ? 'Real accounts' : 'Real money · no bot live yet', ''],
+    [D.paper.trades ? money(D.paper.net) : '$0', `Paper test · ${D.paper.bots} bots since ${nice(D.paper.since)}`, sign(D.paper.net)],
+    [String(D.statusCount.Approved || 0), 'Approved strategies', ''],
+  ];
+  for (const [v, l, s] of tiles) { const t = el('div', 'tile'); const b = el('b', s, v); t.append(b, el('span', '', l)); $('tiles').appendChild(t); }
+
+  for (const r of D.scoreboard) {
+    const row = el('div', 'row'), top = el('div', 't');
+    top.append(el('span', 'n', `${r.bot}. ${r.name} · ${r.timeframe}`), el('span', 'pill ' + gradeTone(r.grade), r.grade));
+    const m = el('div', 'm');
+    const net = el('span', sign(r.net), money(r.net)), late = el('span', sign(r.laterHalf), money(r.laterHalf));
+    m.append(`${r.trades} trades · `, net, ' · later half ', late, ` · worst drawdown $${Math.round(r.maxDrawdown).toLocaleString('en-US')} · Lucid 50K pass ${pct(r.pass)} / fail ${pct(r.fail)}${r.trades < 100 ? '*' : ''}`);
+    row.append(top, m);
+    $('board').appendChild(row);
+  }
+  const d = D.data || {};
+  $('boardNote').textContent = `* Under 100 trades: an anecdote, not evidence. Candles: ${Object.entries(d).map(([k, v]) => `${k} ${nice(v.from)} to ${nice(v.to)} (${v.sessions} sessions)`).join(', ')}.`;
+
+  for (const [s, n] of Object.entries(D.statusCount)) $('counts').appendChild(el('span', 'pill ' + statusTone(s), `${s} ${n}`));
+  for (const s of D.strategies) {
+    const det = el('details'), sum = el('summary');
+    sum.append(el('span', 'n', s.name), el('span', 'pill ' + statusTone(s.status), s.status));
+    det.append(sum, el('p', '', `${s.horizon} · ${s.timeframe}. ${s.verdict}`));
+    $('memory').appendChild(det);
+  }
+  for (const l of D.lessons) { const li = el('li'); li.append(el('b', '', nice(l.date) + ': '), l.lesson); $('lessons').appendChild(li); }
+  for (const q of D.next) { const li = el('li'); li.append(el('b', '', q.what.split('. ')[0] + '. '), `Cost: ${q.cost}.`); $('next').appendChild(li); }
+
+  // ---------- the Quint core: a lit chrome sphere ----------
+  const cv = $('core'), cx = cv.getContext('2d');
+  const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let speaking = false, t0 = performance.now();
+  function drawCore(now) {
+    const W = cv.width, H = cv.height, r = W * 0.3, t = (now - t0) / 1000;
+    cx.clearRect(0, 0, W, H);
+    const pulse = speaking ? 1 + 0.035 * Math.sin(t * 7) : 1;
+    // halo rings
+    for (let i = 0; i < 3; i++) {
+      const rr = r * (1.22 + i * 0.16) * (speaking ? 1 + 0.03 * Math.sin(t * 3 + i) : 1);
+      cx.beginPath(); cx.ellipse(W / 2, H / 2, rr, rr * (0.32 + 0.08 * i), (t * (0.25 + i * 0.1)) + i, 0, Math.PI * 2);
+      cx.strokeStyle = `rgba(255,255,255,${speaking ? 0.26 - i * 0.06 : 0.14 - i * 0.035})`; cx.lineWidth = 1.5; cx.stroke();
+    }
+    // sphere body
+    const R = r * pulse, g = cx.createRadialGradient(W / 2 - R * 0.38, H / 2 - R * 0.42, R * 0.05, W / 2, H / 2, R);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.18, '#e6e6e6'); g.addColorStop(0.5, '#7d7d7d'); g.addColorStop(0.82, '#1c1c1c'); g.addColorStop(1, '#050505');
+    cx.beginPath(); cx.arc(W / 2, H / 2, R, 0, Math.PI * 2); cx.fillStyle = g; cx.fill();
+    // moving reflection band
+    cx.save(); cx.beginPath(); cx.arc(W / 2, H / 2, R, 0, Math.PI * 2); cx.clip();
+    const y = H / 2 - R * 0.25 + Math.sin(t * 0.6) * R * 0.3, band = cx.createLinearGradient(0, y - R * 0.22, 0, y + R * 0.22);
+    band.addColorStop(0, 'rgba(255,255,255,0)'); band.addColorStop(0.5, 'rgba(255,255,255,0.12)'); band.addColorStop(1, 'rgba(255,255,255,0)');
+    cx.fillStyle = band; cx.fillRect(0, y - R * 0.22, W, R * 0.44); cx.restore();
+    // rim
+    cx.beginPath(); cx.arc(W / 2, H / 2, R, 0, Math.PI * 2); cx.strokeStyle = 'rgba(255,255,255,0.35)'; cx.lineWidth = 1; cx.stroke();
+  }
+  let raf = 0;
+  function loop(now) { drawCore(now); raf = requestAnimationFrame(loop); }
+  function startLoop() { if (!still && !raf && !document.hidden) raf = requestAnimationFrame(loop); }
+  function stopLoop() { cancelAnimationFrame(raf); raf = 0; }
+  drawCore(performance.now()); startLoop();
+  document.addEventListener('visibilitychange', () => (document.hidden ? stopLoop() : startLoop()));
+
+  // ---------- voice out: Claude's voice where offered, else the phone's own voice ----------
+  let tts = null;
+  const lis = () => [...$('lines').children];
+  function mark(i) { lis().forEach((li, j) => li.classList.toggle('on', j === i)); }
+  function setSpeaking(on) { speaking = on; $('play').setAttribute('aria-pressed', on ? 'true' : 'false'); $('play').textContent = on ? 'Stop' : 'Play roundup'; if (!on) mark(-1); if (still) drawCore(performance.now()); }
+  function pickVoice() {
+    const vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+    const gb = vs.filter((v) => /en[-_]GB/i.test(v.lang));
+    return gb.find((v) => /daniel|arthur|serena|kate|oliver/i.test(v.name)) || gb[0] || vs.find((v) => /^en/i.test(v.lang)) || null;
+  }
+  function speakLines(lines, onLine) {
+    if (tts) {
+      setSpeaking(true);
+      return tts.speak(lines.map((text, id) => ({ text, id: String(id) }))).catch(() => {}).finally(() => setSpeaking(false));
+    }
+    if (!window.speechSynthesis) { $('voiceNote').textContent = 'This screen has no voice. The roundup is written below.'; return Promise.resolve(); }
+    speechSynthesis.cancel();
+    const v = pickVoice();
+    setSpeaking(true);
+    return new Promise((done) => {
+      lines.forEach((text, i) => {
+        const u = new SpeechSynthesisUtterance(text);
+        if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'en-GB';
+        u.rate = 1.02;
+        u.onstart = () => onLine && onLine(i);
+        if (i === lines.length - 1) { u.onend = () => { setSpeaking(false); done(); }; u.onerror = u.onend; }
+        speechSynthesis.speak(u); // queued straight from the tap, so iPhone allows it
+      });
+    });
+  }
+  function stopSpeaking() { if (tts) { try { tts.stop(); } catch (e) {} } if (window.speechSynthesis) speechSynthesis.cancel(); setSpeaking(false); }
+  $('play').addEventListener('click', () => { if (speaking) return stopSpeaking(); speakLines(D.spoken, mark); });
+
+  // ---------- ask Quint ----------
+  let sample = null, history = [];
+  const brief = JSON.stringify({ date: D.date, candlesTo: D.dataTo, headline: D.headline, roundup: D.spoken, realMoney: D.realMoney, paper: D.paper, scoreboard: D.scoreboard, strategies: D.strategies, lessons: D.lessons, next: D.next, data: D.data });
+  const RULES = 'You are Quint, the owner\'s trading research assistant, speaking like a calm Jarvis. The owner trades MNQ (Micro Nasdaq futures, $2 a point) from an iPhone, lives in the UK and is working to pass a Lucid Trading 50K account. Answer in plain British English, in 2 to 5 short sentences that read well aloud. Use only the lab data below; if the answer is not in it, say so and say what test would answer it. Money is on 1 MNQ after costs. Never call a strategy profitable or proven, never tell the owner to place a trade, and say when a sample is under 100 trades. Nothing is financial advice.\n\nLAB DATA (JSON):\n' + brief;
+  async function ask(question) {
+    question = question.trim();
+    if (!question) return;
+    $('q').value = '';
+    $('chat').appendChild(el('div', 'msg you', question));
+    const out = el('div', 'msg quint', sample ? 'Thinking…' : '');
+    $('chat').appendChild(out);
+    if (!sample) { out.classList.add('err'); out.textContent = 'Asking Quint works when this page is open in Claude. The roundup above is still up to date.'; return; }
+    // Each call is memoryless, so send the rules, the data, the last few exchanges and the new question together.
+    const earlier = history.slice(-3).map((h) => `Owner: ${h.q}\nQuint: ${h.a}`).join('\n\n');
+    const prompt = RULES + (earlier ? '\n\nCONVERSATION SO FAR:\n' + earlier : '') + '\n\nQUESTION: ' + question;
+    try {
+      const r = await sample(prompt, { onText: ({ text }) => { out.textContent = text; }, cache: false, modelTier: 'default' });
+      out.textContent = r.text;
+      history.push({ q: question, a: r.text });
+      speakLines([r.text]);
+    } catch (e) {
+      out.classList.add('err');
+      out.textContent = e && e.code === 'not_granted' ? 'Quint needs your OK to answer here. Allow it in this page\'s permissions to ask questions.' : e && e.code === 'rate_limited' ? 'Quint is busy. Try again in a minute.' : 'Quint couldn\'t answer just now. Try again in a moment.';
+    }
+  }
+  $('askForm').addEventListener('submit', (e) => { e.preventDefault(); ask($('q').value); });
+  ['Which bot is closest to ready?', 'What did we learn today?', 'Why was RSI(2) rejected?', 'What happens next?'].forEach((q) => {
+    const b = el('button', 'chip-q', q); b.type = 'button'; b.addEventListener('click', () => ask(q)); $('quick').appendChild(b);
+  });
+
+  // ---------- voice in: dictation where offered (desktop), else the iPhone keyboard's microphone ----------
+  let dict = null, listening = false;
+  $('mic').addEventListener('click', () => {
+    if (!dict) return;
+    if (listening) { dict.stop().catch(() => {}); return; }
+    $('q').value = '';
+    dict.start().catch((e) => { if (e && e.code === 'not_granted') $('mic').hidden = true; });
+  });
+
+  // Capabilities arrive after first paint; the page works without them.
+  if (window.claude && typeof window.claude.use === 'function') {
+    claude.use('sample').then((s) => { sample = s; if (s) $('askNote').textContent = 'Quint answers from the lab\'s own records. On iPhone, use the microphone on your keyboard to talk.'; }).catch(() => {});
+    claude.use('tts').then((t) => {
+      if (!t) return;
+      tts = t;
+      $('voiceNote').textContent = 'Quint reads this out loud in a Claude voice.';
+      t.onState(({ state }) => { if (state === 'idle') setSpeaking(false); });
+      if (t.onLine) t.onLine(({ id }) => mark(Number(id)));
+    }).catch(() => {});
+    claude.use('dictation').then((d) => {
+      if (!d) return;
+      dict = d; $('mic').hidden = false;
+      $('askNote').textContent = 'Tap the microphone, ask, then tap it again.';
+      d.onPartial(({ text }) => { $('q').value = text; });
+      d.onFinal(({ text }) => { $('q').value = text; });
+      d.onState(({ state }) => { listening = state === 'listening'; $('mic').setAttribute('aria-pressed', listening ? 'true' : 'false'); if (!listening && $('q').value.trim()) ask($('q').value); });
+    }).catch(() => {});
+  }
+  if (window.speechSynthesis && speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = () => {};
+})();
+</script>

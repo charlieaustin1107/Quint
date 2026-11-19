@@ -1,0 +1,2128 @@
+{
+ "asOf": "2026-11-18",
+ "data": {
+  "5m": {
+   "file": "mnq_5m.csv",
+   "from": "2026-10-21",
+   "to": "2026-11-18",
+   "candles": 5437,
+   "sessions": 20
+  },
+  "15m": {
+   "file": "mnq_15m.csv",
+   "from": "2026-08-31",
+   "to": "2026-11-18",
+   "candles": 5141,
+   "sessions": 56
+  }
+ },
+ "results": [
+  {
+   "id": "app-20-candle-breakout",
+   "name": "20-candle breakout",
+   "bot": 3,
+   "timeframe": "15m",
+   "data": {
+    "file": "mnq_15m.csv",
+    "from": "2026-08-31",
+    "to": "2026-11-18",
+    "candles": 5141,
+    "sessions": 56
+   },
+   "score": {
+    "trades": 40,
+    "winRate": 0.525,
+    "profitFactor": 1.8423561457269322,
+    "net": 3711,
+    "avgTrade": 92.775,
+    "maxDrawdown": 1720,
+    "longestLosingStreak": 7,
+    "daysTraded": 36,
+    "bestDay": {
+     "day": "2026-11-05",
+     "usd": 1377
+    },
+    "worstDay": {
+     "day": "2026-11-17",
+     "usd": -483.5
+    },
+    "long": {
+     "n": 20,
+     "net": 610.5
+    },
+    "short": {
+     "n": 20,
+     "net": 3100.5
+    },
+    "firstHalf": {
+     "trades": 20,
+     "net": -1088,
+     "profitFactor": 0.60508166969147,
+     "winRate": 0.3,
+     "maxDrawdown": 1720
+    },
+    "secondHalf": {
+     "trades": 20,
+     "net": 4799,
+     "profitFactor": 3.9076037564374433,
+     "winRate": 0.75,
+     "maxDrawdown": 483.5
+    },
+    "doubleCostsNet": 3611,
+    "withoutBestDay": 2334,
+    "checks": {
+     "enoughTrades": false,
+     "profitAfterCosts": true,
+     "laterHalfProfit": true,
+     "survivesDoubleCosts": true,
+     "notOneLuckyDay": true,
+     "drawdownFitsFirm": true,
+     "worstDayFitsFirm": true
+    },
+    "grade": "Too few trades"
+   },
+   "lucid50k": {
+    "runs": 10000,
+    "sessions": 56,
+    "pPass": 0.6638,
+    "pFail": 0.0892,
+    "pUnfinished": 0.247,
+    "medianDaysToPass": 34,
+    "red": false
+   },
+   "exits": {
+    "close": 29,
+    "stop": 10,
+    "target": 1
+   },
+   "forward": {
+    "since": "2026-11-18",
+    "trades": 0,
+    "winRate": 0,
+    "profitFactor": null,
+    "net": 0,
+    "avgTrade": 0,
+    "maxDrawdown": 0,
+    "longestLosingStreak": 0,
+    "daysTraded": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "long": {
+     "n": 0,
+     "net": 0
+    },
+    "short": {
+     "n": 0,
+     "net": 0
+    },
+    "lastDay": "2026-11-18"
+   },
+   "trades": [
+    {
+     "day": "2026-09-01",
+     "dir": -1,
+     "usd": -208,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-03",
+     "dir": 1,
+     "usd": 117,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-04",
+     "dir": 1,
+     "usd": -202,
+     "why": "stop"
+    },
+    {
+     "day": "2026-09-09",
+     "dir": -1,
+     "usd": -99.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-11",
+     "dir": 1,
+     "usd": -99.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-16",
+     "dir": 1,
+     "usd": -208.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-09-16",
+     "dir": -1,
+     "usd": 112.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-21",
+     "dir": 1,
+     "usd": 815,
+     "why": "target"
+    },
+    {
+     "day": "2026-09-22",
+     "dir": 1,
+     "usd": 208,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-23",
+     "dir": -1,
+     "usd": 197,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-25",
+     "dir": 1,
+     "usd": -293.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-09-25",
+     "dir": 1,
+     "usd": -73,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-28",
+     "dir": -1,
+     "usd": -331.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-09-29",
+     "dir": -1,
+     "usd": -284.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-09-30",
+     "dir": 1,
+     "usd": -29,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-01",
+     "dir": -1,
+     "usd": -306.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-02",
+     "dir": 1,
+     "usd": -233,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-05",
+     "dir": 1,
+     "usd": 217.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-06",
+     "dir": 1,
+     "usd": -156,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-08",
+     "dir": -1,
+     "usd": -230.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-08",
+     "dir": -1,
+     "usd": 131,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-12",
+     "dir": -1,
+     "usd": -7,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-14",
+     "dir": -1,
+     "usd": 580.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-16",
+     "dir": -1,
+     "usd": 1037.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-19",
+     "dir": 1,
+     "usd": 15,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-21",
+     "dir": 1,
+     "usd": 92,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-22",
+     "dir": -1,
+     "usd": 589.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-26",
+     "dir": 1,
+     "usd": 284.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": 1,
+     "usd": 302,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-30",
+     "dir": -1,
+     "usd": 348,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": 1,
+     "usd": -429.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": -1,
+     "usd": 416,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-04",
+     "dir": 1,
+     "usd": -435,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-05",
+     "dir": -1,
+     "usd": 1377,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-09",
+     "dir": 1,
+     "usd": 566,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-10",
+     "dir": -1,
+     "usd": -295.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-11",
+     "dir": 1,
+     "usd": 152.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": -1,
+     "usd": 208.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": -1,
+     "usd": 349.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": -1,
+     "usd": -483.5,
+     "why": "stop"
+    }
+   ]
+  },
+  {
+   "id": "app-ny-open-breakout",
+   "name": "New York open breakout",
+   "bot": 1,
+   "timeframe": "5m",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-18",
+    "candles": 5437,
+    "sessions": 20
+   },
+   "score": {
+    "trades": 19,
+    "winRate": 0.42105263157894735,
+    "profitFactor": 1.068840091607167,
+    "net": 255.5,
+    "avgTrade": 13.447368421052632,
+    "maxDrawdown": 2059,
+    "longestLosingStreak": 6,
+    "daysTraded": 19,
+    "bestDay": {
+     "day": "2026-11-05",
+     "usd": 1504
+    },
+    "worstDay": {
+     "day": "2026-11-06",
+     "usd": -626
+    },
+    "long": {
+     "n": 11,
+     "net": -1713.5
+    },
+    "short": {
+     "n": 8,
+     "net": 1969
+    },
+    "firstHalf": {
+     "trades": 9,
+     "net": -736.5,
+     "profitFactor": 0.514662273476112,
+     "winRate": 0.3333333333333333,
+     "maxDrawdown": 1495
+    },
+    "secondHalf": {
+     "trades": 10,
+     "net": 992,
+     "profitFactor": 1.4521422060164084,
+     "winRate": 0.5,
+     "maxDrawdown": 1027.5
+    },
+    "doubleCostsNet": 208,
+    "withoutBestDay": -1248.5,
+    "checks": {
+     "enoughTrades": false,
+     "profitAfterCosts": true,
+     "laterHalfProfit": true,
+     "survivesDoubleCosts": true,
+     "notOneLuckyDay": false,
+     "drawdownFitsFirm": false,
+     "worstDayFitsFirm": true
+    },
+    "grade": "Too few trades"
+   },
+   "lucid50k": {
+    "runs": 10000,
+    "sessions": 20,
+    "pPass": 0.2621,
+    "pFail": 0.6944,
+    "pUnfinished": 0.0435,
+    "medianDaysToPass": 25,
+    "red": true
+   },
+   "exits": {
+    "close": 10,
+    "target": 2,
+    "stop": 7
+   },
+   "forward": {
+    "since": "2026-11-18",
+    "trades": 0,
+    "winRate": 0,
+    "profitFactor": null,
+    "net": 0,
+    "avgTrade": 0,
+    "maxDrawdown": 0,
+    "longestLosingStreak": 0,
+    "daysTraded": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "long": {
+     "n": 0,
+     "net": 0
+    },
+    "short": {
+     "n": 0,
+     "net": 0
+    },
+    "lastDay": "2026-11-18"
+   },
+   "trades": [
+    {
+     "day": "2026-10-21",
+     "dir": 1,
+     "usd": 227.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-22",
+     "dir": -1,
+     "usd": 410,
+     "why": "target"
+    },
+    {
+     "day": "2026-10-23",
+     "dir": 1,
+     "usd": -22.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-26",
+     "dir": 1,
+     "usd": 143.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": -1,
+     "usd": -330.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-28",
+     "dir": -1,
+     "usd": -333,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-30",
+     "dir": 1,
+     "usd": -349.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": 1,
+     "usd": -262.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-03",
+     "dir": 1,
+     "usd": -219.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-04",
+     "dir": 1,
+     "usd": -564,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-05",
+     "dir": -1,
+     "usd": 1504,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-06",
+     "dir": 1,
+     "usd": -626,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-09",
+     "dir": 1,
+     "usd": 602.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-10",
+     "dir": 1,
+     "usd": -487.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-11",
+     "dir": -1,
+     "usd": -361,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-12",
+     "dir": 1,
+     "usd": -155.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": -1,
+     "usd": 115.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": -1,
+     "usd": 261,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": -1,
+     "usd": 703,
+     "why": "target"
+    }
+   ]
+  },
+  {
+   "id": "botlab-2",
+   "name": "Opening candle direction (5-minute opening range)",
+   "bot": 2,
+   "timeframe": "5m",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-18",
+    "candles": 5437,
+    "sessions": 20
+   },
+   "score": {
+    "trades": 20,
+    "winRate": 0.25,
+    "profitFactor": 1.630167187212934,
+    "net": 1715,
+    "avgTrade": 85.75,
+    "maxDrawdown": 1241.5,
+    "longestLosingStreak": 7,
+    "daysTraded": 20,
+    "bestDay": {
+     "day": "2026-11-05",
+     "usd": 2158.5
+    },
+    "worstDay": {
+     "day": "2026-10-29",
+     "usd": -390.5
+    },
+    "long": {
+     "n": 10,
+     "net": 949
+    },
+    "short": {
+     "n": 10,
+     "net": 766
+    },
+    "firstHalf": {
+     "trades": 10,
+     "net": -914,
+     "profitFactor": 0.3036190476190476,
+     "winRate": 0.1,
+     "maxDrawdown": 961.5
+    },
+    "secondHalf": {
+     "trades": 10,
+     "net": 2629,
+     "profitFactor": 2.865862313697658,
+     "winRate": 0.4,
+     "maxDrawdown": 473
+    },
+    "doubleCostsNet": 1665,
+    "withoutBestDay": -443.5,
+    "checks": {
+     "enoughTrades": false,
+     "profitAfterCosts": true,
+     "laterHalfProfit": true,
+     "survivesDoubleCosts": true,
+     "notOneLuckyDay": false,
+     "drawdownFitsFirm": true,
+     "worstDayFitsFirm": true
+    },
+    "grade": "Too few trades"
+   },
+   "lucid50k": {
+    "runs": 10000,
+    "sessions": 20,
+    "pPass": 0.477,
+    "pFail": 0.3891,
+    "pUnfinished": 0.1339,
+    "medianDaysToPass": 29,
+    "red": true
+   },
+   "exits": {
+    "stop": 14,
+    "close": 6
+   },
+   "forward": {
+    "since": "2026-11-18",
+    "trades": 0,
+    "winRate": 0,
+    "profitFactor": null,
+    "net": 0,
+    "avgTrade": 0,
+    "maxDrawdown": 0,
+    "longestLosingStreak": 0,
+    "daysTraded": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "long": {
+     "n": 0,
+     "net": 0
+    },
+    "short": {
+     "n": 0,
+     "net": 0
+    },
+    "lastDay": "2026-11-18"
+   },
+   "trades": [
+    {
+     "day": "2026-10-21",
+     "dir": 1,
+     "usd": -111.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-22",
+     "dir": 1,
+     "usd": -146.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-23",
+     "dir": 1,
+     "usd": -93,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-26",
+     "dir": 1,
+     "usd": 398.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": 1,
+     "usd": -173,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-28",
+     "dir": 1,
+     "usd": -88.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-29",
+     "dir": -1,
+     "usd": -390.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-30",
+     "dir": -1,
+     "usd": -233,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": -1,
+     "usd": -60,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-03",
+     "dir": 1,
+     "usd": -16.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-04",
+     "dir": -1,
+     "usd": -280,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-05",
+     "dir": -1,
+     "usd": 2158.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-06",
+     "dir": -1,
+     "usd": -208,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-09",
+     "dir": 1,
+     "usd": 1139.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-10",
+     "dir": 1,
+     "usd": -291.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-11",
+     "dir": -1,
+     "usd": -156.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-12",
+     "dir": 1,
+     "usd": 331.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": -1,
+     "usd": 408.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": -1,
+     "usd": -273,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": -1,
+     "usd": -200,
+     "why": "stop"
+    }
+   ]
+  },
+  {
+   "id": "botlab-4",
+   "name": "Last-30-minute momentum",
+   "bot": 4,
+   "timeframe": "5m",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-18",
+    "candles": 5437,
+    "sessions": 20
+   },
+   "score": {
+    "trades": 19,
+    "winRate": 0.21052631578947367,
+    "profitFactor": 0.23816985271074897,
+    "net": -1215.5,
+    "avgTrade": -63.973684210526315,
+    "maxDrawdown": 1325,
+    "longestLosingStreak": 11,
+    "daysTraded": 19,
+    "bestDay": {
+     "day": "2026-11-02",
+     "usd": 177
+    },
+    "worstDay": {
+     "day": "2026-10-30",
+     "usd": -286.5
+    },
+    "long": {
+     "n": 8,
+     "net": -640
+    },
+    "short": {
+     "n": 11,
+     "net": -575.5
+    },
+    "firstHalf": {
+     "trades": 9,
+     "net": -96,
+     "profitFactor": 0.7983193277310925,
+     "winRate": 0.4444444444444444,
+     "maxDrawdown": 373.5
+    },
+    "secondHalf": {
+     "trades": 10,
+     "net": -1119.5,
+     "profitFactor": 0,
+     "winRate": 0,
+     "maxDrawdown": 1119.5
+    },
+    "doubleCostsNet": -1263,
+    "withoutBestDay": -1392.5,
+    "checks": {
+     "enoughTrades": false,
+     "profitAfterCosts": false,
+     "laterHalfProfit": false,
+     "survivesDoubleCosts": false,
+     "notOneLuckyDay": false,
+     "drawdownFitsFirm": true,
+     "worstDayFitsFirm": true
+    },
+    "grade": "Loses money"
+   },
+   "lucid50k": {
+    "runs": 10000,
+    "sessions": 20,
+    "pPass": 0,
+    "pFail": 0.9792,
+    "pUnfinished": 0.0208,
+    "medianDaysToPass": null,
+    "red": true
+   },
+   "exits": {
+    "close": 18,
+    "stop": 1
+   },
+   "forward": {
+    "since": "2026-11-18",
+    "trades": 0,
+    "winRate": 0,
+    "profitFactor": null,
+    "net": 0,
+    "avgTrade": 0,
+    "maxDrawdown": 0,
+    "longestLosingStreak": 0,
+    "daysTraded": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "long": {
+     "n": 0,
+     "net": 0
+    },
+    "short": {
+     "n": 0,
+     "net": 0
+    },
+    "lastDay": "2026-11-18"
+   },
+   "trades": [
+    {
+     "day": "2026-10-22",
+     "dir": -1,
+     "usd": 0.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-23",
+     "dir": -1,
+     "usd": 40,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-26",
+     "dir": 1,
+     "usd": -68.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": 1,
+     "usd": -25,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-28",
+     "dir": 1,
+     "usd": 162.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-29",
+     "dir": -1,
+     "usd": -87,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-30",
+     "dir": -1,
+     "usd": -286.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": -1,
+     "usd": 177,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-03",
+     "dir": 1,
+     "usd": -9,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-04",
+     "dir": 1,
+     "usd": -146.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-05",
+     "dir": -1,
+     "usd": -17,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-06",
+     "dir": 1,
+     "usd": -264.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-09",
+     "dir": 1,
+     "usd": -178.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-10",
+     "dir": -1,
+     "usd": -90,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-11",
+     "dir": 1,
+     "usd": -110.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-12",
+     "dir": -1,
+     "usd": -38.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": -1,
+     "usd": -216.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": -1,
+     "usd": -35.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": -1,
+     "usd": -22,
+     "why": "close"
+    }
+   ]
+  },
+  {
+   "id": "botlab-5",
+   "name": "VWAP trend",
+   "skipped": "needs 1-minute candles or smaller, and the lab only has 5 and 15-minute candles"
+  },
+  {
+   "id": "botlab-6",
+   "name": "Gap fade",
+   "bot": 6,
+   "timeframe": "5m",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-18",
+    "candles": 5437,
+    "sessions": 20
+   },
+   "score": {
+    "trades": 3,
+    "winRate": 0.3333333333333333,
+    "profitFactor": 2.8766233766233764,
+    "net": 289,
+    "avgTrade": 96.33333333333333,
+    "maxDrawdown": 154,
+    "longestLosingStreak": 2,
+    "daysTraded": 3,
+    "bestDay": {
+     "day": "2026-11-10",
+     "usd": 443
+    },
+    "worstDay": {
+     "day": "2026-10-23",
+     "usd": -93.5
+    },
+    "long": {
+     "n": 2,
+     "net": 349.5
+    },
+    "short": {
+     "n": 1,
+     "net": -60.5
+    },
+    "firstHalf": {
+     "trades": 1,
+     "net": -93.5,
+     "profitFactor": 0,
+     "winRate": 0,
+     "maxDrawdown": 93.5
+    },
+    "secondHalf": {
+     "trades": 2,
+     "net": 382.5,
+     "profitFactor": 7.322314049586777,
+     "winRate": 0.5,
+     "maxDrawdown": 60.5
+    },
+    "doubleCostsNet": 281.5,
+    "withoutBestDay": -154,
+    "checks": {
+     "enoughTrades": false,
+     "profitAfterCosts": true,
+     "laterHalfProfit": true,
+     "survivesDoubleCosts": true,
+     "notOneLuckyDay": false,
+     "drawdownFitsFirm": true,
+     "worstDayFitsFirm": true
+    },
+    "grade": "Too few trades"
+   },
+   "lucid50k": {
+    "runs": 10000,
+    "sessions": 20,
+    "pPass": 0.0098,
+    "pFail": 0,
+    "pUnfinished": 0.9902,
+    "medianDaysToPass": 53,
+    "red": false
+   },
+   "exits": {
+    "stop": 2,
+    "target": 1
+   },
+   "forward": {
+    "since": "2026-11-18",
+    "trades": 0,
+    "winRate": 0,
+    "profitFactor": null,
+    "net": 0,
+    "avgTrade": 0,
+    "maxDrawdown": 0,
+    "longestLosingStreak": 0,
+    "daysTraded": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "long": {
+     "n": 0,
+     "net": 0
+    },
+    "short": {
+     "n": 0,
+     "net": 0
+    },
+    "lastDay": "2026-11-18"
+   },
+   "trades": [
+    {
+     "day": "2026-10-23",
+     "dir": 1,
+     "usd": -93.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": -1,
+     "usd": -60.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-10",
+     "dir": 1,
+     "usd": 443,
+     "why": "target"
+    }
+   ]
+  },
+  {
+   "id": "botlab-7",
+   "name": "Inverted fair value gap",
+   "bot": 7,
+   "timeframe": "5m",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-18",
+    "candles": 5437,
+    "sessions": 20
+   },
+   "score": {
+    "trades": 12,
+    "winRate": 0.5833333333333334,
+    "profitFactor": 2.4783845278725827,
+    "net": 1299.5,
+    "avgTrade": 108.29166666666667,
+    "maxDrawdown": 512,
+    "longestLosingStreak": 2,
+    "daysTraded": 12,
+    "bestDay": {
+     "day": "2026-10-30",
+     "usd": 508.5
+    },
+    "worstDay": {
+     "day": "2026-11-17",
+     "usd": -262
+    },
+    "long": {
+     "n": 4,
+     "net": 546
+    },
+    "short": {
+     "n": 8,
+     "net": 753.5
+    },
+    "firstHalf": {
+     "trades": 6,
+     "net": 1440.5,
+     "profitFactor": 12.080769230769231,
+     "winRate": 0.8333333333333334,
+     "maxDrawdown": 130
+    },
+    "secondHalf": {
+     "trades": 6,
+     "net": -141,
+     "profitFactor": 0.8117489986648865,
+     "winRate": 0.3333333333333333,
+     "maxDrawdown": 512
+    },
+    "doubleCostsNet": 1269.5,
+    "withoutBestDay": 791,
+    "checks": {
+     "enoughTrades": false,
+     "profitAfterCosts": true,
+     "laterHalfProfit": false,
+     "survivesDoubleCosts": true,
+     "notOneLuckyDay": true,
+     "drawdownFitsFirm": true,
+     "worstDayFitsFirm": true
+    },
+    "grade": "Too few trades"
+   },
+   "lucid50k": {
+    "runs": 10000,
+    "sessions": 20,
+    "pPass": 0.7554,
+    "pFail": 0.0052,
+    "pUnfinished": 0.2394,
+    "medianDaysToPass": 38,
+    "red": false
+   },
+   "exits": {
+    "stop": 4,
+    "close": 5,
+    "target": 3
+   },
+   "forward": {
+    "since": "2026-11-18",
+    "trades": 0,
+    "winRate": 0,
+    "profitFactor": null,
+    "net": 0,
+    "avgTrade": 0,
+    "maxDrawdown": 0,
+    "longestLosingStreak": 0,
+    "daysTraded": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "long": {
+     "n": 0,
+     "net": 0
+    },
+    "short": {
+     "n": 0,
+     "net": 0
+    },
+    "lastDay": "2026-11-18"
+   },
+   "trades": [
+    {
+     "day": "2026-10-26",
+     "dir": -1,
+     "usd": -130,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": 1,
+     "usd": 317.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-28",
+     "dir": 1,
+     "usd": 172.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-30",
+     "dir": -1,
+     "usd": 508.5,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": -1,
+     "usd": 447,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-03",
+     "dir": -1,
+     "usd": 125,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-04",
+     "dir": -1,
+     "usd": -10,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-06",
+     "dir": -1,
+     "usd": 325,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-10",
+     "dir": 1,
+     "usd": -227,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-11",
+     "dir": 1,
+     "usd": 283,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": -1,
+     "usd": -250,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": -1,
+     "usd": -262,
+     "why": "stop"
+    }
+   ]
+  },
+  {
+   "id": "botlab-8",
+   "name": "Range squeeze breakout",
+   "skipped": "needs 1-minute candles or smaller, and the lab only has 5 and 15-minute candles"
+  },
+  {
+   "id": "botlab-9",
+   "name": "Trend-join scalper",
+   "skipped": "needs 1-minute candles or smaller, and the lab only has 5 and 15-minute candles"
+  },
+  {
+   "id": "botlab-10",
+   "name": "VWAP band fade",
+   "bot": 10,
+   "timeframe": "5m",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-18",
+    "candles": 5437,
+    "sessions": 20
+   },
+   "score": {
+    "trades": 30,
+    "winRate": 0.4666666666666667,
+    "profitFactor": 2.3180613404013632,
+    "net": 1740.5,
+    "avgTrade": 58.016666666666666,
+    "maxDrawdown": 449,
+    "longestLosingStreak": 5,
+    "daysTraded": 17,
+    "bestDay": {
+     "day": "2026-11-10",
+     "usd": 881
+    },
+    "worstDay": {
+     "day": "2026-11-16",
+     "usd": -278
+    },
+    "long": {
+     "n": 15,
+     "net": 367
+    },
+    "short": {
+     "n": 15,
+     "net": 1373.5
+    },
+    "firstHalf": {
+     "trades": 15,
+     "net": 631,
+     "profitFactor": 2.399113082039911,
+     "winRate": 0.4666666666666667,
+     "maxDrawdown": 171
+    },
+    "secondHalf": {
+     "trades": 15,
+     "net": 1109.5,
+     "profitFactor": 2.2760207015526164,
+     "winRate": 0.4666666666666667,
+     "maxDrawdown": 449
+    },
+    "doubleCostsNet": 1665.5,
+    "withoutBestDay": 859.5,
+    "checks": {
+     "enoughTrades": false,
+     "profitAfterCosts": true,
+     "laterHalfProfit": true,
+     "survivesDoubleCosts": true,
+     "notOneLuckyDay": true,
+     "drawdownFitsFirm": true,
+     "worstDayFitsFirm": true
+    },
+    "grade": "Too few trades"
+   },
+   "lucid50k": {
+    "runs": 10000,
+    "sessions": 20,
+    "pPass": 0.8913,
+    "pFail": 0.0019,
+    "pUnfinished": 0.1068,
+    "medianDaysToPass": 32,
+    "red": false
+   },
+   "exits": {
+    "target": 13,
+    "stop": 16,
+    "close": 1
+   },
+   "forward": {
+    "since": "2026-11-18",
+    "trades": 0,
+    "winRate": 0,
+    "profitFactor": null,
+    "net": 0,
+    "avgTrade": 0,
+    "maxDrawdown": 0,
+    "longestLosingStreak": 0,
+    "daysTraded": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "long": {
+     "n": 0,
+     "net": 0
+    },
+    "short": {
+     "n": 0,
+     "net": 0
+    },
+    "lastDay": "2026-11-18"
+   },
+   "trades": [
+    {
+     "day": "2026-10-21",
+     "dir": 1,
+     "usd": 73,
+     "why": "target"
+    },
+    {
+     "day": "2026-10-21",
+     "dir": -1,
+     "usd": -71.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-22",
+     "dir": 1,
+     "usd": -64,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-22",
+     "dir": 1,
+     "usd": -35.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-23",
+     "dir": -1,
+     "usd": 289,
+     "why": "target"
+    },
+    {
+     "day": "2026-10-26",
+     "dir": -1,
+     "usd": -85.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-26",
+     "dir": -1,
+     "usd": 153,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": -1,
+     "usd": -52,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": -1,
+     "usd": -61,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-28",
+     "dir": -1,
+     "usd": 73,
+     "why": "target"
+    },
+    {
+     "day": "2026-10-29",
+     "dir": -1,
+     "usd": 173.5,
+     "why": "target"
+    },
+    {
+     "day": "2026-10-29",
+     "dir": 1,
+     "usd": -60,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-30",
+     "dir": 1,
+     "usd": -21.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-30",
+     "dir": 1,
+     "usd": 140,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": -1,
+     "usd": 180.5,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": 1,
+     "usd": -150.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-03",
+     "dir": -1,
+     "usd": 127,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-03",
+     "dir": -1,
+     "usd": 93.5,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-06",
+     "dir": 1,
+     "usd": 215,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-06",
+     "dir": 1,
+     "usd": 221,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-10",
+     "dir": -1,
+     "usd": 382.5,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-10",
+     "dir": 1,
+     "usd": 498.5,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-11",
+     "dir": -1,
+     "usd": -177,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-11",
+     "dir": -1,
+     "usd": -93,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-12",
+     "dir": -1,
+     "usd": 441.5,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": 1,
+     "usd": -42,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": 1,
+     "usd": -43,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": 1,
+     "usd": -124.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": 1,
+     "usd": -153.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": 1,
+     "usd": -86,
+     "why": "stop"
+    }
+   ]
+  },
+  {
+   "id": "botlab-11",
+   "name": "Failed breakout",
+   "bot": 11,
+   "timeframe": "5m",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-18",
+    "candles": 5437,
+    "sessions": 20
+   },
+   "score": {
+    "trades": 9,
+    "winRate": 0.2222222222222222,
+    "profitFactor": 0.4651274651274651,
+    "net": -556,
+    "avgTrade": -61.77777777777778,
+    "maxDrawdown": 955,
+    "longestLosingStreak": 5,
+    "daysTraded": 8,
+    "bestDay": {
+     "day": "2026-10-23",
+     "usd": 399
+    },
+    "worstDay": {
+     "day": "2026-11-16",
+     "usd": -351
+    },
+    "long": {
+     "n": 5,
+     "net": -300
+    },
+    "short": {
+     "n": 4,
+     "net": -256
+    },
+    "firstHalf": {
+     "trades": 4,
+     "net": 162,
+     "profitFactor": 1.5038880248833593,
+     "winRate": 0.5,
+     "maxDrawdown": 321.5
+    },
+    "secondHalf": {
+     "trades": 5,
+     "net": -718,
+     "profitFactor": 0,
+     "winRate": 0,
+     "maxDrawdown": 718
+    },
+    "doubleCostsNet": -578.5,
+    "withoutBestDay": -955,
+    "checks": {
+     "enoughTrades": false,
+     "profitAfterCosts": false,
+     "laterHalfProfit": false,
+     "survivesDoubleCosts": false,
+     "notOneLuckyDay": false,
+     "drawdownFitsFirm": true,
+     "worstDayFitsFirm": true
+    },
+    "grade": "Loses money"
+   },
+   "lucid50k": {
+    "runs": 10000,
+    "sessions": 20,
+    "pPass": 0,
+    "pFail": 0.5238,
+    "pUnfinished": 0.4762,
+    "medianDaysToPass": null,
+    "red": true
+   },
+   "exits": {
+    "target": 2,
+    "stop": 7
+   },
+   "forward": {
+    "since": "2026-11-18",
+    "trades": 0,
+    "winRate": 0,
+    "profitFactor": null,
+    "net": 0,
+    "avgTrade": 0,
+    "maxDrawdown": 0,
+    "longestLosingStreak": 0,
+    "daysTraded": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "long": {
+     "n": 0,
+     "net": 0
+    },
+    "short": {
+     "n": 0,
+     "net": 0
+    },
+    "lastDay": "2026-11-18"
+   },
+   "trades": [
+    {
+     "day": "2026-10-23",
+     "dir": 1,
+     "usd": 399,
+     "why": "target"
+    },
+    {
+     "day": "2026-10-26",
+     "dir": -1,
+     "usd": -68,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": -1,
+     "usd": -253.5,
+     "why": "stop"
+    },
+    {
+     "day": "2026-10-28",
+     "dir": -1,
+     "usd": 84.5,
+     "why": "target"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": -1,
+     "usd": -19,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": 1,
+     "usd": -156,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": 1,
+     "usd": -96,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": 1,
+     "usd": -351,
+     "why": "stop"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": 1,
+     "usd": -96,
+     "why": "stop"
+    }
+   ]
+  },
+  {
+   "id": "botlab-12",
+   "name": "Noise-area momentum",
+   "bot": 12,
+   "timeframe": "30m",
+   "data": {
+    "file": "mnq_15m.csv",
+    "from": "2026-08-31",
+    "to": "2026-11-18",
+    "candles": 5141,
+    "sessions": 56
+   },
+   "score": {
+    "trades": 43,
+    "winRate": 0.5116279069767442,
+    "profitFactor": 1.5783959086940251,
+    "net": 2318.5,
+    "avgTrade": 53.91860465116279,
+    "maxDrawdown": 1019,
+    "longestLosingStreak": 5,
+    "daysTraded": 27,
+    "bestDay": {
+     "day": "2026-11-05",
+     "usd": 1377
+    },
+    "worstDay": {
+     "day": "2026-11-16",
+     "usd": -517
+    },
+    "long": {
+     "n": 21,
+     "net": -784.5
+    },
+    "short": {
+     "n": 22,
+     "net": 3103
+    },
+    "firstHalf": {
+     "trades": 21,
+     "net": 1826.5,
+     "profitFactor": 2.551826677994902,
+     "winRate": 0.6190476190476191,
+     "maxDrawdown": 799.5
+    },
+    "secondHalf": {
+     "trades": 22,
+     "net": 492,
+     "profitFactor": 1.1737594914356348,
+     "winRate": 0.4090909090909091,
+     "maxDrawdown": 1019
+    },
+    "doubleCostsNet": 2211,
+    "withoutBestDay": 941.5,
+    "checks": {
+     "enoughTrades": false,
+     "profitAfterCosts": true,
+     "laterHalfProfit": true,
+     "survivesDoubleCosts": true,
+     "notOneLuckyDay": true,
+     "drawdownFitsFirm": true,
+     "worstDayFitsFirm": true
+    },
+    "grade": "Too few trades"
+   },
+   "lucid50k": {
+    "runs": 10000,
+    "sessions": 56,
+    "pPass": 0.4234,
+    "pFail": 0.1501,
+    "pUnfinished": 0.4265,
+    "medianDaysToPass": 37,
+    "red": false
+   },
+   "exits": {
+    "rule": 28,
+    "close": 15
+   },
+   "forward": {
+    "since": "2026-11-18",
+    "trades": 0,
+    "winRate": 0,
+    "profitFactor": null,
+    "net": 0,
+    "avgTrade": 0,
+    "maxDrawdown": 0,
+    "longestLosingStreak": 0,
+    "daysTraded": 0,
+    "bestDay": null,
+    "worstDay": null,
+    "long": {
+     "n": 0,
+     "net": 0
+    },
+    "short": {
+     "n": 0,
+     "net": 0
+    },
+    "lastDay": "2026-11-18"
+   },
+   "trades": [
+    {
+     "day": "2026-09-22",
+     "dir": 1,
+     "usd": -39.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-09-22",
+     "dir": 1,
+     "usd": 185.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-23",
+     "dir": -1,
+     "usd": 46.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-09-23",
+     "dir": -1,
+     "usd": 2,
+     "why": "rule"
+    },
+    {
+     "day": "2026-09-23",
+     "dir": -1,
+     "usd": 13.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-09-28",
+     "dir": -1,
+     "usd": -273.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-09-30",
+     "dir": 1,
+     "usd": 9,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-05",
+     "dir": 1,
+     "usd": 217.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-08",
+     "dir": -1,
+     "usd": 131,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-12",
+     "dir": -1,
+     "usd": 5.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-12",
+     "dir": -1,
+     "usd": 64,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-14",
+     "dir": -1,
+     "usd": 417.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-16",
+     "dir": -1,
+     "usd": 1037.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-19",
+     "dir": 1,
+     "usd": -190,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-20",
+     "dir": 1,
+     "usd": -254,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-21",
+     "dir": 1,
+     "usd": -81.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-21",
+     "dir": 1,
+     "usd": -41,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-21",
+     "dir": 1,
+     "usd": -233,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-22",
+     "dir": -1,
+     "usd": 589.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-23",
+     "dir": 1,
+     "usd": -64.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-26",
+     "dir": 1,
+     "usd": 284.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": 1,
+     "usd": 156.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-27",
+     "dir": 1,
+     "usd": 106.5,
+     "why": "close"
+    },
+    {
+     "day": "2026-10-30",
+     "dir": -1,
+     "usd": -213,
+     "why": "rule"
+    },
+    {
+     "day": "2026-10-30",
+     "dir": -1,
+     "usd": 395,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": 1,
+     "usd": -321,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-02",
+     "dir": -1,
+     "usd": 237,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-03",
+     "dir": 1,
+     "usd": -140,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-04",
+     "dir": 1,
+     "usd": -373,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-04",
+     "dir": 1,
+     "usd": -112.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-05",
+     "dir": -1,
+     "usd": 1377,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-06",
+     "dir": 1,
+     "usd": -357.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-09",
+     "dir": 1,
+     "usd": 566,
+     "why": "close"
+    },
+    {
+     "day": "2026-11-11",
+     "dir": 1,
+     "usd": 127,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-11",
+     "dir": 1,
+     "usd": -229.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": -1,
+     "usd": 275.5,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": -1,
+     "usd": -66,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-13",
+     "dir": -1,
+     "usd": 83,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": -1,
+     "usd": -360,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-16",
+     "dir": -1,
+     "usd": -157,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": -1,
+     "usd": -249,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": -1,
+     "usd": -215,
+     "why": "rule"
+    },
+    {
+     "day": "2026-11-17",
+     "dir": -1,
+     "usd": -38,
+     "why": "close"
+    }
+   ]
+  }
+ ]
+}
