@@ -73,6 +73,8 @@ details p { margin: 8px 0 0; color: var(--mut); font-size: 14px; }
 ol.next, ul.lessons { margin: 0; padding-left: 20px; display: grid; gap: 8px; color: var(--mut); }
 ol.next b, ul.lessons b { color: var(--fg); font-weight: 500; }
 .small { font-size: 12px; color: var(--dim); }
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+.links a { text-decoration: none; display: inline-flex; align-items: center; }
 .foot { text-align: center; font-size: 12px; color: var(--dim); padding-top: 6px; }
 @media (min-width: 900px) {
   .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
@@ -137,6 +139,16 @@ ol.next b, ul.lessons b { color: var(--fg); font-weight: 500; }
   <section class="panel">
     <div class="label">Next experiments</div>
     <ol class="next" id="next"></ol>
+  </section>
+
+  <section class="panel wide">
+    <div class="label">Repository · how this page stays up to date</div>
+    <p class="small" style="margin:0 0 12px">Every weeknight at 22:40 UK time, the Quint Lab nightly session adds the day's MNQ candles, re-runs every bot, updates the paper test and this page, and saves the changes to your GitHub repo for you to review. On Fridays it also reviews the week and queues new experiments.</p>
+    <div class="links">
+      <a class="ghost" href="https://github.com/charlieaustin1107/Quint/pulls?q=is%3Apr+head%3Alab%2Fnightly" target="_blank" rel="noopener">Tonight's changes</a>
+      <a class="ghost" href="https://github.com/charlieaustin1107/Quint/pull/17" target="_blank" rel="noopener">The lab's code</a>
+      <a class="ghost" href="https://github.com/charlieaustin1107/Quint" target="_blank" rel="noopener">Quint repo</a>
+    </div>
   </section>
 
   <p class="foot wide">For learning and practice. Nothing here places orders or is financial advice.</p>

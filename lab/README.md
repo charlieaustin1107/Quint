@@ -47,6 +47,8 @@ npm test           # the tests (npm run test:3 runs them three times)
 | `NIGHTLY.md` | The job a scheduled Claude session does every night while you're away |
 
 ## The nightly loop
-`NIGHTLY.md` is the whole job: grow the candle store (2 TradingView calls), re-run the bots, extend the paper test, write the roundup, move one queued experiment forward, record it in the memory, open a pull request, refresh Quint HQ and send you a notification. It's switched on by a scheduled Claude Code task that you approve.
+`NIGHTLY.md` is the whole job: grow the candle store (2 TradingView calls), re-run the bots, extend the paper test, write the roundup, move one queued experiment forward, record it in the memory, save it to GitHub as a pull request on `lab/nightly`, refresh Quint HQ and send you a notification. On Fridays it also reviews the week and queues new experiments.
+
+It runs every weeknight at 22:40 UK time in a Claude Code session called **Quint Lab nightly**, woken by a scheduled task. Open that session to watch a run or ask it something. To pause it, ask Claude to "pause the Quint Lab nightly run"; to change the time, ask for a new time.
 
 Costs used in the lab: 1 MNQ at $2 a point, $0.50 commission a side and 1 tick of slippage on market and stop fills (the bot lab's rules), with a double-cost check. Nothing here is financial advice.
