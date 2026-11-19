@@ -64,6 +64,8 @@ Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ co
 
 ## Session log
 
+| 2026-11-19 | ChatGPT | Owner specified that Quint is the platform/brain and AI chat assistant only; all trading strategies must appear as separately named, selectable bots in a dedicated library grouped by horizon, with honest implementation/evidence statuses. Added menu and naming requirements to PLAN.md on main. |
+
 | 2026-11-19 | ChatGPT | Owner requirement: longer-horizon bots must have strict stop-loss/take-profit boundaries and continuous chart reassessment. Added mandatory protection, event-driven monitoring, decision logging, overnight/gap checks and AI-independent fail-safes to the MNQ research programme and Quint Control plan on main. No trading code or live execution path changed. |
 
 | Date | Model | What happened |
