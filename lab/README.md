@@ -1,8 +1,10 @@
 # Quint Lab
 
-Quint Lab is the brain behind Quint, your Jarvis-style assistant. It remembers every strategy you've tried and what the evidence said, scores every bot the same way, simulates a Lucid 50K evaluation, keeps a paper forward test, and writes the roundup Quint reads out to you. It never places orders.
+Quint Lab is the brain behind Quint, your Jarvis-style assistant. It remembers every strategy you've tried and what the evidence said, scores every bot the same way, runs the **strategy factory** (thousands of variations, judged on data they never saw), simulates a Lucid 50K evaluation, keeps a paper forward test, and writes the briefing Quint reads out to you. It never places orders.
 
-**Quint HQ** (the voice page): https://claude.ai/artifact/NF7M9VSX3YrsyUPWWL1uim. Tap **Play roundup** to hear it, or ask a question. On iPhone, tap the question box and use the microphone on your keyboard.
+**Quint HQ** (your hub): https://claude.ai/artifact/NF7M9VSX3YrsyUPWWL1uim. Five screens: **Today** (spoken briefing, session clock, news blackout, money), **Ask** (talk to Quint), **Desk** (Four Pillars pre-trade check, sizing, prop accounts, journal), **Lab** (factory, bots, library, ideas, memory) and **More** (nightly jobs, MNQ check, apps, roadmap, settings). Your accounts and journal stay private to you; nothing about your money goes to GitHub.
+
+Master prompts: `jarvis/VISION.md` (the hub) and `FACTORY.md` (the strategy factory).
 
 ## Where things stand (19 Nov 2026)
 - **Real money:** no bot is live yet, so nothing has been made or lost. Bots go live through Quint Control (NinjaTrader), phases 1 to 3.
@@ -44,11 +46,13 @@ npm test           # the tests (npm run test:3 runs them three times)
 | `lib/candles.js` | The candle store; merges new TradingView candles in |
 | `roundup.js` | Writes Quint's spoken roundup (`roundup.json`, `ROUNDUP.md`) |
 | `jarvis/` | Quint HQ: `template.html` plus `build.js` make `index.html`. Never hand-edit `index.html` |
-| `NIGHTLY.md` | The job a scheduled Claude session does every night while you're away |
+| `factory/` | The strategy factory: `families.js` (the grids), `engine.js` (unseen sessions, PBO, neighbours, the survivor rule), `run.js` |
+| `NIGHTLY.md` | The job the nightly session does at 22:15 UK |
+| `HQSYNC.md` | The 23:25 UK job: Trading Mastery's bot results, dream report and pinned rules into the hub, privately |
 
 ## The nightly loop
-`NIGHTLY.md` is the whole job: grow the candle store (2 TradingView calls), re-run the bots, extend the paper test, write the roundup, move one queued experiment forward, record it in the memory, save it to GitHub as a pull request on `lab/nightly`, refresh Quint HQ and send you a notification. On Fridays it also reviews the week and queues new experiments.
+`NIGHTLY.md` is the whole job: grow the candle store (1 TradingView call, plus 1 for the news calendar when it runs low), run the strategy factory, re-run the bots, extend the paper test, write the roundup, move one queued experiment forward, record it in the memory, save it to GitHub as a pull request on `lab/nightly`, refresh Quint HQ and send you a notification. On Fridays it also reviews the week and queues new experiments.
 
-It runs every weeknight at 22:40 UK time in a Claude Code session called **Quint Lab nightly**, woken by a scheduled task. Open that session to watch a run or ask it something. To pause it, ask Claude to "pause the Quint Lab nightly run"; to change the time, ask for a new time.
+It runs every weeknight at 22:15 UK time in a Claude Code session called **Quint Lab nightly**, woken by a scheduled task, before Trading Mastery's own dream run at 22:40. A second task at 23:25 runs the HQ sync (`HQSYNC.md`). Open that session to watch a run or ask it something. To pause it, ask Claude to "pause the Quint Lab nightly run"; to change the time, ask for a new time.
 
 Costs used in the lab: 1 MNQ at $2 a point, $0.50 commission a side and 1 tick of slippage on market and stop fills (the bot lab's rules), with a double-cost check. Nothing here is financial advice.

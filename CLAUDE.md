@@ -65,7 +65,8 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 ## Quint Lab
 - **The owner's strategy is WYLD Will's Four Pillars** (sweep → HTF level holds → PDR bias → 1m confirmation), the master version, in `lab/brain/playbooks.json` and the registry entry `wyld-four-pillars`. Trading Mastery's six steps and Chart Wizard's 5-pillar playbook are older codings of this one strategy, not separate strategies: bring them in line with WYLD's rules, and never remove them.
 - **Read `lab/brain/registry.json` before any strategy work, and update it after.** It's Quint's memory: every strategy tried, its status and evidence, the lessons, and the queue of pre-registered experiments. Add a dated entry to `lab/brain/journal.md` each session.
-- Run with `cd lab && npm run lab`; test with `npm run test:3`. Quint HQ is built from `lab/jarvis/template.html` by `lab/jarvis/build.js`; never hand-edit its `index.html`.
+- Run with `cd lab && npm run lab` (bots, the strategy factory, roundup, Quint HQ); test with `npm run test:3` (includes a Playwright phone test of Quint HQ). Quint HQ is built from `lab/jarvis/template.html` by `lab/jarvis/build.js`; never hand-edit its `index.html`. Master prompts: `lab/jarvis/VISION.md` (the hub) and `lab/FACTORY.md` (the strategy factory).
+- **The repo is public: never commit anything about the owner's money.** Prop accounts, the journal, bot P&L and Trading Mastery data live only in Quint HQ's private storage (`lab/HQSYNC.md`).
 - Write an idea's exact rules and pass mark into the queue **before** testing it. Never promote anything on TraderDev's QQQ stand-in alone, and never call a strategy profitable in the roundup.
 - TradingView budget for research: a few calls a session at most (the owner's plan has no Deep Backtesting). Set margin to 0 in Pine test scripts.
 

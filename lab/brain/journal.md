@@ -2,6 +2,13 @@
 
 Newest first. Every lab session adds an entry: what ran, what was learned, what changed, and the TradingView calls used.
 
+## 2026-11-19 (night): Quint HQ v2
+
+- Quint HQ is now the owner's front door, built to `lab/jarvis/VISION.md`: Today (spoken briefing, UK and New York clock, the trading window, news blackout, money, the pre-market checklist), Ask (Quint answers with tools: accounts, journal, sizing, the lab, Trading Mastery, and adds ideas), Desk (Four Pillars pre-trade check with a verdict, sizing by the quarter-of-room rule, Lucid prop accounts, journal with CSV export), Lab (factory, bots with equity curves, library, ideas inbox, memory, TraderDev) and More (nightly jobs with run and pause, an on-demand MNQ check that costs 1 TradingView call, apps, roadmap, ventures, settings).
+- Private by design: accounts, trades and settings live in the hub's own storage under the owner's private path; ideas and the Trading Mastery feed are owner-only. None of it goes to GitHub.
+- Tested with a Playwright phone test (390×844) using a fake `window.claude`: every screen, an account, sizing, a trade, an idea, a question to Quint, the jobs and the MNQ check, with no console errors and no sideways scrolling.
+- Nightly run moved to 22:15 UK with at most 2 TradingView calls, ahead of Trading Mastery's 22:40 dream run. New HQ sync at 23:25 UK (`lab/HQSYNC.md`).
+
 ## 2026-11-19 (evening): one strategy, and the strategy factory
 
 **What happened**
