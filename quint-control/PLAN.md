@@ -374,6 +374,12 @@ Every result shows trades, win rate, profit factor, net dollars, average R, wors
 - **What stays on no matter what:** the guardian's firm rules (room left before the max loss, the daily loss stop, the LucidDaily news blackout, no opposite positions across accounts) and the kill switches. Breaking those fails the account, so they can't be skipped.
 
 ## Discord and Telegram trade-alert integrations
+### Owner's notification layout decision
+
+- **One shared Discord channel for all bots** is the default and the owner's selected layout. Every alert must identify the bot clearly and include its strategy/horizon label, so messages remain easy to distinguish.
+- Do not create a separate Discord channel for each bot by default. Keep per-bot filtering and mute controls in Quint's website settings, while routing enabled bot events into the one shared channel.
+- Telegram can also be connected as an optional second destination; the same shared event stream and per-bot preferences apply.
+
 
 Quint must support linking the website to a private Discord server/channel and/or a Telegram chat. These are notification surfaces for the same event stream shown in the Quint dashboard; they are not separate trading engines. Support both providers so the owner can choose either or both.
 
