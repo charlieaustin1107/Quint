@@ -110,6 +110,30 @@ Interpretation: these are exploratory results, not evidence of robust profitabil
 - Include fault-injection tests for disconnects, stale quotes, partial fills, rejected orders, duplicate events, delayed acknowledgements and restart/reconciliation.
 - Do not modify Quint Control's Guardian, order router or live execution path as part of strategy research without a separate reviewed change.
 
+## Longer-horizon position supervision and protection
+
+For swing, multi-day and monthly/position strategies, a trade must never be left unmanaged merely because its entry signal has passed. Every position requires a complete, pre-trade risk plan and ongoing deterministic supervision.
+
+### Mandatory protection before entry
+- Define the initial hard stop-loss, profit target or explicit exit rule, maximum dollar risk, position size, maximum holding period and thesis-invalidation conditions before submitting an entry.
+- Calculate size from the stop distance, MNQ point/tick value, verified fees and a conservative slippage/gap allowance. Reject the trade if minimum size would exceed the risk budget.
+- Attach broker/platform-held protective stop and target orders where supported, verify acceptance and quantity against the actual filled position, and reconcile after partial fills, reconnects and restarts. If protection cannot be confirmed, block new entries and execute the configured safe response.
+- Stops are hard risk boundaries, not suggestions. Never widen a stop or increase the original maximum risk automatically. Any permitted stop adjustment must be rule-based and may only reduce risk (for example, trail closer or move to breakeven after a pre-defined condition).
+- A target may be reduced or an exit brought forward under pre-defined rules; extending a target or increasing exposure requires a separately specified, tested rule and must never silently increase risk.
+
+### Continuous chart and position analysis
+- Monitor fresh market data continuously while a position is open, but do not call an LLM on every tick. Use deterministic, event-driven calculations for price, volatility, trend, structure, spread, session state, open risk, stop/target distance and data freshness.
+- Reassess on each completed bar at the strategy's declared analysis timeframe and on material events: volatility/regime change, structural break, target/stop approach, scheduled news window, session transition, contract roll, data disconnect or account-rule change.
+- A slower-horizon bot must use its intended higher-timeframe context (for example, daily/weekly structure) while still monitoring lower-timeframe risk and execution conditions. Never let noisy lower-timeframe movement override the strategy's declared rules.
+- Each reassessment must produce a logged decision: hold, reduce, exit, trail stop, take profit, or no change, with timestamp, data snapshot, rule/reason and resulting order state.
+- AI may explain, compare scenarios or propose a change, but must not be the sole real-time risk controller. Execution decisions and protective boundaries must remain deterministic, testable and available without an AI/API connection.
+
+### Failure and overnight controls
+- Detect stale/missing data, lost broker connection, rejected or cancelled protection, position/order mismatch and restart/reconnect discrepancies. Alert and invoke the pre-defined safe response; never assume a stop is working just because it was submitted.
+- Model gaps through stops, partial fills, slippage, exchange closures, margin changes and forced liquidation. A stop price is not a guaranteed fill price.
+- Before entry, check that the specific account and firm permit the intended overnight/weekend hold, product, news exposure and drawdown treatment. If not eligible, reject the trade or require a valid flat-by deadline.
+- Test all of the above with historical replay, simulated execution, fault injection and forward paper trading before any live approval.
+
 ## First experiment queue (balanced across horizons)
 
 Run these as a portfolio of research tracks, not a claim that all can be implemented simultaneously. Rotate between tracks and prioritise shared infrastructure when it unlocks multiple experiments.
