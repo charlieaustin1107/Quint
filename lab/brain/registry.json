@@ -18,6 +18,36 @@
   },
   "strategies": [
     {
+      "id": "six-step-trading-mastery",
+      "name": "Six-step model (Trading Mastery): regime, liquidity, sequence, location, confirmation, execution",
+      "horizon": "Intraday",
+      "timeframe": "5m",
+      "market": "MNQ",
+      "rules": "HTF sweep, rejection within 3 candles, CISD, displacement gap, pullback limit entry, continuation. TP1 1R, TP2 the nearest HTF pool at least 2R away, TP3 the next pool or 3R.",
+      "source": "The owner's Trading Mastery app and its MNQ Intelligence Layer plan, on claude.ai.",
+      "status": "In-sample",
+      "runner": null,
+      "frozenAt": null,
+      "verdict": "Lives in Trading Mastery, whose Backtest lab tests it on real 5-minute candles (first 70% to tune, last 30% unseen) and whose Jarvis dream run audits it every weeknight. Quint HQ shows that report; the lab here doesn't re-run it.",
+      "evidence": [],
+      "next": "Read the dream report's unseen-week verdict nightly (HQ sync)."
+    },
+    {
+      "id": "four-pillars-wyld",
+      "name": "Four Pillars (WYLD | Will): sweep, HTF level holds, PDR bias, 1m confirmation",
+      "horizon": "Scalping",
+      "timeframe": "1m entries, 15m liquidity, monthly to daily levels",
+      "market": "MNQ",
+      "rules": "Liquidity sweep of a 15m pool marked pre-market, then a higher-timeframe level holds, then bias from Point A to Point B (the PDR), then a 1-minute confirmation is the entry. Tight stop beyond the wick, fast break-even, Target 1 Point B, Target 2 the opposing liquidity. First 2 to 3 hours after the New York open only. Full rules: lab/brain/playbooks.json.",
+      "source": "The owner's WYLD Will System rulebook (10 public videos) and Four Pillars Trainer, both on claude.ai.",
+      "status": "Specified",
+      "runner": null,
+      "frozenAt": null,
+      "verdict": "The owner's main discretionary playbook. Not backtested: several rules aren't objective yet (what counts as the easiest equal highs and lows, the stop buffer, the break-even trigger, entries per stage). His results are his own claims.",
+      "evidence": [],
+      "next": "Queue item four-pillars-objective-rules, then a mechanical version for the lab."
+    },
+    {
       "id": "app-20-candle-breakout",
       "name": "20-candle breakout",
       "horizon": "Intraday",
@@ -479,6 +509,12 @@
       "id": "more-history",
       "what": "Decide how to get years of intraday MNQ in the cloud: TradingView Premium adds Deep Backtesting, or a data vendor file of 1-minute MNQ. Until then, years-long tests happen in NinjaTrader.",
       "cost": "Owner's choice",
+      "auto": false
+    },
+    {
+      "id": "four-pillars-objective-rules",
+      "what": "Write the Four Pillars as exact rules a computer can test: what counts as the easiest equal highs and lows on the 15m, how a level shows it holds, the stop buffer in ticks, the break-even trigger, and the cap on entries per PDR. The owner answers these in Quint HQ (Lab, Ideas) or in chat; nothing is tested until they're fixed.",
+      "cost": "None",
       "auto": false
     }
   ],

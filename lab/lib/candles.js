@@ -46,10 +46,43 @@ function span(bars) {
   return { from: d(bars[0].t), to: d(bars[bars.length - 1].t), candles: bars.length };
 }
 
-module.exports = { read, write, merge, fromTradingView, span };
+// Build longer candles from shorter ones (5-minute to 15-minute), so the nightly run needs one TradingView call, not two.
+// Only complete periods count: a 15-minute candle needs all three of its 5-minute candles, starting on the quarter hour.
+function aggregate(bars, minutes, base = 5) {
+  const size = minutes * 60, need = minutes / base, groups = new Map();
+  for (const b of bars) {
+    const k = Math.floor(b.t / size) * size;
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(b);
+  }
+  const out = [];
+  for (const [t, g] of [...groups.entries()].sort((a, b) => a[0] - b[0])) {
+    if (g.length !== need || g[0].t !== t) continue;
+    out.push({ t, o: g[0].o, h: Math.max(...g.map((b) => b.h)), l: Math.min(...g.map((b) => b.l)), c: g[g.length - 1].c, v: g.reduce((a, b) => a + (b.v || 0), 0) });
+  }
+  return out;
+}
+
+// Add 15-minute candles built from the 5-minute store, only after the newest 15-minute candle already saved.
+function rebuild15(file5, file15) {
+  const old = read(file15), last = old.length ? old[old.length - 1].t : 0;
+  const fresh = aggregate(read(file5), 15).filter((b) => b.t > last);
+  const { bars, added } = merge(old, fresh);
+  write(file15, bars);
+  return { added, total: bars.length };
+}
+
+module.exports = { read, write, merge, fromTradingView, span, aggregate, rebuild15 };
 
 // node lab/lib/candles.js lab/data/mnq_5m.csv download.json  ->  merges a TradingView download into the store
+// node lab/lib/candles.js --rebuild-15m                        ->  adds 15-minute candles built from the 5-minute store
 if (require.main === module) {
+  if (process.argv[2] === '--rebuild-15m') {
+    const dir = require('path').join(__dirname, '..', 'data');
+    const r = rebuild15(require('path').join(dir, 'mnq_5m.csv'), require('path').join(dir, 'mnq_15m.csv'));
+    console.log(`mnq_15m.csv: ${r.added} new candles built from 5-minute candles, ${r.total} in total`);
+    process.exit(0);
+  }
   const [csv, json] = process.argv.slice(2);
   if (!csv || !json) { console.error('usage: node lab/lib/candles.js lab/data/mnq_5m.csv tradingview-download.json'); process.exit(1); }
   const before = read(csv);

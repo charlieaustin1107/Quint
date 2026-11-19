@@ -126,6 +126,22 @@ test('Quint HQ build: puts the roundup in the page and can never close its scrip
   assert.throws(() => buildPage('<p>no placeholder</p>', {}));
 });
 
+test('candles: 15-minute candles built from 5-minute ones match TradingView exactly', () => {
+  const dir = path.join(__dirname, '..', 'data');
+  const b15 = new Map(candles.read(path.join(dir, 'mnq_15m.csv')).map((b) => [b.t, b]));
+  let overlap = 0, diff = 0;
+  for (const a of candles.aggregate(candles.read(path.join(dir, 'mnq_5m.csv')), 15)) {
+    const t = b15.get(a.t);
+    if (!t) continue;
+    overlap++;
+    if (a.o !== t.o || a.h !== t.h || a.l !== t.l || a.c !== t.c || a.v !== t.v) diff++;
+  }
+  assert.ok(overlap > 1000, `only ${overlap} overlapping candles`);
+  assert.equal(diff, 0);
+  // an incomplete quarter hour (two of its three 5-minute candles) is skipped
+  assert.equal(candles.aggregate([{ t: 900, o: 1, h: 2, l: 0, c: 1, v: 1 }, { t: 1200, o: 1, h: 2, l: 0, c: 1, v: 1 }], 15).length, 0);
+});
+
 test('roundup: says plainly when nothing is live, and is the same for the same inputs', () => {
   const registry = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'brain', 'registry.json'), 'utf8'));
   const latest = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'results', 'latest.json'), 'utf8'));
