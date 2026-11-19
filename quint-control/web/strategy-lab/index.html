@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Quint · Strategy Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./">QUINT <span>CONTROL</span></a>
+    <div class="top-meta"><span class="status-dot"></span> STRATEGY LAB <span class="mode-pill">LOCAL DRAFT MODE</span></div>
+  </header>
+  <main class="shell">
+    <section class="intro">
+      <p class="eyebrow">RESEARCH & DEVELOPMENT / PHASE 3A</p>
+      <h1>Strategy <em>Lab</em></h1>
+      <p class="lede">Turn a trading idea into a precise, reviewable strategy definition. Save drafts, define manual paper scenarios and export the rules for the Quint engine.</p>
+    </section>
+    <div class="notice"><strong>Prototype:</strong> drafts are stored in this browser only. No market feed, backtest, broker or live order connection exists in this screen. Nothing here can place a trade.</div>
+    <nav class="tabs" aria-label="Strategy Lab sections">
+      <button class="tab active" data-tab="strategy">Create a bot</button>
+      <button class="tab" data-tab="scenario">Manual paper setup</button>
+      <button class="tab" data-tab="library">Strategy library <span id="library-count">0</span></button>
+    </nav>
+    <section id="strategy-panel" class="panel">
+      <div class="panel-heading"><div><p class="eyebrow">01 / DEFINE</p><h2>Describe your strategy</h2></div><span class="step">DRAFT → SPECIFICATION</span></div>
+      <form id="strategy-form">
+        <div class="field-grid">
+          <label>Bot name<input name="name" maxlength="80" required placeholder="e.g. NY Opening Range Retest"></label>
+          <label>Chart timeframe<select name="timeframe"><option>1m</option><option>2m</option><option selected>5m</option><option>15m</option><option>30m</option><option>60m</option><option>1d</option><option>1w</option></select></label>
+          <label>Session<select name="session"><option value="RTH" selected>New York RTH</option><option value="ETH">CME ETH</option><option value="CUSTOM">Custom (not yet configured)</option></select></label>
+          <label>Direction<select name="direction"><option value="long">Long only</option><option value="short">Short only</option><option value="both" selected>Long and short</option></select></label>
+        </div>
+        <label>Explain the trading idea<textarea name="sourcePrompt" rows="4" maxlength="4000" placeholder="Describe the setup in ordinary English: what must happen, what confirms entry, where the trade is invalidated and how it exits."></textarea></label>
+        <label>Exact entry rule — optional JSON expression <textarea name="entryRule" rows="4" spellcheck="false" placeholder='{"op":"gt","left":{"op":"var","name":"close"},"right":{"op":"var","name":"openingHigh"}}'></textarea><small>Use a supported expression only. Leaving this blank saves an idea draft, not a runnable bot. Never paste code here.</small></label>
+        <div class="field-grid three">
+          <label>Initial stop<input name="stopTicks" type="number" min="1" step="1" placeholder="Ticks"></label>
+          <label>First target (R)<input name="targetR" type="number" min="0.1" step="0.1" placeholder="e.g. 2"></label>
+          <label>Maximum MNQ contracts<input name="maxContracts" type="number" min="1" max="40" step="1" value="1" required></label>
+        </div>
+        <div class="form-actions"><button class="primary" type="submit">Save strategy draft</button><button class="secondary" type="reset">Clear form</button></div>
+      </form>
+      <div id="strategy-feedback" class="feedback" aria-live="polite"></div>
+    </section>
+    <section id="scenario-panel" class="panel hidden">
+      <div class="panel-heading"><div><p class="eyebrow">02 / MANUAL SETUP</p><h2>Paper-trade an idea</h2></div><span class="step">ONE-OFF SCENARIO</span></div>
+      <p class="muted">Record a setup you are watching. Quint will eventually monitor the trigger against live data; this prototype only saves the scenario and checks its levels.</p>
+      <form id="scenario-form">
+        <div class="field-grid">
+          <label>Scenario name<input name="name" required maxlength="80" placeholder="e.g. London low sweep"></label>
+          <label>Direction<select name="side"><option value="long">Long</option><option value="short">Short</option></select></label>
+          <label>Reference entry price<input name="entryReference" type="number" min="0.25" step="0.25" required placeholder="e.g. 21000"></label>
+          <label>Stop price<input name="stopPrice" type="number" min="0.25" step="0.25" required></label>
+          <label>Target price<input name="targetPrice" type="number" min="0.25" step="0.25" required></label>
+          <label>Expires in<select name="expiry"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60" selected>1 hour</option><option value="240">4 hours</option></select></label>
+        </div>
+        <label>Trigger condition — JSON expression<textarea name="trigger" rows="3" spellcheck="false" required placeholder='{"op":"gt","left":{"op":"var","name":"close"},"right":{"op":"var","name":"sweptLevel"}}'></textarea></label>
+        <div class="form-actions"><button class="primary" type="submit">Save paper scenario</button><button class="secondary" type="reset">Clear form</button></div>
+      </form>
+      <div id="scenario-feedback" class="feedback" aria-live="polite"></div>
+    </section>
+    <section id="library-panel" class="panel hidden">
+      <div class="panel-heading"><div><p class="eyebrow">03 / YOUR WORK</p><h2>Saved drafts</h2></div><button id="export-all" class="secondary">Export all JSON</button></div>
+      <div id="library-list" class="library-list"><div class="empty">No saved drafts yet. Create a strategy or paper setup to get started.</div></div>
+    </section>
+    <footer><span>QUINT CONTROL · STRATEGY LAB</span><span>MNQ ONLY · PAPER-ONLY DEFINITIONS · NO ORDER ROUTING</span></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
