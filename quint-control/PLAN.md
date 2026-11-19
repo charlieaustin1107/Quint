@@ -247,6 +247,20 @@ Quint Control matches every feature on [Phantom Trader's page](https://itsmikepo
 | Copying your own trades | Not mentioned | Manual Copy mode: trade by hand on one account and every follower copies, each checked by the guardian |
 | Seeing each trade | Open trades and daily profit on its dashboard | Entry, stop and target drawn on your NinjaTrader chart, a live trade card, phone alerts for every open, move and close, and an alarm if the computer goes offline |
 
+## Longer-horizon bot supervision: mandatory rules
+
+Swing, multi-day and monthly bots must actively supervise every open position from entry until confirmed flat. A trade is never "set and forget".
+
+- **Before entry:** calculate and record the initial stop-loss, target/exit rule, maximum dollar risk, size, maximum holding time, invalidation conditions and account eligibility. Size from stop distance using verified MNQ tick value, fees and conservative slippage/gap allowance.
+- **Protection must be confirmed:** place protective stop and target orders with the broker/platform where supported; verify accepted quantity against actual fills, including partial fills. If protection is rejected, missing or cannot be reconciled, block new entries and invoke the pre-defined safe response.
+- **Hard risk boundary:** never automatically widen a stop, increase initial maximum risk or add to a losing position. Rule-based stop changes may only reduce risk (such as trailing closer or moving to breakeven after a tested condition). Target extensions require a separately specified and tested rule.
+- **Continuous analysis:** monitor fresh data continuously using deterministic calculations, not an LLM on every tick. Reassess on every completed bar at the strategy's declared timeframe and on material events such as volatility/regime shifts, structural breaks, approaching stop/target, news windows, session transitions, stale data or account-rule changes.
+- **Multi-timeframe context:** use the strategy's intended daily/weekly structure for slower trades while monitoring lower-timeframe execution and risk. Lower-timeframe noise must not override declared rules.
+- **Explain every decision:** log hold, reduce, exit, trail, take-profit or no-change decisions with timestamp, data snapshot, rule/reason and resulting order state. AI can explain or propose scenarios but cannot be the sole risk controller; risk controls must work without an AI/API connection.
+- **Overnight/gap risk:** model gaps through stops, partial fills, slippage, closures, margin changes and forced liquidation. A stop trigger is not a guaranteed fill price. Check overnight/weekend, news and drawdown eligibility for each account before entry.
+- **Failure handling:** detect stale feeds, disconnects, rejected/cancelled protection, position/order mismatch and restart discrepancies. Alert and execute the pre-defined safe response; never assume an order is working until confirmed.
+- **Validation:** test protection and supervision in historical replay, simulation, fault-injection and paper-forward trading before live approval.
+
 ## Bot setup and backtesting
 
 Setting up a bot takes five screens in the website's setup wizard, and no strategy can go live until its backtest and simulation results pass.
