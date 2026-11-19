@@ -537,3 +537,71 @@ The firm rules and prices above come from the firms' own pages where possible, a
 * [Claude Haiku 5.5 pricing](https://apidog.com/blog/claude-haiku-5-5-pricing/) and [Claude Sonnet 5.5 pricing](https://apidog.com/blog/claude-sonnet-5-5-pricing/)
 
 This plan is for learning and practice. It isn't financial advice, and past results don't predict future ones.
+
+
+## Competitor research: TradersPost
+
+Research date: 19 November 2026. Source basis: TradersPost public website and official documentation. This is a product/workflow study, not access to its private source code or internal infrastructure.
+
+### What TradersPost publicly documents
+
+TradersPost describes itself as a cloud-based, no-code, event-driven signal-to-execution platform. Its public workflow separates:
+1. Broker connections (connected live, paper or prop accounts).
+2. Strategies (asset class, trading style, allowed tickers, security controls, defaults and a unique webhook).
+3. Subscriptions (one or more broker accounts attached to a strategy, each with account-specific settings and auto-submit preferences).
+4. Incoming JSON signals from TradingView, TrendSpider, custom code, AI workflows or its Command Pad.
+5. Broker order submission and a signal/trade history showing per-subscription outcomes, fills, broker responses and rejection reasons.
+
+Official sources:
+- https://traderspost.io/
+- https://docs.traderspost.io/docs
+- https://docs.traderspost.io/docs/core-concepts/strategies
+- https://docs.traderspost.io/docs/core-concepts/subscriptions
+- https://docs.traderspost.io/docs/core-concepts/signals
+- https://docs.traderspost.io/docs/core-concepts/webhooks
+- https://docs.traderspost.io/docs/learn/platform-concepts/position-sizing
+- https://traderspost.io/pricing
+
+### Publicly documented capabilities worth studying
+
+- Strategy/subscription separation: one strategy signal can be routed to multiple account subscriptions; each subscription can inherit defaults or override its own sizing and execution settings.
+- New subscriptions start disabled and must be reviewed and explicitly enabled.
+- Paper and live subscriptions can run in parallel.
+- Signal payloads can describe ticker, action, quantity, order type, entry/limit information, stop loss and take profit.
+- Documented actions include buy, sell, add, exit, cancel, reverse, breakeven and resize; partial exits and trailing stops are documented.
+- Position sizing options include fixed quantity, amount per position, dollar risk per position and risk as a percentage of equity. Their documentation says the platform does not itself verify buying power; broker acceptance/rejection is relied upon.
+- Signal freshness controls include timestamp/age rejection and expiry-related fields.
+- Signal history shows incoming signal timestamps, per-subscription success/problem counts, and drill-down into trades, fills, broker responses and rejection reasons.
+- Public marketing also describes manual approval, automatic submission, parallel account execution, swing-trade stop/target/trailing-stop management and strategy templates.
+
+### Important limitation / opportunity for Quint
+
+TradersPost's Getting Started documentation explicitly warns that it does not currently provide broker/exchange order IDs, position state or account-level information back into external strategy logic as a feedback loop. It describes its role as signal routing and execution, and says users remain responsible for external strategy state and active monitoring. It also warns about conflicting overlapping signals/race conditions and says it is not a set-and-forget self-healing system.
+
+Do not assume this describes every internal capability or every product update; it is the limitation stated in the public documentation reviewed on this date.
+
+Quint should preserve the useful separation of signal source, strategy, account configuration and execution, but aim for a tighter integrated feedback loop through NinjaTrader account/order/position events. Quint's engine should reconcile expected state against actual broker state, identify partial fills/rejections/mismatches, and block unsafe new entries until resolved. This is a design objective, not yet an implemented capability.
+
+### Quint features to adopt or improve
+
+1. **Bot definition vs account assignment:** keep a bot's tested strategy rules independent of per-account settings. A bot can be assigned to eligible accounts, with each account's own contract size, risk cap and firm rules.
+2. **Explicit enable workflow:** new bot/account assignments start disabled. Require review of account, mode, size, firm compatibility and risk before enabling.
+3. **One canonical signal event:** create a typed, versioned signal object with bot ID/version, instrument/contract, direction, setup timestamp, expiry, entry type/price, stop, target ladder, quantity or risk method, rationale, invalidation and correlation/idempotency ID.
+4. **Per-account execution outcomes:** show accepted, rejected, partially filled, filled, cancelled and error states separately for every account; expose broker rejection reason and actual fills.
+5. **Freshness and duplicate protection:** reject expired signals, deduplicate repeated events, define ordering for competing signals and prevent stale/overlapping entries.
+6. **Standard position sizing:** calculate futures size from permitted dollar risk divided by stop distance times contract point value, then include commissions, slippage and gap allowance; cap by account and firm limits. Never rely on broker rejection as the risk control.
+7. **Paper/live parallelism:** support safe parallel shadow/paper execution and comparisons, but never allow paper results to be mistaken for live fills.
+8. **Signal-to-trade audit trail:** retain the original signal, Guardian decision, account-specific order request, broker response, every fill/change, protection status, final exit and fees.
+
+### Differences to preserve
+
+TradersPost is publicly positioned as a general multi-asset signal router. Quint's planned advantage is not to clone that product. Quint is intended to own the research, bot logic, backtesting, account-aware risk supervision and execution feedback loop, initially focused on NinjaTrader/MNQ and then other supported markets only when properly tested.
+
+Do not copy proprietary source code, private implementation details, branding or protected assets. Borrow public product patterns and implement Quint's own design.
+
+### Research caveats
+
+- Public docs explain supported workflows and message formats, not TradersPost's private internal architecture.
+- Marketing claims such as speed, scale, reliability or user counts are vendor claims, not independently audited evidence.
+- A listed feature does not prove it is suitable for a particular Lucid plan, instrument, broker connection or order type. Verify compatibility in simulation and against current official broker/prop-firm rules.
+- Revisit official documentation before implementing integrations because features and limitations can change.
