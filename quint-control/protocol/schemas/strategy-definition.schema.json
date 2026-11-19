@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quint.local/schemas/strategy-definition.schema.json",
+  "title": "Quint Strategy Definition v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "strategyId",
+    "version",
+    "name",
+    "status",
+    "instrument",
+    "market",
+    "entry",
+    "exit",
+    "risk",
+    "execution",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "strategyId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "specified",
+        "validating",
+        "backtesting",
+        "replay",
+        "forward-paper",
+        "approved",
+        "rejected",
+        "paused"
+      ]
+    },
+    "instrument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol",
+        "contract",
+        "rollPolicy"
+      ],
+      "properties": {
+        "symbol": {
+          "const": "MNQ"
+        },
+        "contract": {
+          "const": "front-month"
+        },
+        "rollPolicy": {
+          "enum": [
+            "volume-switch"
+          ]
+        }
+      }
+    },
+    "market": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeframe",
+        "timezone",
+        "session"
+      ],
+      "properties": {
+        "timeframe": {
+          "enum": [
+            "1m",
+            "2m",
+            "5m",
+            "15m",
+            "30m",
+            "60m",
+            "1d",
+            "1w"
+          ]
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "session": {
+          "enum": [
+            "RTH",
+            "ETH",
+            "CUSTOM"
+          ]
+        }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "long",
+        "short"
+      ],
+      "properties": {
+        "long": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/expression"
+            }
+          ]
+        },
+        "short": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/expression"
+            }
+          ]
+        }
+      }
+    },
+    "exit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "initialStop",
+        "targets",
+        "maxHoldingMinutes"
+      ],
+      "properties": {
+        "initialStop": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "ticks",
+                "points",
+                "atr",
+                "structure"
+              ]
+            },
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rMultiple",
+              "percent"
+            ],
+            "properties": {
+              "rMultiple": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "percent": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              }
+            }
+          }
+        },
+        "maxHoldingMinutes": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxContracts",
+        "maxDollarRisk"
+      ],
+      "properties": {
+        "maxContracts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "maxDollarRisk": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "fillModel",
+        "signalExpirySeconds"
+      ],
+      "properties": {
+        "mode": {
+          "const": "paper"
+        },
+        "fillModel": {
+          "const": "conservative"
+        },
+        "signalExpirySeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourcePrompt",
+        "createdAt",
+        "createdBy"
+      ],
+      "properties": {
+        "sourcePrompt": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "$defs": {
+    "expression": {
+      "type": "object",
+      "required": [
+        "op"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": [
+            "and",
+            "or",
+            "not",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "eq",
+            "neq",
+            "add",
+            "sub",
+            "mul",
+            "div",
+            "const",
+            "var"
+          ]
+        },
+        "args": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/expression"
+          }
+        },
+        "arg": {
+          "$ref": "#/$defs/expression"
+        },
+        "left": {
+          "$ref": "#/$defs/expression"
+        },
+        "right": {
+          "$ref": "#/$defs/expression"
+        },
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "boolean"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+        }
+      }
+    }
+  }
+}

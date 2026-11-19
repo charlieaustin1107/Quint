@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quint.local/schemas/paper-scenario.schema.json",
+  "title": "Quint Manual Paper Scenario v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "scenarioId",
+    "name",
+    "mode",
+    "instrument",
+    "side",
+    "trigger",
+    "entryReference",
+    "stopPrice",
+    "targetPrice",
+    "createdAt",
+    "expiresAt",
+    "status"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "scenarioId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "mode": {
+      "const": "paper"
+    },
+    "instrument": {
+      "const": "MNQ"
+    },
+    "side": {
+      "enum": [
+        "long",
+        "short"
+      ]
+    },
+    "trigger": {
+      "$ref": "#/$defs/expression"
+    },
+    "entryReference": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "stopPrice": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "targetPrice": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "armed",
+        "expired",
+        "cancelled"
+      ]
+    }
+  },
+  "$defs": {
+    "expression": {
+      "type": "object",
+      "required": [
+        "op"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "type": "string",
+          "enum": [
+            "and",
+            "or",
+            "not",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "eq",
+            "neq",
+            "add",
+            "sub",
+            "mul",
+            "div",
+            "const",
+            "var"
+          ]
+        },
+        "args": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/expression"
+          }
+        },
+        "arg": {
+          "$ref": "#/$defs/expression"
+        },
+        "left": {
+          "$ref": "#/$defs/expression"
+        },
+        "right": {
+          "$ref": "#/$defs/expression"
+        },
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "boolean"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+        }
+      }
+    }
+  }
+}

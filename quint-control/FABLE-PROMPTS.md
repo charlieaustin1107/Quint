@@ -337,3 +337,22 @@ Here's this week's journal export: [ATTACH CSV]
 3. Anything in the logs that needs fixing.
 4. Suggested rule changes, as proposals only. I decide, and any change goes through the add-a-bot or fix process.
 ```
+
+
+
+### Strategy Lab Phase 3A: definition foundation and local prototype
+
+``` text
+Implement the Strategy Lab Phase 3A vertical slice in branch quint-control/strategy-lab-phase-3a. Read quint-control/research/STRATEGY-LAB.md and the existing research/mnq/STRATEGY-RESEARCH-PROGRAMME.md first.
+
+Scope:
+1. Keep strategy definitions independent from NinjaTrader and all broker APIs.
+2. Implement a versioned MNQ Strategy Definition schema, a manual paper-scenario schema, semantic validation and a bounded allow-listed expression evaluator. Never use eval, Function, arbitrary generated C#/JavaScript, dynamic property traversal or LLM output as executable source.
+3. Saved ideas may be incomplete drafts. They must be visibly non-runnable until an explicit entry rule, numeric stop and target are present. Reject live execution mode in this phase.
+4. Add a standalone responsive Strategy Lab prototype with create strategy, manual paper scenario, local draft library and JSON export. State clearly that local drafts are not connected to the engine or live market data.
+5. Add unit tests for valid/invalid definitions, expression depth and node limits, missing market fields, unsafe operators, price orientation and expiry. Add UI contract tests and run npm test and npm run test:3.
+6. Do not implement or imply live paper trading, historical backtesting, Playback, fill simulation or live orders until the engine and protocol are ready. No code in this phase may call the OrderRouter.
+7. Update STATUS.md and report exact tests. Keep the branch reviewable; do not merge main.
+
+Completion requires all cloud tests to pass three times. If CI is unavailable, say so; do not claim tests passed.
+```
