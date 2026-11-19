@@ -252,11 +252,11 @@ function remember(file, a) {
 }
 
 function main() {
-  const { loadData, loadDaily } = require('../run');
+  const { loadData, loadDaily, loadMinute } = require('../run');
   const lab = path.join(__dirname, '..');
   let queue = [];
   try { queue = JSON.parse(fs.readFileSync(path.join(__dirname, 'registry.json'), 'utf8')).queue.map((q) => q.id); } catch (e) { queue = []; }
-  const a = analyse({ ...loadData(), daily: loadDaily() }, { queue });
+  const a = analyse({ ...loadData(), daily: loadDaily(), 1: loadMinute() }, { queue });
   fs.writeFileSync(path.join(lab, 'results', 'anatomy.json'), JSON.stringify(a, null, 1) + '\n');
   fs.writeFileSync(path.join(lab, 'ANATOMY.md'), report(a));
   if (!a.skipped) remember(path.join(lab, 'results', 'anatomy_history.json'), a);

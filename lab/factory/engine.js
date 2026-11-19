@@ -99,6 +99,7 @@ function isSurvivor(v, familyPBO) {
 function runFamily(fam, data, opt = {}) {
   const set = data[fam.data] || data[parseInt(fam.data, 10)];
   if (!set) return { id: fam.id, name: fam.name, skipped: `needs ${fam.data} candles` };
+  if (fam.minSessions && set.days && set.days.length < fam.minSessions) return { id: fam.id, name: fam.name, skipped: `needs ${fam.minSessions} sessions of ${fam.data} candles (has ${set.days.length})` };
   const missing = (fam.needs || []).filter((k) => !data[k] || !data[k].bars.length);
   if (missing.length) return { id: fam.id, name: fam.name, skipped: `needs ${missing.join(' and ')} candles` };
   const bars = set.bars, days = noise.sessions(bars).days.map((d) => d.day), ctx = fam.context ? fam.context(bars, data) : {};

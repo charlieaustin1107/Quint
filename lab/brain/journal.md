@@ -28,6 +28,10 @@ Newest first. Every lab session adds an entry: what ran, what was learned, what 
   - does a post-mortem: were losers +1R first, and how much heat did winners take?
 
   Every average has a 95% range from 10,000 bootstrap resamples, and nothing under 30 trades is a finding. It proposes experiments with a pass mark, which the nightly job pre-registers (at most one a night), and it keeps a nightly history so the ranges can be seen narrowing.
+- **1-minute candles start tonight.** The nightly run's one candle call now fetches 1-minute candles. TradingView keeps only a few thousand, so the lab collects them night by night.
+  - The 5- and 15-minute files are then built from them (`--rebuild-from-1m`), but only after an exact match against the stored 5-minute candles where they overlap. If the candles differ or leave a gap, it falls back to fetching 5-minute candles as call 2.
+  - At 10 sessions, the sequence analyst and the factory's new `wyld-1m` family switch to them.
+  - Next: let the three 1-minute bots (VWAP trend, range squeeze, trend-join scalper) run on them too, once there's real 1-minute data to test with.
 - **Quint HQ:** the Lab tab has a new **Pillars** screen (the lessons, where setups die, each pillar with and without, each confirmation alone, why trades won or lost, what Quint wants to test next). Ask Quint can read it too. Also fixed: on a phone, the screen column grew wider than the screen when a row of buttons was long.
 
 **First read** (20 sessions of 5-minute candles, so the 1-minute confirmations can't be judged yet):

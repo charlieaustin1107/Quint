@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { loadData, loadDaily } = require('../run');
+const { loadData, loadDaily, loadMinute } = require('../run');
 const { runAll } = require('./engine');
 
 const money = (x) => (x === null || x === undefined ? '' : (x < 0 ? '-$' : '+$') + Math.abs(Math.round(x)).toLocaleString('en-US'));
@@ -58,7 +58,7 @@ function updateStreaks(file, out, asOf) {
 function main(opt = {}) {
   const data = loadData();
   const asOf = Object.values(data).map((d) => d.span.to).sort().pop();
-  const out = runAll({ ...data, daily: loadDaily() }, opt);
+  const out = runAll({ ...data, daily: loadDaily(), 1: loadMinute() }, opt);
   out.readyForPaper = updateStreaks(path.join(__dirname, '..', 'results', 'factory_streaks.json'), out, asOf);
   out.promoteAfter = PROMOTE_AFTER;
   fs.writeFileSync(path.join(__dirname, '..', 'results', 'factory.json'), JSON.stringify({ asOf, ...out }, null, 1) + '\n');

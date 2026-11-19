@@ -72,11 +72,65 @@ function rebuild15(file5, file15) {
   return { added, total: bars.length };
 }
 
-module.exports = { read, write, merge, fromTradingView, span, aggregate, rebuild15 };
+// 1-minute to longer candles. A minute with no trades has no candle, so a period counts if it has any 1-minute candles,
+// except the newest one while it may still be forming (its last minute hasn't been reached yet).
+function from1m(bars, minutes = 5) {
+  const size = minutes * 60, groups = new Map(), lastT = bars.length ? bars[bars.length - 1].t : 0;
+  for (const b of bars) {
+    const k = Math.floor(b.t / size) * size;
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(b);
+  }
+  const out = [];
+  for (const [t, g] of [...groups.entries()].sort((a, b) => a[0] - b[0])) {
+    if (lastT < t + size - 60) continue;
+    g.sort((a, b) => a.t - b.t);
+    out.push({ t, o: g[0].o, h: Math.max(...g.map((b) => b.h)), l: Math.min(...g.map((b) => b.l)), c: g[g.length - 1].c, v: g.reduce((a, b) => a + (b.v || 0), 0) });
+  }
+  return out;
+}
+
+// Build the 5-minute store forward from the 1-minute store, so one TradingView call (1-minute candles) feeds every
+// timeframe. Before writing, the built candles are checked against the stored 5-minute candles where they overlap (the
+// newest stored one is left out: it may have been saved while still forming). Any difference, or a gap between the
+// stored 5-minute candles and the first built one, and nothing is written: the nightly job fetches 5-minute candles.
+function rebuildFrom1m(file1, file5, file15) {
+  const one = read(file1), five = read(file5), built = from1m(one, 5);
+  if (!built.length) return { status: 'EMPTY', added: 0, checked: 0, mismatched: 0 };
+  const last5 = five.length ? five[five.length - 1].t : null, stored = new Map(five.map((b) => [b.t, b]));
+  let checked = 0, mismatched = 0;
+  const diffs = [];
+  for (const b of built) {
+    const s = stored.get(b.t);
+    if (!s || b.t === last5) continue;
+    checked++;
+    if (s.o !== b.o || s.h !== b.h || s.l !== b.l || s.c !== b.c) { mismatched++; if (diffs.length < 3) diffs.push({ t: b.t, stored: [s.o, s.h, s.l, s.c], built: [b.o, b.h, b.l, b.c] }); }
+  }
+  if (mismatched) return { status: 'MISMATCH', added: 0, checked, mismatched, diffs };
+  const fresh = last5 === null ? built : built.filter((b) => b.t >= last5);
+  const gap = last5 !== null && fresh.length && fresh[0].t > last5 + 300 && !built.some((b) => b.t <= last5 + 300 && b.t >= last5);
+  if (gap) return { status: 'GAP', added: 0, checked, mismatched, from: new Date(last5 * 1000).toISOString(), to: new Date(fresh[0].t * 1000).toISOString() };
+  const { bars, added } = merge(five, fresh);
+  write(file5, bars);
+  const r15 = file15 ? rebuild15(file5, file15) : null;
+  return { status: 'OK', added, checked, mismatched, total: bars.length, added15: r15 ? r15.added : 0 };
+}
+
+module.exports = { read, write, merge, fromTradingView, span, aggregate, rebuild15, from1m, rebuildFrom1m };
 
 // node lab/lib/candles.js lab/data/mnq_5m.csv download.json  ->  merges a TradingView download into the store
 // node lab/lib/candles.js --rebuild-15m                        ->  adds 15-minute candles built from the 5-minute store
+// node lab/lib/candles.js --rebuild-from-1m                    ->  adds 5- and 15-minute candles built from the 1-minute store
 if (require.main === module) {
+  if (process.argv[2] === '--rebuild-from-1m') {
+    const path = require('path'), dir = path.join(__dirname, '..', 'data');
+    const r = rebuildFrom1m(path.join(dir, 'mnq_1m.csv'), path.join(dir, 'mnq_5m.csv'), path.join(dir, 'mnq_15m.csv'));
+    if (r.status === 'OK') console.log(`OK: ${r.added} new 5-minute candles built from 1-minute candles (${r.checked} overlapping ones checked, all identical), ${r.total} in total; ${r.added15} new 15-minute candles`);
+    else if (r.status === 'MISMATCH') console.log(`MISMATCH: ${r.mismatched} of ${r.checked} overlapping 5-minute candles differ from the ones built from 1-minute candles, so the 5-minute store is unchanged. Fetch 5-minute candles instead. ${JSON.stringify(r.diffs)}`);
+    else if (r.status === 'GAP') console.log(`GAP: the 1-minute candles start at ${r.to} but the 5-minute store ends at ${r.from}. Fetch 5-minute candles to fill it, then run this again.`);
+    else console.log('EMPTY: no 1-minute candles stored yet.');
+    process.exit(r.status === 'OK' ? 0 : r.status === 'MISMATCH' ? 2 : r.status === 'GAP' ? 3 : 4);
+  }
   if (process.argv[2] === '--rebuild-15m') {
     const dir = require('path').join(__dirname, '..', 'data');
     const r = rebuild15(require('path').join(dir, 'mnq_5m.csv'), require('path').join(dir, 'mnq_15m.csv'));
@@ -84,7 +138,7 @@ if (require.main === module) {
     process.exit(0);
   }
   const [csv, json] = process.argv.slice(2);
-  if (!csv || !json) { console.error('usage: node lab/lib/candles.js lab/data/mnq_5m.csv tradingview-download.json'); process.exit(1); }
+  if (!csv || !json) { console.error('usage: node lab/lib/candles.js lab/data/mnq_1m.csv tradingview-download.json'); process.exit(1); }
   const before = read(csv);
   const { bars, added } = merge(before, fromTradingView(JSON.parse(fs.readFileSync(json, 'utf8'))));
   write(csv, bars);

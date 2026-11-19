@@ -11,7 +11,7 @@
  "tuneShare": 0.6,
  "costStress": 2.5,
  "variants": 1490,
- "seconds": 33.5,
+ "seconds": 32.7,
  "families": [
   {
    "id": "wyld",
@@ -35,6 +35,11 @@
    "top": [],
    "survivors": [],
    "verdict": "None of the 48 variations traded enough to rank. More candles needed."
+  },
+  {
+   "id": "wyld-1m",
+   "name": "Your strategy on 1-minute candles (as the indicator reads it)",
+   "skipped": "needs 1m candles"
   },
   {
    "id": "breakout",

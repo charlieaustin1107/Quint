@@ -36,6 +36,13 @@ function loadDaily() {
   return { file: 'mnq_1d.csv', bars, span: bars.length ? candles.span(bars) : null };
 }
 
+// 1-minute candles (collected nightly from 19 Nov 2026: TradingView's feed keeps only a few thousand). Kept apart from
+// the bots' candle sets; the WYLD analyst and the factory's 1-minute family use them once there are 10 sessions.
+function loadMinute() {
+  const bars = candles.read(path.join(DIR, 'data', 'mnq_1m.csv'));
+  return bars.length ? { file: 'mnq_1m.csv', bars, span: candles.span(bars), days: sessions(bars).days.map((d) => d.day) } : null;
+}
+
 // The candle file with the most sessions whose candles divide the bot's own timeframe.
 function pickData(data, tf) {
   const fits = Object.keys(data).map(Number).filter((m) => tf % m === 0);
@@ -136,5 +143,5 @@ function main() {
   return out;
 }
 
-module.exports = { runOne, loadData, loadDaily, pickData, scoreboard, main };
+module.exports = { runOne, loadData, loadDaily, loadMinute, pickData, scoreboard, main };
 if (require.main === module) main();

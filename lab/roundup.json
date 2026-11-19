@@ -10,7 +10,7 @@
   "No strategy has earned approval yet. That needs years of data and a clean paper test.",
   "Warning: four bots would likely fail a Lucid 50K before passing: New York open breakout, Opening candle direction (5-minute opening range), Last-30-minute momentum, Failed breakout.",
   "Latest lesson: Replaying WYLD's rules exactly as the indicator reads them showed where setups die: the pools marked before the open were all run before 9:30, most sweeps found no higher-timeframe level holding nearby, and on 5-minute candles Point B came before any confirmation.",
-  "Next up: Grow the MNQ candle store every night with one TradingView call: the newest 5-minute candles, merged into lab/data; the 15-minute candles are built from them."
+  "Next up: Grow the MNQ candle store every night with one TradingView call: the newest 1-minute candles (from 19 Nov 2026), merged into lab/data; the 5- and 15-minute candles are built from them after an exact match check against the stored ones (5-minute candles are fetched instead if they ever differ or leave a gap)."
  ],
  "realMoney": {
   "liveBots": 0,
@@ -410,7 +410,7 @@
  "next": [
   {
    "id": "grow-data",
-   "what": "Grow the MNQ candle store every night with one TradingView call: the newest 5-minute candles, merged into lab/data; the 15-minute candles are built from them. This feeds the paper forward test and the strategy factory.",
+   "what": "Grow the MNQ candle store every night with one TradingView call: the newest 1-minute candles (from 19 Nov 2026), merged into lab/data; the 5- and 15-minute candles are built from them after an exact match check against the stored ones (5-minute candles are fetched instead if they ever differ or leave a gap). This feeds the paper forward test, the strategy factory and the sequence analyst.",
    "cost": "1 TradingView call a night"
   },
   {
@@ -420,7 +420,7 @@
   },
   {
    "id": "one-minute-data",
-   "what": "Get 1-minute MNQ into lab/data, so the WYLD family can confirm on the 1-minute chart as WYLD does. Sources: a NinjaTrader export from the owner's Windows computer, or a data vendor file.",
+   "what": "1-minute MNQ for WYLD's 1-minute confirmations. Collected every night from 19 Nov 2026 (TradingView keeps only a few thousand 1-minute candles, so the history grows a night at a time); the sequence analyst and the factory's wyld-1m family switch to it at 10 sessions. Still to get: older 1-minute history, from a NinjaTrader export on the owner's Windows computer or a data vendor file.",
    "cost": "Owner's time or a data purchase"
   }
  ],

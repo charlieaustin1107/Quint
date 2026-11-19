@@ -1,12 +1,13 @@
 # Strategy factory report
 
-Candles up to 2026-11-18. 1,490 variations tested in 33.5s. Every variation: 1 MNQ, $0.50 commission a side, 1 tick of slippage, the bot lab's fills.
+Candles up to 2026-11-18. 1,490 variations tested in 32.7s. Every variation: 1 MNQ, $0.50 commission a side, 1 tick of slippage, the bot lab's fills.
 
 **How a variation survives** (fixed before testing): on unseen sessions at least 30 trades, a profit, profit factor 1.2+, still a profit with $2.50 more costs a trade; worst drawdown under $2,000 and no day worse than -$1,200; its neighbouring variations also profitable unseen; and its family's chance of overfitting (PBO) 30% or less.
 
 | Family | Variations | Sessions (tune / unseen) | Profitable unseen | PBO | Survivors |
 |---|---|---|---|---|---|
 | Your strategy: WYLD Will Four Pillars (as the indicator reads it) | 48 | 12 / 8 | 0 of 0 that traded | n/a | 0 |
+| Your strategy on 1-minute candles (as the indicator reads it) | skipped: needs 1m candles | | | | |
 | N-candle breakout | 600 | 33 / 23 | 522 of 600 that traded | 67% | 0 |
 | Opening range breakout | 324 | 12 / 8 | 191 of 324 that traded | 60% | 0 |
 | VWAP band fade | 432 | 12 / 8 | 314 of 432 that traded | 40% | 0 |
