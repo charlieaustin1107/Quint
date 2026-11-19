@@ -50,3 +50,9 @@ test('rejects expired and incorrectly oriented paper scenarios',()=>{
  const r=validatePaperScenario(s); assert.equal(r.valid,false);
  assert.ok(r.errors.some(x=>x.includes('short scenario'))); assert.ok(r.errors.some(x=>x.includes('expiresAt')));
 });
+
+test('expression evaluator rejects non-numeric comparisons and oversized trees',()=>{
+ assert.throws(()=>evaluateExpression({op:'gt',left:{op:'const',value:'high'},right:{op:'const',value:'low'}},{}),/Numeric comparisons require numeric/);
+ const many={op:'and',args:Array.from({length:16},()=>({op:'eq',left:{op:'const',value:1},right:{op:'const',value:1}}))};
+ assert.throws(()=>evaluateExpression(many,{}),/node limit/);
+});
