@@ -30,7 +30,7 @@
    const p=document.createElement('p');p.textContent=(item.instrument||'MNQ')+' · '+(item.status||'draft')+' · '+new Date(item.createdAt||item.provenance?.createdAt||Date.now()).toLocaleString();
    info.append(h,p);
    const actions=document.createElement('div');actions.className='item-actions';
-   const exp=document.createElement('button');exp.textContent='Export JSON';exp.addEventListener('click',()=>download(item));
+   const exp=document.createElement('button');exp.textContent='Export JSON';exp.addEventListener('click',()=>download(item.definition||item));
    const del=document.createElement('button');del.textContent='Delete';del.addEventListener('click',()=>{write(read().filter(x=>x.id!==item.id));render()});
    actions.append(exp,del);card.append(info,actions);host.appendChild(card);
   });
