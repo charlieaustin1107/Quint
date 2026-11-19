@@ -63,11 +63,14 @@ function leaf(node, context) {
   return undefined;
 }
 
-function evaluateExpression(node, context, depth=0) {
+function evaluateExpression(node, context, depth=0, count={value:0}) {
+  count.value++;
+  if (count.value > MAX_NODES) throw new RangeError('Expression node limit exceeded');
   if (depth > MAX_DEPTH) throw new RangeError('Expression depth limit exceeded');
+  if (!obj(context)) throw new TypeError('Market context must be an object');
   if (!obj(node) || typeof node.op !== 'string') throw new TypeError('Invalid expression');
   if (node.op === 'const' || node.op === 'var') return leaf(node,context);
-  const get = n => evaluateExpression(n,context,depth+1);
+  const get = n => evaluateExpression(n,context,depth+1,count);
   if (node.op === 'and') {
     if (!Array.isArray(node.args) || node.args.length < 2 || node.args.length > 16) throw new TypeError('and requires 2–16 arguments');
     return node.args.every(x=>Boolean(get(x)));
@@ -80,10 +83,14 @@ function evaluateExpression(node, context, depth=0) {
   if (!OPS.has(node.op)) throw new TypeError('Unsupported operator');
   const a=get(node.left), b=get(node.right);
   switch(node.op) {
-    case 'gt': return a>b; case 'gte': return a>=b; case 'lt': return a<b; case 'lte': return a<=b;
+    case 'gt': case 'gte': case 'lt': case 'lte':
+      if (!finite(a) || !finite(b)) throw new TypeError('Numeric comparisons require numeric market fields');
+      if (node.op==='gt') return a>b; if (node.op==='gte') return a>=b; if (node.op==='lt') return a<b; return a<=b;
     case 'eq': return a===b; case 'neq': return a!==b;
-    case 'add': return Number(a)+Number(b); case 'sub': return Number(a)-Number(b); case 'mul': return Number(a)*Number(b);
-    case 'div': if (Number(b)===0) throw new RangeError('Division by zero'); return Number(a)/Number(b);
+    case 'add': case 'sub': case 'mul': case 'div':
+      if (!finite(a) || !finite(b)) throw new TypeError('Arithmetic requires numeric values');
+      if (node.op==='add') return a+b; if (node.op==='sub') return a-b; if (node.op==='mul') return a*b;
+      if (b===0) throw new RangeError('Division by zero'); return a/b;
     default: throw new TypeError('Unsupported operator');
   }
 }
