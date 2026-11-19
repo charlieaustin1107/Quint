@@ -36,13 +36,27 @@ function pickData(data, tf) {
   return fits.map((m) => data[m]).sort((a, b) => b.days.length - a.days.length)[0];
 }
 
+// A runner is "botlab:<number>" (a bot-lab bot) or "factory:<family>:<settings key>" (a variation the strategy factory
+// froze for the paper forward test, e.g. "factory:noise:lookbackDays=14;volatilityMultiplier=1;checkEvery=30").
 function runOne(entry, data) {
-  const n = Number(entry.runner.split(':')[1]);
-  const tf = botlab.BOTS[n]().tf;
-  const d = pickData(data, tf);
-  if (!d) return { id: entry.id, name: entry.name, skipped: `needs ${tf}-minute candles or smaller, and the lab only has ${Object.keys(data).join(' and ')}-minute candles` };
-  const r = botlab.run(d.bars, n);
-  const trades = r.trades.map((t) => ({ day: t.day, dir: t.dir, usd: t.usd, why: t.why }));
+  const [kind, a, ...rest] = entry.runner.split(':');
+  let d, raw, tf, n = null;
+  if (kind === 'factory') {
+    const factory = require('./factory/engine');
+    const fam = factory.FAMILIES.find((f) => f.id === a);
+    if (!fam) return { id: entry.id, name: entry.name, skipped: `no factory family "${a}"` };
+    tf = parseInt(fam.data, 10);
+    d = data[tf];
+    if (!d) return { id: entry.id, name: entry.name, skipped: `needs ${fam.data} candles` };
+    raw = factory.tradesFor(fam, factory.parseKey(rest.join(':'), fam.grid), d.bars, fam.context ? fam.context(d.bars) : {});
+  } else {
+    n = Number(a);
+    tf = botlab.BOTS[n]().tf;
+    d = pickData(data, tf);
+    if (!d) return { id: entry.id, name: entry.name, skipped: `needs ${tf}-minute candles or smaller, and the lab only has ${Object.keys(data).join(' and ')}-minute candles` };
+    raw = botlab.run(d.bars, n).trades;
+  }
+  const trades = raw.map((t) => ({ day: t.day, dir: t.dir, usd: t.usd, why: t.why }));
   const byDay = new Map(d.days.map((day) => [day, 0]));
   for (const t of trades) byDay.set(t.day, byDay.get(t.day) + t.usd);
   const forward = entry.frozenAt ? trades.filter((t) => t.day > entry.frozenAt) : [];
@@ -77,7 +91,7 @@ function scoreboard(results, when) {
     ...ran.map((r) => {
       const s = r.score, m = r.lucid50k;
       const guess = s.trades < MIN_TRADES ? '*' : '';
-      return `| ${r.bot}. ${r.name} (${r.timeframe}) | ${s.trades} | ${money(s.net)} | ${money(s.secondHalf.net)} | $${Math.round(s.maxDrawdown).toLocaleString('en-US')} | ${s.worstDay ? money(s.worstDay.usd) : ''} | ${pct(m.pPass)} / ${pct(m.pFail)}${guess}${m.red ? ' 🔴' : ''} | ${s.grade} |`;
+      return `| ${r.bot === null ? "" : r.bot + ". "}${r.name} (${r.timeframe}) | ${s.trades} | ${money(s.net)} | ${money(s.secondHalf.net)} | $${Math.round(s.maxDrawdown).toLocaleString('en-US')} | ${s.worstDay ? money(s.worstDay.usd) : ''} | ${pct(m.pPass)} / ${pct(m.pFail)}${guess}${m.red ? ' 🔴' : ''} | ${s.grade} |`;
     }),
     '',
     'Lucid 50K column: 10,000 replays of the bot\'s own days through the LucidDaily 50K rules ($3,000 target, $2,000 trailing max loss, 40% consistency, 60 trading days). 🔴 means over a 25% chance of failing first, the plan\'s red line. * Fewer than 100 trades: the replays only reshuffle a few weeks of results, so the percentage is a guess, not evidence.',
@@ -86,7 +100,7 @@ function scoreboard(results, when) {
     '',
     '| Bot | Since | Trades | Net |',
     '|---|---|---|---|',
-    ...ran.map((r) => `| ${r.bot}. ${r.name} | ${r.forward.since} | ${r.forward.trades} | ${money(r.forward.net) || '$0'} |`),
+    ...ran.map((r) => `| ${r.bot === null ? "" : r.bot + ". "}${r.name} | ${r.forward.since} | ${r.forward.trades} | ${money(r.forward.net) || '$0'} |`),
     '',
     `Forward total: ${money(ran.reduce((a, r) => a + r.forward.net, 0)) || '$0'} on paper, from ${ran.reduce((a, r) => a + r.forward.trades, 0)} trades.`,
     '',
@@ -100,7 +114,7 @@ function scoreboard(results, when) {
 function main() {
   const registry = JSON.parse(fs.readFileSync(path.join(DIR, 'brain', 'registry.json'), 'utf8'));
   const data = loadData();
-  const results = registry.strategies.filter((s) => s.runner && s.runner.startsWith('botlab:')).map((s) => runOne(s, data));
+  const results = registry.strategies.filter((s) => s.runner && /^(botlab|factory):/.test(s.runner)).map((s) => runOne(s, data));
   // The run date is the newest candle's date, so re-running on the same candles gives the same files.
   const newest = Object.values(data).map((d) => d.span.to).sort().pop();
   const out = { asOf: newest, data: Object.fromEntries(Object.entries(data).map(([m, d]) => [m + 'm', { file: d.file, ...d.span, sessions: d.days.length }])), results };

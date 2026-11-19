@@ -4,10 +4,13 @@
   "private": true,
   "description": "Quint Lab: Quint's research memory, scoreboard, Lucid pass/fail simulator, paper forward test and spoken roundup. Tests only; nothing to install.",
   "license": "UNLICENSED",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test": "node --test \"test/**/*.test.js\"",
     "test:3": "node --test \"test/**/*.test.js\" && node --test \"test/**/*.test.js\" && node --test \"test/**/*.test.js\"",
-    "lab": "node run.js && node roundup.js && node jarvis/build.js"
+    "lab": "node run.js && node factory/run.js && node roundup.js && node jarvis/build.js",
+    "factory": "node factory/run.js"
   }
 }

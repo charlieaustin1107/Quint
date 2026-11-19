@@ -2,6 +2,24 @@
 
 Newest first. Every lab session adds an entry: what ran, what was learned, what changed, and the TradingView calls used.
 
+## 2026-11-19 (evening): one strategy, and the strategy factory
+
+**What happened**
+- The owner set the record straight: the Four Pillars, Trading Mastery's six steps and Chart Wizard's 5 pillars are **one strategy**, and **WYLD Will's Four Pillars is the master version**. The registry now has one entry (`wyld-four-pillars`) and one checklist (`playbooks.json`), with the two app codings listed as older versions to bring in line with WYLD's rules.
+- Built the **strategy factory** (`lab/factory/`, rules in `lab/FACTORY.md`): six families, 2,594 variations, about a minute of computing. Each variation is judged on unseen sessions, the probability of backtest overfitting (PBO), its neighbours, double costs and the Lucid gate. Every family reproduces the bot lab exactly at the bot lab's settings, and the WYLD family is tested for never seeing future candles.
+- First night: **noise-area momentum** had 6 survivors (PBO 29%), including the paper's own settings (+$839 on 32 unseen trades). WYLD mechanical v0 (1,152 variations on 4 weeks of 5-minute candles) had none: its best tuned variation lost $1,013 over 7 unseen trades. Breakout and opening range had PBO 60 to 67%: their best variations were mostly luck.
+- 15-minute candles are now built from 5-minute ones (all 1,812 overlapping candles match TradingView exactly), so the nightly run needs one TradingView call for candles.
+
+**Lessons**
+- Thousands of variations find lucky winners easily. Judge only on unseen sessions, PBO, neighbours and the Lucid gate.
+- WYLD's strategy needs 1-minute candles and exact rules before its real test.
+
+**Changed**
+- A factory variation enters the paper forward test only after surviving 5 nights in a row.
+- New queue items: `factory-nightly`, `one-minute-data`, `wyld-exact-rules`.
+
+**Calls used:** none.
+
 ## 2026-11-19: the lab is born, and the saved strategies get re-tested
 
 **What happened**

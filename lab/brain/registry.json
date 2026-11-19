@@ -53,6 +53,14 @@
           "data": "MNQ 5m, 21 Oct to 17 Nov 2026",
           "trades": 0,
           "note": "Chart Wizard version. 478 candles at pillar 1, 382 swept, 250 CISD, 106 displaced, 6 confirmed pullbacks, 0 with 1.5R of room."
+        },
+        {
+          "date": "2026-11-19",
+          "where": "lab/FACTORY_REPORT.md (strategy factory, family wyld, mechanical v0)",
+          "data": "MNQ 5m, 21 Oct to 17 Nov 2026: tuned on 12 sessions, judged on 8 unseen",
+          "trades": 7,
+          "net": -1013,
+          "note": "1,152 variations (pools x confirmation x stop buffer x target x break-even x window x entries). 156 made money on the unseen sessions, but the best tuned variation lost $1,013 over 7 unseen trades. PBO 37%. Far too little 5-minute data, and no 1-minute data for WYLD's real confirmations yet."
         }
       ],
       "next": "Queue item wyld-exact-rules, then code WYLD's rules once and line the app versions up with them."
@@ -255,7 +263,7 @@
       "status": "In-sample",
       "runner": "botlab:12",
       "frozenAt": "2026-11-18",
-      "verdict": "The strongest outside evidence of anything here. Drawdowns can last over a year. Its one-week proof is ready to run in NinjaTrader (quint-control/proof/).",
+      "verdict": "The strongest outside evidence of anything here, and the only family the factory let through on its first night (6 survivors, PBO 29%). Still weeks of data, a falling market, and samples just over 30 trades. Drawdowns can last over a year.",
       "evidence": [
         {
           "date": "2026-11-18",
@@ -266,6 +274,16 @@
           "pf": 1.34,
           "maxDrawdown": 1089,
           "note": "First 22 trades +$1,425, last 22 trades +$31. Too short to judge."
+        },
+        {
+          "date": "2026-11-19",
+          "where": "lab/FACTORY_REPORT.md (strategy factory, family noise)",
+          "data": "MNQ 15m, 1 Sep to 17 Nov 2026: tuned on 33 sessions, judged on 23 unseen sessions from 16 Oct",
+          "trades": 32,
+          "net": 839,
+          "pf": 1.22,
+          "maxDrawdown": 1089,
+          "note": "6 of 32 variations survived every factory check (PBO 29%), including the paper's own settings (14 days, x1, half-hourly): +$839 on 32 unseen trades. The best unseen was +$1,814 (21 days, x0.8). The unseen weeks include the October to November sell-off, which suits momentum. Promotion needs 5 nights in a row."
         }
       ],
       "next": "Owner's NinjaTrader Strategy Analyzer run from 2019 (quint-control/proof/README.md)."
@@ -464,9 +482,21 @@
   "queue": [
     {
       "id": "grow-data",
-      "what": "Grow the MNQ candle store every night: the newest 5-minute and 15-minute candles from TradingView (2 calls a night), merged into lab/data. This is what feeds the paper forward test and gives the 5-pillar playbook a fair sample.",
-      "cost": "2 TradingView calls a night",
+      "what": "Grow the MNQ candle store every night with one TradingView call: the newest 5-minute candles, merged into lab/data; the 15-minute candles are built from them. This feeds the paper forward test and the strategy factory.",
+      "cost": "1 TradingView call a night",
       "auto": true
+    },
+    {
+      "id": "factory-nightly",
+      "what": "Run the strategy factory every night (lab/FACTORY.md): every variation of every family, judged on unseen sessions, PBO, neighbours, double costs and the Lucid gate. Variations that survive 5 nights in a row get a registry entry and a frozen paper forward test.",
+      "cost": "None (about a minute of computing)",
+      "auto": true
+    },
+    {
+      "id": "one-minute-data",
+      "what": "Get 1-minute MNQ into lab/data, so the WYLD family can confirm on the 1-minute chart as WYLD does. Sources: a NinjaTrader export from the owner's Windows computer, or a data vendor file.",
+      "cost": "Owner's time or a data purchase",
+      "auto": false
     },
     {
       "id": "rsi2-long-stop-1h",
@@ -506,6 +536,10 @@
     }
   ],
   "lessons": [
+    {
+      "date": "2026-11-19",
+      "lesson": "Testing thousands of variations finds lucky winners easily: on the first night breakout and opening range scored PBO 60 to 67%, meaning their best variations were mostly luck. Only judge on unseen sessions, PBO, neighbours and the Lucid gate."
+    },
     {
       "date": "2026-11-19",
       "lesson": "The owner's strategy is WYLD Will's Four Pillars, the master version. Trading Mastery's six steps and Chart Wizard's 5 pillars are older codings of it, not separate strategies. Keep one entry and one checklist."

@@ -1,0 +1,26 @@
+{
+ "noise:lookbackDays=21;volatilityMultiplier=0.8;checkEvery=30": {
+  "nights": 1,
+  "asOf": "2026-11-18"
+ },
+ "noise:lookbackDays=10;volatilityMultiplier=1;checkEvery=30": {
+  "nights": 1,
+  "asOf": "2026-11-18"
+ },
+ "noise:lookbackDays=14;volatilityMultiplier=0.8;checkEvery=30": {
+  "nights": 1,
+  "asOf": "2026-11-18"
+ },
+ "noise:lookbackDays=10;volatilityMultiplier=0.8;checkEvery=30": {
+  "nights": 1,
+  "asOf": "2026-11-18"
+ },
+ "noise:lookbackDays=21;volatilityMultiplier=1;checkEvery=30": {
+  "nights": 1,
+  "asOf": "2026-11-18"
+ },
+ "noise:lookbackDays=14;volatilityMultiplier=1;checkEvery=30": {
+  "nights": 1,
+  "asOf": "2026-11-18"
+ }
+}

@@ -252,17 +252,25 @@ const BOTS = [
   },
 ];
 
+// One numbered bot from the list above.
 function run(bars, botNumber, opt = {}) {
+  return runBot(bars, BOTS[botNumber](), opt, botNumber);
+}
+
+// Any bot object with the same shape as the list's: { name, tf, maxTrades, dayLoss?, day?(d), bar(d, b, pos, position) }.
+// Quint Lab's strategy factory uses this to test thousands of variations on exactly the same fills and costs.
+// Besides an entry or { exit }, a bot in a trade may return { stopTo }: the stop moves there only if that cuts risk
+// (break-even and trailing), never further away. position is null or { dir, entry, stop, target, at }.
+function runBot(bars, bot, opt = {}, botNumber = null) {
   const o = { ...DEFAULTS, ...opt };
-  const bot = BOTS[botNumber]();
   const { bar: base, days } = sessions(bars);
-  if (bot.tf % base !== 0) throw new Error(`bot ${botNumber} needs ${bot.tf}-minute candles or smaller, and these are ${base}-minute`);
+  if (bot.tf % base !== 0) throw new Error(`bot ${botNumber === null ? bot.name : botNumber} needs ${bot.tf}-minute candles or smaller, and these are ${base}-minute`);
   const slip = o.slippageTicks * o.tick, lastEntry = LAST - base, trades = [];
   const lossLimit = Math.min(o.dailyLossLimit, bot.dayLoss || Infinity);
   let prev = null;
   for (const day of days) {
     const list = day.bars;
-    const d = { tick: o.tick, open: list[0].o, high: -Infinity, low: Infinity, vwap: 0, vsd: 0,
+    const d = { day: day.day, tick: o.tick, open: list[0].o, high: -Infinity, low: Infinity, vwap: 0, vsd: 0,
       prevClose: prev ? prev.close : null, prevHigh: prev ? prev.high : null, prevLow: prev ? prev.low : null, prevFull: !!(prev && prev.full) };
     let pv = 0, pv2 = 0, vol = 0, pos = null, pending = null, cur = null, count = 0, pnl = 0;
     if (bot.day) bot.day(d);
@@ -301,9 +309,14 @@ function run(bars, botNumber, opt = {}) {
       cur.h = Math.max(cur.h, b.h); cur.l = Math.min(cur.l, b.l); cur.c = b.c; cur.v += b.v;
       if (b.m % bot.tf === 0) {
         cur.m = b.m;
-        const sig = bot.bar(d, cur, pos ? pos.dir : 0);
+        const sig = bot.bar(d, cur, pos ? pos.dir : 0, pos ? { dir: pos.dir, entry: pos.entry, stop: pos.stop, target: pos.target, at: pos.at } : null);
         cur = null;
-        if (sig && next && b.m < lastEntry) {
+        if (sig && sig.stopTo !== undefined && !sig.dir && !sig.exit) {
+          if (pos) { // a stop only ever moves to cut risk
+            const s = roundTick(sig.stopTo, o.tick);
+            if (pos.dir > 0 ? s > pos.stop : s < pos.stop) pos.stop = s;
+          }
+        } else if (sig && next && b.m < lastEntry) {
           if (sig.exit) { if (pos) pending = { exit: sig.exit }; }
           else if (sig.dir && (!pos || pos.dir !== sig.dir)) {
             const ok = count < bot.maxTrades && pnl > -lossLimit && (sig.dir > 0 ? sig.stop < b.c : sig.stop > b.c);
@@ -327,7 +340,7 @@ function run(bars, botNumber, opt = {}) {
 
 const NAMES = BOTS.map((f) => (f ? f().name : null));
 
-module.exports = { run, readCsv, BOTS, NAMES, DEFAULTS };
+module.exports = { run, runBot, readCsv, BOTS, NAMES, DEFAULTS, LAST };
 
 if (require.main === module) {
   const [file, which = 'all'] = process.argv.slice(2);

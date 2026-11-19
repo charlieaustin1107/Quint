@@ -9,8 +9,8 @@
   "Best backtest so far: the 20-candle breakout, $3,711 over 40 trades on one MNQ. That is too few trades to trust yet.",
   "No strategy has earned approval yet. That needs years of data and a clean paper test.",
   "Warning: four bots would likely fail a Lucid 50K before passing: New York open breakout, Opening candle direction (5-minute opening range), Last-30-minute momentum, Failed breakout.",
-  "Latest lesson: your strategy is WYLD Will's Four Pillars, the master version.",
-  "Next up: Grow the MNQ candle store every night: the newest 5-minute and 15-minute candles from TradingView (2 calls a night), merged into lab/data."
+  "Latest lesson: Testing thousands of variations finds lucky winners easily: on the first night breakout and opening range scored PBO 60 to 67%, meaning their best variations were mostly luck.",
+  "Next up: Grow the MNQ candle store every night with one TradingView call: the newest 5-minute candles, merged into lab/data; the 15-minute candles are built from them."
  ],
  "realMoney": {
   "liveBots": 0,
@@ -321,7 +321,7 @@
    "status": "In-sample",
    "horizon": "Intraday",
    "timeframe": "30m checks",
-   "verdict": "The strongest outside evidence of anything here. Drawdowns can last over a year. Its one-week proof is ready to run in NinjaTrader (quint-control/proof/)."
+   "verdict": "The strongest outside evidence of anything here, and the only family the factory let through on its first night (6 survivors, PBO 29%). Still weeks of data, a falling market, and samples just over 30 trades. Drawdowns can last over a year."
   },
   {
    "name": "RSI(2) all-weather (saved on TraderDev as '[retest] QQQ COMBO RSI2 all-weather 1h')",
@@ -396,32 +396,32 @@
  "lessons": [
   {
    "date": "2026-11-19",
+   "lesson": "Testing thousands of variations finds lucky winners easily: on the first night breakout and opening range scored PBO 60 to 67%, meaning their best variations were mostly luck. Only judge on unseen sessions, PBO, neighbours and the Lucid gate."
+  },
+  {
+   "date": "2026-11-19",
    "lesson": "The owner's strategy is WYLD Will's Four Pillars, the master version. Trading Mastery's six steps and Chart Wizard's 5 pillars are older codings of it, not separate strategies. Keep one entry and one checklist."
   },
   {
    "date": "2026-11-19",
    "lesson": "The QQQ crypto stand-in on TraderDev flatters strategies. RSI(2) all-weather looked like about +$10,000 on 1 MNQ there and lost $2,345 on real MNQ (different months, so not a perfect comparison). Use the stand-in for quick ideas only; judge on real MNQ."
-  },
-  {
-   "date": "2026-11-19",
-   "lesson": "TraderDev forces 0.05% commission a side and 100%-of-equity sizing whatever the script says, 20 to 30 times MNQ's real costs, so its dollar figures are not MNQ dollars. Convert, or re-test elsewhere."
   }
  ],
  "next": [
   {
    "id": "grow-data",
-   "what": "Grow the MNQ candle store every night: the newest 5-minute and 15-minute candles from TradingView (2 calls a night), merged into lab/data. This is what feeds the paper forward test and gives the 5-pillar playbook a fair sample.",
-   "cost": "2 TradingView calls a night"
+   "what": "Grow the MNQ candle store every night with one TradingView call: the newest 5-minute candles, merged into lab/data; the 15-minute candles are built from them. This feeds the paper forward test and the strategy factory.",
+   "cost": "1 TradingView call a night"
   },
   {
-   "id": "rsi2-long-stop-1h",
-   "what": "Pre-registered 19 Nov 2026, before any result: long only, enter on a close above the 200 SMA with RSI(2) under 5, exit on a close above the 10 SMA, stop 1.5 x ATR(14) below the entry, out after 24 candles at most; 1 MNQ, $0.75 a side, 1 tick slippage, margin 0. Test only on 1 Apr to 19 Nov 2026 MNQ 1h, which no RSI(2) test has traded. Pass: profit after costs, worst drawdown under $2,000, at least 40 trades. Otherwise reject.",
-   "cost": "1 TradingView call"
+   "id": "factory-nightly",
+   "what": "Run the strategy factory every night (lab/FACTORY.md): every variation of every family, judged on unseen sessions, PBO, neighbours, double costs and the Lucid gate. Variations that survive 5 nights in a row get a registry entry and a frozen paper forward test.",
+   "cost": "None (about a minute of computing)"
   },
   {
-   "id": "prop-b-real-mnq",
-   "what": "Run 'Prop B: RSI(2) combo, Globex day' on real MNQ 1h chart history with margin 0, exactly as saved.",
-   "cost": "1 TradingView call"
+   "id": "one-minute-data",
+   "what": "Get 1-minute MNQ into lab/data, so the WYLD family can confirm on the 1-minute chart as WYLD does. Sources: a NinjaTrader export from the owner's Windows computer, or a data vendor file.",
+   "cost": "Owner's time or a data purchase"
   }
  ],
  "data": {

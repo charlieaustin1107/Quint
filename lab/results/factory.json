@@ -1,0 +1,2163 @@
+{
+ "asOf": "2026-11-18",
+ "rule": {
+  "minUnseenTrades": 30,
+  "minUnseenPF": 1.2,
+  "maxDrawdown": 2000,
+  "worstDay": -1200,
+  "maxPBO": 0.3,
+  "minTuneTrades": 10
+ },
+ "tuneShare": 0.6,
+ "costStress": 2.5,
+ "variants": 2594,
+ "seconds": 55.3,
+ "families": [
+  {
+   "id": "wyld",
+   "name": "Your strategy: WYLD Will Four Pillars (mechanical v0)",
+   "registry": "wyld-four-pillars",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-17",
+    "sessions": 20,
+    "tuneSessions": 12,
+    "unseenSessions": 8,
+    "unseenFrom": "2026-11-06"
+   },
+   "variants": 1152,
+   "withTrades": 1152,
+   "unseenPositive": 156,
+   "blocks": 8,
+   "pbo": 0.37142857142857144,
+   "bestTuned": {
+    "key": "pools=on;confirm=reclaim;stopTicks=1;target=B;be=none;window=120;maxEntries=2",
+    "params": {
+     "pools": "on",
+     "confirm": "reclaim",
+     "stopTicks": 1,
+     "target": "B",
+     "be": "none",
+     "window": 120,
+     "maxEntries": 2
+    },
+    "tune": {
+     "n": 11,
+     "net": 371.5,
+     "pf": 1.3108786610878662
+    },
+    "unseen": {
+     "n": 7,
+     "net": -1013,
+     "pf": 0.2428998505231689,
+     "maxDrawdown": 1338
+    },
+    "all": {
+     "n": 18,
+     "net": -641.5,
+     "maxDrawdown": 1338,
+     "worstDay": -784.5
+    },
+    "neighbours": {
+     "count": 8,
+     "medianUnseen": -1013
+    },
+    "survivor": false
+   },
+   "top": [
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=1;target=B;be=none;window=120;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 1,
+      "target": "B",
+      "be": "none",
+      "window": 120,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 11,
+      "net": 371.5,
+      "pf": 1.3108786610878662
+     },
+     "unseen": {
+      "n": 7,
+      "net": -1013,
+      "pf": 0.2428998505231689,
+      "maxDrawdown": 1338
+     },
+     "all": {
+      "n": 18,
+      "net": -641.5,
+      "maxDrawdown": 1338,
+      "worstDay": -784.5
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": -1013
+     },
+     "survivor": false
+    },
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=1;target=B;be=none;window=180;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 1,
+      "target": "B",
+      "be": "none",
+      "window": 180,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 11,
+      "net": 371.5,
+      "pf": 1.3108786610878662
+     },
+     "unseen": {
+      "n": 7,
+      "net": -1013,
+      "pf": 0.2428998505231689,
+      "maxDrawdown": 1338
+     },
+     "all": {
+      "n": 18,
+      "net": -641.5,
+      "maxDrawdown": 1338,
+      "worstDay": -784.5
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": -1013
+     },
+     "survivor": false
+    },
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=2;target=B;be=none;window=120;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 2,
+      "target": "B",
+      "be": "none",
+      "window": 120,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 11,
+      "net": 368.5,
+      "pf": 1.3075959933222037
+     },
+     "unseen": {
+      "n": 7,
+      "net": -1016,
+      "pf": 0.24235645041014167,
+      "maxDrawdown": 1341
+     },
+     "all": {
+      "n": 18,
+      "net": -647.5,
+      "maxDrawdown": 1341,
+      "worstDay": -785.5
+     },
+     "neighbours": {
+      "count": 9,
+      "medianUnseen": -1016
+     },
+     "survivor": false
+    },
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=2;target=B;be=none;window=180;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 2,
+      "target": "B",
+      "be": "none",
+      "window": 180,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 11,
+      "net": 368.5,
+      "pf": 1.3075959933222037
+     },
+     "unseen": {
+      "n": 7,
+      "net": -1016,
+      "pf": 0.24235645041014167,
+      "maxDrawdown": 1341
+     },
+     "all": {
+      "n": 18,
+      "net": -647.5,
+      "maxDrawdown": 1341,
+      "worstDay": -785.5
+     },
+     "neighbours": {
+      "count": 9,
+      "medianUnseen": -1016
+     },
+     "survivor": false
+    },
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=4;target=B;be=none;window=120;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 4,
+      "target": "B",
+      "be": "none",
+      "window": 120,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 11,
+      "net": 362.5,
+      "pf": 1.301079734219269
+     },
+     "unseen": {
+      "n": 7,
+      "net": -1022,
+      "pf": 0.2412769116555308,
+      "maxDrawdown": 1347
+     },
+     "all": {
+      "n": 18,
+      "net": -659.5,
+      "maxDrawdown": 1347,
+      "worstDay": -787.5
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": -1019
+     },
+     "survivor": false
+    },
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=4;target=B;be=none;window=180;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 4,
+      "target": "B",
+      "be": "none",
+      "window": 180,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 11,
+      "net": 362.5,
+      "pf": 1.301079734219269
+     },
+     "unseen": {
+      "n": 7,
+      "net": -1022,
+      "pf": 0.2412769116555308,
+      "maxDrawdown": 1347
+     },
+     "all": {
+      "n": 18,
+      "net": -659.5,
+      "maxDrawdown": 1347,
+      "worstDay": -787.5
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": -1019
+     },
+     "survivor": false
+    },
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=4;target=3R;be=1R;window=120;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 4,
+      "target": "3R",
+      "be": "1R",
+      "window": 120,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 12,
+      "net": 266,
+      "pf": 1.2616822429906542
+     },
+     "unseen": {
+      "n": 8,
+      "net": -1098,
+      "pf": 0,
+      "maxDrawdown": 1098
+     },
+     "all": {
+      "n": 20,
+      "net": -832,
+      "maxDrawdown": 1098,
+      "worstDay": -787.5
+     },
+     "neighbours": {
+      "count": 9,
+      "medianUnseen": -1098
+     },
+     "survivor": false
+    },
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=4;target=3R;be=1R;window=180;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 4,
+      "target": "3R",
+      "be": "1R",
+      "window": 180,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 12,
+      "net": 266,
+      "pf": 1.2616822429906542
+     },
+     "unseen": {
+      "n": 8,
+      "net": -1098,
+      "pf": 0,
+      "maxDrawdown": 1098
+     },
+     "all": {
+      "n": 20,
+      "net": -832,
+      "maxDrawdown": 1098,
+      "worstDay": -787.5
+     },
+     "neighbours": {
+      "count": 9,
+      "medianUnseen": -1098
+     },
+     "survivor": false
+    },
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=2;target=3R;be=1R;window=120;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 2,
+      "target": "3R",
+      "be": "1R",
+      "window": 120,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 12,
+      "net": 255,
+      "pf": 1.2518518518518518
+     },
+     "unseen": {
+      "n": 8,
+      "net": -1093,
+      "pf": 0,
+      "maxDrawdown": 1093
+     },
+     "all": {
+      "n": 20,
+      "net": -838,
+      "maxDrawdown": 1093,
+      "worstDay": -785.5
+     },
+     "neighbours": {
+      "count": 10,
+      "medianUnseen": -1093
+     },
+     "survivor": false
+    },
+    {
+     "key": "pools=on;confirm=reclaim;stopTicks=2;target=3R;be=1R;window=180;maxEntries=2",
+     "params": {
+      "pools": "on",
+      "confirm": "reclaim",
+      "stopTicks": 2,
+      "target": "3R",
+      "be": "1R",
+      "window": 180,
+      "maxEntries": 2
+     },
+     "tune": {
+      "n": 12,
+      "net": 255,
+      "pf": 1.2518518518518518
+     },
+     "unseen": {
+      "n": 8,
+      "net": -1093,
+      "pf": 0,
+      "maxDrawdown": 1093
+     },
+     "all": {
+      "n": 20,
+      "net": -838,
+      "maxDrawdown": 1093,
+      "worstDay": -785.5
+     },
+     "neighbours": {
+      "count": 10,
+      "medianUnseen": -1093
+     },
+     "survivor": false
+    }
+   ],
+   "survivors": [],
+   "verdict": "Best on the tuning sessions: +$372 over 11 trades; on the 8 unseen sessions it made -$1,013 over 7 trades. PBO 37%. Under 30 unseen trades, so no variation can pass yet. It re-runs every night as candles arrive."
+  },
+  {
+   "id": "breakout",
+   "name": "N-candle breakout",
+   "registry": "app-20-candle-breakout",
+   "data": {
+    "file": "mnq_15m.csv",
+    "from": "2026-09-01",
+    "to": "2026-11-17",
+    "sessions": 56,
+    "tuneSessions": 33,
+    "unseenSessions": 23,
+    "unseenFrom": "2026-10-16"
+   },
+   "variants": 600,
+   "withTrades": 600,
+   "unseenPositive": 522,
+   "blocks": 8,
+   "pbo": 0.6714285714285714,
+   "bestTuned": {
+    "key": "n=15;stopAtr=1;targetR=1.5;side=short;maxTrades=2",
+    "params": {
+     "n": 15,
+     "stopAtr": 1,
+     "targetR": 1.5,
+     "side": "short",
+     "maxTrades": 2
+    },
+    "tune": {
+     "n": 15,
+     "net": 802,
+     "pf": 1.9118817509948836
+    },
+    "unseen": {
+     "n": 18,
+     "net": 2525.5,
+     "pf": 3.3438515081206495,
+     "maxDrawdown": 487.5
+    },
+    "all": {
+     "n": 33,
+     "net": 3327.5,
+     "maxDrawdown": 487.5,
+     "worstDay": -246.5
+    },
+    "neighbours": {
+     "count": 6,
+     "medianUnseen": 2154
+    },
+    "survivor": false
+   },
+   "top": [
+    {
+     "key": "n=15;stopAtr=1;targetR=1.5;side=short;maxTrades=2",
+     "params": {
+      "n": 15,
+      "stopAtr": 1,
+      "targetR": 1.5,
+      "side": "short",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 15,
+      "net": 802,
+      "pf": 1.9118817509948836
+     },
+     "unseen": {
+      "n": 18,
+      "net": 2525.5,
+      "pf": 3.3438515081206495,
+      "maxDrawdown": 487.5
+     },
+     "all": {
+      "n": 33,
+      "net": 3327.5,
+      "maxDrawdown": 487.5,
+      "worstDay": -246.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 2154
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=15;stopAtr=1;targetR=1.5;side=short;maxTrades=1",
+     "params": {
+      "n": 15,
+      "stopAtr": 1,
+      "targetR": 1.5,
+      "side": "short",
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 10,
+      "net": 716,
+      "pf": 2.408062930186824
+     },
+     "unseen": {
+      "n": 11,
+      "net": 1196.5,
+      "pf": 2.4134672179562906,
+      "maxDrawdown": 256.5
+     },
+     "all": {
+      "n": 21,
+      "net": 1912.5,
+      "maxDrawdown": 256.5,
+      "worstDay": -256.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 1324
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=15;stopAtr=1;targetR=2;side=short;maxTrades=2",
+     "params": {
+      "n": 15,
+      "stopAtr": 1,
+      "targetR": 2,
+      "side": "short",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 15,
+      "net": 629.5,
+      "pf": 1.5812557710064634
+     },
+     "unseen": {
+      "n": 18,
+      "net": 1918,
+      "pf": 2.1890886546807193,
+      "maxDrawdown": 609
+     },
+     "all": {
+      "n": 33,
+      "net": 2547.5,
+      "maxDrawdown": 609,
+      "worstDay": -246.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 2315.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=30;stopAtr=3;targetR=3;side=both;maxTrades=1",
+     "params": {
+      "n": 30,
+      "stopAtr": 3,
+      "targetR": 3,
+      "side": "both",
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 17,
+      "net": 624.5,
+      "pf": 1.4479913916786227
+     },
+     "unseen": {
+      "n": 15,
+      "net": 2598,
+      "pf": 2.4115729421352894,
+      "maxDrawdown": 651.5
+     },
+     "all": {
+      "n": 32,
+      "net": 3222.5,
+      "maxDrawdown": 813,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 2598
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=30;stopAtr=3;targetR=3;side=both;maxTrades=2",
+     "params": {
+      "n": 30,
+      "stopAtr": 3,
+      "targetR": 3,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 17,
+      "net": 624.5,
+      "pf": 1.4479913916786227
+     },
+     "unseen": {
+      "n": 15,
+      "net": 2598,
+      "pf": 2.4115729421352894,
+      "maxDrawdown": 651.5
+     },
+     "all": {
+      "n": 32,
+      "net": 3222.5,
+      "maxDrawdown": 813,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 2598
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=30;stopAtr=3;targetR=4;side=both;maxTrades=1",
+     "params": {
+      "n": 30,
+      "stopAtr": 3,
+      "targetR": 4,
+      "side": "both",
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 17,
+      "net": 624.5,
+      "pf": 1.4479913916786227
+     },
+     "unseen": {
+      "n": 15,
+      "net": 2598,
+      "pf": 2.4115729421352894,
+      "maxDrawdown": 651.5
+     },
+     "all": {
+      "n": 32,
+      "net": 3222.5,
+      "maxDrawdown": 813,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 2652
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=30;stopAtr=3;targetR=4;side=both;maxTrades=2",
+     "params": {
+      "n": 30,
+      "stopAtr": 3,
+      "targetR": 4,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 17,
+      "net": 624.5,
+      "pf": 1.4479913916786227
+     },
+     "unseen": {
+      "n": 15,
+      "net": 2598,
+      "pf": 2.4115729421352894,
+      "maxDrawdown": 651.5
+     },
+     "all": {
+      "n": 32,
+      "net": 3222.5,
+      "maxDrawdown": 813,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 2652
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=30;stopAtr=3;targetR=2;side=both;maxTrades=1",
+     "params": {
+      "n": 30,
+      "stopAtr": 3,
+      "targetR": 2,
+      "side": "both",
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 17,
+      "net": 604,
+      "pf": 1.4332855093256816
+     },
+     "unseen": {
+      "n": 15,
+      "net": 2598,
+      "pf": 2.4115729421352894,
+      "maxDrawdown": 651.5
+     },
+     "all": {
+      "n": 32,
+      "net": 3202,
+      "maxDrawdown": 813,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 2625
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=30;stopAtr=3;targetR=2;side=both;maxTrades=2",
+     "params": {
+      "n": 30,
+      "stopAtr": 3,
+      "targetR": 2,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 17,
+      "net": 604,
+      "pf": 1.4332855093256816
+     },
+     "unseen": {
+      "n": 15,
+      "net": 2598,
+      "pf": 2.4115729421352894,
+      "maxDrawdown": 651.5
+     },
+     "all": {
+      "n": 32,
+      "net": 3202,
+      "maxDrawdown": 813,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 2882
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=10;stopAtr=1;targetR=1.5;side=short;maxTrades=2",
+     "params": {
+      "n": 10,
+      "stopAtr": 1,
+      "targetR": 1.5,
+      "side": "short",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 17,
+      "net": 594.5,
+      "pf": 1.546918123275069
+     },
+     "unseen": {
+      "n": 23,
+      "net": 2390,
+      "pf": 2.6409200137315483,
+      "maxDrawdown": 487.5
+     },
+     "all": {
+      "n": 40,
+      "net": 2984.5,
+      "maxDrawdown": 487.5,
+      "worstDay": -246.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 2315.5
+     },
+     "survivor": false
+    }
+   ],
+   "survivors": [],
+   "verdict": "Best on the tuning sessions: +$802 over 15 trades; on the 23 unseen sessions it made +$2,526 over 18 trades. Overfitting is likely (PBO 67%): the best tuned variations usually end up below average on data they didn't see. Under 30 unseen trades, so no variation can pass yet. It re-runs every night as candles arrive."
+  },
+  {
+   "id": "orb",
+   "name": "Opening range breakout",
+   "registry": "app-ny-open-breakout",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-17",
+    "sessions": 20,
+    "tuneSessions": 12,
+    "unseenSessions": 8,
+    "unseenFrom": "2026-11-06"
+   },
+   "variants": 324,
+   "withTrades": 324,
+   "unseenPositive": 191,
+   "blocks": 8,
+   "pbo": 0.6,
+   "bestTuned": {
+    "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=3;side=both",
+    "params": {
+     "rangeMin": 5,
+     "cutoffMin": 60,
+     "stop": "range",
+     "targetR": 3,
+     "side": "both"
+    },
+    "tune": {
+     "n": 11,
+     "net": 1567.5,
+     "pf": 2.056266846361186
+    },
+    "unseen": {
+     "n": 8,
+     "net": 1090,
+     "pf": 1.7997065297138666,
+     "maxDrawdown": 602.5
+    },
+    "all": {
+     "n": 19,
+     "net": 2657.5,
+     "maxDrawdown": 1284,
+     "worstDay": -397
+    },
+    "neighbours": {
+     "count": 6,
+     "medianUnseen": 569.25
+    },
+    "survivor": false
+   },
+   "top": [
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=3;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "range",
+      "targetR": 3,
+      "side": "both"
+     },
+     "tune": {
+      "n": 11,
+      "net": 1567.5,
+      "pf": 2.056266846361186
+     },
+     "unseen": {
+      "n": 8,
+      "net": 1090,
+      "pf": 1.7997065297138666,
+      "maxDrawdown": 602.5
+     },
+     "all": {
+      "n": 19,
+      "net": 2657.5,
+      "maxDrawdown": 1284,
+      "worstDay": -397
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 569.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=120;stop=range;targetR=3;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 120,
+      "stop": "range",
+      "targetR": 3,
+      "side": "both"
+     },
+     "tune": {
+      "n": 11,
+      "net": 1567.5,
+      "pf": 2.056266846361186
+     },
+     "unseen": {
+      "n": 8,
+      "net": 1090,
+      "pf": 1.7997065297138666,
+      "maxDrawdown": 602.5
+     },
+     "all": {
+      "n": 19,
+      "net": 2657.5,
+      "maxDrawdown": 1284,
+      "worstDay": -397
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 640.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=1;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "range",
+      "targetR": 1,
+      "side": "both"
+     },
+     "tune": {
+      "n": 11,
+      "net": 1395,
+      "pf": 2.5482796892341844
+     },
+     "unseen": {
+      "n": 8,
+      "net": 1023.5,
+      "pf": 2.512934220251293,
+      "maxDrawdown": 397
+     },
+     "all": {
+      "n": 19,
+      "net": 2418.5,
+      "maxDrawdown": 444,
+      "worstDay": -397
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 808
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=120;stop=range;targetR=1;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 120,
+      "stop": "range",
+      "targetR": 1,
+      "side": "both"
+     },
+     "tune": {
+      "n": 11,
+      "net": 1395,
+      "pf": 2.5482796892341844
+     },
+     "unseen": {
+      "n": 8,
+      "net": 1023.5,
+      "pf": 2.512934220251293,
+      "maxDrawdown": 397
+     },
+     "all": {
+      "n": 19,
+      "net": 2418.5,
+      "maxDrawdown": 444,
+      "worstDay": -397
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 975
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=5;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "range",
+      "targetR": 5,
+      "side": "both"
+     },
+     "tune": {
+      "n": 11,
+      "net": 1339,
+      "pf": 1.9022911051212938
+     },
+     "unseen": {
+      "n": 8,
+      "net": 498,
+      "pf": 1.3653705062362436,
+      "maxDrawdown": 629
+     },
+     "all": {
+      "n": 19,
+      "net": 1837,
+      "maxDrawdown": 1284,
+      "worstDay": -397
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 498
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=10;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "range",
+      "targetR": 10,
+      "side": "both"
+     },
+     "tune": {
+      "n": 11,
+      "net": 1339,
+      "pf": 1.9022911051212938
+     },
+     "unseen": {
+      "n": 8,
+      "net": 498,
+      "pf": 1.3653705062362436,
+      "maxDrawdown": 629
+     },
+     "all": {
+      "n": 19,
+      "net": 1837,
+      "maxDrawdown": 1284,
+      "worstDay": -397
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 362
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=120;stop=range;targetR=5;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 120,
+      "stop": "range",
+      "targetR": 5,
+      "side": "both"
+     },
+     "tune": {
+      "n": 11,
+      "net": 1339,
+      "pf": 1.9022911051212938
+     },
+     "unseen": {
+      "n": 8,
+      "net": 498,
+      "pf": 1.3653705062362436,
+      "maxDrawdown": 629
+     },
+     "all": {
+      "n": 19,
+      "net": 1837,
+      "maxDrawdown": 1284,
+      "worstDay": -397
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 498
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=120;stop=range;targetR=10;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 120,
+      "stop": "range",
+      "targetR": 10,
+      "side": "both"
+     },
+     "tune": {
+      "n": 11,
+      "net": 1339,
+      "pf": 1.9022911051212938
+     },
+     "unseen": {
+      "n": 8,
+      "net": 498,
+      "pf": 1.3653705062362436,
+      "maxDrawdown": 629
+     },
+     "all": {
+      "n": 19,
+      "net": 1837,
+      "maxDrawdown": 1284,
+      "worstDay": -397
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 430
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=180;stop=range;targetR=3;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 180,
+      "stop": "range",
+      "targetR": 3,
+      "side": "both"
+     },
+     "tune": {
+      "n": 12,
+      "net": 1117,
+      "pf": 1.577410183509951
+     },
+     "unseen": {
+      "n": 8,
+      "net": 1090,
+      "pf": 1.7997065297138666,
+      "maxDrawdown": 602.5
+     },
+     "all": {
+      "n": 20,
+      "net": 2207,
+      "maxDrawdown": 1734.5,
+      "worstDay": -450.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 569.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=mid;targetR=10;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "mid",
+      "targetR": 10,
+      "side": "both"
+     },
+     "tune": {
+      "n": 11,
+      "net": 1112,
+      "pf": 1.7703498441288534
+     },
+     "unseen": {
+      "n": 8,
+      "net": 362,
+      "pf": 1.384288747346072,
+      "maxDrawdown": 357
+     },
+     "all": {
+      "n": 19,
+      "net": 1474,
+      "maxDrawdown": 1343,
+      "worstDay": -343.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 362
+     },
+     "survivor": false
+    }
+   ],
+   "survivors": [],
+   "verdict": "Best on the tuning sessions: +$1,568 over 11 trades; on the 8 unseen sessions it made +$1,090 over 8 trades. Overfitting is likely (PBO 60%): the best tuned variations usually end up below average on data they didn't see. Under 30 unseen trades, so no variation can pass yet. It re-runs every night as candles arrive."
+  },
+  {
+   "id": "vwap-fade",
+   "name": "VWAP band fade",
+   "registry": "botlab-10",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-17",
+    "sessions": 20,
+    "tuneSessions": 12,
+    "unseenSessions": 8,
+    "unseenFrom": "2026-11-06"
+   },
+   "variants": 432,
+   "withTrades": 432,
+   "unseenPositive": 314,
+   "blocks": 8,
+   "pbo": 0.4,
+   "bestTuned": {
+    "key": "sd=2;stopBars=2;minRR=1.5;start=60;end=330;maxTrades=3",
+    "params": {
+     "sd": 2,
+     "stopBars": 2,
+     "minRR": 1.5,
+     "start": 60,
+     "end": 330,
+     "maxTrades": 3
+    },
+    "tune": {
+     "n": 19,
+     "net": 1181.5,
+     "pf": 2.6074829931972787
+    },
+    "unseen": {
+     "n": 7,
+     "net": 789.5,
+     "pf": 3.1600547195622437,
+     "maxDrawdown": 212
+    },
+    "all": {
+     "n": 26,
+     "net": 1971,
+     "maxDrawdown": 212,
+     "worstDay": -212
+    },
+    "neighbours": {
+     "count": 7,
+     "medianUnseen": 882.5
+    },
+    "survivor": false
+   },
+   "top": [
+    {
+     "key": "sd=2;stopBars=2;minRR=1.5;start=60;end=330;maxTrades=3",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 1.5,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 3
+     },
+     "tune": {
+      "n": 19,
+      "net": 1181.5,
+      "pf": 2.6074829931972787
+     },
+     "unseen": {
+      "n": 7,
+      "net": 789.5,
+      "pf": 3.1600547195622437,
+      "maxDrawdown": 212
+     },
+     "all": {
+      "n": 26,
+      "net": 1971,
+      "maxDrawdown": 212,
+      "worstDay": -212
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 882.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=2;minRR=0.5;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 0.5,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 10,
+      "net": 977,
+      "pf": 7.144654088050315
+     },
+     "unseen": {
+      "n": 6,
+      "net": 1176,
+      "pf": 4.558245083207262,
+      "maxDrawdown": 177
+     },
+     "all": {
+      "n": 16,
+      "net": 2153,
+      "maxDrawdown": 177,
+      "worstDay": -177
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 824.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=2;minRR=1;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 1,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 10,
+      "net": 977,
+      "pf": 7.144654088050315
+     },
+     "unseen": {
+      "n": 5,
+      "net": 824.5,
+      "pf": 3.4947049924357034,
+      "maxDrawdown": 177
+     },
+     "all": {
+      "n": 15,
+      "net": 1801.5,
+      "maxDrawdown": 177,
+      "worstDay": -177
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": 717
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=3;minRR=0.5;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 3,
+      "minRR": 0.5,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 10,
+      "net": 977,
+      "pf": 7.144654088050315
+     },
+     "unseen": {
+      "n": 6,
+      "net": 1176,
+      "pf": 4.558245083207262,
+      "maxDrawdown": 177
+     },
+     "all": {
+      "n": 16,
+      "net": 2153,
+      "maxDrawdown": 177,
+      "worstDay": -177
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": 827.75
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=3;minRR=1;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 3,
+      "minRR": 1,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 10,
+      "net": 977,
+      "pf": 7.144654088050315
+     },
+     "unseen": {
+      "n": 5,
+      "net": 824.5,
+      "pf": 3.4947049924357034,
+      "maxDrawdown": 177
+     },
+     "all": {
+      "n": 15,
+      "net": 1801.5,
+      "maxDrawdown": 177,
+      "worstDay": -177
+     },
+     "neighbours": {
+      "count": 9,
+      "medianUnseen": 824.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=5;minRR=0.5;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 5,
+      "minRR": 0.5,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 10,
+      "net": 977,
+      "pf": 7.144654088050315
+     },
+     "unseen": {
+      "n": 6,
+      "net": 1176,
+      "pf": 4.558245083207262,
+      "maxDrawdown": 177
+     },
+     "all": {
+      "n": 16,
+      "net": 2153,
+      "maxDrawdown": 177,
+      "worstDay": -177
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 824.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=5;minRR=1;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 5,
+      "minRR": 1,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 10,
+      "net": 977,
+      "pf": 7.144654088050315
+     },
+     "unseen": {
+      "n": 5,
+      "net": 824.5,
+      "pf": 3.4947049924357034,
+      "maxDrawdown": 177
+     },
+     "all": {
+      "n": 15,
+      "net": 1801.5,
+      "maxDrawdown": 177,
+      "worstDay": -177
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": 717
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=3;minRR=1.5;start=60;end=330;maxTrades=3",
+     "params": {
+      "sd": 2,
+      "stopBars": 3,
+      "minRR": 1.5,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 3
+     },
+     "tune": {
+      "n": 18,
+      "net": 959.5,
+      "pf": 2.156024096385542
+     },
+     "unseen": {
+      "n": 7,
+      "net": 789.5,
+      "pf": 3.1600547195622437,
+      "maxDrawdown": 212
+     },
+     "all": {
+      "n": 25,
+      "net": 1749,
+      "maxDrawdown": 212,
+      "worstDay": -212
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": 813.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=5;minRR=1.5;start=60;end=330;maxTrades=3",
+     "params": {
+      "sd": 2,
+      "stopBars": 5,
+      "minRR": 1.5,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 3
+     },
+     "tune": {
+      "n": 18,
+      "net": 926.5,
+      "pf": 2.0735805330243338
+     },
+     "unseen": {
+      "n": 7,
+      "net": 789.5,
+      "pf": 3.1600547195622437,
+      "maxDrawdown": 212
+     },
+     "all": {
+      "n": 25,
+      "net": 1716,
+      "maxDrawdown": 212,
+      "worstDay": -212
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 789.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=2;minRR=0.5;start=30;end=330;maxTrades=2",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 0.5,
+      "start": 30,
+      "end": 330,
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 19,
+      "net": 819.5,
+      "pf": 2.4044558697514997
+     },
+     "unseen": {
+      "n": 13,
+      "net": 930,
+      "pf": 2.1225105612552806,
+      "maxDrawdown": 558.5
+     },
+     "all": {
+      "n": 32,
+      "net": 1749.5,
+      "maxDrawdown": 558.5,
+      "worstDay": -278
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": 930.25
+     },
+     "survivor": false
+    }
+   ],
+   "survivors": [],
+   "verdict": "Best on the tuning sessions: +$1,182 over 19 trades; on the 8 unseen sessions it made +$790 over 7 trades. PBO 40%. Under 30 unseen trades, so no variation can pass yet. It re-runs every night as candles arrive."
+  },
+  {
+   "id": "noise",
+   "name": "Noise-area momentum",
+   "registry": "botlab-12",
+   "data": {
+    "file": "mnq_15m.csv",
+    "from": "2026-09-01",
+    "to": "2026-11-17",
+    "sessions": 56,
+    "tuneSessions": 33,
+    "unseenSessions": 23,
+    "unseenFrom": "2026-10-16"
+   },
+   "variants": 32,
+   "withTrades": 32,
+   "unseenPositive": 30,
+   "blocks": 8,
+   "pbo": 0.2857142857142857,
+   "bestTuned": {
+    "key": "lookbackDays=7;volatilityMultiplier=0.8;checkEvery=30",
+    "params": {
+     "lookbackDays": 7,
+     "volatilityMultiplier": 0.8,
+     "checkEvery": 30
+    },
+    "tune": {
+     "n": 17,
+     "net": 1196,
+     "pf": 2.8499613302397524
+    },
+    "unseen": {
+     "n": 34,
+     "net": 706.5,
+     "pf": 1.178725018972932,
+     "maxDrawdown": 1071.5
+    },
+    "all": {
+     "n": 51,
+     "net": 1902.5,
+     "maxDrawdown": 1071.5,
+     "worstDay": -703.5
+    },
+    "neighbours": {
+     "count": 3,
+     "medianUnseen": 522
+    },
+    "survivor": false
+   },
+   "top": [
+    {
+     "key": "lookbackDays=7;volatilityMultiplier=0.8;checkEvery=30",
+     "params": {
+      "lookbackDays": 7,
+      "volatilityMultiplier": 0.8,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 17,
+      "net": 1196,
+      "pf": 2.8499613302397524
+     },
+     "unseen": {
+      "n": 34,
+      "net": 706.5,
+      "pf": 1.178725018972932,
+      "maxDrawdown": 1071.5
+     },
+     "all": {
+      "n": 51,
+      "net": 1902.5,
+      "maxDrawdown": 1071.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 3,
+      "medianUnseen": 522
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=7;volatilityMultiplier=1;checkEvery=30",
+     "params": {
+      "lookbackDays": 7,
+      "volatilityMultiplier": 1,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 17,
+      "net": 992,
+      "pf": 2.2816537467700257
+     },
+     "unseen": {
+      "n": 25,
+      "net": 522,
+      "pf": 1.1691236027863277,
+      "maxDrawdown": 1131
+     },
+     "all": {
+      "n": 42,
+      "net": 1514,
+      "maxDrawdown": 1131,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 1134.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=7;volatilityMultiplier=1.5;checkEvery=30",
+     "params": {
+      "lookbackDays": 7,
+      "volatilityMultiplier": 1.5,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 11,
+      "net": 960,
+      "pf": 3.1215469613259668
+     },
+     "unseen": {
+      "n": 15,
+      "net": 1647.5,
+      "pf": 2.1899602744673166,
+      "maxDrawdown": 1280
+     },
+     "all": {
+      "n": 26,
+      "net": 2607.5,
+      "maxDrawdown": 1280,
+      "worstDay": -485.5
+     },
+     "neighbours": {
+      "count": 3,
+      "medianUnseen": 1564
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=1;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 1,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 18,
+      "net": 921.5,
+      "pf": 2.324946081955428
+     },
+     "unseen": {
+      "n": 30,
+      "net": 1562.5,
+      "pf": 1.549982400563182,
+      "maxDrawdown": 986
+     },
+     "all": {
+      "n": 48,
+      "net": 2484,
+      "maxDrawdown": 986,
+      "worstDay": -485.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 838.5
+     },
+     "survivor": true
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=1.5;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 1.5,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 11,
+      "net": 860.5,
+      "pf": 3.26149802890933
+     },
+     "unseen": {
+      "n": 13,
+      "net": 1582.5,
+      "pf": 2.1050977653631286,
+      "maxDrawdown": 1180.5
+     },
+     "all": {
+      "n": 24,
+      "net": 2443,
+      "maxDrawdown": 1180.5,
+      "worstDay": -485.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 1678.75
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=1.2;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 1.2,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 17,
+      "net": 833,
+      "pf": 2.1942652329749106
+     },
+     "unseen": {
+      "n": 18,
+      "net": 1903.5,
+      "pf": 2.057206331574563,
+      "maxDrawdown": 842
+     },
+     "all": {
+      "n": 35,
+      "net": 2736.5,
+      "maxDrawdown": 842,
+      "worstDay": -485.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 1562.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=7;volatilityMultiplier=1.2;checkEvery=30",
+     "params": {
+      "lookbackDays": 7,
+      "volatilityMultiplier": 1.2,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 15,
+      "net": 771.5,
+      "pf": 2.08738548273432
+     },
+     "unseen": {
+      "n": 19,
+      "net": 1564,
+      "pf": 1.788703983862834,
+      "maxDrawdown": 1015
+     },
+     "all": {
+      "n": 34,
+      "net": 2335.5,
+      "maxDrawdown": 1015,
+      "worstDay": -549
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 1084.75
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=14;volatilityMultiplier=1;checkEvery=30",
+     "params": {
+      "lookbackDays": 14,
+      "volatilityMultiplier": 1,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 12,
+      "net": 617.5,
+      "pf": 2.789855072463768
+     },
+     "unseen": {
+      "n": 32,
+      "net": 838.5,
+      "pf": 1.2151655119322555,
+      "maxDrawdown": 1088.5
+     },
+     "all": {
+      "n": 44,
+      "net": 1456,
+      "maxDrawdown": 1088.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 1270
+     },
+     "survivor": true
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=0.8;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 0.8,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 19,
+      "net": 432.5,
+      "pf": 1.3075008887308923
+     },
+     "unseen": {
+      "n": 33,
+      "net": 1051.5,
+      "pf": 1.272939649578196,
+      "maxDrawdown": 1088.5
+     },
+     "all": {
+      "n": 52,
+      "net": 1484,
+      "maxDrawdown": 1088.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 1153.25
+     },
+     "survivor": true
+    },
+    {
+     "key": "lookbackDays=7;volatilityMultiplier=1.2;checkEvery=60",
+     "params": {
+      "lookbackDays": 7,
+      "volatilityMultiplier": 1.2,
+      "checkEvery": 60
+     },
+     "tune": {
+      "n": 10,
+      "net": 314.5,
+      "pf": 1.3446575342465754
+     },
+     "unseen": {
+      "n": 17,
+      "net": 486.5,
+      "pf": 1.2250751792736525,
+      "maxDrawdown": 1373
+     },
+     "all": {
+      "n": 27,
+      "net": 801,
+      "maxDrawdown": 1373,
+      "worstDay": -711.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 409.25
+     },
+     "survivor": false
+    }
+   ],
+   "survivors": [
+    {
+     "key": "lookbackDays=21;volatilityMultiplier=0.8;checkEvery=30",
+     "params": {
+      "lookbackDays": 21,
+      "volatilityMultiplier": 0.8,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 7,
+      "net": 678,
+      "pf": 4.307317073170732
+     },
+     "unseen": {
+      "n": 32,
+      "net": 1814,
+      "pf": 1.541573369159576,
+      "maxDrawdown": 703.5
+     },
+     "all": {
+      "n": 39,
+      "net": 2492,
+      "maxDrawdown": 703.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 3,
+      "medianUnseen": 878.5
+     },
+     "survivor": true,
+     "lucid50k": {
+      "runs": 5000,
+      "sessions": 56,
+      "pPass": 0.3726,
+      "pFail": 0.1144,
+      "pUnfinished": 0.513,
+      "medianDaysToPass": 40,
+      "red": false
+     }
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=1;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 1,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 18,
+      "net": 921.5,
+      "pf": 2.324946081955428
+     },
+     "unseen": {
+      "n": 30,
+      "net": 1562.5,
+      "pf": 1.549982400563182,
+      "maxDrawdown": 986
+     },
+     "all": {
+      "n": 48,
+      "net": 2484,
+      "maxDrawdown": 986,
+      "worstDay": -485.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 838.5
+     },
+     "survivor": true,
+     "lucid50k": {
+      "runs": 5000,
+      "sessions": 56,
+      "pPass": 0.3652,
+      "pFail": 0.0934,
+      "pUnfinished": 0.5414,
+      "medianDaysToPass": 39,
+      "red": false
+     }
+    },
+    {
+     "key": "lookbackDays=14;volatilityMultiplier=0.8;checkEvery=30",
+     "params": {
+      "lookbackDays": 14,
+      "volatilityMultiplier": 0.8,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 16,
+      "net": 122,
+      "pf": 1.1125980618366405
+     },
+     "unseen": {
+      "n": 30,
+      "net": 1466,
+      "pf": 1.4160045402951191,
+      "maxDrawdown": 801.5
+     },
+     "all": {
+      "n": 46,
+      "net": 1588,
+      "maxDrawdown": 1039.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 945
+     },
+     "survivor": true,
+     "lucid50k": {
+      "runs": 5000,
+      "sessions": 56,
+      "pPass": 0.2486,
+      "pFail": 0.2452,
+      "pUnfinished": 0.5062,
+      "medianDaysToPass": 40,
+      "red": false
+     }
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=0.8;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 0.8,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 19,
+      "net": 432.5,
+      "pf": 1.3075008887308923
+     },
+     "unseen": {
+      "n": 33,
+      "net": 1051.5,
+      "pf": 1.272939649578196,
+      "maxDrawdown": 1088.5
+     },
+     "all": {
+      "n": 52,
+      "net": 1484,
+      "maxDrawdown": 1088.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 1153.25
+     },
+     "survivor": true,
+     "lucid50k": {
+      "runs": 5000,
+      "sessions": 56,
+      "pPass": 0.2536,
+      "pFail": 0.346,
+      "pUnfinished": 0.4004,
+      "medianDaysToPass": 38,
+      "red": true
+     }
+    },
+    {
+     "key": "lookbackDays=21;volatilityMultiplier=1;checkEvery=30",
+     "params": {
+      "lookbackDays": 21,
+      "volatilityMultiplier": 1,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 5,
+      "net": 644,
+      "pf": 22.114754098360656
+     },
+     "unseen": {
+      "n": 31,
+      "net": 878.5,
+      "pf": 1.226067936181163,
+      "maxDrawdown": 1088.5
+     },
+     "all": {
+      "n": 36,
+      "net": 1522.5,
+      "maxDrawdown": 1088.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 665.5
+     },
+     "survivor": true,
+     "lucid50k": {
+      "runs": 5000,
+      "sessions": 56,
+      "pPass": 0.2364,
+      "pFail": 0.2452,
+      "pUnfinished": 0.5184,
+      "medianDaysToPass": 41,
+      "red": false
+     }
+    },
+    {
+     "key": "lookbackDays=14;volatilityMultiplier=1;checkEvery=30",
+     "params": {
+      "lookbackDays": 14,
+      "volatilityMultiplier": 1,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 12,
+      "net": 617.5,
+      "pf": 2.789855072463768
+     },
+     "unseen": {
+      "n": 32,
+      "net": 838.5,
+      "pf": 1.2151655119322555,
+      "maxDrawdown": 1088.5
+     },
+     "all": {
+      "n": 44,
+      "net": 1456,
+      "maxDrawdown": 1088.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 1270
+     },
+     "survivor": true,
+     "lucid50k": {
+      "runs": 5000,
+      "sessions": 56,
+      "pPass": 0.2294,
+      "pFail": 0.259,
+      "pUnfinished": 0.5116,
+      "medianDaysToPass": 41,
+      "red": true
+     }
+    }
+   ],
+   "verdict": "6 of 32 variations passed every check and go to the paper forward test."
+  },
+  {
+   "id": "gap-fade",
+   "name": "Gap fade",
+   "registry": "botlab-6",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-17",
+    "sessions": 20,
+    "tuneSessions": 12,
+    "unseenSessions": 8,
+    "unseenFrom": "2026-11-06"
+   },
+   "variants": 54,
+   "withTrades": 54,
+   "unseenPositive": 18,
+   "blocks": 8,
+   "pbo": 0.5714285714285714,
+   "bestTuned": null,
+   "top": [],
+   "survivors": [],
+   "verdict": "None of the 54 variations traded enough to rank. More candles needed."
+  }
+ ],
+ "readyForPaper": [],
+ "promoteAfter": 5
+}
