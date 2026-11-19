@@ -2,6 +2,23 @@
 
 Newest first. Every lab session adds an entry: what ran, what was learned, what changed, and the TradingView calls used.
 
+## 2026-11-19 (nightly run, 22:15 UK)
+
+**What ran**
+- **Candles, call 1 (1-minute):** asked for 1-minute MNQ from 17 Nov 23:15 UTC. TradingView only returns the newest 2,000, so they start 18 Nov 11:40 UTC and run to 19 Nov 21:59 UTC. Started the 1-minute store, `data/mnq_1m.csv` (2,000 candles). The 1-minute rebuild reported a **GAP**: the 5-minute store ended 18 Nov 00:15 UTC.
+- **Candles, call 2 (5-minute), per step 3:** 536 new 5-minute candles (store now 5,973, 21 Oct to 19 Nov) and 179 new 15-minute candles built from them. Re-running the 1-minute rebuild then reported a **MISMATCH** on 1 of 399 overlapping 5-minute candles (19 Nov 13:25 UTC: the close is 27,216.50 from TradingView's 5-minute feed, 27,214.75 when built from its 1-minute candles). So the 5-minute store stays on the 5-minute feed for now. Tomorrow's 1-minute call will start from the end of the 1-minute store, so it won't leave a gap; if the mismatch check trips again, step 3's fallback applies.
+- **News calendar:** skipped. Both of tonight's calls went to candles, and `data/calendar.json` is still empty, so tomorrow's call 2 should go to the calendar if the candles match.
+- **Ideas inbox:** no new ideas.
+- **Factory:** 1,490 variations in 5 families, plus 48 of the owner's strategy (WYLD, as the indicator reads it). **0 survivors**, none ready for paper. Every family is still under 30 unseen trades or failed a check (PBO: N-candle 47%, opening range 26%, VWAP band fade 47%, noise-area 40%, gap fade 29%).
+- **Analyst (ANATOMY.md):** on 22 sessions, as written no setup started: all 52 pools marked before the open had already been run before 9:30. With prior-day and overnight pools, 28 sweeps → 6 held a level → 0 confirmations on 5-minute candles. Pillar ② is the main filter (22 of 28 sweeps died there). WYLD confirms on the 1-minute chart, so this needs the 1-minute store to grow before anything is judged.
+- **Queued:** the analyst's proposal `wyld-hold-60` (let a level hold within 60 minutes instead of 30), with its pass mark, to be tested only on sessions after 19 Nov. It is not auto: it waits for those sessions.
+- **Research item:** skipped. The first auto item, `rsi2-long-stop-1h`, needs a TradingView call, and both had been used.
+- **Paper forward test:** nine bots, 10 trades since 18 Nov, -$137 on paper.
+
+- **Tests failed (step 10), so Quint HQ was not republished tonight.** `npm run test:3`: 29 of 30 pass. The failure is `lab run: matches the bot lab first read` (`test/lab.test.js:94`). It expects the 20-candle breakout to make exactly 40 trades and $3,711, the bot lab's first read on the old candle set, and tonight's new candles gave it 41 trades (+$4,374). The bot isn't broken; the check is pinned to old data. Suggested fix for the next build session: run that check only on candles up to the first read's last date, so the store can grow. I didn't change the test inside the nightly run.
+
+**Calls used:** TradingView 2 (1-minute candles, 5-minute candles), TraderDev 0.
+
 ## 2026-11-19 (later): indicator v2, and a faithful backtest port of it
 
 **What happened**

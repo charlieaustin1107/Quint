@@ -1,12 +1,12 @@
 {
  "date": "2026-11-19",
- "dataTo": "2026-11-18",
- "headline": "Nothing live yet. Paper forward test running.",
+ "dataTo": "2026-11-19",
+ "headline": "-$137 on paper from 10 forward trades",
  "spoken": [
   "Evening. Here's your Quint roundup for Thursday 19 November.",
   "Real money: no bot is trading a real or prop account yet, so nothing has been made or lost.",
-  "Paper forward test: nine bots are on paper since Wednesday 18 November. No trades yet, because no new candles have come in since their rules were fixed.",
-  "Best backtest so far: the 20-candle breakout, $3,711 over 40 trades on one MNQ. That is too few trades to trust yet.",
+  "Paper forward test: nine bots, 10 trades since Wednesday 18 November, minus $137 on paper on one MNQ each.",
+  "Best backtest so far: the 20-candle breakout, $4,374 over 41 trades on one MNQ. That is too few trades to trust yet.",
   "No strategy has earned approval yet. That needs years of data and a clean paper test.",
   "Warning: four bots would likely fail a Lucid 50K before passing: New York open breakout, Opening candle direction (5-minute opening range), Last-30-minute momentum, Failed breakout.",
   "Latest lesson: Replaying WYLD's rules exactly as the indicator reads them showed where setups die: the pools marked before the open were all run before 9:30, most sweeps found no higher-timeframe level holding nearby, and on 5-minute candles Point B came before any confirmation.",
@@ -19,28 +19,28 @@
  "paper": {
   "bots": 9,
   "since": "2026-11-18",
-  "trades": 0,
-  "net": 0,
+  "trades": 10,
+  "net": -137.5,
   "byBot": [
    {
     "name": "20-candle breakout",
-    "trades": 0,
-    "net": 0
+    "trades": 1,
+    "net": 662.5
    },
    {
     "name": "New York open breakout",
-    "trades": 0,
-    "net": 0
+    "trades": 1,
+    "net": 1079
    },
    {
     "name": "Opening candle direction (5-minute opening range)",
-    "trades": 0,
-    "net": 0
+    "trades": 1,
+    "net": -331.5
    },
    {
     "name": "Last-30-minute momentum",
-    "trades": 0,
-    "net": 0
+    "trades": 1,
+    "net": -105.5
    },
    {
     "name": "Gap fade",
@@ -49,23 +49,23 @@
    },
    {
     "name": "Inverted fair value gap",
-    "trades": 0,
-    "net": 0
+    "trades": 1,
+    "net": -264.5
    },
    {
     "name": "VWAP band fade",
-    "trades": 0,
-    "net": 0
+    "trades": 2,
+    "net": -627.5
    },
    {
     "name": "Failed breakout",
-    "trades": 0,
-    "net": 0
+    "trades": 2,
+    "net": -802.5
    },
    {
     "name": "Noise-area momentum",
-    "trades": 0,
-    "net": 0
+    "trades": 1,
+    "net": 252.5
    }
   ]
  },
@@ -73,34 +73,34 @@
   {
    "name": "20-candle breakout",
    "timeframe": "15m",
-   "trades": 40,
-   "net": 3711,
-   "laterHalf": 4799,
+   "trades": 41,
+   "net": 4373.5,
+   "laterHalf": 5461.5,
    "maxDrawdown": 1720,
-   "pass": 0.6638,
-   "fail": 0.0892,
+   "pass": 0.7447,
+   "fail": 0.0601,
    "grade": "Too few trades"
   },
   {
    "name": "Noise-area momentum",
    "timeframe": "30m",
-   "trades": 43,
-   "net": 2318.5,
-   "laterHalf": 492,
+   "trades": 44,
+   "net": 2571,
+   "laterHalf": 588,
    "maxDrawdown": 1019,
-   "pass": 0.4234,
-   "fail": 0.1501,
+   "pass": 0.4565,
+   "fail": 0.1283,
    "grade": "Too few trades"
   },
   {
-   "name": "VWAP band fade",
+   "name": "Opening candle direction (5-minute opening range)",
    "timeframe": "5m",
-   "trades": 30,
-   "net": 1740.5,
-   "laterHalf": 1109.5,
-   "maxDrawdown": 449,
-   "pass": 0.8913,
-   "fail": 0.0019,
+   "trades": 22,
+   "net": 1156,
+   "laterHalf": 2350,
+   "maxDrawdown": 1241.5,
+   "pass": 0.3245,
+   "fail": 0.5544,
    "grade": "Too few trades"
   }
  ],
@@ -109,125 +109,125 @@
    "name": "20-candle breakout",
    "bot": 3,
    "timeframe": "15m",
-   "trades": 40,
-   "net": 3711,
-   "laterHalf": 4799,
+   "trades": 41,
+   "net": 4373.5,
+   "laterHalf": 5461.5,
    "maxDrawdown": 1720,
    "worstDay": -483.5,
-   "pass": 0.6638,
-   "fail": 0.0892,
+   "pass": 0.7447,
+   "fail": 0.0601,
    "grade": "Too few trades"
   },
   {
    "name": "Noise-area momentum",
    "bot": 12,
    "timeframe": "30m",
-   "trades": 43,
-   "net": 2318.5,
-   "laterHalf": 492,
+   "trades": 44,
+   "net": 2571,
+   "laterHalf": 588,
    "maxDrawdown": 1019,
    "worstDay": -517,
-   "pass": 0.4234,
-   "fail": 0.1501,
-   "grade": "Too few trades"
-  },
-  {
-   "name": "VWAP band fade",
-   "bot": 10,
-   "timeframe": "5m",
-   "trades": 30,
-   "net": 1740.5,
-   "laterHalf": 1109.5,
-   "maxDrawdown": 449,
-   "worstDay": -278,
-   "pass": 0.8913,
-   "fail": 0.0019,
+   "pass": 0.4565,
+   "fail": 0.1283,
    "grade": "Too few trades"
   },
   {
    "name": "Opening candle direction (5-minute opening range)",
    "bot": 2,
    "timeframe": "5m",
-   "trades": 20,
-   "net": 1715,
-   "laterHalf": 2629,
+   "trades": 22,
+   "net": 1156,
+   "laterHalf": 2350,
    "maxDrawdown": 1241.5,
    "worstDay": -390.5,
-   "pass": 0.477,
-   "fail": 0.3891,
+   "pass": 0.3245,
+   "fail": 0.5544,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "VWAP band fade",
+   "bot": 10,
+   "timeframe": "5m",
+   "trades": 32,
+   "net": 1113,
+   "laterHalf": 632.5,
+   "maxDrawdown": 1076.5,
+   "worstDay": -627.5,
+   "pass": 0.5871,
+   "fail": 0.125,
    "grade": "Too few trades"
   },
   {
    "name": "Inverted fair value gap",
    "bot": 7,
    "timeframe": "5m",
-   "trades": 12,
-   "net": 1299.5,
-   "laterHalf": -141,
-   "maxDrawdown": 512,
-   "worstDay": -262,
-   "pass": 0.7554,
-   "fail": 0.0052,
-   "grade": "Too few trades"
-  },
-  {
-   "name": "Gap fade",
-   "bot": 6,
-   "timeframe": "5m",
-   "trades": 3,
-   "net": 289,
-   "laterHalf": 382.5,
-   "maxDrawdown": 154,
-   "worstDay": -93.5,
-   "pass": 0.0098,
-   "fail": 0,
+   "trades": 14,
+   "net": 782.5,
+   "laterHalf": -648,
+   "maxDrawdown": 1029,
+   "worstDay": -264.5,
+   "pass": 0.3828,
+   "fail": 0.0696,
    "grade": "Too few trades"
   },
   {
    "name": "New York open breakout",
    "bot": 1,
    "timeframe": "5m",
-   "trades": 19,
-   "net": 255.5,
-   "laterHalf": 992,
+   "trades": 21,
+   "net": 704,
+   "laterHalf": 2004.5,
    "maxDrawdown": 2059,
-   "worstDay": -626,
-   "pass": 0.2621,
-   "fail": 0.6944,
+   "worstDay": -630.5,
+   "pass": 0.348,
+   "fail": 0.6319,
    "grade": "Too few trades"
   },
   {
-   "name": "Failed breakout",
-   "bot": 11,
+   "name": "Gap fade",
+   "bot": 6,
    "timeframe": "5m",
-   "trades": 9,
-   "net": -556,
-   "laterHalf": -718,
-   "maxDrawdown": 955,
-   "worstDay": -351,
-   "pass": 0,
-   "fail": 0.5238,
-   "grade": "Loses money"
+   "trades": 4,
+   "net": 528.5,
+   "laterHalf": 682.5,
+   "maxDrawdown": 154,
+   "worstDay": -93.5,
+   "pass": 0.043,
+   "fail": 0,
+   "grade": "Too few trades"
   },
   {
    "name": "Last-30-minute momentum",
    "bot": 4,
    "timeframe": "5m",
-   "trades": 19,
-   "net": -1215.5,
-   "laterHalf": -1119.5,
+   "trades": 21,
+   "net": -1125,
+   "laterHalf": -882.5,
    "maxDrawdown": 1325,
    "worstDay": -286.5,
    "pass": 0,
-   "fail": 0.9792,
+   "fail": 0.9138,
+   "grade": "Loses money"
+  },
+  {
+   "name": "Failed breakout",
+   "bot": 11,
+   "timeframe": "5m",
+   "trades": 11,
+   "net": -1358.5,
+   "laterHalf": -1501.5,
+   "maxDrawdown": 1757.5,
+   "worstDay": -802.5,
+   "pass": 0,
+   "fail": 0.9181,
    "grade": "Loses money"
   }
  ],
  "warnings": [
-  "New York open breakout: 69% chance of failing a Lucid 50K first.",
-  "Opening candle direction (5-minute opening range): 39% chance of failing a Lucid 50K first.",
-  "Last-30-minute momentum: 98% chance of failing a Lucid 50K first.",
-  "Failed breakout: 52% chance of failing a Lucid 50K first.",
+  "New York open breakout: 63% chance of failing a Lucid 50K first.",
+  "Opening candle direction (5-minute opening range): 55% chance of failing a Lucid 50K first.",
+  "Last-30-minute momentum: 91% chance of failing a Lucid 50K first.",
+  "Failed breakout: 92% chance of failing a Lucid 50K first.",
   "Last-30-minute momentum is losing money on the saved candles.",
   "Failed breakout is losing money on the saved candles."
  ],
@@ -428,16 +428,16 @@
   "5m": {
    "file": "mnq_5m.csv",
    "from": "2026-10-21",
-   "to": "2026-11-18",
-   "candles": 5437,
-   "sessions": 20
+   "to": "2026-11-19",
+   "candles": 5973,
+   "sessions": 22
   },
   "15m": {
    "file": "mnq_15m.csv",
    "from": "2026-08-31",
-   "to": "2026-11-18",
-   "candles": 5141,
-   "sessions": 56
+   "to": "2026-11-19",
+   "candles": 5320,
+   "sessions": 58
   }
  }
 }

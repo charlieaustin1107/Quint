@@ -1,7 +1,7 @@
 {
- "asOf": "2026-11-18",
+ "asOf": "2026-11-19",
  "candles": "5-minute",
- "sessions": 20,
+ "sessions": 22,
  "minTrades": 30,
  "reps": 10000,
  "runs": {
@@ -12,7 +12,7 @@
    "confirm": null,
    "funnel": {
     "sweeps": 0,
-    "takenOvernight": 50,
+    "takenOvernight": 52,
     "holds": 0,
     "noHold": 0,
     "pdrs": 0,
@@ -52,10 +52,10 @@
    "without": null,
    "confirm": null,
    "funnel": {
-    "sweeps": 25,
-    "takenOvernight": 61,
+    "sweeps": 28,
+    "takenOvernight": 65,
     "holds": 6,
-    "noHold": 19,
+    "noHold": 22,
     "pdrs": 6,
     "noPointB": 0,
     "confirmations": 0,
@@ -94,7 +94,7 @@
    "confirm": null,
    "funnel": {
     "sweeps": 115,
-    "takenOvernight": 61,
+    "takenOvernight": 65,
     "holds": 104,
     "noHold": 11,
     "pdrs": 103,
@@ -138,41 +138,41 @@
    "without": "level",
    "confirm": null,
    "funnel": {
-    "sweeps": 27,
-    "takenOvernight": 61,
-    "holds": 20,
+    "sweeps": 30,
+    "takenOvernight": 65,
+    "holds": 23,
     "noHold": 7,
-    "pdrs": 20,
+    "pdrs": 23,
     "noPointB": 0,
-    "confirmations": 33,
-    "skippedInTrade": 28,
-    "lowRoom": 3,
-    "entries": 2,
+    "confirmations": 62,
+    "skippedInTrade": 53,
+    "lowRoom": 6,
+    "entries": 3,
     "completeB": 14,
-    "broken": 5,
-    "expired": 1
+    "broken": 7,
+    "expired": 2
    },
-   "n": 2,
-   "wins": 2,
+   "n": 3,
+   "wins": 3,
    "winRate": 1,
-   "net": 620,
+   "net": 2808,
    "maxDrawdown": 0,
-   "avgR": 2.28,
+   "avgR": 3.64,
    "lo": 1.7,
-   "hi": 2.87,
+   "hi": 6.35,
    "enough": false,
    "postMortem": {
     "exits": {
-     "target": 1,
+     "target": 2,
      "close": 1
     },
     "losers": 0,
     "losersUpHalfR": 0,
     "losersUp1R": 0,
-    "winners": 2,
-    "winnersMedianMaeR": 0.6,
+    "winners": 3,
+    "winnersMedianMaeR": 0.58,
     "winnersDeepMae": 0,
-    "medianMinsWin": 195,
+    "medianMinsWin": 280,
     "medianMinsLoss": null
    }
   },
@@ -182,10 +182,10 @@
    "without": "pdr",
    "confirm": null,
    "funnel": {
-    "sweeps": 23,
-    "takenOvernight": 61,
+    "sweeps": 26,
+    "takenOvernight": 65,
     "holds": 5,
-    "noHold": 18,
+    "noHold": 21,
     "pdrs": 5,
     "noPointB": 0,
     "confirmations": 6,
@@ -226,10 +226,10 @@
    "without": "window",
    "confirm": null,
    "funnel": {
-    "sweeps": 30,
-    "takenOvernight": 52,
+    "sweeps": 33,
+    "takenOvernight": 55,
     "holds": 6,
-    "noHold": 24,
+    "noHold": 27,
     "pdrs": 6,
     "noPointB": 0,
     "confirmations": 0,
@@ -268,7 +268,7 @@
    "confirm": "wick",
    "funnel": {
     "sweeps": 115,
-    "takenOvernight": 61,
+    "takenOvernight": 65,
     "holds": 104,
     "noHold": 11,
     "pdrs": 103,
@@ -312,7 +312,7 @@
    "confirm": "retest",
    "funnel": {
     "sweeps": 115,
-    "takenOvernight": 61,
+    "takenOvernight": 65,
     "holds": 104,
     "noHold": 11,
     "pdrs": 103,
@@ -356,7 +356,7 @@
    "confirm": "break",
    "funnel": {
     "sweeps": 115,
-    "takenOvernight": 61,
+    "takenOvernight": 65,
     "holds": 104,
     "noHold": 11,
     "pdrs": 103,
@@ -400,7 +400,7 @@
    "confirm": "ifvg",
    "funnel": {
     "sweeps": 115,
-    "takenOvernight": 61,
+    "takenOvernight": 65,
     "holds": 104,
     "noHold": 11,
     "pdrs": 103,
@@ -444,7 +444,7 @@
    "confirm": "fvgRetest",
    "funnel": {
     "sweeps": 115,
-    "takenOvernight": 61,
+    "takenOvernight": 65,
     "holds": 104,
     "noHold": 11,
     "pdrs": 103,
@@ -498,9 +498,9 @@
    "pillar": "level",
    "name": "② the HTF level",
    "withN": 0,
-   "withoutN": 2,
+   "withoutN": 3,
    "withAvgR": null,
-   "withoutAvgR": 2.28,
+   "withoutAvgR": 3.64,
    "diff": null,
    "lo": null,
    "hi": null,
@@ -755,12 +755,12 @@
   }
  },
  "lessons": [
-  "As written, no setup started: all 50 pools marked before the open had already been run before 9:30, so there was nothing left to sweep in the window.",
-  "With prior-day and overnight highs and lows as pools too: 25 sweeps → 6 held a level (24%) → 6 PDRs → 0 confirmations → 0 entries.",
-  "Most sweeps die at ②: 19 of 25 had no higher-timeframe level hold nearby in time. Pillar ② is the main filter.",
+  "As written, no setup started: all 52 pools marked before the open had already been run before 9:30, so there was nothing left to sweep in the window.",
+  "With prior-day and overnight highs and lows as pools too: 28 sweeps → 6 held a level (21%) → 6 PDRs → 0 confirmations → 0 entries.",
+  "Most sweeps die at ②: 22 of 28 had no higher-timeframe level hold nearby in time. Pillar ② is the main filter.",
   "Every PDR ended before a 5-minute confirmation formed (Point B reached 4, broken 2). WYLD confirms on the 1-minute chart; this needs 1-minute candles to judge.",
   "① the sweep: 0 trades with it, 16 without. Too few to judge (needs 30 in both).",
-  "② the HTF level: 0 trades with it, 2 without. Too few to judge (needs 30 in both).",
+  "② the HTF level: 0 trades with it, 3 without. Too few to judge (needs 30 in both).",
   "③ the PDR: 0 trades with it, 5 without. Too few to judge (needs 30 in both).",
   "The 3-hour window: 0 trades with it, 0 without. Too few to judge (needs 30 in both).",
   "Most trades to study: without ① the sweep (price simply trades into a level), 16 trades, average -0.67R (95% range -1.02R to -0.26R). Below 30 trades, so a description, not a finding.",
@@ -778,10 +778,10 @@
   },
   {
    "id": "wyld-hold-60",
-   "why": "19 of 25 sweeps died at ②.",
+   "why": "22 of 28 sweeps died at ②.",
    "rules": "Let a level hold within 60 minutes of the sweep (holdMinutes 60) instead of 30.",
-   "passMark": "On sessions after 2026-11-18 only: 30+ trades, average R not worse than as written, and more setups reaching ③.",
-   "alreadyQueued": false
+   "passMark": "On sessions after 2026-11-19 only: 30+ trades, average R not worse than as written, and more setups reaching ③.",
+   "alreadyQueued": true
   }
  ]
 }

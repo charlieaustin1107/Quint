@@ -1,14 +1,14 @@
 # The sequence analyst: what each pillar of WYLD's strategy is worth
 
-As of 2026-11-18, on 20 sessions of 5-minute MNQ candles. Every average has a 95% range from 10,000 bootstrap resamples; nothing below 30 trades is a finding. Costs included ($0.50 a side and 1 tick of slippage). Not financial advice. Built by `lab/brain/anatomy.js`.
+As of 2026-11-19, on 22 sessions of 5-minute MNQ candles. Every average has a 95% range from 10,000 bootstrap resamples; nothing below 30 trades is a finding. Costs included ($0.50 a side and 1 tick of slippage). Not financial advice. Built by `lab/brain/anatomy.js`.
 
 ## What Quint learned tonight
-- As written, no setup started: all 50 pools marked before the open had already been run before 9:30, so there was nothing left to sweep in the window.
-- With prior-day and overnight highs and lows as pools too: 25 sweeps → 6 held a level (24%) → 6 PDRs → 0 confirmations → 0 entries.
-- Most sweeps die at ②: 19 of 25 had no higher-timeframe level hold nearby in time. Pillar ② is the main filter.
+- As written, no setup started: all 52 pools marked before the open had already been run before 9:30, so there was nothing left to sweep in the window.
+- With prior-day and overnight highs and lows as pools too: 28 sweeps → 6 held a level (21%) → 6 PDRs → 0 confirmations → 0 entries.
+- Most sweeps die at ②: 22 of 28 had no higher-timeframe level hold nearby in time. Pillar ② is the main filter.
 - Every PDR ended before a 5-minute confirmation formed (Point B reached 4, broken 2). WYLD confirms on the 1-minute chart; this needs 1-minute candles to judge.
 - ① the sweep: 0 trades with it, 16 without. Too few to judge (needs 30 in both).
-- ② the HTF level: 0 trades with it, 2 without. Too few to judge (needs 30 in both).
+- ② the HTF level: 0 trades with it, 3 without. Too few to judge (needs 30 in both).
 - ③ the PDR: 0 trades with it, 5 without. Too few to judge (needs 30 in both).
 - The 3-hour window: 0 trades with it, 0 without. Too few to judge (needs 30 in both).
 - Most trades to study: without ① the sweep (price simply trades into a level), 16 trades, average -0.67R (95% range -1.02R to -0.26R). Below 30 trades, so a description, not a finding.
@@ -20,17 +20,17 @@ As of 2026-11-18, on 20 sessions of 5-minute MNQ candles. Every average has a 95
 | Run | Sweeps | Held ② | PDRs ③ | Confirmations ④ | Entries | Trades | Avg R (95% range) | Net |
 |---|---|---|---|---|---|---|---|---|
 | As written (his 15m equal highs and lows only) | 0 | 0 | 0 | 0 | 0 | 0 | — | — |
-| With prior-day and overnight highs/lows as pools too | 25 | 6 | 6 | 0 | 0 | 0 | — | — |
+| With prior-day and overnight highs/lows as pools too | 28 | 6 | 6 | 0 | 0 | 0 | — | — |
 | Without ① the sweep (price simply trades into a level) | 115 | 104 | 103 | 106 | 16 | 16 | -0.67R (95% range -1.02R to -0.26R) | $-688 |
-| Without ② the HTF level (a close back beyond the swept pool) | 27 | 20 | 20 | 33 | 2 | 2 | +2.28R (95% range +1.70R to +2.87R) | $620 |
-| Without ③ the PDR (a fixed 2R target) | 23 | 5 | 5 | 6 | 5 | 5 | -0.41R (95% range -1.01R to +0.78R) | $-812 |
-| Without the 3-hour window (until 15:30 New York) | 30 | 6 | 6 | 0 | 0 | 0 | — | — |
+| Without ② the HTF level (a close back beyond the swept pool) | 30 | 23 | 23 | 62 | 3 | 3 | +3.64R (95% range +1.70R to +6.35R) | $2808 |
+| Without ③ the PDR (a fixed 2R target) | 26 | 5 | 5 | 6 | 5 | 5 | -0.41R (95% range -1.01R to +0.78R) | $-812 |
+| Without the 3-hour window (until 15:30 New York) | 33 | 6 | 6 | 0 | 0 | 0 | — | — |
 
 ## Each pillar: with it against without it
 | Pillar | Trades with / without | Avg R with | Avg R without | Difference (95% range) | Verdict |
 |---|---|---|---|---|---|
 | ① the sweep | 0 / 16 | — | -0.67R | — | too few trades to judge |
-| ② the HTF level | 0 / 2 | — | +2.28R | — | too few trades to judge |
+| ② the HTF level | 0 / 3 | — | +3.64R | — | too few trades to judge |
 | ③ the PDR | 0 / 5 | — | -0.41R | — | too few trades to judge |
 | the 3-hour window | 0 / 0 | — | — | — | too few trades to judge |
 
@@ -60,4 +60,4 @@ As of 2026-11-18, on 20 sessions of 5-minute MNQ candles. Every average has a 95
 
 ## Proposals for the queue (pre-register before testing)
 - **one-minute-data** (already queued): Fetch 1-minute MNQ candles nightly and run the analyst on them once there are 10 sessions. Why: Every PDR ended before a confirmation on 5-minute candles. Pass mark: At least 30 confirmations across the 1-minute sessions.
-- **wyld-hold-60**: Let a level hold within 60 minutes of the sweep (holdMinutes 60) instead of 30. Why: 19 of 25 sweeps died at ②. Pass mark: On sessions after 2026-11-18 only: 30+ trades, average R not worse than as written, and more setups reaching ③.
+- **wyld-hold-60** (already queued): Let a level hold within 60 minutes of the sweep (holdMinutes 60) instead of 30. Why: 22 of 28 sweeps died at ②. Pass mark: On sessions after 2026-11-19 only: 30+ trades, average R not worse than as written, and more setups reaching ③.
