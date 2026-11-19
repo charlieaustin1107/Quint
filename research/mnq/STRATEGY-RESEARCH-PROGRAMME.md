@@ -79,6 +79,37 @@ Interpretation: these are exploratory results, not evidence of robust profitabil
 5. Contract roll: use correctly adjusted continuous data for research, then verify signals and execution on actual quarterly contracts; avoid artificial roll jumps.
 6. Account compatibility: a multi-day hold may be incompatible with a prop firm's intraday drawdown, news, overnight or flat-by-close rules. Treat this as a hard eligibility gate, not a strategy parameter.
 
+## Balanced trade management: protect capital without premature exits
+
+Quint bots must be disciplined, not timid. They must respect hard risk limits while allowing a valid, tested setup enough room and time to play out. Do not make bots exit early simply because price briefly moves against the position, an indicator flickers, or an AI model expresses uncertainty.
+
+### Separate hard safety from normal strategy decisions
+- **Hard safety exits** always take priority: protective stop reached, account loss/drawdown limit, invalid position/order state, loss of reliable market data or connection, broker/firm restriction, or another explicitly defined emergency condition.
+- **Normal trade management** follows that bot's pre-tested rules. A normal pullback, temporary adverse candle or short-lived volatility spike is not by itself an exit signal unless the strategy specification says it is.
+- A safety cap is not a profit-taking signal. Do not use the account's daily loss limit, a conservative risk budget or a generic fear threshold to close a trade that remains valid and is still within its planned risk.
+- Never widen the initial stop, exceed the approved risk budget, average down or add exposure unless a separately tested and authorised rule explicitly permits it.
+
+### Give each strategy room to work
+- Before entry, define the setup's invalidation level, initial stop, target(s), expected holding horizon, maximum holding time and permitted management actions.
+- Use stop placement suited to the strategy and market structure (for example, swing structure or volatility/ATR), not an arbitrary tiny stop that causes routine market noise to close trades.
+- Use a declared confirmation rule for reversals or invalidation. Avoid exiting on one unconfirmed lower-timeframe candle when the strategy is based on a higher timeframe.
+- Use hysteresis / persistence rules where appropriate: a regime or trend change may need a defined close, threshold or number of bars to confirm. These rules must be fixed and tested, not improvised after entry.
+- Do not move a stop to breakeven or trail it too early by default. Each bot must test when trailing or breakeven improves net expectancy versus letting the original trade plan work.
+- Partial profit-taking, target ladders, time stops and early exits must each have explicit conditions and separate test evidence. If no exit condition has fired, the default is to hold the position and continue monitoring.
+- A strategy's confidence score may control whether a new trade is eligible or how much risk is allocated within strict caps; it must not silently override stops, targets or turn into a vague reason to exit an open trade.
+
+### Measure whether management is too tight or too loose
+Backtests must record exit reason and compare baseline exits against alternatives: stop/target, structure invalidation, volatility stop, time stop, trailing activation and partial exits. Report premature-exit rate (where price later reaches the original target before the original stop within the declared evaluation window), missed target movement, average favourable/adverse excursion, average hold time, net expectancy, drawdown and tail loss. Avoid hindsight-based labels and use only data available at the decision time. Evaluate each bot and timeframe separately, walk-forward and on untouched data.
+
+### Decision hierarchy
+1. Exchange/broker/firm emergency and account-level hard limits.
+2. Confirmed protective stop / predefined maximum-risk boundary.
+3. Strategy-specific confirmed invalidation or exit condition.
+4. Strategy-specific profit target, trailing or time exit.
+5. Otherwise hold, monitor and log the reason for no change.
+
+AI may explain the decision or flag a possible issue, but it cannot invent discretionary exits or loosen hard controls. The strategy must be able to continue managing a valid position deterministically if the AI service is unavailable.
+
 ## Data and validation standard
 
 - Prefer CME-quality tick/trade and bid/ask data for scalping; 1-minute or 5-minute bars are insufficient for fill-accurate scalping claims.
