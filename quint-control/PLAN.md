@@ -373,6 +373,39 @@ Every result shows trades, win rate, profit factor, net dollars, average R, wors
 - Its live trades are tagged in the journal, so its real results build its record.
 - **What stays on no matter what:** the guardian's firm rules (room left before the max loss, the daily loss stop, the LucidDaily news blackout, no opposite positions across accounts) and the kill switches. Breaking those fails the account, so they can't be skipped.
 
+## Discord and Telegram trade-alert integrations
+
+Quint must support linking the website to a private Discord server/channel and/or a Telegram chat. These are notification surfaces for the same event stream shown in the Quint dashboard; they are not separate trading engines. Support both providers so the owner can choose either or both.
+
+### Required trade lifecycle notifications
+Send a clearly labelled, timestamped alert for each relevant event:
+1. **Setup spotted (not a trade):** bot name, market/contract, direction, timeframe, setup rationale, proposed entry or entry zone, stop-loss, target(s), planned dollar risk/reward, expiry/invalidation and strategy status. Explicitly label this as a signal only; no order has been placed.
+2. **Approval requested / approved / declined:** for signal-assisted mode, include a secure link to the relevant Quint website page. Approval must happen in the authenticated Quint website, not by interpreting a casual chat message.
+3. **Order submitted / accepted / rejected:** report actual broker order state; distinguish submitted from accepted and filled.
+4. **Trade opened / filled:** actual average fill price, filled quantity, protective stop and target order status, account nickname (never expose full account identifiers), and a link to the live trade page.
+5. **Trade management:** stop/target changes, partial fills, partial exits, trailing-stop changes and any safety intervention, with old and new values and reason.
+6. **Trade closed:** exit reason, average exit price, quantity, gross and net P&L after known commissions/fees, points, R-multiple, holding time, and whether the outcome was win/loss/breakeven. Mark estimates where final fees or fills are not yet confirmed.
+7. **Operational warnings:** stale data, broker disconnect/reconnect, unconfirmed protection, order/position mismatch, Guardian block, daily risk limit and bot stopped/paused.
+
+### Website linking and presentation
+- Every alert should deep-link to the matching bot, signal, order or trade journal page in Quint after authentication.
+- The website should show delivery status and let the owner configure providers, destination, event types, quiet hours and per-bot notification preferences.
+- Include a test-message action and clear connection health / last successful delivery.
+- Alerts should be concise on mobile, with a detailed trade page for charts, reasoning and full execution history.
+
+### Delivery, security and reliability
+- Use authenticated Discord and Telegram integrations with secrets stored locally/server-side in protected configuration; never put tokens, webhook URLs, API keys or account credentials in source control, browser code or alert text.
+- Queue events, retry transient delivery failures with bounded backoff, deduplicate by event ID, preserve event order where possible and log delivery outcomes. A notification failure must never affect order management or risk controls.
+- Use least-privilege bot permissions and a private destination by default. Do not expose account numbers, personal details or credentials.
+- Chat messages are notifications and discussion only. No placing, modifying or cancelling trades from Discord/Telegram in the first release. Any future remote controls require a separate security design, explicit owner authentication, confirmation and one-time authorisation, and must still pass the Guardian and single OrderRouter.
+- The dashboard and chat notifications must use the same canonical event records so they cannot report different trade states.
+
+### Implementation stages
+1. Build a provider-neutral notification/event service and test it locally with simulated events.
+2. Add Discord delivery first (private channel) and a website connection/test flow.
+3. Add Telegram delivery using a bot and private chat/group setup.
+4. Test duplicate events, retries, invalid tokens, provider outage, restart recovery and event ordering; verify that trading and Guardian operation are unaffected.
+
 ## Quint, the built-in assistant
 
 A glowing Quint button sits in the corner of every screen. Tap it and a chat panel slides up where Quint answers questions about trading, your strategies and the website itself, and can highlight the exact button you need.
