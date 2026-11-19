@@ -18,34 +18,44 @@
   },
   "strategies": [
     {
-      "id": "six-step-trading-mastery",
-      "name": "Six-step model (Trading Mastery): regime, liquidity, sequence, location, confirmation, execution",
-      "horizon": "Intraday",
-      "timeframe": "5m",
-      "market": "MNQ",
-      "rules": "HTF sweep, rejection within 3 candles, CISD, displacement gap, pullback limit entry, continuation. TP1 1R, TP2 the nearest HTF pool at least 2R away, TP3 the next pool or 3R.",
-      "source": "The owner's Trading Mastery app and its MNQ Intelligence Layer plan, on claude.ai.",
-      "status": "In-sample",
-      "runner": null,
-      "frozenAt": null,
-      "verdict": "Lives in Trading Mastery, whose Backtest lab tests it on real 5-minute candles (first 70% to tune, last 30% unseen) and whose Jarvis dream run audits it every weeknight. Quint HQ shows that report; the lab here doesn't re-run it.",
-      "evidence": [],
-      "next": "Read the dream report's unseen-week verdict nightly (HQ sync)."
-    },
-    {
-      "id": "four-pillars-wyld",
-      "name": "Four Pillars (WYLD | Will): sweep, HTF level holds, PDR bias, 1m confirmation",
+      "id": "wyld-four-pillars",
+      "name": "Your strategy: WYLD Will Four Pillars",
       "horizon": "Scalping",
       "timeframe": "1m entries, 15m liquidity, monthly to daily levels",
       "market": "MNQ",
-      "rules": "Liquidity sweep of a 15m pool marked pre-market, then a higher-timeframe level holds, then bias from Point A to Point B (the PDR), then a 1-minute confirmation is the entry. Tight stop beyond the wick, fast break-even, Target 1 Point B, Target 2 the opposing liquidity. First 2 to 3 hours after the New York open only. Full rules: lab/brain/playbooks.json.",
-      "source": "The owner's WYLD Will System rulebook (10 public videos) and Four Pillars Trainer, both on claude.ai.",
-      "status": "Specified",
+      "rules": "WYLD Will's four pillars, in order. 1 Liquidity sweep of a 15m pool marked before the open. 2 Price trades into a higher-timeframe level and shows it holds. 3 PDR bias: from Point A (the level that held) to Point B (the next HTF level). 4 A 1-minute confirmation is the entry. Tight stop beyond the wick, break-even fast, Target 1 Point B, Target 2 the opposing liquidity. While the PDR is active each new confirmation is a fresh entry. First 2 to 3 hours after the New York open only. Full checklist: lab/brain/playbooks.json.",
+      "source": "The owner's own strategy, from WYLD Will's videos: the WYLD Will System rulebook and the Four Pillars Trainer (claude.ai). The master version. Never remove it.",
+      "status": "Implemented",
       "runner": null,
       "frozenAt": null,
-      "verdict": "The owner's main discretionary playbook. Not backtested: several rules aren't objective yet (what counts as the easiest equal highs and lows, the stop buffer, the break-even trigger, entries per stage). His results are his own claims.",
-      "evidence": [],
-      "next": "Queue item four-pillars-objective-rules, then a mechanical version for the lab."
+      "versions": [
+        {
+          "name": "Master: WYLD Will Four Pillars",
+          "where": "WYLD Will System rulebook and Four Pillars Trainer (claude.ai)",
+          "note": "The rules everything else follows."
+        },
+        {
+          "name": "Older coding: six steps",
+          "where": "Trading Mastery (claude.ai)",
+          "note": "Differs from WYLD: requires displacement, takes one pullback entry, adds a regime filter. Tested in its Backtest lab and the Jarvis dream run."
+        },
+        {
+          "name": "Older coding: 5 pillars",
+          "where": "Chart Wizard, pbEval in chart-wizard/src/pillars.js",
+          "note": "Differs from WYLD: requires displacement and 1.5R of room. 0 trades in 4 weeks."
+        }
+      ],
+      "verdict": "Your main strategy, and WYLD Will's rules are the master. Not backtested as WYLD states it yet: a few rules aren't exact (the easiest equal highs and lows, the stop buffer, the break-even trigger, entries per PDR). The two coded versions in your apps are older and stricter than WYLD (Chart Wizard's took 0 trades in 4 weeks), so they should be brought in line with WYLD's rules. His results are his own claims.",
+      "evidence": [
+        {
+          "date": "2026-11-18",
+          "where": "backtest/results/REPORT.md and pillar_funnel.json (branch backtest-results)",
+          "data": "MNQ 5m, 21 Oct to 17 Nov 2026",
+          "trades": 0,
+          "note": "Chart Wizard version. 478 candles at pillar 1, 382 swept, 250 CISD, 106 displaced, 6 confirmed pullbacks, 0 with 1.5R of room."
+        }
+      ],
+      "next": "Queue item wyld-exact-rules, then code WYLD's rules once and line the app versions up with them."
     },
     {
       "id": "app-20-candle-breakout",
@@ -98,29 +108,6 @@
         }
       ],
       "next": "Years of data in NinjaTrader before any decision."
-    },
-    {
-      "id": "app-5-pillar",
-      "name": "5-pillar playbook (the owner's own)",
-      "horizon": "Intraday",
-      "timeframe": "5m",
-      "market": "MNQ",
-      "rules": "Location, liquidity sweep, CISD, displacement, then a confirmed pullback entry, in the New York session. Engine: pbEval in chart-wizard/src/pillars.js.",
-      "source": "The owner. Never remove it.",
-      "status": "Implemented",
-      "runner": null,
-      "frozenAt": null,
-      "verdict": "Took no trades in 4 weeks. Setups reach the last step 6 times, then the 'room for 1.5R to the target' filter rejects every one.",
-      "evidence": [
-        {
-          "date": "2026-11-18",
-          "where": "backtest/results/REPORT.md and pillar_funnel.json (branch backtest-results)",
-          "data": "MNQ 5m, 21 Oct to 17 Nov 2026",
-          "trades": 0,
-          "note": "478 candles at pillar 1, 382 swept, 250 CISD, 106 displaced, 6 confirmed pullbacks, 0 with 1.5R of room."
-        }
-      ],
-      "next": "Pre-registered test: a fixed 2R target instead of 'the other side of the range' (REPORT.md, next test 2). More 5-minute data from the nightly refresh."
     },
     {
       "id": "botlab-2",
@@ -495,7 +482,7 @@
     },
     {
       "id": "pillar-2r",
-      "what": "5-pillar playbook with a fixed 2R target instead of 'the other side of the range' (REPORT.md next test 2).",
+      "what": "Chart Wizard's older coding of your strategy with a fixed 2R target instead of 'the other side of the range' (REPORT.md next test 2), to see if the room filter is what blocks it. Lower priority than wyld-exact-rules.",
       "cost": "None (saved candles)",
       "auto": true
     },
@@ -512,13 +499,17 @@
       "auto": false
     },
     {
-      "id": "four-pillars-objective-rules",
-      "what": "Write the Four Pillars as exact rules a computer can test: what counts as the easiest equal highs and lows on the 15m, how a level shows it holds, the stop buffer in ticks, the break-even trigger, and the cap on entries per PDR. The owner answers these in Quint HQ (Lab, Ideas) or in chat; nothing is tested until they're fixed.",
+      "id": "wyld-exact-rules",
+      "what": "Write WYLD Will's Four Pillars as exact rules a computer can test, following his videos: what counts as the easiest equal highs and lows on the 15m, how a level shows it holds, the stop buffer in ticks, the break-even trigger, and the cap on entries per PDR. You answer the gaps in Quint HQ or in chat. Then the Trading Mastery and Chart Wizard versions get lined up with these rules. Nothing is backtested until the rules are fixed.",
       "cost": "None",
       "auto": false
     }
   ],
   "lessons": [
+    {
+      "date": "2026-11-19",
+      "lesson": "The owner's strategy is WYLD Will's Four Pillars, the master version. Trading Mastery's six steps and Chart Wizard's 5 pillars are older codings of it, not separate strategies. Keep one entry and one checklist."
+    },
     {
       "date": "2026-11-19",
       "lesson": "The QQQ crypto stand-in on TraderDev flatters strategies. RSI(2) all-weather looked like about +$10,000 on 1 MNQ there and lost $2,345 on real MNQ (different months, so not a perfect comparison). Use the stand-in for quick ideas only; judge on real MNQ."

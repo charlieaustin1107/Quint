@@ -13,7 +13,7 @@ This is the master prompt for building Quint HQ. Give it to any Claude session t
 ## Who it's for
 - One trader, UK-based, trading MNQ (Micro Nasdaq futures, $2 a point) on Lucid Trading prop accounts. Scalps and day trades in the New York morning (14:30 UK).
 - Works from an iPhone. Not a programmer. Plain English always, with UK and New York times side by side.
-- Their own systems come first: the **Four Pillars** (WYLD | Will), their **six-step model** in Trading Mastery, and the **5-pillar playbook** in Chart Wizard.
+- Their own strategy comes first: **WYLD Will's Four Pillars** (sweep → HTF level holds → PDR bias → 1m confirmation). It's one strategy and WYLD's rules are the master. Trading Mastery's six steps and Chart Wizard's 5 pillars are older codings of it, never separate strategies.
 - The long game: automated bots, copy trading across prop accounts, more prop firms, and later other businesses ("ventures") on the same platform.
 
 ## The five principles (never break these)
@@ -28,7 +28,7 @@ This is the master prompt for building Quint HQ. Give it to any Claude session t
 |---|---|---|
 | Quint Lab (this repo) | Bot scoreboard, Lucid pass/fail odds, paper forward test, research memory, lessons, queue | Built into the page each night |
 | Trading Mastery (the owner's app) | NinjaTrader bot P&L by account type, last night's Jarvis dream report, the owner's pinned rules | The HQ sync job reads its database read-only each night and writes a private summary into the hub's storage |
-| Four Pillars Trainer and WYLD rulebook | The playbook the Desk walks through before every trade | `lab/brain/playbooks.json` |
+| WYLD Will rulebook and Four Pillars Trainer | The owner's strategy: the one checklist the Desk walks through before every trade | `lab/brain/playbooks.json` |
 | TradingView | Candles for the lab; the week's red-folder news; an on-demand MNQ price check | Nightly job (1 to 2 calls); the price check only on the owner's tap |
 | TraderDev | Live signal counts, saved strategies, credits | On demand from the Lab tab |
 | Claude Code (cloud) | The nightly lab run and HQ sync | Run now, pause and resume buttons |
@@ -41,23 +41,23 @@ This is the master prompt for building Quint HQ. Give it to any Claude session t
 - Session clock: UK and New York time, what part of the day it is, a countdown to the owner's trading window (the first 3 hours after the New York open) and to its end.
 - News: the next red-folder release and Lucid's blackout around it (flat from 1 minute before to 1 minute after on a funded LucidDaily account; Quint uses 2 minutes either side).
 - Money: real bots (from Trading Mastery), the owner's own trades (journal), the paper forward test, and prop room left on the tightest account.
-- The pre-market checklist from the active playbook, ticked off each day.
+- The Four Pillars pre-market checklist, ticked off each day.
 - Warnings, and what the lab did overnight.
 
 **2. Ask** (Jarvis)
 - Voice or text. Quint answers in 2 to 5 short sentences that read well aloud, and speaks them.
-- Quint uses tools to look things up, never guesses: the overview, bots, a strategy's evidence, a playbook, the prop accounts, the journal, sizing a trade, last night's Jarvis report, and adding an idea to the lab.
+- Quint uses tools to look things up, never guesses: the overview, bots, a strategy's evidence, the Four Pillars rules, the prop accounts, the journal, sizing a trade, last night's Jarvis report, and adding an idea to the lab.
 - Quint never tells the owner to take a trade, never calls a strategy profitable, and says when data is thin.
 
 **3. Desk** (before, during and after a trade)
-- **Pre-trade check:** the active playbook's pillars in order, the no-trade rules, the trading window and the news blackout, then a verdict: all clear, wait, or no trade.
+- **Pre-trade check:** the four pillars in order, the no-trade rules, the trading window and the news blackout, then a verdict: all clear, wait, or no trade.
 - **Size it:** entry, stop and target give R, and the selected account's room gives contracts (a full stop-out under a quarter of the room left), the dollar risk, and what a stop-out leaves.
 - **Prop accounts:** each account's balance, floor, room left, distance to target, daily loss limit and consistency, with the Lucid presets filled in and every number editable.
 - **Journal:** log trades in seconds, see P&L by day, week and playbook, and export to CSV.
 
 **4. Lab** (the brain getting smarter)
 - The scoreboard with equity curves, grades, the Lucid pass/fail odds and the paper forward test.
-- The strategy library grouped by holding time, with honest statuses, including the owner's own systems.
+- The strategy library grouped by holding time, with honest statuses, with the owner's strategy (WYLD Will Four Pillars) at the top.
 - **Ideas inbox:** the owner speaks an idea; the nightly run writes its exact rules and pass mark down before testing it, tests it, and reports back here.
 - Lessons learned and the experiment queue. TraderDev live numbers on demand.
 

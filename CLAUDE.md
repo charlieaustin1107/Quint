@@ -63,6 +63,7 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 - Nothing here is financial advice. Chart Wizard, Quint Brain and Quint never place orders. **Only the Quint Engine (`quint-control/`) places orders, and every bot needs the owner's confirm before it trades a live account. Simulation first is recommended, not required.** The guardian's firm rules and kill switches can never be skipped.
 
 ## Quint Lab
+- **The owner's strategy is WYLD Will's Four Pillars** (sweep → HTF level holds → PDR bias → 1m confirmation), the master version, in `lab/brain/playbooks.json` and the registry entry `wyld-four-pillars`. Trading Mastery's six steps and Chart Wizard's 5-pillar playbook are older codings of this one strategy, not separate strategies: bring them in line with WYLD's rules, and never remove them.
 - **Read `lab/brain/registry.json` before any strategy work, and update it after.** It's Quint's memory: every strategy tried, its status and evidence, the lessons, and the queue of pre-registered experiments. Add a dated entry to `lab/brain/journal.md` each session.
 - Run with `cd lab && npm run lab`; test with `npm run test:3`. Quint HQ is built from `lab/jarvis/template.html` by `lab/jarvis/build.js`; never hand-edit its `index.html`.
 - Write an idea's exact rules and pass mark into the queue **before** testing it. Never promote anything on TraderDev's QQQ stand-in alone, and never call a strategy profitable in the roundup.

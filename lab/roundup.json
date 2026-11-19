@@ -3,13 +3,13 @@
  "dataTo": "2026-11-18",
  "headline": "Nothing live yet. Paper forward test running.",
  "spoken": [
-  "Afternoon. Here's your Quint roundup for Thursday 19 November.",
+  "Evening. Here's your Quint roundup for Thursday 19 November.",
   "Real money: no bot is trading a real or prop account yet, so nothing has been made or lost.",
   "Paper forward test: nine bots are on paper since Wednesday 18 November. No trades yet, because no new candles have come in since their rules were fixed.",
   "Best backtest so far: the 20-candle breakout, $3,711 over 40 trades on one MNQ. That is too few trades to trust yet.",
   "No strategy has earned approval yet. That needs years of data and a clean paper test.",
   "Warning: four bots would likely fail a Lucid 50K before passing: New York open breakout, Opening candle direction (5-minute opening range), Last-30-minute momentum, Failed breakout.",
-  "Latest lesson: The QQQ crypto stand-in on TraderDev flatters strategies.",
+  "Latest lesson: your strategy is WYLD Will's Four Pillars, the master version.",
   "Next up: Grow the MNQ candle store every night: the newest 5-minute and 15-minute candles from TradingView (2 calls a night), merged into lab/data."
  ],
  "realMoney": {
@@ -233,6 +233,13 @@
  ],
  "strategies": [
   {
+   "name": "Your strategy: WYLD Will Four Pillars",
+   "status": "Implemented",
+   "horizon": "Scalping",
+   "timeframe": "1m entries, 15m liquidity, monthly to daily levels",
+   "verdict": "Your main strategy, and WYLD Will's rules are the master. Not backtested as WYLD states it yet: a few rules aren't exact (the easiest equal highs and lows, the stop buffer, the break-even trigger, entries per PDR). The two coded versions in your apps are older and stricter than WYLD (Chart Wizard's took 0 trades in 4 weeks), so they should be brought in line with WYLD's rules. His results are his own claims."
+  },
+  {
    "name": "20-candle breakout",
    "status": "In-sample",
    "horizon": "Intraday",
@@ -245,13 +252,6 @@
    "horizon": "Intraday",
    "timeframe": "15m",
    "verdict": "Just over break-even, and only because of one big day. Without that day it lost money. The weakest case for staying in the app."
-  },
-  {
-   "name": "5-pillar playbook (the owner's own)",
-   "status": "Implemented",
-   "horizon": "Intraday",
-   "timeframe": "5m",
-   "verdict": "Took no trades in 4 weeks. Setups reach the last step 6 times, then the 'room for 1.5R to the target' filter rejects every one."
   },
   {
    "name": "Opening candle direction (5-minute opening range)",
@@ -388,12 +388,16 @@
   }
  ],
  "statusCount": {
-  "In-sample": 13,
   "Implemented": 4,
+  "In-sample": 13,
   "Rejected": 3,
   "Idea": 2
  },
  "lessons": [
+  {
+   "date": "2026-11-19",
+   "lesson": "The owner's strategy is WYLD Will's Four Pillars, the master version. Trading Mastery's six steps and Chart Wizard's 5 pillars are older codings of it, not separate strategies. Keep one entry and one checklist."
+  },
   {
    "date": "2026-11-19",
    "lesson": "The QQQ crypto stand-in on TraderDev flatters strategies. RSI(2) all-weather looked like about +$10,000 on 1 MNQ there and lost $2,345 on real MNQ (different months, so not a perfect comparison). Use the stand-in for quick ideas only; judge on real MNQ."
@@ -401,10 +405,6 @@
   {
    "date": "2026-11-19",
    "lesson": "TraderDev forces 0.05% commission a side and 100%-of-equity sizing whatever the script says, 20 to 30 times MNQ's real costs, so its dollar figures are not MNQ dollars. Convert, or re-test elsewhere."
-  },
-  {
-   "date": "2026-11-19",
-   "lesson": "Most TraderDev edges came from the overnight hours, when the stand-in market is thin. The regular-hours versions mostly lost. An edge that only exists in thin hours is a warning sign."
   }
  ],
  "next": [

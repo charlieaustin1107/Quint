@@ -1,15 +1,24 @@
 {
-  "about": "The owner's own trading playbooks, as checklists Quint HQ's Desk walks through before a trade and Ask Quint reads. Rules are written as the sources state them. None of these is backtested yet as written here; statuses live in registry.json. Nothing here is financial advice.",
-  "default": "four-pillars",
+  "about": "The owner's strategy: WYLD Will's Four Pillars, the master version. Quint HQ's Desk walks through this checklist before a trade and Ask Quint reads it. Rules are written as WYLD Will states them in his videos. Trading Mastery's six steps and Chart Wizard's 5 pillars are older codings of this same strategy, not separate ones. Not backtested as written yet; the status lives in registry.json (wyld-four-pillars). Nothing here is financial advice.",
+  "default": "wyld-four-pillars",
   "playbooks": [
     {
-      "id": "four-pillars",
-      "name": "Four Pillars (WYLD | Will)",
+      "id": "wyld-four-pillars",
+      "name": "WYLD Will Four Pillars",
       "short": "Sweep → HTF level holds → PDR bias → 1m confirmation",
-      "status": "Specified · not yet backtested",
+      "status": "Your strategy · not yet backtested as written",
       "sources": [
         { "name": "WYLD Will System — Trading Rulebook", "url": "https://claude.ai/artifact/KF6hmvDJWm3cPFbgxi3CKy" },
         { "name": "Four Pillars Trainer", "url": "https://claude.ai/artifact/SuUYodEDjKUqrdTAMBFWF1" }
+      ],
+      "codedVersions": [
+        { "name": "Trading Mastery's six steps", "url": "https://claude.ai/artifact/4AhyMBBvRs9j4P3LKEmhnZ", "differs": "Requires displacement, takes one pullback entry, adds a regime filter." },
+        { "name": "Chart Wizard's 5 pillars", "url": "https://github.com/charlieaustin1107/Quint/blob/main/chart-wizard/src/pillars.js", "differs": "Requires displacement and 1.5R of room; took 0 trades in 4 weeks." }
+      ],
+      "philosophy": [
+        "Many cheap, tight-stop attempts and a few large winners, not a high win rate.",
+        "Bias is immediate: the next move between two levels. Daily and weekly bias are left out.",
+        "Order matters more than location: the pillars must happen in sequence."
       ],
       "window": { "startNY": "09:30", "hours": 3, "note": "Only the first 2 to 3 hours after the New York open (14:30 UK). Nothing after." },
       "premarket": [
@@ -57,62 +66,8 @@
         "His figures (about 70% break-even, 20% wins, 10% losses, 60R a month) are his own claims, not verified results.",
         "Lucid flags an account when over half its profit comes from trades held 5 seconds or less. Hold winners well past that.",
         "He never sets size, risk per trade or a daily loss limit. Use the Desk's sizing: a full stop-out under a quarter of the room left.",
-        "Not backtestable yet: 'easiest equal highs and lows', the stop buffer and the break-even trigger aren't defined objectively."
+        "Not backtestable yet: 'easiest equal highs and lows', the stop buffer and the break-even trigger aren't defined exactly (lab queue: wyld-exact-rules)."
       ]
-    },
-    {
-      "id": "six-step",
-      "name": "Six-step model (Trading Mastery)",
-      "short": "Regime → Liquidity → Sequence → Location → Confirmation → Execution",
-      "status": "Implemented in Trading Mastery · audited nightly by the Jarvis dream run",
-      "sources": [
-        { "name": "Trading Mastery", "url": "https://claude.ai/artifact/4AhyMBBvRs9j4P3LKEmhnZ" },
-        { "name": "MNQ Intelligence Layer — Audit & Plan", "url": "https://claude.ai/artifact/GPiurQUfktf67uXxV55Wwa" }
-      ],
-      "window": { "startNY": "09:30", "hours": 4, "note": "Setups expire if not filled within 4 hours, or when the session ends." },
-      "premarket": [
-        "Check the regime and the 1H trend before the open.",
-        "Mark the HTF liquidity pools, prior day high and low, and session levels.",
-        "Check red-folder news times."
-      ],
-      "checklist": [
-        { "id": "regime", "name": "Regime", "check": "Which of the five price regimes is it, and is the setup with or against the 1H trend?" },
-        { "id": "sweep", "name": "Liquidity: HTF sweep", "check": "HTF liquidity swept or an HTF point of interest touched (WATCHING)." },
-        { "id": "reject", "name": "Rejection", "check": "A close back inside within 3 candles (FORMING)." },
-        { "id": "cisd", "name": "CISD", "check": "The change in state of delivery closes (ARMED)." },
-        { "id": "disp", "name": "Displacement", "check": "A displacement gap forms: entry, stop and targets are final (CONFIRMED)." },
-        { "id": "pullback", "name": "Pullback entry", "check": "The pullback fills the limit entry (ACTIVE). Invalid if price closes back through the sweep extreme first." }
-      ],
-      "management": [
-        "TP1 1R. TP2 the model's target: the nearest HTF pool at least 2R away, otherwise 2R. TP3 the next HTF pool, otherwise 3R.",
-        "Strength (0 to 100) is a confluence score, never a probability."
-      ],
-      "noTrade": [
-        "A close back through the sweep extreme before entry (INVALIDATED).",
-        "Not filled within 4 hours, or the session ended (EXPIRED)."
-      ],
-      "cautions": [
-        "Early probabilities rest on a few weeks of 5-minute data, so they're labelled LIMITED DATA until the ledger grows."
-      ]
-    },
-    {
-      "id": "five-pillar",
-      "name": "5-pillar playbook (Chart Wizard)",
-      "short": "Location → Sweep → CISD → Displacement → Execution",
-      "status": "Implemented · 0 trades in 4 weeks (the 1.5R room filter blocks every setup)",
-      "sources": [ { "name": "Quint repo: chart-wizard/src/pillars.js", "url": "https://github.com/charlieaustin1107/Quint/blob/main/chart-wizard/src/pillars.js" } ],
-      "window": { "startNY": "09:30", "hours": 6.5, "note": "New York session, 5-minute chart." },
-      "premarket": [ "Mark the daily levels and the range before the sweep." ],
-      "checklist": [
-        { "id": "loc", "name": "Location", "check": "Price is at a level that matters on the daily." },
-        { "id": "sweep", "name": "Liquidity sweep", "check": "A swing high or low is taken." },
-        { "id": "cisd", "name": "CISD", "check": "The change in state of delivery prints." },
-        { "id": "disp", "name": "Displacement", "check": "A strong candle away from the sweep." },
-        { "id": "exec", "name": "Execution", "check": "A confirmed pullback entry with at least 1.5R of room to the target." }
-      ],
-      "management": [ "Stop beyond the sweep; target the other side of the range before the sweep." ],
-      "noTrade": [ "Stop size outside 0.3 to 5 ATR, or less than 1.5R of room to the target." ],
-      "cautions": [ "Next test: a fixed 2R target instead of the range target (queued in the lab)." ]
     }
   ]
 }
