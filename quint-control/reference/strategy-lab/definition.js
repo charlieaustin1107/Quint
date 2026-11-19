@@ -32,6 +32,14 @@ function validateExpression(node, errors, path='$', depth=0, count={value:0}) {
   if (depth > MAX_DEPTH) { errors.push(path+': expression exceeds maximum depth '+MAX_DEPTH); return; }
   if (!obj(node) || typeof node.op !== 'string' || !OPS.has(node.op)) { errors.push(path+': unsupported expression node'); return; }
   const child = (v,s) => validateExpression(v,errors,path+s,depth+1,count);
+  if (node.op === 'const') {
+    if (!(typeof node.value === 'boolean' || finite(node.value) || typeof node.value === 'string')) errors.push(path+': invalid constant');
+    return;
+  }
+  if (node.op === 'var') {
+    if (typeof node.name !== 'string' || !SAFE_NAME.test(node.name) || ['__proto__','prototype','constructor'].includes(node.name)) errors.push(path+': invalid variable name');
+    return;
+  }
   if (node.op === 'and' || node.op === 'or') {
     if (!Array.isArray(node.args) || node.args.length < 2 || node.args.length > 16) errors.push(path+': '+node.op+' requires 2–16 arguments');
     else node.args.forEach((x,i)=>child(x,'.args['+i+']'));
