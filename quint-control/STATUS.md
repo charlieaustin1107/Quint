@@ -62,6 +62,23 @@ Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ co
 - YouTube pages can't be read from the cloud workspace (rate limited). Ask the owner for titles, screenshots or transcripts.
 - Lucid's microscalping rule (help center, updated 26 Aug 2026): flagged when more than 50% of profits come from trades held 5 seconds or less. The guardian's 30-second minimum hold is stricter than this, on purpose.
 
+
+## Strategy Lab Phase 3A implementation (feature branch)
+
+Branch: `quint-control/strategy-lab-phase-3a`. This is a first vertical slice and prototype, not a completed engine integration.
+
+- [x] Pure JavaScript domain module: create MNQ paper drafts, validate definitions and manual paper scenarios.
+- [x] Bounded allow-listed expression evaluator; no eval, generated source execution, network or broker access.
+- [x] JSON schemas for Strategy Definition v1 and Manual Paper Scenario v1.
+- [x] Standalone mobile-friendly browser prototype: create bot drafts, create one-off paper scenarios, local library and JSON export.
+- [x] Unit and UI contract tests authored; CI workflow added to run the suite and three consecutive runs.
+- [ ] Verify CI passes; fix any failures before considering this slice mergeable.
+- [ ] Add server-side Claude interpreter that converts natural-language descriptions into a proposed definition, asks for missing fields and requires user review.
+- [ ] Integrate with the phase 1 website shell and phase 2 engine protocol.
+- [ ] Add persistent strategy storage, historical test runner, NinjaTrader Playback and live-feed paper ledger in subsequent stages.
+
+**Safety / current limitations:** the browser prototype saves only in localStorage and exports JSON. It does not interpret free text, connect to market data, backtest, replay, simulate fills, or connect to the engine. Paper scenario records are plans only, not running orders. Live trading is not implemented here. Phases 1 and 2 remain prerequisites for the actual integrated product.
+
 ## Session log
 
 | 2026-11-19 | ChatGPT | Owner requested Discord and/or Telegram alerts linked to the Quint website for detected setups, entries/fills, stop/target updates and completed trade results. Added provider-neutral notification design, event lifecycle, website deep links, delivery reliability and security requirements to PLAN.md on main. |
