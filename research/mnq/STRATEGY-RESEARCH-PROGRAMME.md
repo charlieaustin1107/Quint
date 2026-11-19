@@ -4,6 +4,7 @@ Status: Research only — no strategy approved for live trading
 Owner: Quint project
 Branch: research/mnq-strategy-programme
 Created: 2026-11-19
+Priority decision: Research all horizons equally; support both automated and signal-assisted/manual-approval modes.
 
 ## Objective
 
@@ -12,7 +13,28 @@ Build a repeatable, evidence-led research pipeline for Micro E-mini Nasdaq-100 (
 - Intraday: minutes to hours; flatten before the session cutoff where required by the account.
 - Swing/position: overnight to multi-day or multi-week holds; must model overnight gaps, margin, funding/broker requirements, contract rolls, and prop-firm restrictions. Monthly is a research horizon, not a promise of suitability for a funded intraday account.
 
+All strategy families and holding horizons have equal research priority at the discovery stage. No horizon is assumed superior in advance. Rank candidates later using comparable evidence: net expectancy after costs, robustness, drawdown, sample size, operational complexity and account compatibility.
+
+Quint must support two distinct operating modes:
+1. **Automated mode:** the strategy can generate and manage orders automatically, subject to the same Guardian, risk limits, account eligibility checks and explicit live-mode authorisation.
+2. **Signal-assisted mode:** the strategy generates entries, exits, risk levels and rationale for the user to review; orders are not sent until the user explicitly approves them. Manual approval must not bypass Guardian checks.
+
+A strategy may be eligible for one mode and not the other. A multi-day strategy, for example, may be useful for research and alerts but incompatible with a particular intraday funded account's overnight restrictions.
+
 No strategy is called profitable until it passes preregistered out-of-sample tests after all costs and survives forward simulation.
+
+## Research priority framework
+
+Research the following tracks in parallel, using a rotating experiment schedule so no single style dominates simply because its data is easier to obtain:
+
+| Track | Horizons | Initial candidates | Special requirements |
+|---|---|---|---|
+| Scalping | Seconds to minutes | VWAP deviation, liquidity sweep/retest, opening microstructure, short-term momentum | Tick/trade and bid/ask data; fill/queue modelling |
+| Intraday | Minutes to hours | ORB, overnight range/gap, VWAP reclaim/rejection, trend pullback | Session/DST correctness; intraday account rules |
+| Swing | Days to weeks | Daily trend, weekly breakout, multi-day pullback | Overnight gaps, margin and roll modelling |
+| Monthly/position | Weeks to months | Long-horizon trend and regime filters | Contract rolls, drawdown duration, capital/margin and overnight eligibility |
+
+Do not select a "winner" by comparing raw profit across different holding periods or datasets. Use horizon-appropriate metrics and report risk, exposure and capital requirements.
 
 ## Initial evidence and implications
 
@@ -74,6 +96,12 @@ Interpretation: these are exploratory results, not evidence of robust profitabil
 
 - Strategy logic must be pure/deterministic and separated from NinjaTrader, Tradovate, UI and broker adapters.
 - One canonical signal definition must be shared by research, backtest and live engine. Create golden test cases to prove Python/JS/C# parity where applicable.
+- Each strategy should expose a common interface for: market-data requirements, signal generation, proposed entry/stop/target, time stop, sizing constraints, invalidation, session eligibility and explanation.
+- The same strategy engine must support two modes:
+  - **Signal-assisted:** publish a proposed trade with entry/stop/target, risk in dollars, setup rationale, invalidation and expiry. Require explicit user approval before order submission.
+  - **Automated:** permit the engine to submit/manage orders only after account eligibility, strategy status, risk checks and explicit live authorisation pass.
+- Keep mode selection visible per bot and per account. Never let a strategy silently switch from signal-assisted to automated mode.
+- Both modes use the same Guardian and single OrderRouter. Manual approval is an additional gate, never a risk-control bypass.
 - Use event-driven order state: Submitted → Accepted → Working → PartFilled → Filled / CancelPending → Cancelled / Rejected. Reconcile broker state after reconnect; never assume a request succeeded.
 - Enforce single order gateway and Guardian checks for every order, modify, cancel and flatten. No direct bypasses.
 - Hard controls: max contracts, max daily loss, max trailing drawdown buffer, max trades/orders per minute, max consecutive losses, max position time, session/news blocks, duplicate-signal protection, stale-data detection, disconnect kill switch and manual flatten.
@@ -82,14 +110,19 @@ Interpretation: these are exploratory results, not evidence of robust profitabil
 - Include fault-injection tests for disconnects, stale quotes, partial fills, rejected orders, duplicate events, delayed acknowledgements and restart/reconciliation.
 - Do not modify Quint Control's Guardian, order router or live execution path as part of strategy research without a separate reviewed change.
 
-## First experiment queue (priority order)
+## First experiment queue (balanced across horizons)
 
-1. Reproduce the existing breakout results on the same data and fees; add per-year, per-regime, long/short, best-day and top-1%-trade concentration analysis.
-2. Re-run ORB 5/15/30-minute variants with a preregistered small parameter grid and walk-forward holdouts.
-3. Inspect the six near-miss five-pillar setups; diagnose whether the target-room filter is structurally too restrictive. Do not loosen it without a written hypothesis and separate test.
-4. Build a VWAP rotation-vs-trend classifier and compare fade/reclaim variants after cost stress.
-5. Start daily swing baseline tests (20/50/100-day trend and weekly breakout) to establish whether longer horizons survive costs and overnight risk.
-6. Establish a common cost configuration and source of truth. Existing project notes have referenced different commission/slippage assumptions; reconcile actual Lucid/Tradovate/NinjaTrader costs before comparing strategies.
+Run these as a portfolio of research tracks, not a claim that all can be implemented simultaneously. Rotate between tracks and prioritise shared infrastructure when it unlocks multiple experiments.
+
+1. **Common research foundation:** audit existing MNQ datasets, contract rolls, session/DST handling and the true fee/slippage schedule. Define common result schemas so horizons can be compared honestly.
+2. **Scalping baseline:** assess availability of tick and bid/ask data; if unavailable, document the limitation and do not make fill-accurate claims from OHLC bars.
+3. **Intraday baseline:** reproduce existing breakout results on the same data and fees; add per-year, per-regime, long/short, best-day and top-1%-trade concentration analysis.
+4. **Swing/monthly baseline:** test daily 20/50/100-day trend and prior-week breakout with overnight gap, roll and margin assumptions.
+5. **ORB variants:** re-run 5/15/30-minute opening ranges with a preregistered small parameter grid and walk-forward holdouts.
+6. **Liquidity playbook:** inspect the six near-miss five-pillar setups; diagnose whether target-room filtering is structurally too restrictive. Do not loosen it without a written hypothesis and separate test.
+7. **VWAP family:** build a rotation-vs-trend classifier and compare fade/reclaim variants after cost stress.
+8. **Mode parity:** design one signal contract that can power both signal-assisted recommendations and automated execution; test that both modes produce identical strategy signals and risk calculations before order-routing differences.
+9. **Cost source of truth:** reconcile actual Lucid/Tradovate/NinjaTrader commissions, exchange fees and slippage assumptions before comparing results.
 
 ## Claude handoff protocol
 
@@ -99,15 +132,16 @@ Claude is the implementation partner when the user runs Claude Code/Fable with r
 
 Read `CLAUDE.md`, `quint-control/CLAUDE.md` if present, this research programme and all relevant backtest reports before editing. Act as a skeptical quantitative researcher and senior trading-systems engineer.
 
-1. Identify the next highest-value experiment from the queue; do not repeat a completed experiment.
+1. Identify the next highest-value experiment from the balanced queue; rotate across scalping, intraday and swing/monthly tracks and avoid repeating completed work.
 2. State the hypothesis, exact signal/entry/exit rules, timeframe, session, data granularity, cost assumptions and preregistered parameter grid before coding.
 3. Audit data integrity, DST, contract rolls, lookahead, repainting, intrabar fill ambiguity and account-rule compatibility.
-4. Implement only in a separate research branch. Keep strategy research isolated from Quint Control's Guardian, order router and live execution.
-5. Add deterministic unit tests, golden examples and machine-readable trade/event logs. Run the full relevant test suite three times; report exact commands and results. Never claim a test was run if it was not.
-6. Evaluate chronologically with walk-forward and untouched holdout data; include cost stress, long/short, year/regime, best-day removal, parameter stability, ablations and confidence intervals.
-7. If results fail, document the negative result and why. Do not tune repeatedly against the holdout.
-8. Return: plain-English findings, metrics table, data limitations, changed files, test results, risks, and a small reviewable PR. Never merge to main or enable live trading.
-9. Save the next handoff note in `research/mnq/DAILY-LOG.md` and update the experiment registry only when evidence supports the change.
+4. Where relevant, define how the strategy supports both signal-assisted and automated modes. The signal, proposed risk and invalidation logic must be shared; automated order submission must have additional explicit authorisation and Guardian checks.
+5. Implement only in a separate research branch. Keep strategy research isolated from Quint Control's Guardian, order router and live execution.
+6. Add deterministic unit tests, golden examples and machine-readable trade/event logs. Run the full relevant test suite three times; report exact commands and results. Never claim a test was run if it was not.
+7. Evaluate chronologically with walk-forward and untouched holdout data; include cost stress, long/short, year/regime, best-day removal, parameter stability, ablations and confidence intervals.
+8. If results fail, document the negative result and why. Do not tune repeatedly against the holdout.
+9. Return: plain-English findings, metrics table, data limitations, changed files, test results, risks, and a small reviewable PR. Never merge to main or enable live trading.
+10. Save the next handoff note in `research/mnq/DAILY-LOG.md` and update the experiment registry only when evidence supports the change.
 
 ## Decision rule
 
