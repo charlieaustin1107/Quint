@@ -1,0 +1,662 @@
+//@version=6
+// Quint · WYLD Four Pillars
+// The owner's strategy (WYLD Will's Four Pillars) as a live checklist on the chart, with an alert at every step:
+//   ① Liquidity sweep of a marked 15m pool (equal highs or lows formed before the open)
+//   ② Price trades into a higher-timeframe level and shows it holds (closes back on the right side)
+//   ③ PDR bias: Point A (the level that held) to Point B (the next HTF level), with the 25 / 50 / 75 steps
+//   ④ 1-minute confirmation = the entry: stop beyond the wick, Target 1 Point B, Target 2 the opposing liquidity
+// Then: +1R (WYLD moves to break-even), and the stage ends when Point B is reached or Point A is lost.
+// Only the first hours after the 9:30 New York open (14:30 UK). Built for MNQ on the 1-minute chart.
+// This is Quint's mechanical reading of WYLD's rules. Where his videos leave a rule open (what counts as the "easiest"
+// equal highs and lows, the stop buffer), it's a setting. Signals only: it never places orders. Not financial advice.
+// Source: Quint repo, lab/pine/wyld_four_pillars.pine. Rules: lab/brain/playbooks.json.
+indicator("Quint · WYLD Four Pillars", shorttitle = "WYLD 4P", overlay = true, max_lines_count = 500, max_labels_count = 500)
+
+// ───────── Settings ─────────
+const string G1 = "Session"
+const string G2 = "① Liquidity (15m equal highs and lows)"
+const string G3 = "② and ③ Higher-timeframe levels and the PDR"
+const string G4 = "④ Confirmation and the trade"
+const string G5 = "Display"
+winHours      = input.float(3.0, "Trading window: hours after the 9:30 New York open", minval = 0.5, maxval = 6.5, step = 0.5, group = G1)
+swingLen      = input.int(3, "15m swing strength (candles each side)", minval = 1, maxval = 10, group = G2)
+eqTicks       = input.int(8, "Equal highs/lows tolerance (ticks)", minval = 1, maxval = 80, group = G2, tooltip = "Two 15m swing highs (or lows) within this many ticks make a liquidity pool. 8 ticks = 2 MNQ points.")
+lookbackDays  = input.int(3, "Pools from the last N days", minval = 1, maxval = 10, group = G2)
+onlyPremarket = input.bool(true, "Only pools formed before the open (marked pre-market)", group = G2)
+usePdPools    = input.bool(false, "Also count prior day high/low as pools", group = G2, tooltip = "WYLD counts only the marked 15m equal highs and lows. Off follows him.")
+useOnPools    = input.bool(false, "Also count the overnight high/low as pools", group = G2)
+useMonthly    = input.bool(true, "Monthly levels (prior month high/low)", group = G3)
+useWeekly     = input.bool(true, "Weekly levels (prior week high/low, NWOG, weekly FVG)", group = G3)
+useDaily      = input.bool(true, "Daily levels (prior day high/low, NDOG, daily FVG, wick 50%s)", group = G3)
+overlapTicks  = input.int(8, "Drop a lower-timeframe level within (ticks) of a higher one", minval = 0, maxval = 80, group = G3)
+reachTicks    = input.int(60, "The level must be within (ticks) of the sweep", minval = 4, maxval = 400, group = G3)
+tolTicks      = input.int(4, "Touch tolerance (ticks)", minval = 0, maxval = 40, group = G3)
+minPdrTicks   = input.int(40, "Point B at least (ticks) from Point A", minval = 4, maxval = 400, group = G3)
+breakTicks    = input.int(8, "PDR broken when a close is (ticks) through Point A", minval = 0, maxval = 80, group = G3)
+holdBars      = input.int(30, "A level must hold within (candles) of the sweep", minval = 1, maxval = 240, group = G3)
+useWick       = input.bool(true, "Confirm: a wick holds and price closes beyond it", group = G4)
+useRetest     = input.bool(true, "Confirm: retest of the HTF level holds", group = G4)
+useBreak      = input.bool(true, "Confirm: a held level breaks (close beyond the recent swing)", group = G4)
+useIfvg       = input.bool(true, "Confirm: an FVG inverts", group = G4)
+useFvgRetest  = input.bool(true, "Confirm: price trades into a new FVG and holds", group = G4)
+sbLen         = input.int(5, "Recent swing for the break (candles)", minval = 2, maxval = 50, group = G4)
+fvgLook       = input.int(20, "FVG inversion: gaps formed within (candles) of the sweep", minval = 1, maxval = 200, group = G4)
+stopBufTicks  = input.int(2, "Stop buffer beyond the wick (ticks)", minval = 0, maxval = 40, group = G4)
+minR          = input.float(1.0, "Minimum reward to Point B (R)", minval = 0.0, maxval = 20.0, step = 0.5, group = G4)
+maxEntries    = input.int(3, "Entries per stage (WYLD re-enters on each new confirmation)", minval = 1, maxval = 25, group = G4)
+reentryBars   = input.int(5, "Candles between entries", minval = 1, maxval = 120, group = G4)
+showLevels    = input.int(10, "HTF levels to draw (nearest to price)", minval = 0, maxval = 30, group = G5)
+showPools     = input.bool(true, "Draw the liquidity pools", group = G5)
+showBox       = input.bool(true, "Confluence box", group = G5)
+boxPosIn      = input.string("Top right", "Confluence box position", options = ["Top right", "Top left", "Bottom right", "Bottom left"], group = G5)
+showRegime    = input.bool(true, "Regime table (every timeframe)", group = G5)
+regPosIn      = input.string("Bottom right", "Regime table position", options = ["Top right", "Top left", "Bottom right", "Bottom left"], group = G5)
+textSizeIn    = input.string("Small", "Text size", options = ["Tiny", "Small", "Normal"], group = G5)
+
+const color MINT   = #2fd9a8
+const color ROSE   = #ff4f6e
+const color AMBER  = #ffb547
+const color CHROME = #d4d4d4
+const color DIM    = #8a8a8a
+const color INK    = #000000
+
+tk  = syminfo.mintick
+txt = textSizeIn == "Tiny" ? size.tiny : textSizeIn == "Normal" ? size.normal : size.small
+posOf(string s) => s == "Top left" ? position.top_left : s == "Bottom right" ? position.bottom_right : s == "Bottom left" ? position.bottom_left : position.top_right
+fmt(float p) => na(p) ? "—" : str.tostring(p, format.mintick)
+
+// ───────── New York session clock ─────────
+nyMin     = hour(time, "America/New_York") * 60 + minute(time, "America/New_York")
+nyDow     = dayofweek(time, "America/New_York")
+weekday   = nyDow >= dayofweek.monday and nyDow <= dayofweek.friday
+winEnd    = 570 + int(math.round(winHours * 60))
+inWindow  = weekday and nyMin >= 570 and nyMin < winEnd
+newWindow = inWindow and not inWindow[1]
+winOver   = inWindow[1] and not inWindow
+var int winStartTime = na
+if newWindow
+    winStartTime := time
+
+// overnight (Globex) high and low, 18:00 to 9:30 New York
+var float onH = na
+var float onL = na
+isON = nyMin >= 1080 or nyMin < 570
+if isON and not isON[1]
+    onH := high
+    onL := low
+else if isON
+    onH := math.max(nz(onH, high), high)
+    onL := math.min(nz(onL, low), low)
+
+// ───────── Higher timeframes (completed candles only, so nothing repaints) ─────────
+[pdh, pdl, pdo, pdc, dOpen] = request.security(syminfo.tickerid, "D", [high[1], low[1], open[1], close[1], open], lookahead = barmerge.lookahead_on)
+[pwh, pwl, wPrevClose, wOpen] = request.security(syminfo.tickerid, "W", [high[1], low[1], close[1], open], lookahead = barmerge.lookahead_on)
+[pmh, pml] = request.security(syminfo.tickerid, "M", [high[1], low[1]], lookahead = barmerge.lookahead_on)
+
+fvgPrev() =>
+    var float bTop = na
+    var float bBot = na
+    var float sTop = na
+    var float sBot = na
+    if low > high[2]
+        bTop := low
+        bBot := high[2]
+    if high < low[2]
+        sTop := low[2]
+        sBot := high
+    if not na(bBot) and close < bBot
+        bTop := na
+        bBot := na
+    if not na(sTop) and close > sTop
+        sTop := na
+        sBot := na
+    [bTop[1], bBot[1], sTop[1], sBot[1]]
+[dBuT, dBuB, dBeT, dBeB] = request.security(syminfo.tickerid, "D", fvgPrev(), lookahead = barmerge.lookahead_on)
+[wBuT, wBuB, wBeT, wBeB] = request.security(syminfo.tickerid, "W", fvgPrev(), lookahead = barmerge.lookahead_on)
+
+// Regime of the last completed candle: trend (EMA 20/50 and the 50's slope), volatility (ATR against its average),
+// and zone (where price sits in the last 50 candles' range). Context only: WYLD's bias is the PDR, not these.
+regimePrev() =>
+    e20 = ta.ema(close, 20)
+    e50 = ta.ema(close, 50)
+    a   = ta.atr(14)
+    aa  = ta.sma(a, 50)
+    hh  = ta.highest(high, 50)
+    ll  = ta.lowest(low, 50)
+    int tr = close[1] > e50[1] and e20[1] > e50[1] and e50[1] > e50[6] ? 1 : close[1] < e50[1] and e20[1] < e50[1] and e50[1] < e50[6] ? -1 : 0
+    int vo = a[1] > aa[1] * 1.2 ? 1 : a[1] < aa[1] * 0.8 ? -1 : 0
+    float zo = hh[1] > ll[1] ? (close[1] - ll[1]) / (hh[1] - ll[1]) : 0.5
+    [tr, vo, zo]
+[trM, voM, zoM] = request.security(syminfo.tickerid, "M", regimePrev(), lookahead = barmerge.lookahead_on)
+[trW, voW, zoW] = request.security(syminfo.tickerid, "W", regimePrev(), lookahead = barmerge.lookahead_on)
+[trD, voD, zoD] = request.security(syminfo.tickerid, "D", regimePrev(), lookahead = barmerge.lookahead_on)
+[tr4, vo4, zo4] = request.security(syminfo.tickerid, "240", regimePrev(), lookahead = barmerge.lookahead_on)
+[tr1H, vo1H, zo1H] = request.security(syminfo.tickerid, "60", regimePrev(), lookahead = barmerge.lookahead_on)
+[tr15, vo15, zo15] = request.security(syminfo.tickerid, "15", regimePrev(), lookahead = barmerge.lookahead_on)
+[tr5, vo5, zo5] = request.security(syminfo.tickerid, "5", regimePrev(), lookahead = barmerge.lookahead_on)
+[tr1, vo1, zo1] = request.security(syminfo.tickerid, "1", regimePrev(), lookahead = barmerge.lookahead_on)
+
+// 15m swing highs and lows, confirmed
+[ph15, pl15, ph15t, pl15t] = request.security(syminfo.tickerid, "15", [ta.pivothigh(high, swingLen, swingLen)[1], ta.pivotlow(low, swingLen, swingLen)[1], time[swingLen + 1], time[swingLen + 1]], lookahead = barmerge.lookahead_on)
+
+// ───────── Liquidity pools ─────────
+var array<float> swH  = array.new<float>()
+var array<int>   swHt = array.new<int>()
+var array<float> swL  = array.new<float>()
+var array<int>   swLt = array.new<int>()
+var array<float> poolP = array.new<float>()
+var array<int>   poolD = array.new<int>()   // 1 = buy-side (equal highs), -1 = sell-side (equal lows)
+var array<int>   poolT = array.new<int>()
+var array<bool>  poolSwept = array.new<bool>()
+var array<int>   poolN = array.new<int>()
+lookMs = lookbackDays * 86400000
+
+addPool(float level, int dir, int t) =>
+    bool merged = false
+    int n = array.size(poolP)
+    if n > 0
+        for i = 0 to n - 1
+            if array.get(poolD, i) == dir and not array.get(poolSwept, i) and math.abs(array.get(poolP, i) - level) <= eqTicks * syminfo.mintick
+                array.set(poolP, i, dir == 1 ? math.max(array.get(poolP, i), level) : math.min(array.get(poolP, i), level))
+                array.set(poolN, i, array.get(poolN, i) + 1)
+                merged := true
+                break
+    if not merged
+        array.push(poolP, level)
+        array.push(poolD, dir)
+        array.push(poolT, t)
+        array.push(poolSwept, false)
+        array.push(poolN, 2)
+        if array.size(poolP) > 60
+            array.shift(poolP)
+            array.shift(poolD)
+            array.shift(poolT)
+            array.shift(poolSwept)
+            array.shift(poolN)
+    merged
+
+addSwing(array<float> px, array<int> tx, float p, int t, int dir) =>
+    int n = array.size(px)
+    if n > 0
+        int stopAt = math.max(0, n - 12)
+        for i = n - 1 to stopAt
+            float q = array.get(px, i)
+            if math.abs(p - q) <= eqTicks * syminfo.mintick and t - array.get(tx, i) <= lookMs
+                addPool(dir == 1 ? math.max(p, q) : math.min(p, q), dir, t)
+                break
+    array.push(px, p)
+    array.push(tx, t)
+    if array.size(px) > 40
+        array.shift(px)
+        array.shift(tx)
+    n
+
+var int lastPhT = na
+var int lastPlT = na
+if not na(ph15) and (na(lastPhT) or ph15t != lastPhT)
+    lastPhT := ph15t
+    addSwing(swH, swHt, ph15, ph15t, 1)
+if not na(pl15) and (na(lastPlT) or pl15t != lastPlT)
+    lastPlT := pl15t
+    addSwing(swL, swLt, pl15, pl15t, -1)
+if newWindow
+    if usePdPools
+        addPool(pdl, -1, time - 60000)
+        addPool(pdh, 1, time - 60000)
+    if useOnPools
+        addPool(onL, -1, time - 60000)
+        addPool(onH, 1, time - 60000)
+
+poolEligible(int i) =>
+    int pt = array.get(poolT, i)
+    bool fresh = time - pt <= lookMs
+    bool pre = not onlyPremarket or (not na(winStartTime) and pt <= winStartTime)
+    fresh and pre
+
+// ───────── Higher-timeframe levels: monthly first, then weekly, then daily; a lower one that overlaps a higher one is dropped ─────────
+var array<float>  lvP = array.new<float>()
+var array<string> lvN = array.new<string>()
+var array<int>    lvR = array.new<int>()
+array.clear(lvP)
+array.clear(lvN)
+array.clear(lvR)
+addLevel(float p, string name, int rank) =>
+    bool dup = false
+    if not na(p)
+        int n = array.size(lvP)
+        if n > 0
+            for i = 0 to n - 1
+                if math.abs(array.get(lvP, i) - p) <= overlapTicks * syminfo.mintick
+                    dup := true
+                    break
+        if not dup
+            array.push(lvP, p)
+            array.push(lvN, name)
+            array.push(lvR, rank)
+    dup
+if useMonthly
+    addLevel(pmh, "Prior month high", 3)
+    addLevel(pml, "Prior month low", 3)
+if useWeekly
+    addLevel(pwh, "Prior week high", 2)
+    addLevel(pwl, "Prior week low", 2)
+    if math.abs(wOpen - wPrevClose) >= 2 * tk
+        addLevel(math.max(wOpen, wPrevClose), "NWOG top", 2)
+        addLevel(math.min(wOpen, wPrevClose), "NWOG bottom", 2)
+    addLevel(wBuT, "Weekly FVG top", 2)
+    addLevel(na(wBuT) ? na : (wBuT + wBuB) / 2, "Weekly FVG 50%", 2)
+    addLevel(wBuB, "Weekly FVG bottom", 2)
+    addLevel(wBeT, "Weekly FVG top", 2)
+    addLevel(na(wBeT) ? na : (wBeT + wBeB) / 2, "Weekly FVG 50%", 2)
+    addLevel(wBeB, "Weekly FVG bottom", 2)
+if useDaily
+    addLevel(pdh, "Prior day high", 1)
+    addLevel(pdl, "Prior day low", 1)
+    if math.abs(dOpen - pdc) >= 2 * tk
+        addLevel(math.max(dOpen, pdc), "NDOG top", 1)
+        addLevel(math.min(dOpen, pdc), "NDOG bottom", 1)
+    addLevel(dBuT, "Daily FVG top", 1)
+    addLevel(na(dBuT) ? na : (dBuT + dBuB) / 2, "Daily FVG 50%", 1)
+    addLevel(dBuB, "Daily FVG bottom", 1)
+    addLevel(dBeT, "Daily FVG top", 1)
+    addLevel(na(dBeT) ? na : (dBeT + dBeB) / 2, "Daily FVG 50%", 1)
+    addLevel(dBeB, "Daily FVG bottom", 1)
+    addLevel(pdh - (pdh - math.max(pdo, pdc)) / 2, "Prior day upper wick 50%", 1)
+    addLevel(pdl + (math.min(pdo, pdc) - pdl) / 2, "Prior day lower wick 50%", 1)
+
+// ───────── Chart fair value gaps and the recent swing (for confirmations) ─────────
+var float cfBuT = na
+var float cfBuB = na
+var int   cfBuBar = na
+var float cfBeT = na
+var float cfBeB = na
+var int   cfBeBar = na
+if low > high[2]
+    cfBuT := low
+    cfBuB := high[2]
+    cfBuBar := bar_index
+if high < low[2]
+    cfBeT := low[2]
+    cfBeB := high
+    cfBeBar := bar_index
+hhPrev = ta.highest(high, sbLen)[1]
+llPrev = ta.lowest(low, sbLen)[1]
+lo3 = math.min(low, math.min(low[1], low[2]))
+hi3 = math.max(high, math.max(high[1], high[2]))
+
+// ───────── One stage per direction ─────────
+type Stage
+    int    dir
+    int    step = 0
+    float  pool = na
+    int    poolTouches = 0
+    float  extreme = na
+    int    extremeBar = na
+    float  wickEdge = na
+    int    sweepBar = na
+    int    sweepTime = na
+    float  pointA = na
+    string aName = ""
+    int    aRank = 0
+    float  pointB = na
+    string bName = ""
+    float  t2 = na
+    int    heldBar = na
+    int    entries = 0
+    int    lastEntryBar = na
+    float  entry = na
+    float  stop = na
+    bool   beSent = false
+    bool   usedWick = false
+    bool   usedBreak = false
+    string conf = ""
+    string last = ""
+
+method clearStage(Stage s) =>
+    s.step := 0
+    s.pool := na
+    s.poolTouches := 0
+    s.extreme := na
+    s.extremeBar := na
+    s.wickEdge := na
+    s.sweepBar := na
+    s.sweepTime := na
+    s.pointA := na
+    s.aName := ""
+    s.aRank := 0
+    s.pointB := na
+    s.bName := ""
+    s.t2 := na
+    s.heldBar := na
+    s.entries := 0
+    s.lastEntryBar := na
+    s.entry := na
+    s.stop := na
+    s.beSent := false
+    s.usedWick := false
+    s.usedBreak := false
+    s.conf := ""
+    s
+
+join(string a, string b) => a == "" ? b : a + "  ·  " + b
+
+runStage(Stage s) =>
+    bool e1 = false
+    bool e2 = false
+    bool e3 = false
+    bool e4 = false
+    bool eBE = false
+    bool eEnd = false
+    string msg = ""
+    int d = s.dir
+    string side = d == 1 ? "LONG" : "SHORT"
+    float tol = tolTicks * syminfo.mintick
+    // ① the sweep of a marked pool on the other side
+    if s.step == 0 and inWindow
+        float best = na
+        int bestN = 0
+        int n = array.size(poolP)
+        if n > 0
+            for i = 0 to n - 1
+                if array.get(poolD, i) == -d and not array.get(poolSwept, i) and poolEligible(i)
+                    float p = array.get(poolP, i)
+                    if d == 1 ? low < p : high > p
+                        array.set(poolSwept, i, true)
+                        if na(best) or (d == 1 ? p < best : p > best)
+                            best := p
+                            bestN := array.get(poolN, i)
+        if not na(best)
+            s.step := 1
+            s.pool := best
+            s.poolTouches := bestN
+            s.extreme := d == 1 ? low : high
+            s.extremeBar := bar_index
+            s.wickEdge := d == 1 ? high : low
+            s.sweepBar := bar_index
+            s.sweepTime := time
+            e1 := true
+            msg := join(msg, "① SWEEP (" + side + " stage): " + (d == 1 ? "sell-side equal lows " : "buy-side equal highs ") + fmt(best) + " taken. Now wait for an HTF level to hold.")
+    // ② a higher-timeframe level near the sweep holds
+    if s.step == 1
+        if d == 1 ? low < s.extreme : high > s.extreme
+            s.extreme := d == 1 ? low : high
+            s.extremeBar := bar_index
+            s.wickEdge := d == 1 ? high : low
+        float A = na
+        string aN = ""
+        int aR = 0
+        int m = array.size(lvP)
+        if m > 0
+            for i = 0 to m - 1
+                float lv = array.get(lvP, i)
+                bool near = math.abs(lv - s.extreme) <= reachTicks * syminfo.mintick
+                bool held = d == 1 ? low <= lv + tol and close > lv : high >= lv - tol and close < lv
+                if near and held and (na(A) or (d == 1 ? lv > A : lv < A))
+                    A := lv
+                    aN := array.get(lvN, i)
+                    aR := array.get(lvR, i)
+        if not na(A)
+            s.step := 2
+            s.pointA := A
+            s.aName := aN
+            s.aRank := aR
+            s.heldBar := bar_index
+            e2 := true
+            msg := join(msg, "② HTF LEVEL HOLDS (" + side + "): " + aN + " " + fmt(A) + ".")
+        else if bar_index - s.sweepBar > holdBars or not inWindow
+            msg := join(msg, "Stage dropped: no HTF level held after the sweep.")
+            s.clearStage()
+    // ③ the PDR: Point A to the next HTF level, Point B
+    if s.step == 2
+        float B = na
+        string bN = ""
+        int m = array.size(lvP)
+        if m > 0
+            for i = 0 to m - 1
+                float lv = array.get(lvP, i)
+                if (d == 1 ? lv > s.pointA + minPdrTicks * syminfo.mintick : lv < s.pointA - minPdrTicks * syminfo.mintick) and (na(B) or (d == 1 ? lv < B : lv > B))
+                    B := lv
+                    bN := array.get(lvN, i)
+        float T2 = na
+        int n = array.size(poolP)
+        if n > 0
+            for i = 0 to n - 1
+                float p = array.get(poolP, i)
+                if array.get(poolD, i) == d and not array.get(poolSwept, i) and (d == 1 ? p > s.pointA + minPdrTicks * syminfo.mintick : p < s.pointA - minPdrTicks * syminfo.mintick)
+                    if na(B)
+                        B := p
+                        bN := d == 1 ? "Equal highs" : "Equal lows"
+                    else if (d == 1 ? p > B : p < B) and (na(T2) or (d == 1 ? p < T2 : p > T2))
+                        T2 := p
+        if na(B)
+            msg := join(msg, "Stage dropped: no Point B (no HTF level or liquidity beyond Point A).")
+            s.clearStage()
+        else
+            if na(T2) and m > 0
+                for i = 0 to m - 1
+                    float lv = array.get(lvP, i)
+                    if (d == 1 ? lv > B + tol : lv < B - tol) and (na(T2) or (d == 1 ? lv < T2 : lv > T2))
+                        T2 := lv
+            s.pointB := B
+            s.bName := bN
+            s.t2 := T2
+            s.step := 3
+            e3 := true
+            msg := join(msg, "③ PDR BIAS " + side + ": A " + fmt(s.pointA) + " → B " + fmt(B) + " (" + bN + "), 0.5 at " + fmt((s.pointA + B) / 2) + ". Stage set: wait for the 1m confirmation.")
+    // ④ the stage is set: confirmations, management, the end of the stage
+    if s.step == 3
+        bool reachedB = d == 1 ? high >= s.pointB : low <= s.pointB
+        bool broken = d == 1 ? close < s.pointA - breakTicks * syminfo.mintick : close > s.pointA + breakTicks * syminfo.mintick
+        if not na(s.entry) and not s.beSent and (d == 1 ? high >= s.entry + (s.entry - s.stop) : low <= s.entry - (s.stop - s.entry))
+            s.beSent := true
+            eBE := true
+            msg := join(msg, "+1R on the " + side + " from " + fmt(s.entry) + ": WYLD moves the stop to break-even.")
+        if reachedB or broken
+            eEnd := true
+            msg := join(msg, reachedB ? "STAGE COMPLETE: Point B " + fmt(s.pointB) + " reached. Next: the opposing liquidity " + fmt(s.t2) + " if you're still in." : "PDR BROKEN: price closed through Point A " + fmt(s.pointA) + ". The stage is over.")
+            s.clearStage()
+        else if inWindow and s.entries < maxEntries and bar_index > s.heldBar and (na(s.lastEntryBar) or bar_index - s.lastEntryBar >= reentryBars)
+            string c = ""
+            if useWick and not s.usedWick and bar_index > s.extremeBar and (d == 1 ? close > s.wickEdge : close < s.wickEdge)
+                c := "a wick held and price closed beyond it"
+            if c == "" and useRetest and (d == 1 ? low <= s.pointA + tol and close > s.pointA : high >= s.pointA - tol and close < s.pointA)
+                c := "the HTF level retest held"
+            if c == "" and useBreak and not s.usedBreak and (d == 1 ? close > hhPrev : close < llPrev)
+                c := "a held level broke (close beyond the recent swing)"
+            if c == "" and useIfvg and (d == 1 ? not na(cfBeT) and cfBeBar >= s.sweepBar - fvgLook and close > cfBeT : not na(cfBuB) and cfBuBar >= s.sweepBar - fvgLook and close < cfBuB)
+                c := "an FVG inverted"
+            if c == "" and useFvgRetest and (d == 1 ? not na(cfBuT) and cfBuBar > s.heldBar and cfBuBar < bar_index and low <= cfBuT and close > cfBuB : not na(cfBeB) and cfBeBar > s.heldBar and cfBeBar < bar_index and high >= cfBeB and close < cfBeT)
+                c := "price traded into a new FVG and held"
+            if c != ""
+                float entry = close
+                float stopP = d == 1 ? lo3 - stopBufTicks * syminfo.mintick : hi3 + stopBufTicks * syminfo.mintick
+                float risk = math.abs(entry - stopP)
+                bool room = d == 1 ? entry < s.pointB : entry > s.pointB
+                float rB = risk > 0 ? math.abs(s.pointB - entry) / risk : 0.0
+                if risk > 0 and room and rB >= minR
+                    s.entries := s.entries + 1
+                    s.lastEntryBar := bar_index
+                    s.entry := entry
+                    s.stop := stopP
+                    s.beSent := false
+                    s.conf := c
+                    if str.contains(c, "wick")
+                        s.usedWick := true
+                    if str.contains(c, "broke")
+                        s.usedBreak := true
+                    e4 := true
+                    string t2s = na(s.t2) ? "" : " · T2 opposing liquidity " + fmt(s.t2) + " (" + str.tostring(math.abs(s.t2 - entry) / risk, "#.#") + "R)"
+                    msg := join(msg, "④ ENTRY " + side + " #" + str.tostring(s.entries) + ": " + c + ". Entry " + fmt(entry) + " · stop " + fmt(stopP) + " (" + str.tostring(risk / syminfo.mintick, "#") + " ticks) · T1 Point B " + fmt(s.pointB) + " (" + str.tostring(rB, "#.#") + "R)" + t2s + ".")
+                    label.new(bar_index, d == 1 ? low : high, (d == 1 ? "BUY " : "SELL ") + str.tostring(rB, "#.#") + "R\n" + c, color = d == 1 ? MINT : ROSE, textcolor = INK, style = d == 1 ? label.style_label_up : label.style_label_down, size = size.small)
+    s.last := msg == "" ? s.last : msg
+    [e1, e2, e3, e4, eBE, eEnd, msg]
+
+var Stage L = Stage.new(dir = 1)
+var Stage S = Stage.new(dir = -1)
+[l1, l2, l3, l4, lBE, lEnd, lMsg] = runStage(L)
+[s1, s2, s3, s4, sBE, sEnd, sMsg] = runStage(S)
+bool expired = false
+if winOver and (L.step > 0 or S.step > 0)
+    expired := true
+    L.clearStage()
+    S.clearStage()
+
+// ───────── Alerts: one alert with "Any alert() function call" gets every step with its prices ─────────
+if lMsg != ""
+    alert(syminfo.ticker + " · " + lMsg, alert.freq_once_per_bar_close)
+if sMsg != ""
+    alert(syminfo.ticker + " · " + sMsg, alert.freq_once_per_bar_close)
+if expired
+    alert(syminfo.ticker + " · Window closed: the open stage expired. No new trades today (WYLD trades the first hours only).", alert.freq_once_per_bar_close)
+alertcondition(l1 or s1, "① Sweep", "WYLD 4P: a marked liquidity pool was swept")
+alertcondition(l2 or s2, "② HTF level holds", "WYLD 4P: an HTF level held after the sweep")
+alertcondition(l3 or s3, "③ PDR bias set", "WYLD 4P: PDR bias set, waiting for the 1m confirmation")
+alertcondition(l4 or s4, "④ Entry (1m confirmation)", "WYLD 4P: ENTRY on the 1m confirmation")
+alertcondition(lBE or sBE, "+1R break-even", "WYLD 4P: +1R, move the stop to break-even")
+alertcondition(lEnd or sEnd or expired, "Stage over", "WYLD 4P: the stage is complete, broken or expired")
+
+// ───────── On the chart ─────────
+plotshape(l1, "① Sweep (long stage)", shape.circle, location.belowbar, MINT, text = "1", textcolor = MINT, size = size.tiny)
+plotshape(l2, "② Level holds (long)", shape.diamond, location.belowbar, MINT, text = "2", textcolor = MINT, size = size.tiny)
+plotshape(l3, "③ PDR bias long", shape.triangleup, location.belowbar, MINT, text = "3", textcolor = MINT, size = size.tiny)
+plotshape(s1, "① Sweep (short stage)", shape.circle, location.abovebar, ROSE, text = "1", textcolor = ROSE, size = size.tiny)
+plotshape(s2, "② Level holds (short)", shape.diamond, location.abovebar, ROSE, text = "2", textcolor = ROSE, size = size.tiny)
+plotshape(s3, "③ PDR bias short", shape.triangledown, location.abovebar, ROSE, text = "3", textcolor = ROSE, size = size.tiny)
+plotshape(lBE or sBE, "+1R break-even", shape.xcross, location.abovebar, AMBER, text = "BE", textcolor = AMBER, size = size.tiny)
+plot(L.step >= 3 ? L.pointA : na, "Long Point A", color = MINT, linewidth = 2, style = plot.style_linebr)
+plot(L.step >= 3 ? L.pointA + (L.pointB - L.pointA) * 0.25 : na, "Long PDR 25%", color = color.new(CHROME, 60), style = plot.style_linebr)
+plot(L.step >= 3 ? (L.pointA + L.pointB) / 2 : na, "Long PDR 50%", color = color.new(CHROME, 20), style = plot.style_linebr)
+plot(L.step >= 3 ? L.pointA + (L.pointB - L.pointA) * 0.75 : na, "Long PDR 75%", color = color.new(CHROME, 60), style = plot.style_linebr)
+plot(L.step >= 3 ? L.pointB : na, "Long Point B (Target 1)", color = CHROME, linewidth = 2, style = plot.style_linebr)
+plot(L.step >= 3 ? L.t2 : na, "Long Target 2 (opposing liquidity)", color = color.new(MINT, 40), style = plot.style_linebr)
+plot(L.step >= 3 and not na(L.entry) ? L.stop : na, "Long stop", color = ROSE, style = plot.style_linebr)
+plot(S.step >= 3 ? S.pointA : na, "Short Point A", color = ROSE, linewidth = 2, style = plot.style_linebr)
+plot(S.step >= 3 ? S.pointA + (S.pointB - S.pointA) * 0.25 : na, "Short PDR 25%", color = color.new(CHROME, 60), style = plot.style_linebr)
+plot(S.step >= 3 ? (S.pointA + S.pointB) / 2 : na, "Short PDR 50%", color = color.new(CHROME, 20), style = plot.style_linebr)
+plot(S.step >= 3 ? S.pointA + (S.pointB - S.pointA) * 0.75 : na, "Short PDR 75%", color = color.new(CHROME, 60), style = plot.style_linebr)
+plot(S.step >= 3 ? S.pointB : na, "Short Point B (Target 1)", color = CHROME, linewidth = 2, style = plot.style_linebr)
+plot(S.step >= 3 ? S.t2 : na, "Short Target 2 (opposing liquidity)", color = color.new(ROSE, 40), style = plot.style_linebr)
+plot(S.step >= 3 and not na(S.entry) ? S.stop : na, "Short stop", color = ROSE, style = plot.style_linebr)
+bgcolor(inWindow ? color.new(CHROME, 96) : na, title = "Trading window")
+
+// HTF levels and pools nearest to price, redrawn on the last candle
+var array<line>  drawnLines  = array.new<line>()
+var array<label> drawnLabels = array.new<label>()
+if barstate.islast
+    while array.size(drawnLines) > 0
+        line.delete(array.pop(drawnLines))
+    while array.size(drawnLabels) > 0
+        label.delete(array.pop(drawnLabels))
+    int m = array.size(lvP)
+    if showLevels > 0 and m > 0
+        array<bool> used = array.new<bool>(m, false)
+        for k = 1 to math.min(showLevels, m)
+            int pick = -1
+            float bestD = na
+            for i = 0 to m - 1
+                float dist = math.abs(array.get(lvP, i) - close)
+                if not array.get(used, i) and (na(bestD) or dist < bestD)
+                    bestD := dist
+                    pick := i
+            if pick >= 0
+                array.set(used, pick, true)
+                float p = array.get(lvP, pick)
+                int r = array.get(lvR, pick)
+                color c = r == 3 ? CHROME : r == 2 ? color.new(CHROME, 30) : color.new(CHROME, 55)
+                array.push(drawnLines, line.new(bar_index - 40, p, bar_index, p, extend = extend.right, color = c, style = line.style_dotted, width = r == 3 ? 2 : 1))
+                array.push(drawnLabels, label.new(bar_index + 3, p, array.get(lvN, pick) + "  " + fmt(p), style = label.style_none, textcolor = c, size = size.tiny, textalign = text.align_left))
+    int np = array.size(poolP)
+    if showPools and np > 0
+        for i = 0 to np - 1
+            if not array.get(poolSwept, i) and time - array.get(poolT, i) <= lookMs
+                float p = array.get(poolP, i)
+                int dr = array.get(poolD, i)
+                color c = dr == 1 ? color.new(ROSE, 20) : color.new(MINT, 20)
+                array.push(drawnLines, line.new(bar_index - 25, p, bar_index, p, extend = extend.right, color = c, style = line.style_dashed))
+                array.push(drawnLabels, label.new(bar_index + 3, p, (dr == 1 ? "EQH" : "EQL") + " ×" + str.tostring(array.get(poolN, i)) + "  " + fmt(p), style = label.style_none, textcolor = c, size = size.tiny, textalign = text.align_left))
+
+// ───────── The confluence box ─────────
+nearestPool(int dir) =>
+    float best = na
+    int n = array.size(poolP)
+    if n > 0
+        for i = 0 to n - 1
+            float p = array.get(poolP, i)
+            if array.get(poolD, i) == dir and not array.get(poolSwept, i) and poolEligible(i) and (dir == 1 ? p > close : p < close) and (na(best) or math.abs(p - close) < math.abs(best - close))
+                best := p
+    best
+
+trendTxt(int t) => t == 1 ? "▲ Bull" : t == -1 ? "▼ Bear" : "■ Range"
+trendCol(int t) => t == 1 ? MINT : t == -1 ? ROSE : AMBER
+volTxt(int v) => v == 1 ? "Expanding" : v == -1 ? "Quiet" : "Normal"
+zoneTxt(float z) => na(z) ? "—" : z >= 0.6 ? "Premium " + str.tostring(math.round(z * 100)) + "%" : z <= 0.4 ? "Discount " + str.tostring(math.round(z * 100)) + "%" : "Middle " + str.tostring(math.round(z * 100)) + "%"
+mark(bool ok) => ok ? "✓ " : "· "
+
+var table conf = table.new(posOf(boxPosIn), 2, 11, bgcolor = color.new(INK, 5), frame_color = color.new(CHROME, 60), frame_width = 1, border_color = color.new(CHROME, 85), border_width = 1)
+var table reg = table.new(posOf(regPosIn), 4, 10, bgcolor = color.new(INK, 5), frame_color = color.new(CHROME, 60), frame_width = 1, border_color = color.new(CHROME, 85), border_width = 1)
+
+cell(table t, int c, int r, string s, color col) =>
+    table.cell(t, c, r, s, text_color = col, text_size = txt, text_halign = text.align_left)
+
+if barstate.islast and showBox
+    Stage st = L
+    if S.step > L.step
+        st := S
+    bool active = st.step > 0
+    int d = st.dir
+    string side = d == 1 ? "LONG" : "SHORT"
+    int left = winEnd - nyMin
+    string status = not weekday ? "WEEKEND" : not inWindow ? "OUTSIDE THE WINDOW" : st.step == 0 ? "WAITING FOR A SWEEP" : st.step == 1 ? "SWEPT: WAIT FOR A LEVEL TO HOLD" : st.step == 2 ? "LEVEL HELD" : not na(st.entry) ? "IN PLAY: " + side : "STAGE SET: WAIT FOR 1M CONFIRMATION"
+    color sCol = not inWindow ? DIM : st.step >= 3 ? MINT : st.step > 0 ? AMBER : CHROME
+    cell(conf, 0, 0, "WYLD FOUR PILLARS", CHROME)
+    cell(conf, 1, 0, status, sCol)
+    cell(conf, 0, 1, "Window", DIM)
+    cell(conf, 1, 1, inWindow ? str.tostring(math.floor(left / 60)) + "h " + str.tostring(left % 60) + "m left (to " + str.tostring(math.floor(winEnd / 60)) + ":" + (winEnd % 60 < 10 ? "0" : "") + str.tostring(winEnd % 60) + " NY)" : "First " + str.tostring(winHours) + "h after 9:30 NY (14:30 UK)", inWindow ? MINT : DIM)
+    cell(conf, 0, 2, mark(st.step >= 1) + "① Sweep", st.step >= 1 ? MINT : DIM)
+    cell(conf, 1, 2, st.step >= 1 ? (d == 1 ? "Equal lows " : "Equal highs ") + fmt(st.pool) + " taken (" + str.tostring(st.poolTouches) + " touches)" : "Pools: EQH " + fmt(nearestPool(1)) + " · EQL " + fmt(nearestPool(-1)), st.step >= 1 ? CHROME : DIM)
+    cell(conf, 0, 3, mark(st.step >= 2) + "② HTF level holds", st.step >= 2 ? MINT : DIM)
+    cell(conf, 1, 3, st.step >= 2 ? st.aName + " " + fmt(st.pointA) : "Waiting", st.step >= 2 ? CHROME : DIM)
+    float mid = st.step >= 3 ? (st.pointA + st.pointB) / 2 : na
+    cell(conf, 0, 4, mark(st.step >= 3) + "③ PDR bias", st.step >= 3 ? MINT : DIM)
+    cell(conf, 1, 4, st.step >= 3 ? side + ": A " + fmt(st.pointA) + " → B " + fmt(st.pointB) + " · 0.5 " + fmt(mid) : "Waiting", st.step >= 3 ? CHROME : DIM)
+    cell(conf, 0, 5, mark(not na(st.entry)) + "④ 1m confirmation", not na(st.entry) ? MINT : DIM)
+    cell(conf, 1, 5, not na(st.entry) ? st.conf + " (entry " + str.tostring(st.entries) + " of " + str.tostring(maxEntries) + ")" : st.step >= 3 ? "Watching the 1m" : "Waiting", not na(st.entry) ? CHROME : DIM)
+    float risk = na(st.entry) ? na : math.abs(st.entry - st.stop)
+    cell(conf, 0, 6, "Plan", DIM)
+    cell(conf, 1, 6, na(st.entry) ? (st.step >= 3 ? "T1 Point B " + fmt(st.pointB) + " · T2 " + fmt(st.t2) : "—") : "Entry " + fmt(st.entry) + " · stop " + fmt(st.stop) + " · T1 " + fmt(st.pointB) + " (" + str.tostring(math.abs(st.pointB - st.entry) / risk, "#.#") + "R) · T2 " + fmt(st.t2), CHROME)
+    bool cAbove = st.step >= 3 and (d == 1 ? close > mid : close < mid)
+    bool cRank = st.aRank >= 2
+    bool cPool = st.poolTouches >= 3
+    bool c1H = tr1H == d
+    bool c15 = tr15 == d
+    bool cVol = vo5 != -1
+    int score = (cAbove ? 1 : 0) + (cRank ? 1 : 0) + (cPool ? 1 : 0) + (c1H ? 1 : 0) + (c15 ? 1 : 0) + (cVol ? 1 : 0)
+    cell(conf, 0, 7, "Confluence " + (active ? str.tostring(score) + "/6" : "—"), active ? (score >= 4 ? MINT : score >= 2 ? AMBER : ROSE) : DIM)
+    cell(conf, 1, 7, active ? mark(cAbove) + "past the 0.5  " + mark(cRank) + "weekly/monthly level  " + mark(cPool) + "3+ touch pool" : "Extras, not rules: the four pillars decide", active ? CHROME : DIM)
+    cell(conf, 0, 8, "", DIM)
+    cell(conf, 1, 8, active ? mark(c1H) + "1H trend agrees  " + mark(c15) + "15m trend agrees  " + mark(cVol) + "5m not quiet" : "", CHROME)
+    cell(conf, 0, 9, "Last", DIM)
+    cell(conf, 1, 9, st.last == "" ? "—" : str.substring(st.last, 0, math.min(str.length(st.last), 120)), DIM)
+    cell(conf, 0, 10, "Check", AMBER)
+    cell(conf, 1, 10, "Red-folder news? Lucid: flat 1 min either side. Hold winners past 5s.", AMBER)
+
+if barstate.islast and showRegime
+    cell(reg, 0, 0, "TF", DIM)
+    cell(reg, 1, 0, "Trend", DIM)
+    cell(reg, 2, 0, "Volatility", DIM)
+    cell(reg, 3, 0, "Zone (50 candles)", DIM)
+    int chartSec = timeframe.in_seconds()
+    array<string> names = array.from("Monthly", "Weekly", "Daily", "4H", "1H", "15m", "5m", "1m")
+    array<int> secs = array.from(2628000, 604800, 86400, 14400, 3600, 900, 300, 60)
+    array<int> trs = array.from(trM, trW, trD, tr4, tr1H, tr15, tr5, tr1)
+    array<int> vos = array.from(voM, voW, voD, vo4, vo1H, vo15, vo5, vo1)
+    array<float> zos = array.from(zoM, zoW, zoD, zo4, zo1H, zo15, zo5, zo1)
+    for i = 0 to 7
+        bool lower = array.get(secs, i) < chartSec
+        int t = array.get(trs, i)
+        cell(reg, 0, i + 1, array.get(names, i), CHROME)
+        cell(reg, 1, i + 1, lower ? "use a lower chart" : trendTxt(t), lower ? DIM : trendCol(t))
+        cell(reg, 2, i + 1, lower ? "" : volTxt(array.get(vos, i)), array.get(vos, i) == 1 ? AMBER : DIM)
+        cell(reg, 3, i + 1, lower ? "" : zoneTxt(array.get(zos, i)), DIM)
+    cell(reg, 0, 9, "Context only", DIM)
+    cell(reg, 1, 9, "WYLD's bias is the PDR, not these", DIM)

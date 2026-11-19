@@ -2,6 +2,12 @@
 
 Newest first. Every lab session adds an entry: what ran, what was learned, what changed, and the TradingView calls used.
 
+## 2026-11-19 (late): the WYLD Four Pillars indicator
+
+- Built **Quint · WYLD Four Pillars** for TradingView (`lab/pine/`). It alerts at every step (① sweep, ② HTF level holds, ③ PDR bias, ④ 1m confirmation entry, +1R break-even, stage over), shows a confluence box with the pillars ticked off in order, and a regime table for every timeframe from monthly to 1-minute.
+- It compiled first time and is saved in the owner's TradingView (`USER;30b790d0742346528a65e8c1d5e28d6e`). It's a mechanical reading of WYLD's rules, with the open choices as settings, and has no order-block entry yet.
+- **Calls used:** TradingView 1 (save and compile), 3 today in total.
+
 ## 2026-11-19 (night): Quint HQ v2
 
 - Quint HQ is now the owner's front door, built to `lab/jarvis/VISION.md`: Today (spoken briefing, UK and New York clock, the trading window, news blackout, money, the pre-market checklist), Ask (Quint answers with tools: accounts, journal, sizing, the lab, Trading Mastery, and adds ideas), Desk (Four Pillars pre-trade check with a verdict, sizing by the quarter-of-room rule, Lucid prop accounts, journal with CSV export), Lab (factory, bots with equity curves, library, ideas inbox, memory, TraderDev) and More (nightly jobs with run and pause, an on-demand MNQ check that costs 1 TradingView call, apps, roadmap, ventures, settings).

@@ -35,6 +35,11 @@
           "note": "The rules everything else follows."
         },
         {
+          "name": "TradingView indicator: Quint · WYLD Four Pillars",
+          "where": "Your TradingView (My scripts); code in lab/pine/wyld_four_pillars.pine",
+          "note": "Live step-by-step alerts, a confluence box and a regime table for every timeframe. Signals only; a mechanical reading of the rules with the open choices as settings."
+        },
+        {
           "name": "Older coding: six steps",
           "where": "Trading Mastery (claude.ai)",
           "note": "Differs from WYLD: requires displacement, takes one pullback entry, adds a regime filter. Tested in its Backtest lab and the Jarvis dream run."
