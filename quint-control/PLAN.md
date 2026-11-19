@@ -261,6 +261,22 @@ Swing, multi-day and monthly bots must actively supervise every open position fr
 - **Failure handling:** detect stale feeds, disconnects, rejected/cancelled protection, position/order mismatch and restart discrepancies. Alert and execute the pre-defined safe response; never assume an order is working until confirmed.
 - **Validation:** test protection and supervision in historical replay, simulation, fault-injection and paper-forward trading before live approval.
 
+## Bot library and selection menu
+
+**Quint is the name of the overall platform/brain and the built-in AI chat assistant only. It is not the name of a trading bot or a generic strategy.** Every trading bot has its own distinct, descriptive name that states what trading method it uses.
+
+The website must have a dedicated **Bots** menu/library. Show every available strategy as a separate selectable item, grouped by holding horizon:
+- **Scalping:** VWAP Deviation Fade; Liquidity Sweep, Displacement and Retest; Opening Auction Microstructure; Short-Term Momentum.
+- **Intraday:** 5-Minute Opening Range Breakout; 15-Minute Opening Range Breakout; 30-Minute Opening Range Breakout; Overnight Range Breakout; Gap Continuation; Gap Fade; VWAP Reclaim; VWAP Rejection; Trend Pullback; Noise-Area Momentum; Last-30-Minute Momentum; 5-Pillar Liquidity/CISD/Displacement/Pullback.
+- **Swing:** Daily Trend-Following; Weekly High/Low Breakout; Multi-Day Trend Pullback.
+- **Monthly / Position:** Long-Horizon Trend-Following; Monthly Regime Breakout.
+
+These are separate strategy entries, not promises that every entry is already implemented or profitable. The menu must display an honest status on each item (Idea, Specified, Implemented, Testing, Approved, Rejected), timeframe, market, holding horizon, and whether it supports signal-assisted mode, automated mode, or both. Do not show an unimplemented research hypothesis as a ready-to-run bot. Avoid duplicate entries where two labels are merely parameter variations; if timeframes materially change the rules or test results, show them separately with the exact timeframe in the name.
+
+Selecting a bot opens its own detail/setup page: plain-English explanation, exact entry and exit rules, stop-loss and take-profit method, risk controls, market/timeframe/session, account compatibility (including overnight eligibility), backtest and forward-test evidence, limitations, settings and operating mode. The user can select different bots for different eligible accounts, subject to the one-bot-per-account rule. The menu must never silently substitute one strategy for another.
+
+The **Quint AI** chat box remains a separate assistant available throughout the site. It can explain a selected bot, compare bots and discuss its decisions, but it is not itself a trading bot and must not be presented as one.
+
 ## Bot setup and backtesting
 
 Setting up a bot takes five screens in the website's setup wizard, and no strategy can go live until its backtest and simulation results pass.
