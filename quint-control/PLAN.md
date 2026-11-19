@@ -605,3 +605,14 @@ Do not copy proprietary source code, private implementation details, branding or
 - Marketing claims such as speed, scale, reliability or user counts are vendor claims, not independently audited evidence.
 - A listed feature does not prove it is suitable for a particular Lucid plan, instrument, broker connection or order type. Verify compatibility in simulation and against current official broker/prop-firm rules.
 - Revisit official documentation before implementing integrations because features and limitations can change.
+
+
+## Multi-day futures trading and prop-firm compatibility
+
+Quint strategies are independent of prop-firm holding rules. The account manager enforces the exact firm + plan + account-stage permissions: daily flat deadline, overnight permission, weekend permission, reduced overnight size, resting-order cancellation, holiday/early-close schedule, timezone and auto-liquidation behaviour. Genuine swing/weekend bots are blocked on daily-flat accounts; they must never be silently converted into intraday bots. A longer-timeframe signal may inform an intraday bot, but that is not a multi-day hold.
+
+Support separate account capabilities: `DailyFlatRequired`, `OvernightAllowed`, `WeekendAllowed`, optional overnight size caps, cutoff/timezone, product close, holiday schedule, resting-order policy, auto-liquidation behaviour, source URL, effective date and last-verified status. Profiles are specific to firm + exact product + evaluation/sim-funded/live stage. Stale or unverified profiles default to no overnight/weekend automation.
+
+Overnight/weekend execution requires gap-through-stop and mark-to-market stress assumptions, smaller exposure limits where appropriate, confirmed broker-held protection, reconnect/reopen reconciliation, and no new entries while account/order state is uncertain. Firm rules must be enforced deterministically, never by an LLM.
+
+Research and candidate firms: see [Futures prop firms: overnight and weekend holding](../research/prop-firms/OVERNIGHT-FUTURES.md). As of 19 Nov 2026, candidates with official support for multi-day holding include Phidias Premium, DayTraders.com futures accounts and Elite Trader Funding Diamond Hands; The5ers Futures Swing permits limited overnight holding (up to 10 micros / 1 mini) but not weekends. Verify exact MNQ plan, account stage, size, margin, payouts, platform/API access and current contract before recommending or enabling. Lucid, Topstep, Apex, FTMO Futures and Earn2Trade cited rules require daily flatness.
