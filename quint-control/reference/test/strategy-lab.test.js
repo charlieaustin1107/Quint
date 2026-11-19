@@ -53,6 +53,6 @@ test('rejects expired and incorrectly oriented paper scenarios',()=>{
 
 test('expression evaluator rejects non-numeric comparisons and oversized trees',()=>{
  assert.throws(()=>evaluateExpression({op:'gt',left:{op:'const',value:'high'},right:{op:'const',value:'low'}},{}),/Numeric comparisons require numeric/);
- const many={op:'and',args:Array.from({length:16},()=>({op:'eq',left:{op:'const',value:1},right:{op:'const',value:1}}))};
+ const many={op:'and',args:Array.from({length:16},()=>({op:'and',args:Array.from({length:16},()=>({op:'const',value:true}))}))};
  assert.throws(()=>evaluateExpression(many,{}),/node limit/);
 });
