@@ -345,11 +345,18 @@
    "verdict": "Small edge on the stand-in. The plan's walk-forward evidence says ATR trailing trend lost on MNQ hourly (PF 0.49)."
   },
   {
-   "name": "Prop A and B, regular-hours-only versions on 5m and 15m (TraderDev, 4 strategies)",
+   "name": "Prop A and B, regular-hours-only versions on 5m and 15m (TraderDev, 3 strategies)",
    "status": "Rejected",
    "horizon": "Intraday",
    "timeframe": "5m and 15m",
-   "verdict": "Rejected: during the hours that matter for a day trader, three of the four had no edge or lost (RSI2 5m about $1 a trade; EMA-ATR 5m -$2,836; EMA-ATR 15m -$2,542). Only RSI2 15m stayed positive (+$2,766 on 76 trades, rough)."
+   "verdict": "Rejected: during the hours that matter for a day trader these had no edge or lost, even on the flattering stand-in (RSI2 5m about $1 a trade over 217 trades; EMA-ATR 5m -$2,836; EMA-ATR 15m -$2,542; rough 1-MNQ figures)."
+  },
+  {
+   "name": "Prop B: RSI(2) combo, regular hours only, 15m (TraderDev)",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "15m",
+   "verdict": "The only regular-hours version that stayed positive on the stand-in, and only just. Unproven: its cousin lost on real MNQ."
   },
   {
    "name": "Other TraderDev retests: Bollinger squeeze 15m, Bollinger mean-reversion long 15m, EMA ATR trail long 1h, pivot break + volume 1h, trend pullback EMA96/EMA50 15m",
@@ -381,7 +388,7 @@
   }
  ],
  "statusCount": {
-  "In-sample": 12,
+  "In-sample": 13,
   "Implemented": 4,
   "Rejected": 3,
   "Idea": 2

@@ -17,7 +17,7 @@ Newest first. Every lab session adds an entry: what ran, what was learned, what 
 
 **Changed**
 - RSI(2) all-weather 1h: Rejected as it stands (lost on real MNQ, no stop, drawdown 2.5x Lucid's max loss).
-- Regular-hours versions of Prop A and B, and the Lucid sweep + volume: Rejected.
+- Three of the four regular-hours versions of Prop A and B, and the Lucid sweep + volume: Rejected. Prop B RSI(2) 15m regular hours stays In-sample (+$2,766 rough on the stand-in, 76 trades).
 - New pre-registered test in the queue: long-only RSI(2) with a stop, on April to November 2026 only.
 
 **Calls used:** TradingView 2, TraderDev 13 credits.
