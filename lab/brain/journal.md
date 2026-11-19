@@ -2,6 +2,34 @@
 
 Newest first. Every lab session adds an entry: what ran, what was learned, what changed, and the TradingView calls used.
 
+## 2026-11-19 (later): indicator v2, and a faithful backtest port of it
+
+**What happened**
+- **Indicator version 2.0** (saved over the same TradingView script):
+  - Each step is now marked on the chart with its price.
+  - ① The sweep label, with an amber box on the wick of the candle that made the last push, its 50% (WYLD's wick entry) and the dashed ④ trigger line, where a close beyond is the internal confirmation.
+  - ② The level that held, named and priced.
+  - ③ The PDR box from Point A to Point B, with 25/50/75 and Target 2.
+  - ④ The entry label, with entry and stop lines; then +1R · BE and how the setup ended.
+  - The owner wanted both boxes kept: the confluence box (small by default, Detailed in settings) and the regime table.
+- **Fixed:** a pool that price had already run overnight was treated as a sweep at 9:30. Now every pool is marked as taken at any hour, and only a sweep inside the window starts a setup.
+- **`lab/factory/wyld.js`:** a candle-by-candle JavaScript copy of the indicator for backtesting.
+  - It uses the same levels (monthly → weekly → daily with the overlap rule, NWOG/NDOG, FVGs, wick 50%s), pools, steps and confirmations, and never looks ahead.
+  - It counts how many setups reach each step (the "funnel").
+  - Each trade records what made it: the confirmation, the pool, the level, the room to Point B, the time, and how far it ran for and against.
+- **The bot lab engine** (`quint-control/botlab/botlab.js`) can now carry those details and track how far each trade ran for and against (off by default, so nothing else changes).
+
+**First read** (20 sessions of 5-minute candles, so the 1-minute confirmations can't be judged yet):
+- As written, the sweep never triggered. All 50 pools that formed before the open had already been run before 9:30, and equal highs/lows within 2 points are rare on the 15-minute chart (81 in 958 swings).
+- With the prior-day and overnight highs/lows added as pools: 25 sweeps → 6 levels held → 6 PDRs → **0 confirmations**. Point B was reached (4) or the PDR broke (2) before a 5-minute confirmation appeared.
+- Without the sweep pillar: 115 setups → 104 holds → 103 PDRs → 106 confirmations → 16 trades, **−$688**. That's too few trades to judge, and 75 confirmations came while already in a trade.
+
+**Lessons**
+- On 5-minute candles the move from Point A to Point B often finishes before a confirmation forms. WYLD's 1-minute confirmations need 1-minute data to be tested fairly.
+- The sweep pillar depends heavily on what counts as a pool and when it's marked. These must be pinned down (`wyld-exact-rules`) before any verdict.
+
+**Calls used:** TradingView 1 (save and compile the indicator), 4 today in total.
+
 ## 2026-11-19 (late): the WYLD Four Pillars indicator
 
 - Built **Quint · WYLD Four Pillars** for TradingView (`lab/pine/`). It alerts at every step (① sweep, ② HTF level holds, ③ PDR bias, ④ 1m confirmation entry, +1R break-even, stage over), shows a confluence box with the pillars ticked off in order, and a regime table for every timeframe from monthly to 1-minute.

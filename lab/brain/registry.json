@@ -37,7 +37,7 @@
         {
           "name": "TradingView indicator: Quint · WYLD Four Pillars",
           "where": "Your TradingView (My scripts); code in lab/pine/wyld_four_pillars.pine",
-          "note": "Live step-by-step alerts, a confluence box and a regime table for every timeframe. Signals only; a mechanical reading of the rules with the open choices as settings."
+          "note": "Version 2.0: live step-by-step alerts with each step marked on the chart (the wick box of the last push with its 50% and close-beyond trigger, the level that held, the PDR box, entry and stop, how each setup ended), a small confluence box (Detailed in settings) and a regime table for every timeframe. Pools run overnight no longer count as a 9:30 sweep. Signals only; a mechanical reading of the rules with the open choices as settings."
         },
         {
           "name": "Older coding: six steps",

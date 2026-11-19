@@ -1,16 +1,17 @@
 //@version=6
-// Quint · WYLD Four Pillars
-// The owner's strategy (WYLD Will's Four Pillars) as a live checklist on the chart, with an alert at every step:
-//   ① Liquidity sweep of a marked 15m pool (equal highs or lows formed before the open)
-//   ② Price trades into a higher-timeframe level and shows it holds (closes back on the right side)
-//   ③ PDR bias: Point A (the level that held) to Point B (the next HTF level), with the 25 / 50 / 75 steps
-//   ④ 1-minute confirmation = the entry: stop beyond the wick, Target 1 Point B, Target 2 the opposing liquidity
-// Then: +1R (WYLD moves to break-even), and the stage ends when Point B is reached or Point A is lost.
+// Quint · WYLD Four Pillars (v2)
+// The owner's strategy (WYLD Will's Four Pillars) marked live on the chart, with an alert at every step:
+//   ① Liquidity sweep of a marked 15m pool (equal highs or lows formed before the open). A box marks the wick of the
+//     candle that made the last push, with its 50% (WYLD's wick entry) and the trigger line a close must beat.
+//   ② Price trades into a higher-timeframe level near the sweep and closes back on the right side: the level is drawn.
+//   ③ PDR bias: a box from Point A (the level that held) to Point B (the next HTF level), with 25 / 50 / 75 steps.
+//   ④ 1-minute confirmation = the entry: entry and stop lines, Target 1 Point B, Target 2 the opposing liquidity.
+// Then: +1R (WYLD moves to break-even), and the stage ends at Point B, on a close through Point A, or at the window's end.
+// Pools taken overnight are marked as taken; only a sweep inside the window starts a stage.
 // Only the first hours after the 9:30 New York open (14:30 UK). Built for MNQ on the 1-minute chart.
-// This is Quint's mechanical reading of WYLD's rules. Where his videos leave a rule open (what counts as the "easiest"
-// equal highs and lows, the stop buffer), it's a setting. Signals only: it never places orders. Not financial advice.
-// Source: Quint repo, lab/pine/wyld_four_pillars.pine. Rules: lab/brain/playbooks.json.
-indicator("Quint · WYLD Four Pillars", shorttitle = "WYLD 4P", overlay = true, max_lines_count = 500, max_labels_count = 500)
+// Quint's mechanical reading of WYLD's rules; where his videos leave a rule open, it's a setting.
+// Signals only: it never places orders. Not financial advice. Source: Quint repo, lab/pine/wyld_four_pillars.pine.
+indicator("Quint · WYLD Four Pillars", shorttitle = "WYLD 4P", overlay = true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 200)
 
 // ───────── Settings ─────────
 const string G1 = "Session"
@@ -45,9 +46,10 @@ stopBufTicks  = input.int(2, "Stop buffer beyond the wick (ticks)", minval = 0, 
 minR          = input.float(1.0, "Minimum reward to Point B (R)", minval = 0.0, maxval = 20.0, step = 0.5, group = G4)
 maxEntries    = input.int(3, "Entries per stage (WYLD re-enters on each new confirmation)", minval = 1, maxval = 25, group = G4)
 reentryBars   = input.int(5, "Candles between entries", minval = 1, maxval = 120, group = G4)
-showLevels    = input.int(10, "HTF levels to draw (nearest to price)", minval = 0, maxval = 30, group = G5)
+showMarks     = input.bool(true, "Mark each step on the chart (wick box, level, PDR, entry)", group = G5)
+showLevels    = input.int(8, "HTF levels to draw (nearest to price)", minval = 0, maxval = 30, group = G5)
 showPools     = input.bool(true, "Draw the liquidity pools", group = G5)
-showBox       = input.bool(true, "Confluence box", group = G5)
+boxStyle      = input.string("Small", "Confluence box", options = ["Small", "Detailed", "Off"], group = G5)
 boxPosIn      = input.string("Top right", "Confluence box position", options = ["Top right", "Top left", "Bottom right", "Bottom left"], group = G5)
 showRegime    = input.bool(true, "Regime table (every timeframe)", group = G5)
 regPosIn      = input.string("Bottom right", "Regime table position", options = ["Top right", "Top left", "Bottom right", "Bottom left"], group = G5)
@@ -59,6 +61,7 @@ const color AMBER  = #ffb547
 const color CHROME = #d4d4d4
 const color DIM    = #8a8a8a
 const color INK    = #000000
+const color CLEAR  = #00000000
 
 tk  = syminfo.mintick
 txt = textSizeIn == "Tiny" ? size.tiny : textSizeIn == "Normal" ? size.normal : size.small
@@ -213,6 +216,32 @@ poolEligible(int i) =>
     bool pre = not onlyPremarket or (not na(winStartTime) and pt <= winStartTime)
     fresh and pre
 
+// Pools taken on this candle, at any hour. Only a sweep inside the window can start a stage, so a pool that was run
+// overnight is already taken by the open (WYLD: note whether either side has already been swept).
+var array<float> takenLo = array.new<float>()
+var array<int>   takenLoN = array.new<int>()
+var array<float> takenHi = array.new<float>()
+var array<int>   takenHiN = array.new<int>()
+array.clear(takenLo)
+array.clear(takenLoN)
+array.clear(takenHi)
+array.clear(takenHiN)
+int npl = array.size(poolP)
+if npl > 0
+    for i = 0 to npl - 1
+        if not array.get(poolSwept, i)
+            float p = array.get(poolP, i)
+            int dr = array.get(poolD, i)
+            if dr == -1 ? low < p : high > p
+                array.set(poolSwept, i, true)
+                if inWindow and poolEligible(i)
+                    if dr == -1
+                        array.push(takenLo, p)
+                        array.push(takenLoN, array.get(poolN, i))
+                    else
+                        array.push(takenHi, p)
+                        array.push(takenHiN, array.get(poolN, i))
+
 // ───────── Higher-timeframe levels: monthly first, then weekly, then daily; a lower one that overlaps a higher one is dropped ─────────
 var array<float>  lvP = array.new<float>()
 var array<string> lvN = array.new<string>()
@@ -284,7 +313,7 @@ llPrev = ta.lowest(low, sbLen)[1]
 lo3 = math.min(low, math.min(low[1], low[2]))
 hi3 = math.max(high, math.max(high[1], high[2]))
 
-// ───────── One stage per direction ─────────
+// ───────── One stage per direction, with its marks on the chart ─────────
 type Stage
     int    dir
     int    step = 0
@@ -311,6 +340,49 @@ type Stage
     bool   usedBreak = false
     string conf = ""
     string last = ""
+    box    wickBox
+    line   wickMid
+    line   trigLine
+    label  lb1
+    label  lbTrig
+    line   aLine
+    label  lb2
+    box    pdrBox
+    line   q25
+    line   q50
+    line   q75
+    line   t2Line
+    label  lb3
+    line   eLine
+    line   sLine
+
+endLine(line l) =>
+    if not na(l)
+        line.set_extend(l, extend.none)
+        line.set_x2(l, bar_index)
+    l
+endBox(box b) =>
+    if not na(b)
+        box.set_extend(b, extend.none)
+        box.set_right(b, bar_index)
+    b
+
+// Stop the stage's marks at this candle (they stay on the chart as a record) and say how it ended.
+method finishStage(Stage s, string outcome, color col) =>
+    endBox(s.wickBox)
+    endLine(s.wickMid)
+    endLine(s.trigLine)
+    endLine(s.aLine)
+    endBox(s.pdrBox)
+    endLine(s.q25)
+    endLine(s.q50)
+    endLine(s.q75)
+    endLine(s.t2Line)
+    endLine(s.eLine)
+    endLine(s.sLine)
+    if showMarks and outcome != "" and s.step > 0
+        label.new(bar_index, s.dir == 1 ? high : low, outcome, color = CLEAR, textcolor = col, style = s.dir == 1 ? label.style_label_down : label.style_label_up, size = size.small)
+    s
 
 method clearStage(Stage s) =>
     s.step := 0
@@ -336,9 +408,52 @@ method clearStage(Stage s) =>
     s.usedWick := false
     s.usedBreak := false
     s.conf := ""
+    s.wickBox := na
+    s.wickMid := na
+    s.trigLine := na
+    s.lb1 := na
+    s.lbTrig := na
+    s.aLine := na
+    s.lb2 := na
+    s.pdrBox := na
+    s.q25 := na
+    s.q50 := na
+    s.q75 := na
+    s.t2Line := na
+    s.lb3 := na
+    s.eLine := na
+    s.sLine := na
     s
 
 join(string a, string b) => a == "" ? b : a + "  ·  " + b
+
+// The wick of the candle that made the last push: for a long, from its low up to its body; for a short, from its body up
+// to its high. Its 50% is WYLD's wick entry. The trigger is the far end of that candle: a close beyond it confirms.
+method markWick(Stage s) =>
+    int d = s.dir
+    float wTop = d == 1 ? math.min(open, close) : high
+    float wBot = d == 1 ? low : math.max(open, close)
+    float mid = (wTop + wBot) / 2
+    float trig = d == 1 ? high : low
+    color c = d == 1 ? MINT : ROSE
+    if showMarks
+        if na(s.wickBox)
+            s.wickBox := box.new(bar_index, wTop, bar_index + 1, wBot, border_color = color.new(AMBER, 20), bgcolor = color.new(AMBER, 82), extend = extend.right)
+            s.wickMid := line.new(bar_index, mid, bar_index + 1, mid, extend = extend.right, color = AMBER, style = line.style_dotted)
+            s.trigLine := line.new(bar_index, trig, bar_index + 1, trig, extend = extend.right, color = color.new(CHROME, 25), style = line.style_dashed)
+            s.lb1 := label.new(bar_index, d == 1 ? low : high, "① sweep " + fmt(s.pool), color = CLEAR, textcolor = c, style = d == 1 ? label.style_label_up : label.style_label_down, size = size.small)
+            s.lbTrig := label.new(bar_index, trig, "④ trigger: close " + (d == 1 ? "above " : "below ") + fmt(trig) + " · wick 50% " + fmt(mid), color = CLEAR, textcolor = color.new(CHROME, 20), style = label.style_label_left, size = size.tiny)
+        else
+            box.set_lefttop(s.wickBox, bar_index, wTop)
+            box.set_rightbottom(s.wickBox, bar_index + 1, wBot)
+            line.set_xy1(s.wickMid, bar_index, mid)
+            line.set_xy2(s.wickMid, bar_index + 1, mid)
+            line.set_xy1(s.trigLine, bar_index, trig)
+            line.set_xy2(s.trigLine, bar_index + 1, trig)
+            label.set_xy(s.lb1, bar_index, d == 1 ? low : high)
+            label.set_xy(s.lbTrig, bar_index, trig)
+            label.set_text(s.lbTrig, "④ trigger: close " + (d == 1 ? "above " : "below ") + fmt(trig) + " · wick 50% " + fmt(mid))
+    s
 
 runStage(Stage s) =>
     bool e1 = false
@@ -350,21 +465,24 @@ runStage(Stage s) =>
     string msg = ""
     int d = s.dir
     string side = d == 1 ? "LONG" : "SHORT"
+    color c = d == 1 ? MINT : ROSE
     float tol = tolTicks * syminfo.mintick
-    // ① the sweep of a marked pool on the other side
+    // ① a marked pool on the other side is swept inside the window
     if s.step == 0 and inWindow
         float best = na
         int bestN = 0
-        int n = array.size(poolP)
+        array<float> tp = takenHi
+        array<int> tn = takenHiN
+        if d == 1
+            tp := takenLo
+            tn := takenLoN
+        int n = array.size(tp)
         if n > 0
             for i = 0 to n - 1
-                if array.get(poolD, i) == -d and not array.get(poolSwept, i) and poolEligible(i)
-                    float p = array.get(poolP, i)
-                    if d == 1 ? low < p : high > p
-                        array.set(poolSwept, i, true)
-                        if na(best) or (d == 1 ? p < best : p > best)
-                            best := p
-                            bestN := array.get(poolN, i)
+                float p = array.get(tp, i)
+                if na(best) or (d == 1 ? p < best : p > best)
+                    best := p
+                    bestN := array.get(tn, i)
         if not na(best)
             s.step := 1
             s.pool := best
@@ -374,14 +492,16 @@ runStage(Stage s) =>
             s.wickEdge := d == 1 ? high : low
             s.sweepBar := bar_index
             s.sweepTime := time
+            s.markWick()
             e1 := true
-            msg := join(msg, "① SWEEP (" + side + " stage): " + (d == 1 ? "sell-side equal lows " : "buy-side equal highs ") + fmt(best) + " taken. Now wait for an HTF level to hold.")
+            msg := join(msg, "① SWEEP (" + side + " stage): " + (d == 1 ? "sell-side equal lows " : "buy-side equal highs ") + fmt(best) + " taken. Wick box drawn. Now wait for an HTF level to hold.")
     // ② a higher-timeframe level near the sweep holds
     if s.step == 1
-        if d == 1 ? low < s.extreme : high > s.extreme
+        if bar_index > s.extremeBar and (d == 1 ? low < s.extreme : high > s.extreme)
             s.extreme := d == 1 ? low : high
             s.extremeBar := bar_index
             s.wickEdge := d == 1 ? high : low
+            s.markWick()
         float A = na
         string aN = ""
         int aR = 0
@@ -401,10 +521,14 @@ runStage(Stage s) =>
             s.aName := aN
             s.aRank := aR
             s.heldBar := bar_index
+            if showMarks
+                s.aLine := line.new(bar_index, A, bar_index + 1, A, extend = extend.right, color = c, width = 2)
+                s.lb2 := label.new(bar_index, A, "② " + aN + " " + fmt(A) + " held", color = CLEAR, textcolor = c, style = label.style_label_left, size = size.small)
             e2 := true
             msg := join(msg, "② HTF LEVEL HOLDS (" + side + "): " + aN + " " + fmt(A) + ".")
         else if bar_index - s.sweepBar > holdBars or not inWindow
             msg := join(msg, "Stage dropped: no HTF level held after the sweep.")
+            s.finishStage("no level held", DIM)
             s.clearStage()
     // ③ the PDR: Point A to the next HTF level, Point B
     if s.step == 2
@@ -430,6 +554,7 @@ runStage(Stage s) =>
                         T2 := p
         if na(B)
             msg := join(msg, "Stage dropped: no Point B (no HTF level or liquidity beyond Point A).")
+            s.finishStage("no Point B", DIM)
             s.clearStage()
         else
             if na(T2) and m > 0
@@ -441,8 +566,17 @@ runStage(Stage s) =>
             s.bName := bN
             s.t2 := T2
             s.step := 3
+            float mid = (s.pointA + B) / 2
+            if showMarks
+                s.pdrBox := box.new(bar_index, math.max(s.pointA, B), bar_index + 1, math.min(s.pointA, B), border_color = color.new(CHROME, 70), bgcolor = color.new(CHROME, 93), extend = extend.right)
+                s.q25 := line.new(bar_index, s.pointA + (B - s.pointA) * 0.25, bar_index + 1, s.pointA + (B - s.pointA) * 0.25, extend = extend.right, color = color.new(CHROME, 65), style = line.style_dotted)
+                s.q50 := line.new(bar_index, mid, bar_index + 1, mid, extend = extend.right, color = color.new(CHROME, 30), style = line.style_dashed)
+                s.q75 := line.new(bar_index, s.pointA + (B - s.pointA) * 0.75, bar_index + 1, s.pointA + (B - s.pointA) * 0.75, extend = extend.right, color = color.new(CHROME, 65), style = line.style_dotted)
+                s.lb3 := label.new(bar_index, B, "③ B " + bN + " " + fmt(B) + " · 0.5 " + fmt(mid), color = CLEAR, textcolor = CHROME, style = label.style_label_left, size = size.small)
+                if not na(T2)
+                    s.t2Line := line.new(bar_index, T2, bar_index + 1, T2, extend = extend.right, color = color.new(c, 45), style = line.style_dashed)
             e3 := true
-            msg := join(msg, "③ PDR BIAS " + side + ": A " + fmt(s.pointA) + " → B " + fmt(B) + " (" + bN + "), 0.5 at " + fmt((s.pointA + B) / 2) + ". Stage set: wait for the 1m confirmation.")
+            msg := join(msg, "③ PDR BIAS " + side + ": A " + fmt(s.pointA) + " → B " + fmt(B) + " (" + bN + "), 0.5 at " + fmt(mid) + ". Stage set: wait for the 1m confirmation.")
     // ④ the stage is set: confirmations, management, the end of the stage
     if s.step == 3
         bool reachedB = d == 1 ? high >= s.pointB : low <= s.pointB
@@ -450,24 +584,27 @@ runStage(Stage s) =>
         if not na(s.entry) and not s.beSent and (d == 1 ? high >= s.entry + (s.entry - s.stop) : low <= s.entry - (s.stop - s.entry))
             s.beSent := true
             eBE := true
+            if showMarks
+                label.new(bar_index, d == 1 ? high : low, "+1R · BE", color = CLEAR, textcolor = AMBER, style = d == 1 ? label.style_label_down : label.style_label_up, size = size.small)
             msg := join(msg, "+1R on the " + side + " from " + fmt(s.entry) + ": WYLD moves the stop to break-even.")
         if reachedB or broken
             eEnd := true
             msg := join(msg, reachedB ? "STAGE COMPLETE: Point B " + fmt(s.pointB) + " reached. Next: the opposing liquidity " + fmt(s.t2) + " if you're still in." : "PDR BROKEN: price closed through Point A " + fmt(s.pointA) + ". The stage is over.")
+            s.finishStage(reachedB ? "✓ B reached" : "✗ PDR broken", reachedB ? MINT : ROSE)
             s.clearStage()
         else if inWindow and s.entries < maxEntries and bar_index > s.heldBar and (na(s.lastEntryBar) or bar_index - s.lastEntryBar >= reentryBars)
-            string c = ""
+            string cf = ""
             if useWick and not s.usedWick and bar_index > s.extremeBar and (d == 1 ? close > s.wickEdge : close < s.wickEdge)
-                c := "a wick held and price closed beyond it"
-            if c == "" and useRetest and (d == 1 ? low <= s.pointA + tol and close > s.pointA : high >= s.pointA - tol and close < s.pointA)
-                c := "the HTF level retest held"
-            if c == "" and useBreak and not s.usedBreak and (d == 1 ? close > hhPrev : close < llPrev)
-                c := "a held level broke (close beyond the recent swing)"
-            if c == "" and useIfvg and (d == 1 ? not na(cfBeT) and cfBeBar >= s.sweepBar - fvgLook and close > cfBeT : not na(cfBuB) and cfBuBar >= s.sweepBar - fvgLook and close < cfBuB)
-                c := "an FVG inverted"
-            if c == "" and useFvgRetest and (d == 1 ? not na(cfBuT) and cfBuBar > s.heldBar and cfBuBar < bar_index and low <= cfBuT and close > cfBuB : not na(cfBeB) and cfBeBar > s.heldBar and cfBeBar < bar_index and high >= cfBeB and close < cfBeT)
-                c := "price traded into a new FVG and held"
-            if c != ""
+                cf := "a wick held and price closed beyond it"
+            if cf == "" and useRetest and (d == 1 ? low <= s.pointA + tol and close > s.pointA : high >= s.pointA - tol and close < s.pointA)
+                cf := "the HTF level retest held"
+            if cf == "" and useBreak and not s.usedBreak and (d == 1 ? close > hhPrev : close < llPrev)
+                cf := "a held level broke (close beyond the recent swing)"
+            if cf == "" and useIfvg and (d == 1 ? not na(cfBeT) and cfBeBar >= s.sweepBar - fvgLook and close > cfBeT : not na(cfBuB) and cfBuBar >= s.sweepBar - fvgLook and close < cfBuB)
+                cf := "an FVG inverted"
+            if cf == "" and useFvgRetest and (d == 1 ? not na(cfBuT) and cfBuBar > s.heldBar and cfBuBar < bar_index and low <= cfBuT and close > cfBuB : not na(cfBeB) and cfBeBar > s.heldBar and cfBeBar < bar_index and high >= cfBeB and close < cfBeT)
+                cf := "price traded into a new FVG and held"
+            if cf != ""
                 float entry = close
                 float stopP = d == 1 ? lo3 - stopBufTicks * syminfo.mintick : hi3 + stopBufTicks * syminfo.mintick
                 float risk = math.abs(entry - stopP)
@@ -479,15 +616,20 @@ runStage(Stage s) =>
                     s.entry := entry
                     s.stop := stopP
                     s.beSent := false
-                    s.conf := c
-                    if str.contains(c, "wick")
+                    s.conf := cf
+                    if str.contains(cf, "wick")
                         s.usedWick := true
-                    if str.contains(c, "broke")
+                    if str.contains(cf, "broke")
                         s.usedBreak := true
                     e4 := true
+                    if showMarks
+                        endLine(s.eLine)
+                        endLine(s.sLine)
+                        s.eLine := line.new(bar_index, entry, bar_index + 1, entry, extend = extend.right, color = color.new(c, 20))
+                        s.sLine := line.new(bar_index, stopP, bar_index + 1, stopP, extend = extend.right, color = color.new(ROSE, 20), style = line.style_dashed)
                     string t2s = na(s.t2) ? "" : " · T2 opposing liquidity " + fmt(s.t2) + " (" + str.tostring(math.abs(s.t2 - entry) / risk, "#.#") + "R)"
-                    msg := join(msg, "④ ENTRY " + side + " #" + str.tostring(s.entries) + ": " + c + ". Entry " + fmt(entry) + " · stop " + fmt(stopP) + " (" + str.tostring(risk / syminfo.mintick, "#") + " ticks) · T1 Point B " + fmt(s.pointB) + " (" + str.tostring(rB, "#.#") + "R)" + t2s + ".")
-                    label.new(bar_index, d == 1 ? low : high, (d == 1 ? "BUY " : "SELL ") + str.tostring(rB, "#.#") + "R\n" + c, color = d == 1 ? MINT : ROSE, textcolor = INK, style = d == 1 ? label.style_label_up : label.style_label_down, size = size.small)
+                    msg := join(msg, "④ ENTRY " + side + " #" + str.tostring(s.entries) + ": " + cf + ". Entry " + fmt(entry) + " · stop " + fmt(stopP) + " (" + str.tostring(risk / syminfo.mintick, "#") + " ticks) · T1 Point B " + fmt(s.pointB) + " (" + str.tostring(rB, "#.#") + "R)" + t2s + ".")
+                    label.new(bar_index, d == 1 ? low : high, "④ " + (d == 1 ? "BUY " : "SELL ") + str.tostring(rB, "#.#") + "R\n" + cf, color = c, textcolor = INK, style = d == 1 ? label.style_label_up : label.style_label_down, size = size.small)
     s.last := msg == "" ? s.last : msg
     [e1, e2, e3, e4, eBE, eEnd, msg]
 
@@ -498,6 +640,8 @@ var Stage S = Stage.new(dir = -1)
 bool expired = false
 if winOver and (L.step > 0 or S.step > 0)
     expired := true
+    L.finishStage("window closed", DIM)
+    S.finishStage("window closed", DIM)
     L.clearStage()
     S.clearStage()
 
@@ -514,29 +658,6 @@ alertcondition(l3 or s3, "③ PDR bias set", "WYLD 4P: PDR bias set, waiting for
 alertcondition(l4 or s4, "④ Entry (1m confirmation)", "WYLD 4P: ENTRY on the 1m confirmation")
 alertcondition(lBE or sBE, "+1R break-even", "WYLD 4P: +1R, move the stop to break-even")
 alertcondition(lEnd or sEnd or expired, "Stage over", "WYLD 4P: the stage is complete, broken or expired")
-
-// ───────── On the chart ─────────
-plotshape(l1, "① Sweep (long stage)", shape.circle, location.belowbar, MINT, text = "1", textcolor = MINT, size = size.tiny)
-plotshape(l2, "② Level holds (long)", shape.diamond, location.belowbar, MINT, text = "2", textcolor = MINT, size = size.tiny)
-plotshape(l3, "③ PDR bias long", shape.triangleup, location.belowbar, MINT, text = "3", textcolor = MINT, size = size.tiny)
-plotshape(s1, "① Sweep (short stage)", shape.circle, location.abovebar, ROSE, text = "1", textcolor = ROSE, size = size.tiny)
-plotshape(s2, "② Level holds (short)", shape.diamond, location.abovebar, ROSE, text = "2", textcolor = ROSE, size = size.tiny)
-plotshape(s3, "③ PDR bias short", shape.triangledown, location.abovebar, ROSE, text = "3", textcolor = ROSE, size = size.tiny)
-plotshape(lBE or sBE, "+1R break-even", shape.xcross, location.abovebar, AMBER, text = "BE", textcolor = AMBER, size = size.tiny)
-plot(L.step >= 3 ? L.pointA : na, "Long Point A", color = MINT, linewidth = 2, style = plot.style_linebr)
-plot(L.step >= 3 ? L.pointA + (L.pointB - L.pointA) * 0.25 : na, "Long PDR 25%", color = color.new(CHROME, 60), style = plot.style_linebr)
-plot(L.step >= 3 ? (L.pointA + L.pointB) / 2 : na, "Long PDR 50%", color = color.new(CHROME, 20), style = plot.style_linebr)
-plot(L.step >= 3 ? L.pointA + (L.pointB - L.pointA) * 0.75 : na, "Long PDR 75%", color = color.new(CHROME, 60), style = plot.style_linebr)
-plot(L.step >= 3 ? L.pointB : na, "Long Point B (Target 1)", color = CHROME, linewidth = 2, style = plot.style_linebr)
-plot(L.step >= 3 ? L.t2 : na, "Long Target 2 (opposing liquidity)", color = color.new(MINT, 40), style = plot.style_linebr)
-plot(L.step >= 3 and not na(L.entry) ? L.stop : na, "Long stop", color = ROSE, style = plot.style_linebr)
-plot(S.step >= 3 ? S.pointA : na, "Short Point A", color = ROSE, linewidth = 2, style = plot.style_linebr)
-plot(S.step >= 3 ? S.pointA + (S.pointB - S.pointA) * 0.25 : na, "Short PDR 25%", color = color.new(CHROME, 60), style = plot.style_linebr)
-plot(S.step >= 3 ? (S.pointA + S.pointB) / 2 : na, "Short PDR 50%", color = color.new(CHROME, 20), style = plot.style_linebr)
-plot(S.step >= 3 ? S.pointA + (S.pointB - S.pointA) * 0.75 : na, "Short PDR 75%", color = color.new(CHROME, 60), style = plot.style_linebr)
-plot(S.step >= 3 ? S.pointB : na, "Short Point B (Target 1)", color = CHROME, linewidth = 2, style = plot.style_linebr)
-plot(S.step >= 3 ? S.t2 : na, "Short Target 2 (opposing liquidity)", color = color.new(ROSE, 40), style = plot.style_linebr)
-plot(S.step >= 3 and not na(S.entry) ? S.stop : na, "Short stop", color = ROSE, style = plot.style_linebr)
 bgcolor(inWindow ? color.new(CHROME, 96) : na, title = "Trading window")
 
 // HTF levels and pools nearest to price, redrawn on the last candle
@@ -562,20 +683,20 @@ if barstate.islast
                 array.set(used, pick, true)
                 float p = array.get(lvP, pick)
                 int r = array.get(lvR, pick)
-                color c = r == 3 ? CHROME : r == 2 ? color.new(CHROME, 30) : color.new(CHROME, 55)
-                array.push(drawnLines, line.new(bar_index - 40, p, bar_index, p, extend = extend.right, color = c, style = line.style_dotted, width = r == 3 ? 2 : 1))
-                array.push(drawnLabels, label.new(bar_index + 3, p, array.get(lvN, pick) + "  " + fmt(p), style = label.style_none, textcolor = c, size = size.tiny, textalign = text.align_left))
+                color lc = r == 3 ? CHROME : r == 2 ? color.new(CHROME, 30) : color.new(CHROME, 55)
+                array.push(drawnLines, line.new(bar_index - 40, p, bar_index, p, extend = extend.right, color = lc, style = line.style_dotted, width = r == 3 ? 2 : 1))
+                array.push(drawnLabels, label.new(bar_index + 3, p, array.get(lvN, pick) + "  " + fmt(p), style = label.style_none, textcolor = lc, size = size.tiny, textalign = text.align_left))
     int np = array.size(poolP)
     if showPools and np > 0
         for i = 0 to np - 1
             if not array.get(poolSwept, i) and time - array.get(poolT, i) <= lookMs
                 float p = array.get(poolP, i)
                 int dr = array.get(poolD, i)
-                color c = dr == 1 ? color.new(ROSE, 20) : color.new(MINT, 20)
-                array.push(drawnLines, line.new(bar_index - 25, p, bar_index, p, extend = extend.right, color = c, style = line.style_dashed))
-                array.push(drawnLabels, label.new(bar_index + 3, p, (dr == 1 ? "EQH" : "EQL") + " ×" + str.tostring(array.get(poolN, i)) + "  " + fmt(p), style = label.style_none, textcolor = c, size = size.tiny, textalign = text.align_left))
+                color pc = dr == 1 ? color.new(ROSE, 20) : color.new(MINT, 20)
+                array.push(drawnLines, line.new(bar_index - 25, p, bar_index, p, extend = extend.right, color = pc, style = line.style_dashed))
+                array.push(drawnLabels, label.new(bar_index + 3, p, (dr == 1 ? "EQH" : "EQL") + " ×" + str.tostring(array.get(poolN, i)) + "  " + fmt(p), style = label.style_none, textcolor = pc, size = size.tiny, textalign = text.align_left))
 
-// ───────── The confluence box ─────────
+// ───────── The confluence box (small by default) ─────────
 nearestPool(int dir) =>
     float best = na
     int n = array.size(poolP)
@@ -598,7 +719,8 @@ var table reg = table.new(posOf(regPosIn), 4, 10, bgcolor = color.new(INK, 5), f
 cell(table t, int c, int r, string s, color col) =>
     table.cell(t, c, r, s, text_color = col, text_size = txt, text_halign = text.align_left)
 
-if barstate.islast and showBox
+if barstate.islast and boxStyle != "Off"
+    table.clear(conf, 0, 0, 1, 10)
     Stage st = L
     if S.step > L.step
         st := S
@@ -606,24 +728,7 @@ if barstate.islast and showBox
     int d = st.dir
     string side = d == 1 ? "LONG" : "SHORT"
     int left = winEnd - nyMin
-    string status = not weekday ? "WEEKEND" : not inWindow ? "OUTSIDE THE WINDOW" : st.step == 0 ? "WAITING FOR A SWEEP" : st.step == 1 ? "SWEPT: WAIT FOR A LEVEL TO HOLD" : st.step == 2 ? "LEVEL HELD" : not na(st.entry) ? "IN PLAY: " + side : "STAGE SET: WAIT FOR 1M CONFIRMATION"
-    color sCol = not inWindow ? DIM : st.step >= 3 ? MINT : st.step > 0 ? AMBER : CHROME
-    cell(conf, 0, 0, "WYLD FOUR PILLARS", CHROME)
-    cell(conf, 1, 0, status, sCol)
-    cell(conf, 0, 1, "Window", DIM)
-    cell(conf, 1, 1, inWindow ? str.tostring(math.floor(left / 60)) + "h " + str.tostring(left % 60) + "m left (to " + str.tostring(math.floor(winEnd / 60)) + ":" + (winEnd % 60 < 10 ? "0" : "") + str.tostring(winEnd % 60) + " NY)" : "First " + str.tostring(winHours) + "h after 9:30 NY (14:30 UK)", inWindow ? MINT : DIM)
-    cell(conf, 0, 2, mark(st.step >= 1) + "① Sweep", st.step >= 1 ? MINT : DIM)
-    cell(conf, 1, 2, st.step >= 1 ? (d == 1 ? "Equal lows " : "Equal highs ") + fmt(st.pool) + " taken (" + str.tostring(st.poolTouches) + " touches)" : "Pools: EQH " + fmt(nearestPool(1)) + " · EQL " + fmt(nearestPool(-1)), st.step >= 1 ? CHROME : DIM)
-    cell(conf, 0, 3, mark(st.step >= 2) + "② HTF level holds", st.step >= 2 ? MINT : DIM)
-    cell(conf, 1, 3, st.step >= 2 ? st.aName + " " + fmt(st.pointA) : "Waiting", st.step >= 2 ? CHROME : DIM)
     float mid = st.step >= 3 ? (st.pointA + st.pointB) / 2 : na
-    cell(conf, 0, 4, mark(st.step >= 3) + "③ PDR bias", st.step >= 3 ? MINT : DIM)
-    cell(conf, 1, 4, st.step >= 3 ? side + ": A " + fmt(st.pointA) + " → B " + fmt(st.pointB) + " · 0.5 " + fmt(mid) : "Waiting", st.step >= 3 ? CHROME : DIM)
-    cell(conf, 0, 5, mark(not na(st.entry)) + "④ 1m confirmation", not na(st.entry) ? MINT : DIM)
-    cell(conf, 1, 5, not na(st.entry) ? st.conf + " (entry " + str.tostring(st.entries) + " of " + str.tostring(maxEntries) + ")" : st.step >= 3 ? "Watching the 1m" : "Waiting", not na(st.entry) ? CHROME : DIM)
-    float risk = na(st.entry) ? na : math.abs(st.entry - st.stop)
-    cell(conf, 0, 6, "Plan", DIM)
-    cell(conf, 1, 6, na(st.entry) ? (st.step >= 3 ? "T1 Point B " + fmt(st.pointB) + " · T2 " + fmt(st.t2) : "—") : "Entry " + fmt(st.entry) + " · stop " + fmt(st.stop) + " · T1 " + fmt(st.pointB) + " (" + str.tostring(math.abs(st.pointB - st.entry) / risk, "#.#") + "R) · T2 " + fmt(st.t2), CHROME)
     bool cAbove = st.step >= 3 and (d == 1 ? close > mid : close < mid)
     bool cRank = st.aRank >= 2
     bool cPool = st.poolTouches >= 3
@@ -631,14 +736,45 @@ if barstate.islast and showBox
     bool c15 = tr15 == d
     bool cVol = vo5 != -1
     int score = (cAbove ? 1 : 0) + (cRank ? 1 : 0) + (cPool ? 1 : 0) + (c1H ? 1 : 0) + (c15 ? 1 : 0) + (cVol ? 1 : 0)
-    cell(conf, 0, 7, "Confluence " + (active ? str.tostring(score) + "/6" : "—"), active ? (score >= 4 ? MINT : score >= 2 ? AMBER : ROSE) : DIM)
-    cell(conf, 1, 7, active ? mark(cAbove) + "past the 0.5  " + mark(cRank) + "weekly/monthly level  " + mark(cPool) + "3+ touch pool" : "Extras, not rules: the four pillars decide", active ? CHROME : DIM)
-    cell(conf, 0, 8, "", DIM)
-    cell(conf, 1, 8, active ? mark(c1H) + "1H trend agrees  " + mark(c15) + "15m trend agrees  " + mark(cVol) + "5m not quiet" : "", CHROME)
-    cell(conf, 0, 9, "Last", DIM)
-    cell(conf, 1, 9, st.last == "" ? "—" : str.substring(st.last, 0, math.min(str.length(st.last), 120)), DIM)
-    cell(conf, 0, 10, "Check", AMBER)
-    cell(conf, 1, 10, "Red-folder news? Lucid: flat 1 min either side. Hold winners past 5s.", AMBER)
+    string status = not weekday ? "Weekend" : not inWindow ? "Outside window" : st.step == 0 ? "Wait for ①" : st.step == 1 ? "Wait for ②" : st.step == 2 ? "Level held" : not na(st.entry) ? "In play " + side : "Wait for ④"
+    color sCol = not inWindow ? DIM : st.step >= 3 ? MINT : st.step > 0 ? AMBER : CHROME
+    if boxStyle == "Small"
+        cell(conf, 0, 0, "WYLD 4P", CHROME)
+        cell(conf, 1, 0, status, sCol)
+        cell(conf, 0, 1, mark(st.step >= 1) + "①", st.step >= 1 ? MINT : DIM)
+        cell(conf, 1, 1, st.step >= 1 ? (d == 1 ? "EQL " : "EQH ") + fmt(st.pool) : "EQH " + fmt(nearestPool(1)) + " · EQL " + fmt(nearestPool(-1)), st.step >= 1 ? CHROME : DIM)
+        cell(conf, 0, 2, mark(st.step >= 2) + "②", st.step >= 2 ? MINT : DIM)
+        cell(conf, 1, 2, st.step >= 2 ? st.aName + " " + fmt(st.pointA) : "—", st.step >= 2 ? CHROME : DIM)
+        cell(conf, 0, 3, mark(st.step >= 3) + "③", st.step >= 3 ? MINT : DIM)
+        cell(conf, 1, 3, st.step >= 3 ? "B " + fmt(st.pointB) + " · 0.5 " + fmt(mid) : "—", st.step >= 3 ? CHROME : DIM)
+        cell(conf, 0, 4, mark(not na(st.entry)) + "④", not na(st.entry) ? MINT : DIM)
+        cell(conf, 1, 4, not na(st.entry) ? "Entry " + fmt(st.entry) + " · stop " + fmt(st.stop) : st.step >= 3 ? "Watch the trigger" : "—", not na(st.entry) ? CHROME : DIM)
+        cell(conf, 0, 5, "Score", DIM)
+        cell(conf, 1, 5, active ? str.tostring(score) + "/6 extras" : (inWindow ? str.tostring(math.floor(left / 60)) + "h " + str.tostring(left % 60) + "m left" : "14:30 UK"), active ? (score >= 4 ? MINT : score >= 2 ? AMBER : ROSE) : DIM)
+    else
+        cell(conf, 0, 0, "WYLD FOUR PILLARS", CHROME)
+        cell(conf, 1, 0, status, sCol)
+        cell(conf, 0, 1, "Window", DIM)
+        cell(conf, 1, 1, inWindow ? str.tostring(math.floor(left / 60)) + "h " + str.tostring(left % 60) + "m left" : "First " + str.tostring(winHours) + "h after 9:30 NY (14:30 UK)", inWindow ? MINT : DIM)
+        cell(conf, 0, 2, mark(st.step >= 1) + "① Sweep", st.step >= 1 ? MINT : DIM)
+        cell(conf, 1, 2, st.step >= 1 ? (d == 1 ? "Equal lows " : "Equal highs ") + fmt(st.pool) + " taken (" + str.tostring(st.poolTouches) + " touches)" : "Pools: EQH " + fmt(nearestPool(1)) + " · EQL " + fmt(nearestPool(-1)), st.step >= 1 ? CHROME : DIM)
+        cell(conf, 0, 3, mark(st.step >= 2) + "② HTF level holds", st.step >= 2 ? MINT : DIM)
+        cell(conf, 1, 3, st.step >= 2 ? st.aName + " " + fmt(st.pointA) : "Waiting", st.step >= 2 ? CHROME : DIM)
+        cell(conf, 0, 4, mark(st.step >= 3) + "③ PDR bias", st.step >= 3 ? MINT : DIM)
+        cell(conf, 1, 4, st.step >= 3 ? side + ": A " + fmt(st.pointA) + " → B " + fmt(st.pointB) + " · 0.5 " + fmt(mid) : "Waiting", st.step >= 3 ? CHROME : DIM)
+        cell(conf, 0, 5, mark(not na(st.entry)) + "④ 1m confirmation", not na(st.entry) ? MINT : DIM)
+        cell(conf, 1, 5, not na(st.entry) ? st.conf + " (entry " + str.tostring(st.entries) + " of " + str.tostring(maxEntries) + ")" : st.step >= 3 ? "Watch the trigger line" : "Waiting", not na(st.entry) ? CHROME : DIM)
+        float risk = na(st.entry) ? na : math.abs(st.entry - st.stop)
+        cell(conf, 0, 6, "Plan", DIM)
+        cell(conf, 1, 6, na(st.entry) ? (st.step >= 3 ? "T1 Point B " + fmt(st.pointB) + " · T2 " + fmt(st.t2) : "—") : "Entry " + fmt(st.entry) + " · stop " + fmt(st.stop) + " · T1 " + fmt(st.pointB) + " (" + str.tostring(math.abs(st.pointB - st.entry) / risk, "#.#") + "R) · T2 " + fmt(st.t2), CHROME)
+        cell(conf, 0, 7, "Confluence " + (active ? str.tostring(score) + "/6" : "—"), active ? (score >= 4 ? MINT : score >= 2 ? AMBER : ROSE) : DIM)
+        cell(conf, 1, 7, active ? mark(cAbove) + "past the 0.5  " + mark(cRank) + "weekly/monthly level  " + mark(cPool) + "3+ touch pool" : "Extras, not rules: the four pillars decide", active ? CHROME : DIM)
+        cell(conf, 0, 8, "", DIM)
+        cell(conf, 1, 8, active ? mark(c1H) + "1H trend agrees  " + mark(c15) + "15m trend agrees  " + mark(cVol) + "5m not quiet" : "", CHROME)
+        cell(conf, 0, 9, "Last", DIM)
+        cell(conf, 1, 9, st.last == "" ? "—" : str.substring(st.last, 0, math.min(str.length(st.last), 120)), DIM)
+        cell(conf, 0, 10, "Check", AMBER)
+        cell(conf, 1, 10, "Red-folder news? Lucid: flat 1 min either side. Hold winners past 5s.", AMBER)
 
 if barstate.islast and showRegime
     cell(reg, 0, 0, "TF", DIM)

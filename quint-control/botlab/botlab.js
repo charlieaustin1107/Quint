@@ -276,7 +276,10 @@ function runBot(bars, bot, opt = {}, botNumber = null) {
     if (bot.day) bot.day(d);
     const close = (price, why, at) => {
       const usd = (price - pos.entry) * pos.dir * o.pointValue * o.contracts - 2 * o.commissionPerSide * o.contracts;
-      trades.push({ day: day.day, bot: botNumber, dir: pos.dir, entry: pos.entry, exit: price, why, from: pos.at, to: at, usd });
+      const t = { day: day.day, bot: botNumber, dir: pos.dir, entry: pos.entry, exit: price, why, from: pos.at, to: at, usd };
+      if (pos.tag !== undefined) t.tag = pos.tag; // what the setup looked like (bots that describe their setups)
+      if (o.excursions) { t.risk = pos.risk; t.mfe = pos.mfe; t.mae = pos.mae; } // how far it ran for and against, in points
+      trades.push(t);
       pnl += usd; pos = null;
     };
     for (let i = 0; i < list.length; i++) {
@@ -286,9 +289,13 @@ function runBot(bars, bot, opt = {}, botNumber = null) {
         if (pending.exit && pos) close(b.o - pos.dir * slip, pending.exit, b.m);
         if (pending.dir) {
           if (pos && pos.dir === -pending.dir) close(b.o - pos.dir * slip, 'flip', b.m);
-          if (!pos) pos = { dir: pending.dir, entry: b.o + pending.dir * slip, stop: pending.stop, target: pending.target, at: b.m };
+          if (!pos) { pos = { dir: pending.dir, entry: b.o + pending.dir * slip, stop: pending.stop, target: pending.target, at: b.m, tag: pending.tag, mfe: 0, mae: 0 }; pos.risk = Math.abs(pos.entry - pos.stop); }
         }
         pending = null;
+      }
+      if (pos && o.excursions) { // best and worst price reached while the trade is open
+        pos.mfe = Math.max(pos.mfe, pos.dir > 0 ? b.h - pos.entry : pos.entry - b.l);
+        pos.mae = Math.max(pos.mae, pos.dir > 0 ? pos.entry - b.l : b.h - pos.entry);
       }
       // the stop and target inside this candle (the stop counts first if both could have filled)
       if (pos) {
@@ -320,7 +327,7 @@ function runBot(bars, bot, opt = {}, botNumber = null) {
           if (sig.exit) { if (pos) pending = { exit: sig.exit }; }
           else if (sig.dir && (!pos || pos.dir !== sig.dir)) {
             const ok = count < bot.maxTrades && pnl > -lossLimit && (sig.dir > 0 ? sig.stop < b.c : sig.stop > b.c);
-            if (ok) { pending = { dir: sig.dir, stop: roundTick(sig.stop, o.tick), target: sig.target === null ? null : roundTick(sig.target, o.tick) }; count++; }
+            if (ok) { pending = { dir: sig.dir, stop: roundTick(sig.stop, o.tick), target: sig.target === null ? null : roundTick(sig.target, o.tick), tag: sig.tag }; count++; }
             else if (pos) pending = { exit: 'blocked' };
           }
         }
