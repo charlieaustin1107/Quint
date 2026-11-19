@@ -9,101 +9,14 @@
 
 const { nyTime } = require('../../quint-control/proof/noise_momentum');
 
-// ---------- your strategy: WYLD Will's Four Pillars, mechanical version 0 ----------
-// What it can test today on 5-minute candles (no 1-minute data yet), as close to WYLD's rules as candles allow:
-//   1 Sweep: a 5-minute candle trades through a liquidity pool: the prior day's high or low (PD), the overnight high or
-//     low (ON), or either (both). Pools stand in for "the easiest 15m equal highs and lows", which aren't defined
-//     exactly yet (lab queue: wyld-exact-rules).
-//   2 Level holds: a close back inside the pool.
-//   3 PDR bias: towards Point B, the nearest opposite pool beyond the entry; the "B" target needs at least 1R of room.
-//   4 Confirmation, the part WYLD varies most, so it's the main thing tested:
-//       reclaim  the close back inside is the entry ("can't get back below the swept lows")
-//       break    after the reclaim, a close beyond the sweep candle ("a wick holds and price closes beyond it")
-//       retest   after the reclaim, price comes back to the pool and closes back inside ("a held level breaks, then retests")
-//       ifvg     a close through the most recent fair value gap against the sweep ("an FVG inverts")
-//   Stop beyond the sweep extreme plus a buffer; target 1R, 2R, 3R or Point B; optional break-even after 1R; setups only
-//   inside the window after the 9:30 open; one entry per sweep, at most maxEntries a day; a setup expires after an hour.
-function overnightLevels(bars) {
-  const out = new Map();
-  let acc = null;
-  for (const b of bars) {
-    const { day, min } = nyTime(b.t);
-    if (min >= 18 * 60) {
-      if (!acc || acc.started !== day) acc = { started: day, h: -Infinity, l: Infinity };
-      acc.h = Math.max(acc.h, b.h); acc.l = Math.min(acc.l, b.l);
-    } else if (min < 9 * 60 + 30 && acc) {
-      acc.h = Math.max(acc.h, b.h); acc.l = Math.min(acc.l, b.l);
-      out.set(day, { h: acc.h, l: acc.l });
-    }
-  }
-  return out;
-}
-
-function wyld(p, ctx) {
-  let L = null, S = null, recent = [], fvgDown = [], fvgUp = [], be = null, onL = null, onH = null;
-  const pools = (pd, on) => (p.pools === 'pd' ? [pd] : p.pools === 'on' ? [on] : [pd, on]).filter((x) => x !== null && x !== undefined && Number.isFinite(x));
-  function track(st, dir, b, levels) {
-    const swept = levels.filter((lv) => (dir > 0 ? b.l < lv : b.h > lv));
-    if (swept.length) {
-      const level = dir > 0 ? Math.min(...swept) : Math.max(...swept), ext = dir > 0 ? b.l : b.h;
-      if (!st || st.done) st = { level, extreme: ext, bar: b, born: b.m, reclaimed: false, done: false };
-      else if (dir > 0 ? ext < st.extreme : ext > st.extreme) { st.extreme = ext; st.bar = b; st.reclaimed = false; }
-    }
-    if (st && !st.done && b.m - st.born > 60) st.done = true; // no confirmation within an hour
-    return st;
-  }
-  function confirm(st, dir, b, d, opposite) {
-    if (!st || st.done) return null;
-    const back = dir > 0 ? b.c > st.level : b.c < st.level;
-    let go = false;
-    if (p.confirm === 'ifvg') {
-      const g = (dir > 0 ? fvgDown : fvgUp).filter((x) => x.m >= st.born - 30).pop();
-      go = back && !!g && (dir > 0 ? b.c > g.top : b.c < g.bottom);
-    } else if (!st.reclaimed) {
-      if (back) { st.reclaimed = true; st.at = b.m; go = p.confirm === 'reclaim'; }
-    } else if (p.confirm === 'break') {
-      go = dir > 0 ? b.c > st.bar.h : b.c < st.bar.l;
-    } else if (p.confirm === 'retest') {
-      go = b.m > st.at && back && (dir > 0 ? b.l <= st.level + 2 * d.tick : b.h >= st.level - 2 * d.tick);
-    }
-    if (!go) return null;
-    const stop = st.extreme - dir * p.stopTicks * d.tick, risk = Math.abs(b.c - stop);
-    if (!(risk > 0)) return null;
-    const beyond = opposite.filter((lv) => (dir > 0 ? lv > b.c : lv < b.c));
-    const B = beyond.length ? (dir > 0 ? Math.min(...beyond) : Math.max(...beyond)) : null;
-    let target;
-    if (p.target === 'B') { if (B === null || Math.abs(B - b.c) < risk) return null; target = B; }
-    else target = b.c + dir * Number(p.target.replace('R', '')) * risk;
-    st.done = true;
-    return { dir, stop, target };
-  }
-  return { name: 'WYLD Four Pillars v0', tf: 5, maxTrades: p.maxEntries,
-    day(d) {
-      L = null; S = null; recent = []; fvgDown = []; fvgUp = []; be = null;
-      const on = ctx.overnight.get(d.day);
-      onL = on ? on.l : null; onH = on ? on.h : null;
-    },
-    bar(d, b, pos, position) {
-      recent.push(b);
-      if (recent.length > 3) recent.shift();
-      if (recent.length === 3) {
-        const [a, , c] = recent;
-        if (a.l > c.h) fvgDown.push({ m: b.m, top: a.l, bottom: c.h });
-        if (a.h < c.l) fvgUp.push({ m: b.m, top: c.l, bottom: a.h });
-      }
-      if (position) { // in a trade: optional break-even once it has run 1R
-        if (!be) be = { entry: position.entry, risk: Math.abs(position.entry - position.stop), moved: false };
-        if (p.be === '1R' && !be.moved && (position.dir > 0 ? b.h >= be.entry + be.risk : b.l <= be.entry - be.risk)) { be.moved = true; return { stopTo: be.entry }; }
-        return null;
-      }
-      be = null;
-      if (b.m > p.window) return null;
-      const lows = pools(d.prevLow, onL), highs = pools(d.prevHigh, onH);
-      L = track(L, 1, b, lows);
-      S = track(S, -1, b, highs);
-      return confirm(L, 1, b, d, highs) || confirm(S, -1, b, d, lows);
-    } };
-}
+// ---------- your strategy: WYLD Will's Four Pillars, exactly as the TradingView indicator reads it ----------
+// The family runs lab/factory/wyld.js, a candle-by-candle copy of lab/pine/wyld_four_pillars.pine, so the factory tests
+// the same rules the owner is alerted to live. The grid covers rules WYLD leaves open (lab queue: wyld-exact-rules):
+// which pools count for the sweep (his 15m equal highs and lows only, or also the prior day's and the overnight highs
+// and lows), which 1m confirmation is the entry (each alone, or any of them), the stop buffer and the break-even step.
+// It's small on purpose: a grid grows only as the data grows (FACTORY.md). On 5-minute candles until 1-minute data
+// arrives. Mechanical v0, a looser stand-in (prior-day and overnight pools only), ran on 19 Nov 2026 and is retired;
+// its result is in the registry.
 
 // ---------- N-candle breakout (Chart Wizard's 20-candle breakout; bot 3 is n 20, stopAtr 2, targetR 3, both, 2) ----------
 function breakout(p) {
@@ -181,9 +94,11 @@ function gapFade(p) {
 }
 
 const FAMILIES = [
-  { id: 'wyld', name: 'Your strategy: WYLD Will Four Pillars (mechanical v0)', registry: 'wyld-four-pillars', data: '5m', make: wyld,
-    context: (bars) => ({ overnight: overnightLevels(bars) }),
-    grid: { pools: ['pd', 'on', 'both'], confirm: ['reclaim', 'break', 'retest', 'ifvg'], stopTicks: [1, 2, 4], target: ['1R', '2R', '3R', 'B'], be: ['none', '1R'], window: [120, 180], maxEntries: [1, 2] } },
+  { id: 'wyld', name: 'Your strategy: WYLD Will Four Pillars (as the indicator reads it)', registry: 'wyld-four-pillars', data: '5m', engine: 'wyld',
+    needs: ['15', 'daily'],
+    context: (bars, data) => ({ b15: data[15].bars, daily: data.daily.bars }),
+    options: (p) => ({ ...p, usePdPools: p.pools !== 'eq', useOnPools: p.pools !== 'eq' }),
+    grid: { pools: ['eq', 'eq+pd+on'], confirm: ['any', 'wick', 'retest', 'break', 'ifvg', 'fvgRetest'], stopBufTicks: [2, 4], be: ['none', '1R'] } },
   { id: 'breakout', name: 'N-candle breakout', registry: 'app-20-candle-breakout', data: '15m', make: breakout,
     grid: { n: [10, 15, 20, 30, 40], stopAtr: [1, 1.5, 2, 2.5, 3], targetR: [1.5, 2, 3, 4], side: ['both', 'long', 'short'], maxTrades: [1, 2] } },
   { id: 'orb', name: 'Opening range breakout', registry: 'app-ny-open-breakout', data: '5m', make: orb,
@@ -196,4 +111,4 @@ const FAMILIES = [
     grid: { minGap: [0.001, 0.002, 0.003], maxGap: [0.006, 0.01, 0.015], cutoff: [60, 120, 180], target: ['close', 'half'] } },
 ];
 
-module.exports = { FAMILIES, overnightLevels, makers: { wyld, breakout, orb, vwapFade, gapFade } };
+module.exports = { FAMILIES, makers: { breakout, orb, vwapFade, gapFade } };

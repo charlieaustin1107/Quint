@@ -115,13 +115,21 @@ test('Quint HQ works end to end on an iPhone-size screen', { skip: !chromium && 
 
     // Lab: every section renders; add an idea to the shared inbox
     await tab('lab');
-    for (const s of ['Factory', 'Bots', 'Library', 'Memory', 'Ideas']) { await p.click(`#labSeg button:has-text("${s}")`); await p.waitForTimeout(60); assert.ok((await wide()) <= 390, `Lab ${s} scrolls sideways`); }
+    for (const s of ['Factory', 'Pillars', 'Bots', 'Library', 'Memory', 'Ideas']) { await p.click(`#labSeg button:has-text("${s}")`); await p.waitForTimeout(60); assert.ok((await wide()) <= 390, `Lab ${s} scrolls sideways`); }
     await p.fill('#idText', 'Test the Four Pillars on London session lows');
     await p.click('button:has-text("Add to the lab")');
     await p.waitForTimeout(150);
     assert.match(await p.textContent('#labBody'), /London session lows/);
     await p.click('#labSeg button:has-text("Factory")');
     await p.screenshot({ path: path.join(SHOTS, 'hq-lab-factory.png'), fullPage: true });
+    await p.click('#labSeg button:has-text("Pillars")');
+    await p.waitForTimeout(60);
+    const pillars = await p.textContent('#labBody');
+    assert.match(pillars, /Your four pillars, dissected/);
+    assert.match(pillars, /Where setups die/);
+    assert.match(pillars, /Each confirmation on its own/);
+    assert.doesNotMatch(pillars, /profitable/i);
+    await p.screenshot({ path: path.join(SHOTS, 'hq-lab-pillars.png'), fullPage: true });
     await p.click('#labSeg button:has-text("Memory")');
     await p.click('button:has-text("Load TraderDev")');
     await p.waitForTimeout(100);

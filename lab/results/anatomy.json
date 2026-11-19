@@ -1,0 +1,787 @@
+{
+ "asOf": "2026-11-18",
+ "candles": "5-minute",
+ "sessions": 20,
+ "minTrades": 30,
+ "reps": 10000,
+ "runs": {
+  "asWritten": {
+   "id": "asWritten",
+   "name": "As written (his 15m equal highs and lows only)",
+   "without": null,
+   "confirm": null,
+   "funnel": {
+    "sweeps": 0,
+    "takenOvernight": 50,
+    "holds": 0,
+    "noHold": 0,
+    "pdrs": 0,
+    "noPointB": 0,
+    "confirmations": 0,
+    "skippedInTrade": 0,
+    "lowRoom": 0,
+    "entries": 0,
+    "completeB": 0,
+    "broken": 0,
+    "expired": 0
+   },
+   "n": 0,
+   "wins": 0,
+   "winRate": null,
+   "net": 0,
+   "maxDrawdown": 0,
+   "avgR": null,
+   "lo": null,
+   "hi": null,
+   "enough": false,
+   "postMortem": {
+    "exits": {},
+    "losers": 0,
+    "losersUpHalfR": 0,
+    "losersUp1R": 0,
+    "winners": 0,
+    "winnersMedianMaeR": null,
+    "winnersDeepMae": 0,
+    "medianMinsWin": null,
+    "medianMinsLoss": null
+   }
+  },
+  "base": {
+   "id": "base",
+   "name": "With prior-day and overnight highs/lows as pools too",
+   "without": null,
+   "confirm": null,
+   "funnel": {
+    "sweeps": 25,
+    "takenOvernight": 61,
+    "holds": 6,
+    "noHold": 19,
+    "pdrs": 6,
+    "noPointB": 0,
+    "confirmations": 0,
+    "skippedInTrade": 0,
+    "lowRoom": 0,
+    "entries": 0,
+    "completeB": 4,
+    "broken": 2,
+    "expired": 0
+   },
+   "n": 0,
+   "wins": 0,
+   "winRate": null,
+   "net": 0,
+   "maxDrawdown": 0,
+   "avgR": null,
+   "lo": null,
+   "hi": null,
+   "enough": false,
+   "postMortem": {
+    "exits": {},
+    "losers": 0,
+    "losersUpHalfR": 0,
+    "losersUp1R": 0,
+    "winners": 0,
+    "winnersMedianMaeR": null,
+    "winnersDeepMae": 0,
+    "medianMinsWin": null,
+    "medianMinsLoss": null
+   }
+  },
+  "noSweep": {
+   "id": "noSweep",
+   "name": "Without ① the sweep (price simply trades into a level)",
+   "without": "sweep",
+   "confirm": null,
+   "funnel": {
+    "sweeps": 115,
+    "takenOvernight": 61,
+    "holds": 104,
+    "noHold": 11,
+    "pdrs": 103,
+    "noPointB": 1,
+    "confirmations": 106,
+    "skippedInTrade": 75,
+    "lowRoom": 15,
+    "entries": 16,
+    "completeB": 64,
+    "broken": 32,
+    "expired": 7
+   },
+   "n": 16,
+   "wins": 3,
+   "winRate": 0.188,
+   "net": -688,
+   "maxDrawdown": 1118,
+   "avgR": -0.67,
+   "lo": -1.02,
+   "hi": -0.26,
+   "enough": false,
+   "postMortem": {
+    "exits": {
+     "stop": 13,
+     "target": 1,
+     "close": 2
+    },
+    "losers": 13,
+    "losersUpHalfR": 7,
+    "losersUp1R": 3,
+    "winners": 3,
+    "winnersMedianMaeR": 0.48,
+    "winnersDeepMae": 0,
+    "medianMinsWin": 330,
+    "medianMinsLoss": 5
+   }
+  },
+  "noLevel": {
+   "id": "noLevel",
+   "name": "Without ② the HTF level (a close back beyond the swept pool)",
+   "without": "level",
+   "confirm": null,
+   "funnel": {
+    "sweeps": 27,
+    "takenOvernight": 61,
+    "holds": 20,
+    "noHold": 7,
+    "pdrs": 20,
+    "noPointB": 0,
+    "confirmations": 33,
+    "skippedInTrade": 28,
+    "lowRoom": 3,
+    "entries": 2,
+    "completeB": 14,
+    "broken": 5,
+    "expired": 1
+   },
+   "n": 2,
+   "wins": 2,
+   "winRate": 1,
+   "net": 620,
+   "maxDrawdown": 0,
+   "avgR": 2.28,
+   "lo": 1.7,
+   "hi": 2.87,
+   "enough": false,
+   "postMortem": {
+    "exits": {
+     "target": 1,
+     "close": 1
+    },
+    "losers": 0,
+    "losersUpHalfR": 0,
+    "losersUp1R": 0,
+    "winners": 2,
+    "winnersMedianMaeR": 0.6,
+    "winnersDeepMae": 0,
+    "medianMinsWin": 195,
+    "medianMinsLoss": null
+   }
+  },
+  "noPdr": {
+   "id": "noPdr",
+   "name": "Without ③ the PDR (a fixed 2R target)",
+   "without": "pdr",
+   "confirm": null,
+   "funnel": {
+    "sweeps": 23,
+    "takenOvernight": 61,
+    "holds": 5,
+    "noHold": 18,
+    "pdrs": 5,
+    "noPointB": 0,
+    "confirmations": 6,
+    "skippedInTrade": 1,
+    "lowRoom": 0,
+    "entries": 5,
+    "completeB": 0,
+    "broken": 5,
+    "expired": 0
+   },
+   "n": 5,
+   "wins": 1,
+   "winRate": 0.2,
+   "net": -812,
+   "maxDrawdown": 812,
+   "avgR": -0.41,
+   "lo": -1.01,
+   "hi": 0.78,
+   "enough": false,
+   "postMortem": {
+    "exits": {
+     "stop": 4,
+     "target": 1
+    },
+    "losers": 4,
+    "losersUpHalfR": 1,
+    "losersUp1R": 0,
+    "winners": 1,
+    "winnersMedianMaeR": 0.33,
+    "winnersDeepMae": 0,
+    "medianMinsWin": 0,
+    "medianMinsLoss": 13
+   }
+  },
+  "noWindow": {
+   "id": "noWindow",
+   "name": "Without the 3-hour window (until 15:30 New York)",
+   "without": "window",
+   "confirm": null,
+   "funnel": {
+    "sweeps": 30,
+    "takenOvernight": 52,
+    "holds": 6,
+    "noHold": 24,
+    "pdrs": 6,
+    "noPointB": 0,
+    "confirmations": 0,
+    "skippedInTrade": 0,
+    "lowRoom": 0,
+    "entries": 0,
+    "completeB": 4,
+    "broken": 2,
+    "expired": 0
+   },
+   "n": 0,
+   "wins": 0,
+   "winRate": null,
+   "net": 0,
+   "maxDrawdown": 0,
+   "avgR": null,
+   "lo": null,
+   "hi": null,
+   "enough": false,
+   "postMortem": {
+    "exits": {},
+    "losers": 0,
+    "losersUpHalfR": 0,
+    "losersUp1R": 0,
+    "winners": 0,
+    "winnersMedianMaeR": null,
+    "winnersDeepMae": 0,
+    "medianMinsWin": null,
+    "medianMinsLoss": null
+   }
+  },
+  "only-wick": {
+   "id": "only-wick",
+   "name": "④ only: a wick held and price closed beyond it (① skipped so there are trades to study)",
+   "without": null,
+   "confirm": "wick",
+   "funnel": {
+    "sweeps": 115,
+    "takenOvernight": 61,
+    "holds": 104,
+    "noHold": 11,
+    "pdrs": 103,
+    "noPointB": 1,
+    "confirmations": 18,
+    "skippedInTrade": 0,
+    "lowRoom": 11,
+    "entries": 7,
+    "completeB": 64,
+    "broken": 32,
+    "expired": 7
+   },
+   "n": 7,
+   "wins": 2,
+   "winRate": 0.286,
+   "net": -255,
+   "maxDrawdown": 628,
+   "avgR": -0.52,
+   "lo": -1.02,
+   "hi": 0.12,
+   "enough": false,
+   "postMortem": {
+    "exits": {
+     "stop": 5,
+     "close": 2
+    },
+    "losers": 5,
+    "losersUpHalfR": 2,
+    "losersUp1R": 1,
+    "winners": 2,
+    "winnersMedianMaeR": 0.5,
+    "winnersDeepMae": 0,
+    "medianMinsWin": 340,
+    "medianMinsLoss": 20
+   }
+  },
+  "only-retest": {
+   "id": "only-retest",
+   "name": "④ only: the HTF level retest held (① skipped so there are trades to study)",
+   "without": null,
+   "confirm": "retest",
+   "funnel": {
+    "sweeps": 115,
+    "takenOvernight": 61,
+    "holds": 104,
+    "noHold": 11,
+    "pdrs": 103,
+    "noPointB": 1,
+    "confirmations": 25,
+    "skippedInTrade": 6,
+    "lowRoom": 6,
+    "entries": 13,
+    "completeB": 64,
+    "broken": 32,
+    "expired": 7
+   },
+   "n": 13,
+   "wins": 1,
+   "winRate": 0.077,
+   "net": -776,
+   "maxDrawdown": 834,
+   "avgR": -0.86,
+   "lo": -1.03,
+   "hi": -0.53,
+   "enough": false,
+   "postMortem": {
+    "exits": {
+     "stop": 12,
+     "target": 1
+    },
+    "losers": 12,
+    "losersUpHalfR": 6,
+    "losersUp1R": 3,
+    "winners": 1,
+    "winnersMedianMaeR": 0.1,
+    "winnersDeepMae": 0,
+    "medianMinsWin": 5,
+    "medianMinsLoss": 3
+   }
+  },
+  "only-break": {
+   "id": "only-break",
+   "name": "④ only: a held level broke (① skipped so there are trades to study)",
+   "without": null,
+   "confirm": "break",
+   "funnel": {
+    "sweeps": 115,
+    "takenOvernight": 61,
+    "holds": 104,
+    "noHold": 11,
+    "pdrs": 103,
+    "noPointB": 1,
+    "confirmations": 7,
+    "skippedInTrade": 0,
+    "lowRoom": 4,
+    "entries": 3,
+    "completeB": 64,
+    "broken": 32,
+    "expired": 7
+   },
+   "n": 3,
+   "wins": 2,
+   "winRate": 0.667,
+   "net": 78,
+   "maxDrawdown": 124,
+   "avgR": -0.03,
+   "lo": -1.01,
+   "hi": 0.81,
+   "enough": false,
+   "postMortem": {
+    "exits": {
+     "stop": 1,
+     "close": 2
+    },
+    "losers": 1,
+    "losersUpHalfR": 1,
+    "losersUp1R": 1,
+    "winners": 2,
+    "winnersMedianMaeR": 0.29,
+    "winnersDeepMae": 0,
+    "medianMinsWin": 320,
+    "medianMinsLoss": 225
+   }
+  },
+  "only-ifvg": {
+   "id": "only-ifvg",
+   "name": "④ only: an FVG inverted (① skipped so there are trades to study)",
+   "without": null,
+   "confirm": "ifvg",
+   "funnel": {
+    "sweeps": 115,
+    "takenOvernight": 61,
+    "holds": 104,
+    "noHold": 11,
+    "pdrs": 103,
+    "noPointB": 1,
+    "confirmations": 50,
+    "skippedInTrade": 38,
+    "lowRoom": 7,
+    "entries": 5,
+    "completeB": 64,
+    "broken": 32,
+    "expired": 7
+   },
+   "n": 5,
+   "wins": 1,
+   "winRate": 0.2,
+   "net": -458,
+   "maxDrawdown": 459,
+   "avgR": -0.81,
+   "lo": -1.08,
+   "hi": -0.34,
+   "enough": false,
+   "postMortem": {
+    "exits": {
+     "stop": 4,
+     "close": 1
+    },
+    "losers": 4,
+    "losersUpHalfR": 3,
+    "losersUp1R": 1,
+    "winners": 1,
+    "winnersMedianMaeR": 0.23,
+    "winnersDeepMae": 0,
+    "medianMinsWin": 315,
+    "medianMinsLoss": 120
+   }
+  },
+  "only-fvgRetest": {
+   "id": "only-fvgRetest",
+   "name": "④ only: price traded into a new FVG and held (① skipped so there are trades to study)",
+   "without": null,
+   "confirm": "fvgRetest",
+   "funnel": {
+    "sweeps": 115,
+    "takenOvernight": 61,
+    "holds": 104,
+    "noHold": 11,
+    "pdrs": 103,
+    "noPointB": 1,
+    "confirmations": 16,
+    "skippedInTrade": 8,
+    "lowRoom": 1,
+    "entries": 7,
+    "completeB": 64,
+    "broken": 32,
+    "expired": 7
+   },
+   "n": 7,
+   "wins": 0,
+   "winRate": 0,
+   "net": -748,
+   "maxDrawdown": 748,
+   "avgR": -1.02,
+   "lo": -1.04,
+   "hi": -1.01,
+   "enough": false,
+   "postMortem": {
+    "exits": {
+     "stop": 7
+    },
+    "losers": 7,
+    "losersUpHalfR": 3,
+    "losersUp1R": 2,
+    "winners": 0,
+    "winnersMedianMaeR": null,
+    "winnersDeepMae": 0,
+    "medianMinsWin": null,
+    "medianMinsLoss": 5
+   }
+  }
+ },
+ "pillars": [
+  {
+   "pillar": "sweep",
+   "name": "① the sweep",
+   "withN": 0,
+   "withoutN": 16,
+   "withAvgR": null,
+   "withoutAvgR": -0.67,
+   "diff": null,
+   "lo": null,
+   "hi": null,
+   "verdict": "too few trades to judge"
+  },
+  {
+   "pillar": "level",
+   "name": "② the HTF level",
+   "withN": 0,
+   "withoutN": 2,
+   "withAvgR": null,
+   "withoutAvgR": 2.28,
+   "diff": null,
+   "lo": null,
+   "hi": null,
+   "verdict": "too few trades to judge"
+  },
+  {
+   "pillar": "pdr",
+   "name": "③ the PDR",
+   "withN": 0,
+   "withoutN": 5,
+   "withAvgR": null,
+   "withoutAvgR": -0.41,
+   "diff": null,
+   "lo": null,
+   "hi": null,
+   "verdict": "too few trades to judge"
+  },
+  {
+   "pillar": "window",
+   "name": "the 3-hour window",
+   "withN": 0,
+   "withoutN": 0,
+   "withAvgR": null,
+   "withoutAvgR": null,
+   "diff": null,
+   "lo": null,
+   "hi": null,
+   "verdict": "too few trades to judge"
+  }
+ ],
+ "confirmations": [
+  {
+   "confirm": "break",
+   "name": "a held level broke",
+   "n": 3,
+   "avgR": -0.03,
+   "lo": -1.01,
+   "hi": 0.81,
+   "net": 78,
+   "enough": false
+  },
+  {
+   "confirm": "wick",
+   "name": "a wick held and price closed beyond it",
+   "n": 7,
+   "avgR": -0.52,
+   "lo": -1.02,
+   "hi": 0.12,
+   "net": -255,
+   "enough": false
+  },
+  {
+   "confirm": "ifvg",
+   "name": "an FVG inverted",
+   "n": 5,
+   "avgR": -0.81,
+   "lo": -1.08,
+   "hi": -0.34,
+   "net": -458,
+   "enough": false
+  },
+  {
+   "confirm": "retest",
+   "name": "the HTF level retest held",
+   "n": 13,
+   "avgR": -0.86,
+   "lo": -1.03,
+   "hi": -0.53,
+   "net": -776,
+   "enough": false
+  },
+  {
+   "confirm": "fvgRetest",
+   "name": "price traded into a new FVG and held",
+   "n": 7,
+   "avgR": -1.02,
+   "lo": -1.04,
+   "hi": -1.01,
+   "net": -748,
+   "enough": false
+  }
+ ],
+ "study": {
+  "from": "noSweep",
+  "name": "Without ① the sweep (price simply trades into a level)",
+  "n": 16,
+  "attribution": {
+   "confirm": [
+    {
+     "bucket": "retest",
+     "n": 12,
+     "winRate": 0.083,
+     "avgR": -0.85,
+     "net": -620
+    },
+    {
+     "bucket": "wick",
+     "n": 3,
+     "winRate": 0.667,
+     "avgR": 0.15,
+     "net": 217
+    },
+    {
+     "bucket": "ifvg",
+     "n": 1,
+     "winRate": 0,
+     "avgR": -1.01,
+     "net": -284
+    }
+   ],
+   "side": [
+    {
+     "bucket": "long",
+     "n": 9,
+     "winRate": 0.111,
+     "avgR": -0.77,
+     "net": -578
+    },
+    {
+     "bucket": "short",
+     "n": 7,
+     "winRate": 0.286,
+     "avgR": -0.54,
+     "net": -110
+    }
+   ],
+   "level": [
+    {
+     "bucket": "daily",
+     "n": 12,
+     "winRate": 0.167,
+     "avgR": -0.74,
+     "net": -442
+    },
+    {
+     "bucket": "weekly",
+     "n": 3,
+     "winRate": 0,
+     "avgR": -1.01,
+     "net": -534
+    },
+    {
+     "bucket": "monthly",
+     "n": 1,
+     "winRate": 1,
+     "avgR": 1.2,
+     "net": 289
+    }
+   ],
+   "pastHalf": [
+    {
+     "bucket": "before the 0.5",
+     "n": 16,
+     "winRate": 0.188,
+     "avgR": -0.67,
+     "net": -688
+    }
+   ],
+   "entry": [
+    {
+     "bucket": "first entry",
+     "n": 15,
+     "winRate": 0.133,
+     "avgR": -0.79,
+     "net": -805
+    },
+    {
+     "bucket": "re-entry",
+     "n": 1,
+     "winRate": 1,
+     "avgR": 1.12,
+     "net": 118
+    }
+   ],
+   "time": [
+    {
+     "bucket": "after 11:30",
+     "n": 6,
+     "winRate": 0,
+     "avgR": -1.02,
+     "net": -721
+    },
+    {
+     "bucket": "10:30–11:30",
+     "n": 5,
+     "winRate": 0,
+     "avgR": -1.03,
+     "net": -302
+    },
+    {
+     "bucket": "10:00–10:30",
+     "n": 4,
+     "winRate": 0.75,
+     "avgR": 0.39,
+     "net": 396
+    },
+    {
+     "bucket": "9:30–10:00",
+     "n": 1,
+     "winRate": 0,
+     "avgR": -1.03,
+     "net": -60
+    }
+   ],
+   "room": [
+    {
+     "bucket": "1–2R to B",
+     "n": 7,
+     "winRate": 0.143,
+     "avgR": -0.72,
+     "net": -546
+    },
+    {
+     "bucket": "3R+ to B",
+     "n": 6,
+     "winRate": 0.333,
+     "avgR": -0.44,
+     "net": 60
+    },
+    {
+     "bucket": "2–3R to B",
+     "n": 3,
+     "winRate": 0,
+     "avgR": -1.02,
+     "net": -202
+    }
+   ],
+   "stop": [
+    {
+     "bucket": "stop > 10 pts",
+     "n": 16,
+     "winRate": 0.188,
+     "avgR": -0.67,
+     "net": -688
+    }
+   ]
+  },
+  "postMortem": {
+   "exits": {
+    "stop": 13,
+    "target": 1,
+    "close": 2
+   },
+   "losers": 13,
+   "losersUpHalfR": 7,
+   "losersUp1R": 3,
+   "winners": 3,
+   "winnersMedianMaeR": 0.48,
+   "winnersDeepMae": 0,
+   "medianMinsWin": 330,
+   "medianMinsLoss": 5
+  }
+ },
+ "lessons": [
+  "As written, no setup started: all 50 pools marked before the open had already been run before 9:30, so there was nothing left to sweep in the window.",
+  "With prior-day and overnight highs and lows as pools too: 25 sweeps → 6 held a level (24%) → 6 PDRs → 0 confirmations → 0 entries.",
+  "Most sweeps die at ②: 19 of 25 had no higher-timeframe level hold nearby in time. Pillar ② is the main filter.",
+  "Every PDR ended before a 5-minute confirmation formed (Point B reached 4, broken 2). WYLD confirms on the 1-minute chart; this needs 1-minute candles to judge.",
+  "① the sweep: 0 trades with it, 16 without. Too few to judge (needs 30 in both).",
+  "② the HTF level: 0 trades with it, 2 without. Too few to judge (needs 30 in both).",
+  "③ the PDR: 0 trades with it, 5 without. Too few to judge (needs 30 in both).",
+  "The 3-hour window: 0 trades with it, 0 without. Too few to judge (needs 30 in both).",
+  "Most trades to study: without ① the sweep (price simply trades into a level), 16 trades, average -0.67R (95% range -1.02R to -0.26R). Below 30 trades, so a description, not a finding.",
+  "Why losers lost: 3 of 13 were +1R up first (break-even at 1R would have saved them), 7 were +0.5R up first.",
+  "How winners won: they went a median 0.48R against first, and 0 of 3 came within a quarter of the stop.",
+  "No confirmation has 30 trades yet: break 3, wick 7, ifvg 5, retest 13, fvgRetest 7."
+ ],
+ "proposals": [
+  {
+   "id": "one-minute-data",
+   "why": "Every PDR ended before a confirmation on 5-minute candles.",
+   "rules": "Fetch 1-minute MNQ candles nightly and run the analyst on them once there are 10 sessions.",
+   "passMark": "At least 30 confirmations across the 1-minute sessions.",
+   "alreadyQueued": true
+  },
+  {
+   "id": "wyld-hold-60",
+   "why": "19 of 25 sweeps died at ②.",
+   "rules": "Let a level hold within 60 minutes of the sweep (holdMinutes 60) instead of 30.",
+   "passMark": "On sessions after 2026-11-18 only: 30+ trades, average R not worse than as written, and more setups reaching ③.",
+   "alreadyQueued": false
+  }
+ ]
+}

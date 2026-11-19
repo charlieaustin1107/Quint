@@ -29,6 +29,13 @@ function loadData() {
   return out;
 }
 
+// Daily candles (2019 onwards): the higher-timeframe levels for WYLD's pillars 2 and 3. Kept apart from the intraday
+// sets so they never count as a bot's candles or move the "as of" date.
+function loadDaily() {
+  const bars = candles.read(path.join(DIR, 'data', 'mnq_1d.csv'));
+  return { file: 'mnq_1d.csv', bars, span: bars.length ? candles.span(bars) : null };
+}
+
 // The candle file with the most sessions whose candles divide the bot's own timeframe.
 function pickData(data, tf) {
   const fits = Object.keys(data).map(Number).filter((m) => tf % m === 0);
@@ -129,5 +136,5 @@ function main() {
   return out;
 }
 
-module.exports = { runOne, loadData, pickData, scoreboard, main };
+module.exports = { runOne, loadData, loadDaily, pickData, scoreboard, main };
 if (require.main === module) main();

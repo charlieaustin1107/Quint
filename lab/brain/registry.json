@@ -66,9 +66,16 @@
           "trades": 7,
           "net": -1013,
           "note": "1,152 variations (pools x confirmation x stop buffer x target x break-even x window x entries). 156 made money on the unseen sessions, but the best tuned variation lost $1,013 over 7 unseen trades. PBO 37%. Far too little 5-minute data, and no 1-minute data for WYLD's real confirmations yet."
+        },
+        {
+          "date": "2026-11-19",
+          "where": "lab/ANATOMY.md and lab/FACTORY_REPORT.md (sequence analyst and factory family wyld, both running the indicator's exact rules from lab/factory/wyld.js)",
+          "data": "MNQ 5m, 21 Oct to 18 Nov 2026 (20 sessions), 15m and daily levels",
+          "trades": 0,
+          "note": "As written, no setup started: all 50 pools marked before the open had been run before 9:30. With prior-day and overnight highs/lows as pools: 25 sweeps, 6 held a level, 6 PDRs, 0 confirmations (Point B reached 4 times and the PDR broke twice before a 5-minute confirmation formed). Without the sweep: 16 trades, average -0.67R (95% range -1.02 to -0.26), too few to be a finding. The factory's 48 exact-rule variations: none traded enough to rank. Needs 1-minute candles and an exact pool rule before a verdict."
         }
       ],
-      "next": "Queue item wyld-exact-rules, then code WYLD's rules once and line the app versions up with them."
+      "next": "1-minute candles (queue one-minute-data), then the exact pool rule (wyld-exact-rules). The sequence analyst re-runs every night and says when each pillar has 30 trades to judge."
     },
     {
       "id": "app-20-candle-breakout",
@@ -541,6 +548,10 @@
     }
   ],
   "lessons": [
+    {
+      "date": "2026-11-19",
+      "lesson": "Replaying WYLD's rules exactly as the indicator reads them showed where setups die: the pools marked before the open were all run before 9:30, most sweeps found no higher-timeframe level holding nearby, and on 5-minute candles Point B came before any confirmation. A pillar can only be judged with the data it was designed for: 1-minute candles for the confirmation, and an exact rule for which pools count."
+    },
     {
       "date": "2026-11-19",
       "lesson": "Testing thousands of variations finds lucky winners easily: on the first night breakout and opening range scored PBO 60 to 67%, meaning their best variations were mostly luck. Only judge on unseen sessions, PBO, neighbours and the Lucid gate."

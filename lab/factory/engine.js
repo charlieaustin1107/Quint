@@ -19,6 +19,7 @@ const noise = require('../../quint-control/proof/noise_momentum');
 const { basic } = require('../lib/score');
 const { simulate } = require('../lib/prop');
 const { FAMILIES } = require('./families');
+const wyld = require('./wyld');
 
 const TUNE_SHARE = 0.6;
 const COST_STRESS = 2.5; // another $2.50 a trade
@@ -42,6 +43,7 @@ function parseKey(key, grid) {
 
 function tradesFor(fam, params, bars, ctx) {
   if (fam.engine === 'noise') return noise.run(bars, params).trades;
+  if (fam.engine === 'wyld') return wyld.run(bars, ctx.b15, ctx.daily, fam.options ? fam.options(params) : params).trades;
   return runBot(bars, fam.make(params, ctx), {}).trades;
 }
 
@@ -97,7 +99,9 @@ function isSurvivor(v, familyPBO) {
 function runFamily(fam, data, opt = {}) {
   const set = data[fam.data] || data[parseInt(fam.data, 10)];
   if (!set) return { id: fam.id, name: fam.name, skipped: `needs ${fam.data} candles` };
-  const bars = set.bars, days = noise.sessions(bars).days.map((d) => d.day), ctx = fam.context ? fam.context(bars) : {};
+  const missing = (fam.needs || []).filter((k) => !data[k] || !data[k].bars.length);
+  if (missing.length) return { id: fam.id, name: fam.name, skipped: `needs ${missing.join(' and ')} candles` };
+  const bars = set.bars, days = noise.sessions(bars).days.map((d) => d.day), ctx = fam.context ? fam.context(bars, data) : {};
   const nTune = Math.floor(days.length * TUNE_SHARE), tune = new Set(days.slice(0, nTune));
   const blocks = days.length >= 16 ? 8 : 4, blockOf = new Map(days.map((d, i) => [d, Math.floor((i * blocks) / days.length)]));
   const variants = expand(fam.grid).slice(0, opt.limit || Infinity);
@@ -115,7 +119,8 @@ function runFamily(fam, data, opt = {}) {
       blockNet, trades };
     rows.push(v); byKey.set(v.key, v);
   }
-  const pbo = probabilityOfOverfitting(rows.map((r) => r.blockNet), blocks);
+  // PBO needs at least two variations that traded; with none it would read 0% ("no overfitting") when it means "no data"
+  const pbo = rows.filter((r) => r.all.n > 0).length >= 2 ? probabilityOfOverfitting(rows.map((r) => r.blockNet), blocks) : null;
   for (const v of rows) {
     const nb = neighbours(v.params, fam.grid, byKey);
     v.neighbours = { count: nb.length, medianUnseen: median(nb.map((x) => x.unseen.net)) };

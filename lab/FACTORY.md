@@ -29,8 +29,15 @@ Grow a grid only as data grows: never more variations in a family than 50 times 
 **WYLD Will's Four Pillars** (sweep → HTF level holds → PDR bias → 1m confirmation) is the owner's strategy and the master version (`lab/brain/playbooks.json`). The factory's job is to find the exact version of it that works best for Lucid:
 - Every pillar is a dimension: which pools count for the sweep, how a level shows it holds, how Point B is chosen, and above all **which confirmation is the entry**. WYLD lists six confirmations; test each one separately, and each new one he describes.
 - Then the management: stop buffer, break-even trigger, Target 1 versus Point B versus the opposing liquidity, entries per PDR, and the 2- or 3-hour window.
-- **Mechanical v0** (`lab/factory/families.js`, family `wyld`) tests 1,152 variations on 5-minute candles today: 3 pool choices × 4 confirmations (reclaim, break, retest, FVG inversion) × 3 stop buffers × 4 targets × break-even on or off × 2 windows × 1 or 2 entries.
-- **What it still needs:** 1-minute candles (WYLD confirms on the 1m), the order-block confirmations, true monthly-to-daily levels, and the owner's answers to the exact-rules questions (registry queue `wyld-exact-rules`).
+- **The family runs the indicator's own rules** (`lab/factory/wyld.js`, a candle-by-candle copy of `lab/pine/wyld_four_pillars.pine`), so what's tested is exactly what the owner is alerted to live:
+  - monthly → weekly → daily levels with the overlap rule;
+  - 15m equal-high/low pools marked before the open (a pool run overnight is already taken);
+  - the hold, Point A to Point B, and the five coded confirmations.
+- **The grid today: 48 variations** = 2 pool choices (his equal highs and lows only, or also the prior day's and overnight highs and lows) × 6 entries (each confirmation alone, or any of them) × 2 stop buffers × break-even at 1R or not. It's small because a grid grows only as the data grows (above).
+- **Next, in dated commits:** the equal-highs tolerance, the window and the entries per stage, once 1-minute candles cover 10 sessions.
+- (Mechanical v0, a looser stand-in with prior-day and overnight pools only, ran once on 19 Nov 2026 and is retired. Its result is in the registry.)
+- **The sequence analyst** (`lab/brain/anatomy.js`) runs alongside it every night and asks what each pillar is worth, rather than which settings won. See "The online brain" below.
+- **What it still needs:** 1-minute candles (WYLD confirms on the 1m), the order-block confirmations, and the owner's answers to the exact-rules questions (registry queue `wyld-exact-rules`).
 
 ## The other families (ideas that showed something positive)
 | Family | Where it came from | Grid today |
@@ -59,6 +66,24 @@ Rejected ideas stay rejected unless new evidence arrives (registry `lessons`): R
 - Never call a strategy profitable or winning. Say what it made, on what data, over how many trades, and its PBO.
 - Label anything under 100 trades an anecdote, and anything from TraderDev's QQQ stand-in a stand-in.
 - Report every family every night, including the ones that died.
+
+## The online brain (how Quint gets smarter, not just busier)
+Replaying the same candles 10,000 times teaches nothing new: the 10,000th run sees exactly what the first did. Quint gets smarter in four ways, and the loop uses all of them:
+1. **New sessions.** Every night adds a day of real MNQ (soon 1-minute candles). Every average's 95% range narrows as the sessions grow; `lab/results/anatomy_history.json` keeps one line a night, so the narrowing can be seen.
+2. **Questions, not just settings.** The sequence analyst (`lab/brain/anatomy.js`, report in `lab/ANATOMY.md`) runs WYLD's rules as written, then takes away one pillar at a time and tries each confirmation alone. It asks:
+   - where setups die in the funnel;
+   - whether each pillar earns its place;
+   - why losers lost (were they +1R first?) and how winners won (how much heat they took).
+   Nothing is a finding below 30 trades.
+3. **Disciplined updates.** The analyst only proposes. A proposal becomes a queue item with its exact rules and pass mark written down first, and it's tested only on sessions after that date. The registry records what passed and what failed, so the same idea isn't re-tried by accident.
+4. **Memory.** The registry (strategies, evidence, lessons, queue) and the journal are what Quint knows. Each session reads them first and writes to them last.
+
+Live and nightly together:
+- **Live:** the TradingView indicator alerts each step of the sequence as it happens.
+- **Nightly:** the same rules are replayed on the day's candles. Factory, analyst, proposals, research item, journal, Quint HQ.
+- **Weekly:** a review.
+
+Anything that would trade a live account still needs the owner's yes.
 
 ## The data roadmap (where the next big jump comes from)
 1. **Now:** 5-minute and 15-minute MNQ, growing nightly (weeks of history).

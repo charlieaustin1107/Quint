@@ -18,6 +18,17 @@ Newest first. Every lab session adds an entry: what ran, what was learned, what 
   - It counts how many setups reach each step (the "funnel").
   - Each trade records what made it: the confirmation, the pool, the level, the room to Point B, the time, and how far it ran for and against.
 - **The bot lab engine** (`quint-control/botlab/botlab.js`) can now carry those details and track how far each trade ran for and against (off by default, so nothing else changes).
+- **The strategy factory now tests the indicator's exact rules.** Its WYLD family runs `wyld.js`: 48 variations (which pools count, each confirmation alone or any, stop buffer, break-even at 1R). That's small on purpose: a grid grows as the data grows. Mechanical v0 is retired, and its result stays in the registry.
+  - A family where nothing traded now shows PBO "n/a" instead of 0%.
+- **The sequence analyst** (`lab/brain/anatomy.js` → `lab/ANATOMY.md`, part of `npm run lab`, under a second). Every night it:
+  - replays the rules as written;
+  - takes away one pillar at a time (and the window);
+  - tries each confirmation alone;
+  - splits trades by what made them;
+  - does a post-mortem: were losers +1R first, and how much heat did winners take?
+
+  Every average has a 95% range from 10,000 bootstrap resamples, and nothing under 30 trades is a finding. It proposes experiments with a pass mark, which the nightly job pre-registers (at most one a night), and it keeps a nightly history so the ranges can be seen narrowing.
+- **Quint HQ:** the Lab tab has a new **Pillars** screen (the lessons, where setups die, each pillar with and without, each confirmation alone, why trades won or lost, what Quint wants to test next). Ask Quint can read it too. Also fixed: on a phone, the screen column grew wider than the screen when a row of buttons was long.
 
 **First read** (20 sessions of 5-minute candles, so the 1-minute confirmations can't be judged yet):
 - As written, the sweep never triggered. All 50 pools that formed before the open had already been run before 9:30, and equal highs/lows within 2 points are rare on the 15-minute chart (81 in 958 swings).

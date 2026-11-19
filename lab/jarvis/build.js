@@ -26,7 +26,7 @@ function curve(trades, points = 40) {
 }
 
 function hubData(src) {
-  const { roundup, registry, latest, factory, playbooks, firm, calendar, vision } = src;
+  const { roundup, registry, latest, factory, anatomy, playbooks, firm, calendar, vision } = src;
   const bots = (latest.results || []).filter((r) => !r.skipped).map((r) => ({
     id: r.id, name: r.name, bot: r.bot, timeframe: r.timeframe, data: r.data,
     trades: r.score.trades, net: r.score.net, laterHalf: r.score.secondHalf.net, maxDrawdown: r.score.maxDrawdown,
@@ -45,11 +45,18 @@ function hubData(src) {
       top: f.top.slice(0, 3).map((v) => ({ key: v.key, tune: v.tune, unseen: v.unseen, neighbours: v.neighbours })),
     })),
   } : null;
+  const ana = anatomy && !anatomy.skipped ? {
+    asOf: anatomy.asOf, candles: anatomy.candles, sessions: anatomy.sessions, minTrades: anatomy.minTrades, lessons: anatomy.lessons,
+    funnel: Object.values(anatomy.runs).filter((r) => !r.confirm).map((r) => ({ id: r.id, name: r.name, f: r.funnel, n: r.n, avgR: r.avgR, lo: r.lo, hi: r.hi, net: r.net })),
+    pillars: anatomy.pillars, confirmations: anatomy.confirmations,
+    study: { name: anatomy.study.name, n: anatomy.study.n, postMortem: anatomy.study.postMortem },
+    proposals: anatomy.proposals.map((p) => ({ id: p.id, rules: p.rules, why: p.why, passMark: p.passMark, alreadyQueued: p.alreadyQueued })),
+  } : null;
   const size = firm ? firm.sizes : [];
   return {
     builtFor: roundup.date, dataTo: roundup.dataTo,
     roundup: { headline: roundup.headline, spoken: roundup.spoken, paper: roundup.paper, warnings: roundup.warnings, statusCount: roundup.statusCount },
-    bots, skipped, factory: fac,
+    bots, skipped, factory: fac, anatomy: ana,
     strategies: registry.strategies.map((s) => ({ id: s.id, name: s.name, horizon: s.horizon, timeframe: s.timeframe, status: s.status, rules: s.rules,
       source: s.source, verdict: s.verdict, next: s.next, versions: s.versions || [], evidence: (s.evidence || []).slice(-4) })),
     queue: registry.queue, lessons: registry.lessons.slice(0, 8),
@@ -72,7 +79,7 @@ function hubData(src) {
       lucidRules: 'https://support.lucidtrading.com/en/articles/15996664-luciddaily-evaluation',
     },
     jobs: [
-      { name: 'Quint Lab nightly run', when: 'Weeknights 22:15 UK', what: 'New candles, every bot, the strategy factory, the paper test, your ideas, this page' },
+      { name: 'Quint Lab nightly run', when: 'Weeknights 22:15 UK', what: 'New candles, every bot, the strategy factory, the sequence analyst (what each pillar is worth), the paper test, your ideas, this page' },
       { name: 'Quint HQ sync', when: 'Weeknights 23:25 UK', what: 'Copies your Trading Mastery bot results, last night\'s Jarvis report and your pinned rules into this page\'s private storage' },
       { name: 'Jarvis nightly dream run', when: 'Weeknights 22:40 UK', what: 'Trading Mastery\'s own audit (yours, unchanged)' },
     ],
@@ -83,6 +90,7 @@ const ROADMAP = [
   { stage: 'Lab, scoreboard, Lucid simulator, paper test, spoken roundup', status: 'Done' },
   { stage: 'Strategy factory: thousands of variations, judged on unseen data', status: 'Done' },
   { stage: 'Quint HQ v2: Today, Ask, Desk, Lab, More, Trading Mastery sync, nightly controls', status: 'Done' },
+  { stage: 'WYLD indicator v2 on your chart, and the sequence analyst: what each pillar is worth, every night', status: 'Done' },
   { stage: '1-minute data and exact rules for your Four Pillars', status: 'Next' },
   { stage: 'Years of data from NinjaTrader\'s Strategy Analyzer', status: 'Needs your Windows computer' },
   { stage: 'Quint Control: engine, guardian, first bots on simulation', status: 'Planned' },
@@ -97,6 +105,7 @@ if (require.main === module) {
     registry: read(path.join(lab, 'brain', 'registry.json')),
     latest: read(path.join(lab, 'results', 'latest.json'), { results: [] }),
     factory: read(path.join(lab, 'results', 'factory.json'), null),
+    anatomy: read(path.join(lab, 'results', 'anatomy.json'), null),
     playbooks: read(path.join(lab, 'brain', 'playbooks.json')),
     firm: read(path.join(lab, '..', 'quint-control', 'firms', 'lucid-daily.json'), null),
     calendar: read(path.join(lab, 'data', 'calendar.json'), { events: [] }),

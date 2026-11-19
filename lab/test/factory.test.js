@@ -6,15 +6,16 @@ const assert = require('node:assert/strict');
 const path = require('path');
 const engine = require('../factory/engine');
 const { FAMILIES } = require('../factory/families');
-const { loadData } = require('../run');
+const { loadData, loadDaily } = require('../run');
+const W = require('../factory/wyld');
 const candles = require('../lib/candles');
 const { run } = require('../../quint-control/botlab/botlab');
 const noise = require('../../quint-control/proof/noise_momentum');
 
-const data = loadData();
+const data = { ...loadData(), daily: loadDaily() };
 const fam = (id) => FAMILIES.find((f) => f.id === id);
 const sum = (ts) => Math.round(ts.reduce((a, t) => a + t.usd, 0));
-const tradesOf = (id, p, bars) => { const f = fam(id), b = bars || data[parseInt(f.data, 10)].bars; return engine.tradesFor(f, p, b, f.context ? f.context(b) : {}); };
+const tradesOf = (id, p, bars, ctx) => { const f = fam(id), b = bars || data[parseInt(f.data, 10)].bars; return engine.tradesFor(f, p, b, ctx || (f.context ? f.context(b, data) : {})); };
 
 test('grids: every variation is listed once, and keys round-trip', () => {
   for (const f of FAMILIES) {
@@ -35,17 +36,34 @@ test('families reproduce the bot lab exactly with the bot lab settings', () => {
   same(tradesOf('noise', { lookbackDays: 14, volatilityMultiplier: 1, checkEvery: 30 }), noise.run(b15).trades);
 });
 
-test('WYLD v0: stops on the right side, targets beyond the entry, and no candles from the future', () => {
-  const p = { pools: 'both', confirm: 'reclaim', stopTicks: 2, target: '2R', be: '1R', window: 180, maxEntries: 2 };
+test('WYLD family: the indicator\'s rules, stops on the right side, and no candles from the future', () => {
+  // With the sweep pillar skipped there are enough trades on 4 weeks of 5-minute candles to check the mechanics.
+  const p = { pools: 'eq+pd+on', confirm: 'any', stopBufTicks: 2, be: '1R', skip: 'sweep' };
   const all = tradesOf('wyld', p);
-  assert.ok(all.length > 0, 'it should trade on 4 weeks of candles');
-  for (const t of all) assert.ok(t.dir === 1 || t.dir === -1);
-  // cut the candles after the 10th session: every trade before the cut must be identical
+  assert.ok(all.length > 0, 'it should trade with the sweep pillar skipped');
+  for (const t of all) {
+    assert.ok(t.dir === 1 || t.dir === -1);
+    assert.ok(t.risk > 0);
+    if (t.why === 'stop') assert.ok(t.r < 0, 'a full stop loses');
+    assert.ok(W.CONFIRMS.includes(t.tag.confirm), t.tag.confirm);
+  }
+  // cut every candle set after the 10th session: every trade before the cut must be identical
   const bars = data[5].bars, days = noise.sessions(bars).days.map((d) => d.day), cut = days[10];
-  const early = tradesOf('wyld', p, bars.filter((b) => noise.nyTime(b.t).day < cut));
+  const before = (arr) => arr.filter((b) => noise.nyTime(b.t).day < cut);
+  const early = tradesOf('wyld', p, before(bars), { b15: before(data[15].bars), daily: data.daily.bars.filter((b) => W.tradeDate(b.t) < cut) });
   assert.deepEqual(early, all.filter((t) => t.day < cut));
-  // every confirmation type trades
-  for (const confirm of fam('wyld').grid.confirm) assert.ok(tradesOf('wyld', { ...p, confirm }).length > 0, confirm);
+  // every confirmation can be the entry on its own
+  for (const confirm of W.CONFIRMS) assert.ok(tradesOf('wyld', { ...p, confirm }).length > 0, confirm);
+});
+
+test('WYLD funnel: each step can only keep or lose setups, never gain them', () => {
+  for (const opt of [{}, { usePdPools: true, useOnPools: true }, { skip: 'sweep' }]) {
+    const f = W.run(data[5].bars, data[15].bars, data.daily.bars, opt).funnel;
+    assert.equal(f.holds + f.noHold <= f.sweeps, true, 'holds');
+    assert.ok(f.pdrs + f.noPointB <= f.holds, 'pdrs');
+    assert.ok(f.entries <= f.confirmations, 'entries');
+    assert.ok(f.confirmations === 0 || f.pdrs > 0, 'confirmations need a PDR');
+  }
 });
 
 test('overfitting check: noise scores near 50%, a real edge near 0%', () => {

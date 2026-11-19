@@ -30,7 +30,7 @@ a { color: var(--fg); }
 .brand { font: 600 15px/1 var(--display); letter-spacing: .22em; text-transform: uppercase; white-space: nowrap; flex: none; background: var(--chrome); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .clock { display: flex; gap: 10px; align-items: center; min-width: 0; font: 400 11px/1.2 var(--mono); color: var(--mut); white-space: nowrap; }
 .clock b { color: var(--fg); font-weight: 500; }
-.screen { display: grid; gap: 14px; padding-top: 14px; }
+.screen { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; padding-top: 14px; }
 .panel { background: var(--s1); border: 1px solid var(--line); border-radius: 14px; box-shadow: inset 0 1px 0 var(--hi); padding: 16px; min-width: 0; }
 .label { font: 600 11px/1 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--mut); margin: 0 0 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
 .label .r { letter-spacing: .04em; text-transform: none; font: 400 11px/1 var(--mono); color: var(--dim); }
@@ -420,7 +420,7 @@ svg.spark { width: 100%; height: 34px; display: block; }
     const fac = D.factory;
     if (fac) {
       const surv = fac.families.reduce((a, f) => a + ((f.survivors && f.survivors.length) || 0), 0), wy = fac.families.find((f) => f.id === 'wyld');
-      lines.push(`The strategy factory tested ${fac.variants.toLocaleString('en-US')} variations. ${surv ? `${surv} survived every check` : 'None survived every check'}${fac.readyForPaper.length ? `, and ${fac.readyForPaper.length} earned the paper test` : ''}.${wy ? ' Your Four Pillars needs more five-minute history and one-minute candles before its real test.' : ''}`);
+      lines.push(`The strategy factory tested ${fac.variants.toLocaleString('en-US')} variations. ${surv ? `${surv} survived every check` : 'None survived every check'}${fac.readyForPaper.length ? `, and ${fac.readyForPaper.length} earned the paper test` : ''}.${D.anatomy ? ' ' + D.anatomy.lessons[0] : wy ? ' Your Four Pillars needs more five-minute history and one-minute candles before its real test.' : ''}`);
     }
     if (S.feed && S.feed.dream && S.feed.dream.top) lines.push(`Last night's Jarvis report: ${S.feed.dream.top}`);
     const waiting = S.ideas.filter((i) => i.status === 'new').length, done = S.ideas.filter((i) => i.status === 'done' || i.status === 'rejected').length;
@@ -638,11 +638,12 @@ svg.spark { width: 100%; height: 34px; display: block; }
   }
 
   // ---------- LAB ----------
-  const LAB = [['factory', 'Factory'], ['bots', 'Bots'], ['library', 'Library'], ['ideas', 'Ideas'], ['memory', 'Memory']];
+  const LAB = [['factory', 'Factory'], ['pillars', 'Pillars'], ['bots', 'Bots'], ['library', 'Library'], ['ideas', 'Ideas'], ['memory', 'Memory']];
   function renderLab() {
     clear($('labSeg'), LAB.map(([id, label]) => h('button', { role: 'tab', type: 'button', 'aria-selected': S.lab === id ? 'true' : 'false', onclick: () => { S.lab = id; renderLab(); }, text: label })));
     const b = $('labBody');
     if (S.lab === 'factory') return clear(b, labFactory());
+    if (S.lab === 'pillars') return clear(b, labPillars());
     if (S.lab === 'bots') return clear(b, labBots());
     if (S.lab === 'library') return clear(b, labLibrary());
     if (S.lab === 'ideas') return clear(b, labIdeas());
@@ -660,6 +661,39 @@ svg.spark { width: 100%; height: 34px; display: block; }
           h('div', { class: 'tile' }, h('b', { text: String(f.readyForPaper.length) }), h('span', { text: `earned the paper test (${f.promoteAfter} nights in a row)` })), h('div', { class: 'tile' }, h('b', { text: `${f.seconds}s` }), h('span', { text: 'computing time' }))),
         h('p', { class: 'small', style: 'margin-top:10px', text: `A variation survives only if, on sessions it never saw: ${f.rule.minUnseenTrades}+ trades, a profit, profit factor ${f.rule.minUnseenPF}+, still a profit at double costs; drawdown under $${f.rule.maxDrawdown.toLocaleString('en-US')}; its neighbours also profitable; and its family's overfitting chance (PBO) ${pct(f.rule.maxPBO)} or less.` })),
       h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Families' }), h('div', { class: 'list' }, fams))];
+  }
+  // The sequence analyst: what each pillar of WYLD's strategy is worth (lab/brain/anatomy.js, every night).
+  function labPillars() {
+    const a = D.anatomy;
+    if (!a) return [h('div', { class: 'panel' }, h('p', { class: 'mut', text: 'The sequence analyst hasn\'t run yet. It runs every night after the factory.' }))];
+    const R = (x) => (x === null || x === undefined ? '—' : `${x >= 0 ? '+' : ''}${x.toFixed(2)}R`), cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+    const base = a.funnel.find((r) => r.id === 'base') || a.funnel[0], f = base.f;
+    const steps = [['① Sweeps in the window', f.sweeps], ['② An HTF level held', f.holds], ['③ PDR set', f.pdrs], ['④ Confirmations', f.confirmations], ['Entries', f.entries]];
+    const top = Math.max(1, ...steps.map((x) => x[1]));
+    const tone = (v) => (v === 'earns its place' ? 'good' : v === 'costs more than it adds' ? 'bad' : v === 'no clear difference yet' ? 'warn' : '');
+    const pm = a.study.postMortem;
+    return [
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Your four pillars, dissected', h('span', { class: 'r', text: `${a.sessions} sessions · ${a.candles}` })),
+        h('p', { class: 'small', text: `Every night Quint replays WYLD's rules exactly as your TradingView indicator reads them, takes one pillar away at a time, and tries each confirmation alone. Every average has a 95% range; under ${a.minTrades} trades nothing counts as a finding.` }),
+        h('div', { class: 'list', style: 'margin-top:10px' }, a.lessons.slice(0, 7).map((x) => h('div', { class: 'item' }, h('div', { style: 'font-size:14px;line-height:1.5', text: x }))))),
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Where setups die', h('span', { class: 'r', text: 'with prior-day and overnight pools' })),
+        steps.map(([name, v]) => h('div', { style: 'margin-top:10px' }, h('div', { class: 'row2', style: 'justify-content:space-between' }, h('span', { text: name }), h('span', { class: 'num', text: String(v) })), h('div', { class: 'bar' }, h('i', { style: `width:${Math.round((100 * v) / top)}%` })))),
+        h('p', { class: 'small', style: 'margin-top:10px', text: `As written (your 15m equal highs and lows only): ${a.funnel[0].f.sweeps} sweeps in the window; ${a.funnel[0].f.takenOvernight} pools were already taken before 9:30.` })),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Each pillar: with it against without it' }),
+        h('div', { class: 'list' }, a.pillars.map((p) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: cap(p.name) }), h('span', { class: 'pill ' + tone(p.verdict), text: p.verdict === 'too few trades to judge' ? 'too few' : p.verdict })),
+          h('div', { class: 'm', text: `${p.withN} trades with it (${R(p.withAvgR)}) · ${p.withoutN} without (${R(p.withoutAvgR)})` }))))),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Each confirmation on its own' }),
+        h('div', { class: 'list' }, a.confirmations.map((c) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: cap(c.name) }), h('span', { class: 'pill ' + (c.enough ? (c.lo > 0 ? 'good' : c.hi < 0 ? 'bad' : 'warn') : ''), text: c.enough ? R(c.avgR) : `${c.n} trades` })),
+          h('div', { class: 'm', text: c.n ? `${R(c.avgR)} a trade · 95% range ${R(c.lo)} to ${R(c.hi)}` : 'No trades yet' }))))),
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Why trades won or lost', h('span', { class: 'r', text: `${a.study.n} trades` })),
+        h('div', { class: 'tiles' }, h('div', { class: 'tile' }, h('b', { text: `${pm.losersUp1R}/${pm.losers}` }), h('span', { text: 'losers that were +1R first' })), h('div', { class: 'tile' }, h('b', { text: `${pm.losersUpHalfR}/${pm.losers}` }), h('span', { text: 'losers that were +0.5R first' })),
+          h('div', { class: 'tile' }, h('b', { text: pm.winnersMedianMaeR === null ? '—' : `${pm.winnersMedianMaeR}R` }), h('span', { text: 'heat winners took first' })), h('div', { class: 'tile' }, h('b', { text: `${pm.winners}/${a.study.n}` }), h('span', { text: 'trades that won' }))),
+        h('p', { class: 'small', style: 'margin-top:10px', text: `How they ended: ${Object.entries(pm.exits).map(([k, v]) => `${k} ${v}`).join(', ') || 'no trades'}. From the run with the most trades: ${a.study.name.toLowerCase()}. A description until there are ${a.minTrades} trades.` })),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'What Quint wants to test next' }),
+        a.proposals.length ? h('div', { class: 'list' }, a.proposals.map((p) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: p.rules }), h('span', { class: 'pill', text: p.alreadyQueued ? 'queued' : 'proposed' })), h('div', { class: 'm', text: `${p.why} Pass mark: ${p.passMark}` }))))
+          : h('p', { class: 'mut', text: 'Nothing new tonight.' }),
+        h('p', { class: 'small', style: 'margin-top:10px', text: 'Proposals are written into the lab\'s queue with their pass mark before anything is tested, and tested only on sessions after that date. Nothing changes your rules by itself.' })),
+    ];
   }
   function openFamily(x) {
     const row = (v, extra) => h('div', { class: 'item' }, h('div', { class: 'n', text: v.key.replace(/;/g, ' · ') }), h('div', { class: 'm', text: `tune ${signed(v.tune.net)} (${v.tune.n}) → unseen ${signed(v.unseen.net)} (${v.unseen.n})${extra || ''}` }));
@@ -857,8 +891,8 @@ svg.spark { width: 100%; height: 34px; display: block; }
   const TOOLS = [
     { name: 'get_overview', description: 'Today at a glance: session, next news, money (bots from Trading Mastery, the owner\'s own trades, the paper test), prop room, lab headline and warnings.',
       execute: () => { const now = new Date(), n = news(now), tg = tightest(); return { session: session(now), nextNews: n.next ? { title: n.next.title, ukTime: ukTime(n.next.at) } : null, newsLoaded: n.loaded, bots: botsLive(), myTrades: jstats(S.trades), paper: D.roundup.paper, tightestAccount: tg ? { name: tg.a.name, room: tg.m.room, maxRisk: tg.m.maxRisk } : null, labHeadline: D.roundup.headline, warnings: D.roundup.warnings }; } },
-    { name: 'get_lab', description: 'The bot scoreboard (backtests on saved MNQ candles, 1 MNQ after costs) and the strategy factory results (variations, survivors, PBO by family).',
-      execute: () => ({ bots: D.bots.map((b) => ({ name: b.name, trades: b.trades, net: Math.round(b.net), laterHalf: Math.round(b.laterHalf), maxDrawdown: Math.round(b.maxDrawdown), grade: b.grade, lucidPass: b.pass, lucidFail: b.fail, paperTrades: b.forward.trades, paperNet: Math.round(b.forward.net) })), factory: D.factory && { variants: D.factory.variants, asOf: D.factory.asOf, readyForPaper: D.factory.readyForPaper, families: D.factory.families.map((f) => ({ name: f.name, variants: f.variants, pbo: f.pbo, survivors: (f.survivors || []).length, verdict: f.verdict })) } }) },
+    { name: 'get_lab', description: 'The bot scoreboard (backtests on saved MNQ candles, 1 MNQ after costs), the strategy factory results (variations, survivors, PBO by family), and the sequence analyst: what each WYLD pillar is worth (the funnel, each pillar with and without, each confirmation alone, why trades won or lost, proposed experiments).',
+      execute: () => ({ bots: D.bots.map((b) => ({ name: b.name, trades: b.trades, net: Math.round(b.net), laterHalf: Math.round(b.laterHalf), maxDrawdown: Math.round(b.maxDrawdown), grade: b.grade, lucidPass: b.pass, lucidFail: b.fail, paperTrades: b.forward.trades, paperNet: Math.round(b.forward.net) })), factory: D.factory && { variants: D.factory.variants, asOf: D.factory.asOf, readyForPaper: D.factory.readyForPaper, families: D.factory.families.map((f) => ({ name: f.name, variants: f.variants, pbo: f.pbo, survivors: (f.survivors || []).length, verdict: f.verdict })) }, pillars: D.anatomy && { asOf: D.anatomy.asOf, candles: D.anatomy.candles, sessions: D.anatomy.sessions, lessons: D.anatomy.lessons, pillars: D.anatomy.pillars, confirmations: D.anatomy.confirmations, whyTradesWonOrLost: D.anatomy.study, proposals: D.anatomy.proposals } }) },
     { name: 'find_strategy', description: 'Look up one strategy in Quint\'s memory by name or keyword: status, rules, verdict, evidence and next step.', inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'] },
       execute: ({ query }) => { const q = String(query || '').toLowerCase(); const hits = D.strategies.filter((s) => (s.name + ' ' + s.id + ' ' + (s.rules || '')).toLowerCase().includes(q)).slice(0, 3); return hits.length ? hits : { none: 'No strategy matches. Try another word.' }; } },
     { name: 'get_my_strategy', description: 'The owner\'s strategy, WYLD Will\'s Four Pillars: the checklist, pre-market routine, entries, stops and targets, no-trade rules and cautions.', execute: () => D.playbook },
@@ -899,7 +933,7 @@ svg.spark { width: 100%; height: 34px; display: block; }
   }
   $('askForm').addEventListener('submit', (e) => { e.preventDefault(); ask($('q').value); });
   $('clearChat').addEventListener('click', () => { chat = []; LS.set('chat', chat); renderAsk(); });
-  clear($('quick'), ['Brief me for today', 'How much room do I have?', 'How did my bots do?', 'What did the factory find?', 'Walk me through the four pillars', 'Add an idea to the lab'].map((q) => h('button', { class: 'chip', type: 'button', onclick: () => ask(q), text: q })));
+  clear($('quick'), ['Brief me for today', 'How much room do I have?', 'How did my bots do?', 'What did the factory find?', 'What is each pillar worth?', 'Walk me through the four pillars', 'Add an idea to the lab'].map((q) => h('button', { class: 'chip', type: 'button', onclick: () => ask(q), text: q })));
   $('mic').addEventListener('click', () => {
     if (!dict) return;
     if (listening) { dict.stop().catch(() => {}); return; }

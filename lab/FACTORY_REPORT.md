@@ -1,31 +1,21 @@
 # Strategy factory report
 
-Candles up to 2026-11-18. 2,594 variations tested in 53.1s. Every variation: 1 MNQ, $0.50 commission a side, 1 tick of slippage, the bot lab's fills.
+Candles up to 2026-11-18. 1,490 variations tested in 33.5s. Every variation: 1 MNQ, $0.50 commission a side, 1 tick of slippage, the bot lab's fills.
 
 **How a variation survives** (fixed before testing): on unseen sessions at least 30 trades, a profit, profit factor 1.2+, still a profit with $2.50 more costs a trade; worst drawdown under $2,000 and no day worse than -$1,200; its neighbouring variations also profitable unseen; and its family's chance of overfitting (PBO) 30% or less.
 
 | Family | Variations | Sessions (tune / unseen) | Profitable unseen | PBO | Survivors |
 |---|---|---|---|---|---|
-| Your strategy: WYLD Will Four Pillars (mechanical v0) | 1,152 | 12 / 8 | 156 of 1152 that traded | 37% | 0 |
+| Your strategy: WYLD Will Four Pillars (as the indicator reads it) | 48 | 12 / 8 | 0 of 0 that traded | n/a | 0 |
 | N-candle breakout | 600 | 33 / 23 | 522 of 600 that traded | 67% | 0 |
 | Opening range breakout | 324 | 12 / 8 | 191 of 324 that traded | 60% | 0 |
 | VWAP band fade | 432 | 12 / 8 | 314 of 432 that traded | 40% | 0 |
 | Noise-area momentum | 32 | 33 / 23 | 30 of 32 that traded | 29% | 6 |
 | Gap fade | 54 | 12 / 8 | 18 of 54 that traded | 57% | 0 |
 
-## Your strategy: WYLD Will Four Pillars (mechanical v0)
+## Your strategy: WYLD Will Four Pillars (as the indicator reads it)
 
-Best on the tuning sessions: +$372 over 11 trades; on the 8 unseen sessions it made -$1,013 over 7 trades. PBO 37%. Under 30 unseen trades, so no variation can pass yet. It re-runs every night as candles arrive.
-
-Top 5 by the tuning sessions, then how they did unseen:
-
-| Settings | Tune | Unseen | Neighbours unseen (median) |
-|---|---|---|---|
-| pools=on, confirm=reclaim, stopTicks=1, target=B, be=none, window=120, maxEntries=2 | +$372 (11) | -$1,013 (7) | -$1,013 |
-| pools=on, confirm=reclaim, stopTicks=1, target=B, be=none, window=180, maxEntries=2 | +$372 (11) | -$1,013 (7) | -$1,013 |
-| pools=on, confirm=reclaim, stopTicks=2, target=B, be=none, window=120, maxEntries=2 | +$369 (11) | -$1,016 (7) | -$1,016 |
-| pools=on, confirm=reclaim, stopTicks=2, target=B, be=none, window=180, maxEntries=2 | +$369 (11) | -$1,016 (7) | -$1,016 |
-| pools=on, confirm=reclaim, stopTicks=4, target=B, be=none, window=120, maxEntries=2 | +$363 (11) | -$1,022 (7) | -$1,019 |
+None of the 48 variations traded enough to rank. More candles needed.
 
 ## N-candle breakout
 

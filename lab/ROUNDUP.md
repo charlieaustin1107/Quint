@@ -8,7 +8,7 @@
 - Best backtest so far: the 20-candle breakout, $3,711 over 40 trades on one MNQ. That is too few trades to trust yet.
 - No strategy has earned approval yet. That needs years of data and a clean paper test.
 - Warning: four bots would likely fail a Lucid 50K before passing: New York open breakout, Opening candle direction (5-minute opening range), Last-30-minute momentum, Failed breakout.
-- Latest lesson: Testing thousands of variations finds lucky winners easily: on the first night breakout and opening range scored PBO 60 to 67%, meaning their best variations were mostly luck.
+- Latest lesson: Replaying WYLD's rules exactly as the indicator reads them showed where setups die: the pools marked before the open were all run before 9:30, most sweeps found no higher-timeframe level holding nearby, and on 5-minute candles Point B came before any confirmation.
 - Next up: Grow the MNQ candle store every night with one TradingView call: the newest 5-minute candles, merged into lab/data; the 15-minute candles are built from them.
 
 Full numbers: `lab/SCOREBOARD.md`. Every strategy and its verdict: `lab/brain/registry.json`. Nothing here is financial advice.
