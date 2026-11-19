@@ -64,6 +64,8 @@ Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ co
 
 ## Session log
 
+| 2026-11-19 | ChatGPT | Owner requirement: longer-horizon bots must have strict stop-loss/take-profit boundaries and continuous chart reassessment. Added mandatory protection, event-driven monitoring, decision logging, overnight/gap checks and AI-independent fail-safes to the MNQ research programme and Quint Control plan on main. No trading code or live execution path changed. |
+
 | Date | Model | What happened |
 |---|---|---|
 | 2026-11-18 | Opus 5.5 | Phase 0 built: plan, prompts, structure, protocol and schemas, skill, firm preset, setup guide, install scripts, tests (39, three clean runs). Pull request opened. Not tested: the PowerShell scripts (no PowerShell in the cloud); they get their first real run on the owner's computer in phase 1. |
