@@ -5,7 +5,7 @@ The scheduled **Quint Lab nightly** Claude session does this every weeknight at 
 The scheduled message just says: "Nightly run: follow `lab/NIGHTLY.md`." Everything it needs is below.
 
 ## Budget (hard limits)
-- **TradingView: at most 2 calls a night.** The owner's Essential plan allows 10 a day for everything: Trading Mastery, the dream run (which uses most of the rest), and every chat. Call 1 is always the candles. Call 2 is the news calendar when it's running low, otherwise one queued research item. If a call is refused, stop calling and say so.
+- **TradingView: at most 2 calls a night**, whatever the scheduled message says (it may still say 3). The owner's Essential plan allows 10 a day for everything: Trading Mastery, the dream run (which uses most of the rest), and every chat. Call 1 is always the candles. Call 2 is the news calendar when it's running low, otherwise one queued research item. If a call is refused, stop calling and say so.
 - **TraderDev:** at most 20 credits a night. **Claude:** keep the run lean; don't paste big files into the conversation.
 
 ## Steps
@@ -20,13 +20,14 @@ The scheduled message just says: "Nightly run: follow `lab/NIGHTLY.md`." Everyth
    - **feature** or **venture:** add a line to the journal for the next build session; set it to "queued".
    When a queued strategy idea is tested, set it to "done" or "rejected" with a one-line `result`. Never delete an idea.
 6. **Run everything:** `cd lab && npm run lab`. That runs every bot, the strategy factory (about a minute), the paper forward test, the roundup and Quint HQ.
-7. **Factory promotions.** For each entry in `lab/results/factory.json` → `readyForPaper` (survived 5 nights in a row) that isn't in the registry yet, add a strategy: `id` `factory-<family>-<n>`, status "Walk-forward", `runner` `factory:<family>:<settings key>`, `frozenAt` today, and the evidence from the factory report. Then run `npm run lab` again, so it enters the paper forward test.
-8. **One research item (optional; only if call 2 wasn't used, or the item needs no TradingView call).** Take the first queue item with `"auto": true` that isn't `grow-data` or `factory-nightly`. Run it exactly as written, record the result on the strategy, change its status only as `lab/FACTORY.md` allows, and take it off the queue.
-9. **Test:** `cd lab && npm run test:3` (unit, factory and the Quint HQ phone test). If anything fails, stop, write what failed in the journal, push that, and don't republish Quint HQ.
-10. **Remember:** a dated journal entry (what ran, survivors, ideas handled, calls used) and any new lesson in the registry. Run `npm run lab` again if the registry changed.
-11. **Save to the repo:** commit with a plain-English message, push `lab/nightly` (retry network errors), and open a pull request to the base branch if none is open. Don't merge it: that's the owner's call. **Never commit anything about the owner's money** (the repo is public).
-12. **Refresh Quint HQ:** read the artifact first, then publish `lab/jarvis/index.html` to https://claude.ai/artifact/NF7M9VSX3YrsyUPWWL1uim without passing `capabilities`, so its stored capabilities carry forward.
-13. **Tell the owner:** a push notification with the roundup headline, the factory line (variations tested, survivors) and any idea that got a result.
+7. **Fridays only, the weekly review (no TradingView calls).** Add a weekly section to the journal: the paper forward test, the factory's survivors and streaks, what changed in the scoreboard, ideas handled, and what was learned. Keep the queue stocked: if fewer than 3 `"auto": true` items are left, add up to 2 new ones from the "First experiment queue" in `research/mnq/STRATEGY-RESEARCH-PROGRAMME.md` or `lab/FACTORY.md`, each with its exact rules, data, cost and pass mark written **before** anything is run.
+8. **Factory promotions.** For each entry in `lab/results/factory.json` → `readyForPaper` (survived 5 nights in a row) that isn't in the registry yet, add a strategy: `id` `factory-<family>-<n>`, status "Walk-forward", `runner` `factory:<family>:<settings key>`, `frozenAt` today, and the evidence from the factory report. Then run `npm run lab` again, so it enters the paper forward test.
+9. **One research item (optional; only if call 2 wasn't used, or the item needs no TradingView call).** Take the first queue item with `"auto": true` that isn't `grow-data` or `factory-nightly`. Run it exactly as written, record the result on the strategy, change its status only as `lab/FACTORY.md` allows, and take it off the queue.
+10. **Test:** `cd lab && npm run test:3` (unit, factory and the Quint HQ phone test). If anything fails, stop, write what failed in the journal, push that, and don't republish Quint HQ.
+11. **Remember:** a dated journal entry (what ran, survivors, ideas handled, calls used) and any new lesson in the registry. Run `npm run lab` again if the registry changed.
+12. **Save to the repo:** commit with a plain-English message, push `lab/nightly` (retry network errors), and open a pull request to the base branch if none is open. Don't merge it: that's the owner's call. **Never commit anything about the owner's money** (the repo is public).
+13. **Refresh Quint HQ:** read the artifact first, then publish `lab/jarvis/index.html` to https://claude.ai/artifact/NF7M9VSX3YrsyUPWWL1uim without passing `capabilities`, so its stored capabilities carry forward.
+14. **Tell the owner:** a push notification with the roundup headline, the factory line (variations tested, survivors) and any idea that got a result.
 
 ## Rules for statuses
 Follow `lab/FACTORY.md`. In short: nothing is Approved without years of real MNQ data, every gate passed, and a clean paper test; nothing from TraderDev's stand-in is promoted on its own; never call anything profitable; report every variant.
