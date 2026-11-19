@@ -4,6 +4,7 @@ A NinjaTrader 8 trading engine with a black, futuristic dashboard website. It ru
 
 - **Start here:** `STATUS.md` (what's done and what's next)
 - **The plan:** `PLAN.md` (a copy of the plan doc)
+- **Strategy Lab research:** `research/STRATEGY-LAB.md` (plain-English bot creation, backtests and live paper-forward testing)
 - **Prompts for every build phase:** `FABLE-PROMPTS.md`
 - **Setting up your computer:** `SETUP.md`
 - **How the engine and website talk:** `protocol.md`
