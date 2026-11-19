@@ -19,6 +19,7 @@
 2. Initial test window: 09:35–15:55 America/New_York, Monday–Friday. Split results into open, midday and close rather than selecting the best period after seeing results.
 3. Apply the intended account's scheduled-news restrictions as a hard eligibility filter. The current Quint repo notes a LucidDaily red-folder flat window of two minutes either side; re-verify the exact live account terms before using that preset.
 4. One MNQ contract, one position at a time, no pyramiding or averaging down. This is a research sizing assumption, not live permission.
+5. The current Quint Control status records a planned 30-second minimum-hold rule, while Guardian implementation is still a later build phase. Reconcile this before account-specific testing: a minimum-hold gate must never delay a protective stop, emergency flatten, firm-required exit or loss-of-protection response. If the intended account's rules or eventual Guardian semantics conflict with this strategy's immediately active bracket, mark the strategy ineligible for that account. The 30-second cooldown after an exit is separate from any minimum position-hold rule.
 
 ### Signal definition
 
