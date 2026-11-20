@@ -103,3 +103,5 @@ Branch: `quint-control/strategy-lab-phase-3a`. This is a first vertical slice an
 
 
 | 2026-11-19 | ChatGPT | Added `research/mnq/2026-11-19-vwap-first-pullback.md` on a separate research branch. Updated PLAN.md and the Phase 3 FABLE prompt to keep the exact crossover as baseline and define a separate VWAP first-pullback hypothesis. Evidence reviewed is QQQ/ETF-focused, not MNQ proof; no MNQ backtest has been run. Research only: no trading code, live engine or Guardian changed. |
+
+| 2026-11-20 | ChatGPT | Researched MNQ contract-roll and continuous-series integrity using CME, Databento and QuantConnect documentation. Added the frozen roll-integrity sentinel, causal calendar/volume/OI mapping rules, data requirements and Fable prompt in `research/mnq/2026-11-20-contract-roll-integrity.md`; updated the research programme, PLAN and FABLE-PROMPTS on a branch stacked on the VWAP research branch. Specification only: no MNQ backtest was run and no live trading code changed. |
