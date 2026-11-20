@@ -12,7 +12,7 @@ const SCHEMAS = path.join(ROOT, 'protocol', 'schemas');
 const EXAMPLES = path.join(ROOT, 'protocol', 'examples');
 const reg = new Registry(SCHEMAS);
 
-const schemaTypes = fs.readdirSync(SCHEMAS).filter((f) => f.endsWith('.json') && f !== 'common.json').map((f) => f.replace(/\.json$/, '')).sort();
+const schemaTypes = fs.readdirSync(SCHEMAS).filter((f) => f.endsWith('.json') && f !== 'common.json' && !f.endsWith('.schema.json')).map((f) => f.replace(/\.json$/, '')).sort();
 const exampleFiles = fs.readdirSync(EXAMPLES).filter((f) => f.endsWith('.json')).sort();
 const load = (f) => JSON.parse(fs.readFileSync(path.join(EXAMPLES, f), 'utf8'));
 const example = (name) => JSON.parse(JSON.stringify(load(name + '.json')));

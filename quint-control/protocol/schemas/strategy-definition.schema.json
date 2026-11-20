@@ -333,5 +333,6 @@
         }
       }
     }
-  }
+  },
+  "description": "Reusable data schema for a Quint strategy definition. This is not an engine-to-website protocol message."
 }

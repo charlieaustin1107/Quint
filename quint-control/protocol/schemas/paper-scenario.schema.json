@@ -136,5 +136,6 @@
         }
       }
     }
-  }
+  },
+  "description": "Reusable data schema for a manual paper scenario. This is not an engine-to-website protocol message."
 }

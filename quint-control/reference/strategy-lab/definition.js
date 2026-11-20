@@ -1,5 +1,5 @@
 'use strict';
-const OPS = new Set(['and','or','not','gt','gte','lt','lte','eq','neq','add','sub','mul','div']);
+const OPS = new Set(['and','or','not','gt','gte','lt','lte','eq','neq','add','sub','mul','div','const','var']);
 const SAFE_NAME = /^[A-Za-z][A-Za-z0-9_]{0,63}$/;
 const MAX_DEPTH = 12, MAX_NODES = 128;
 const obj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
