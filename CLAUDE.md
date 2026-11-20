@@ -51,8 +51,11 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 - Read `backtest/README.md` for how to run it.
 - The strategy logic is **not rewritten**. `backtest/extract_engine.py` copies Quint Brain's own functions into `backtest/engine.js`, so the backtest tests exactly what the app teaches. After changing the rules in Quint Brain, re-run the extractor.
 - Costs are always included: **$0.75 commission a side plus 1 tick of slippage a side**. MNQ is $2 a point and a tick is 0.25.
-- Always report the result **out of sample** (the later half of the data) as well as over the whole period. One good stretch isn't proof.
-- Lucid's limits matter more than profit: report the worst drawdown in dollars on 1 contract.
+- The current legacy runner's firstHalf/secondHalf fields split the trade list by trade count; they are **not** a valid chronological out-of-sample test. Do not describe them as OOS. Use fixed chronological date boundaries and a locked final holdout in new research.
+- The legacy runner's $2.50 round-trip cost assumption is specific to that script and is not automatically the correct Quint Control account cost profile. Quint Control must use a versioned, verified account-specific cost schedule.
+- Candle OHLC fills are approximate. If stop and target can both be touched within one bar, use adverse ordering or mark the outcome ambiguous; never assume a favourable sequence.
+- Follow `quint-control/research/BACKTEST-INTEGRITY-STANDARD.md` for the target data, fill, validation, overfitting and reporting requirements. The old `backtest/` harness is exploratory, not the Quint Control bot-validation engine.
+- Lucid's limits matter more than profit: report mark-to-market drawdown, intratrade heat and account-rule breaches, not just closed-trade P&L.
 
 ## How to work
 - **One focused change per pull request.** Explain what changed in plain English, as if to a trader rather than a programmer.
@@ -63,6 +66,6 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 
 ## Quint Control
 - Read `quint-control/STATUS.md` first: it says which phase is in progress and what to do next. Update it at the end of every session, and commit and push often so work survives a session ending early.
-- The rules, decisions and testing protocol are in the `quint-control` skill (`.claude/skills/quint-control/SKILL.md`). The phase prompts are in `quint-control/FABLE-PROMPTS.md`.
+- The rules, decisions and testing protocol are in the `quint-control` skill (`.claude/skills/quint-control/SKILL.md`). The phase prompts are in `quint-control/FABLE-PROMPTS.md`. The Strategy Lab's backtest integrity requirements are in `quint-control/research/BACKTEST-INTEGRITY-STANDARD.md`.
 - Nothing is done until it's tested: JavaScript reference and `node --test` in the cloud, golden files, the engine's self-tests inside NinjaTrader, Playwright for the website, and the owner's checklist. Run the suites three times before calling a phase done.
 - Run the Quint Control tests with `cd quint-control && npm test`.
