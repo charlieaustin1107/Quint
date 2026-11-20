@@ -13,7 +13,7 @@ The website is the remote control and monitoring interface. The NinjaTrader engi
 
 - NinjaTrader 8 add-on is the engine; the dashboard is currently served locally.
 - Bot plug-ins expose strategy metadata/settings, `OnBarClose(BarContext)`, optional `Manage(PositionContext)`, and every entry must have a stop and target.
-- One bot per account; all orders go through Guardian and the single OrderRouter.
+- Current safe baseline: one bot per account; all orders go through Guardian and the single OrderRouter. Proposed future capability: multiple bots per account only through the account-level Portfolio Manager / Position Coordinator specified in `ACCOUNT-LEVEL-MULTI-BOT-POSITION-COORDINATION.md`. This is a design requirement, not implemented functionality; retain one-bot-per-account enforcement until its release gates pass.
 - PositionReconciler runs at startup and every few seconds.
 - Protocol has one-second engine heartbeat, market updates up to four per second, snapshots, website auto-reconnect, Telegram alerts and Healthchecks.io offline alarm.
 - Stale data, lost connection, bot error and position mismatch block new entries.
