@@ -6,6 +6,7 @@ Research-only record. No strategy in this log is approved for live trading. Rese
 |---|---|---|---|---|---|
 | 2026-11-19 | Scalping | MNQ best-level order-flow imbalance (OFI) plus microprice skew predicts 5–30 second continuation | Specified; not backtested | Existing Quint OHLCV candles cannot test order-book features. Need licensed event-level MNQ quotes/depth and realistic execution replay. | Intraday |
 | 2026-11-20 | Intraday | Confirmed opening-gap midpoint reversion, conditioned on pre-RTH session range, versus mirrored-price control | Specified; not backtested | Published 2026 NQ session study motivates replication; MNQ preprint warns generic gap/liquidity signals may fail after costs. Must audit overlap and verify 1m/event data. | Swing |
+| 2026-11-20 | Swing | Close-confirmed 55-session Donchian breakout, 20-session opposite-channel exit, 2 × ATR(20) initial stop | Specified; not backtested | Evidence is mixed: broad futures TSMOM evidence, volatility-scaling critique, and 2026 preprint warning about fast equity-index trends. LucidFlex simulated accounts force flat at 4:45 PM ET, so this multi-day version is ineligible there. | Monthly/position |
 
 ## 2026-11-19 — Scalping
 
@@ -29,3 +30,8 @@ Important context discovered in existing open PRs:
 The published 2026 NQ gap-midpoint study is forecasting/descriptive evidence, not proof of an executable MNQ edge. The MNQ gap preprint is a preprint and reports that its tested OHLCV gap family did not pass all validation criteria. The New York Fed's 2026 overnight-drift result concerns a distinct 02:00–03:00 ET return pattern and is included as a warning about regime decay, not as direct evidence about gap-midpoint touch rates.
 
 No new backtest or paper-forward test was run during this repository review.
+
+
+## 2026-11-20 — Swing
+
+See [the full swing research note](notes/2026-11-20-swing-55d-donchian.md). The candidate is a 55/20-day Donchian breakout with a 2 × ATR(20) initial stop, benchmarked against a fixed 20/10-day variant and risk-matched long-only baselines. Academic evidence is mixed and the exact MNQ setup remains untested. LucidFlex's official rules require positions flat by 4:45 PM ET and prohibit overnight holding on simulated accounts, so this exact multi-day strategy is not eligible for LucidFlex evaluation/funded-sim use. A flat-by-close adaptation would be a separate hypothesis. No backtest was run.
