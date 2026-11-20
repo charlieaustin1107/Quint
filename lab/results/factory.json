@@ -1,0 +1,1559 @@
+{
+ "asOf": "2026-11-19",
+ "rule": {
+  "minUnseenTrades": 30,
+  "minUnseenPF": 1.2,
+  "maxDrawdown": 2000,
+  "worstDay": -1200,
+  "maxPBO": 0.3,
+  "minTuneTrades": 10
+ },
+ "tuneShare": 0.6,
+ "costStress": 2.5,
+ "variants": 1490,
+ "seconds": 32.5,
+ "families": [
+  {
+   "id": "wyld",
+   "name": "Your strategy: WYLD Will Four Pillars (as the indicator reads it)",
+   "registry": "wyld-four-pillars",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-19",
+    "sessions": 22,
+    "tuneSessions": 13,
+    "unseenSessions": 9,
+    "unseenFrom": "2026-11-09"
+   },
+   "variants": 48,
+   "withTrades": 0,
+   "unseenPositive": 0,
+   "blocks": 8,
+   "pbo": null,
+   "bestTuned": null,
+   "top": [],
+   "survivors": [],
+   "verdict": "None of the 48 variations traded enough to rank. More candles needed."
+  },
+  {
+   "id": "wyld-1m",
+   "name": "Your strategy on 1-minute candles (as the indicator reads it)",
+   "skipped": "needs 10 sessions of 1m candles (has 2)"
+  },
+  {
+   "id": "breakout",
+   "name": "N-candle breakout",
+   "registry": "app-20-candle-breakout",
+   "data": {
+    "file": "mnq_15m.csv",
+    "from": "2026-09-01",
+    "to": "2026-11-19",
+    "sessions": 58,
+    "tuneSessions": 34,
+    "unseenSessions": 24,
+    "unseenFrom": "2026-10-19"
+   },
+   "variants": 600,
+   "withTrades": 600,
+   "unseenPositive": 522,
+   "blocks": 8,
+   "pbo": 0.4714285714285714,
+   "bestTuned": {
+    "key": "n=10;stopAtr=3;targetR=3;side=both;maxTrades=2",
+    "params": {
+     "n": 10,
+     "stopAtr": 3,
+     "targetR": 3,
+     "side": "both",
+     "maxTrades": 2
+    },
+    "tune": {
+     "n": 28,
+     "net": 1590.5,
+     "pf": 1.6867443868739205
+    },
+    "unseen": {
+     "n": 23,
+     "net": 1402.5,
+     "pf": 1.3892589508742714,
+     "maxDrawdown": 1503.5
+    },
+    "all": {
+     "n": 51,
+     "net": 2993,
+     "maxDrawdown": 1503.5,
+     "worstDay": -651.5
+    },
+    "neighbours": {
+     "count": 6,
+     "medianUnseen": 1402.5
+    },
+    "survivor": false
+   },
+   "top": [
+    {
+     "key": "n=10;stopAtr=3;targetR=3;side=both;maxTrades=2",
+     "params": {
+      "n": 10,
+      "stopAtr": 3,
+      "targetR": 3,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 28,
+      "net": 1590.5,
+      "pf": 1.6867443868739205
+     },
+     "unseen": {
+      "n": 23,
+      "net": 1402.5,
+      "pf": 1.3892589508742714,
+      "maxDrawdown": 1503.5
+     },
+     "all": {
+      "n": 51,
+      "net": 2993,
+      "maxDrawdown": 1503.5,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 1402.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=10;stopAtr=3;targetR=4;side=both;maxTrades=2",
+     "params": {
+      "n": 10,
+      "stopAtr": 3,
+      "targetR": 4,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 28,
+      "net": 1590.5,
+      "pf": 1.6867443868739205
+     },
+     "unseen": {
+      "n": 23,
+      "net": 1402.5,
+      "pf": 1.3892589508742714,
+      "maxDrawdown": 1503.5
+     },
+     "all": {
+      "n": 51,
+      "net": 2993,
+      "maxDrawdown": 1503.5,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 1402.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=10;stopAtr=3;targetR=2;side=both;maxTrades=2",
+     "params": {
+      "n": 10,
+      "stopAtr": 3,
+      "targetR": 2,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 28,
+      "net": 1570,
+      "pf": 1.6778929188255614
+     },
+     "unseen": {
+      "n": 23,
+      "net": 1402.5,
+      "pf": 1.3892589508742714,
+      "maxDrawdown": 1503.5
+     },
+     "all": {
+      "n": 51,
+      "net": 2972.5,
+      "maxDrawdown": 1503.5,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 1544.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=10;stopAtr=3;targetR=3;side=short;maxTrades=2",
+     "params": {
+      "n": 10,
+      "stopAtr": 3,
+      "targetR": 3,
+      "side": "short",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 13,
+      "net": 1550.5,
+      "pf": 2.3684907325684024
+     },
+     "unseen": {
+      "n": 15,
+      "net": 3833,
+      "pf": 5.615291992775436,
+      "maxDrawdown": 295.5
+     },
+     "all": {
+      "n": 28,
+      "net": 5383.5,
+      "maxDrawdown": 977.5,
+      "worstDay": -306.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 3833
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=10;stopAtr=3;targetR=1.5;side=both;maxTrades=2",
+     "params": {
+      "n": 10,
+      "stopAtr": 3,
+      "targetR": 1.5,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 31,
+      "net": 1466,
+      "pf": 1.612748171368861
+     },
+     "unseen": {
+      "n": 24,
+      "net": 1686.5,
+      "pf": 1.468082153760755,
+      "maxDrawdown": 1503.5
+     },
+     "all": {
+      "n": 55,
+      "net": 3152.5,
+      "maxDrawdown": 1503.5,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 1429.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=10;stopAtr=3;targetR=3;side=short;maxTrades=1",
+     "params": {
+      "n": 10,
+      "stopAtr": 3,
+      "targetR": 3,
+      "side": "short",
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 12,
+      "net": 1419.5,
+      "pf": 2.2528684907325682
+     },
+     "unseen": {
+      "n": 15,
+      "net": 3833,
+      "pf": 5.615291992775436,
+      "maxDrawdown": 295.5
+     },
+     "all": {
+      "n": 27,
+      "net": 5252.5,
+      "maxDrawdown": 984.5,
+      "worstDay": -344.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 3833
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=15;stopAtr=3;targetR=3;side=both;maxTrades=2",
+     "params": {
+      "n": 15,
+      "stopAtr": 3,
+      "targetR": 3,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 27,
+      "net": 1378.5,
+      "pf": 1.5778662754139594
+     },
+     "unseen": {
+      "n": 21,
+      "net": 1899,
+      "pf": 1.6230314960629921,
+      "maxDrawdown": 1403.5
+     },
+     "all": {
+      "n": 48,
+      "net": 3277.5,
+      "maxDrawdown": 1403.5,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 1899
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=15;stopAtr=3;targetR=4;side=both;maxTrades=2",
+     "params": {
+      "n": 15,
+      "stopAtr": 3,
+      "targetR": 4,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 27,
+      "net": 1378.5,
+      "pf": 1.5778662754139594
+     },
+     "unseen": {
+      "n": 21,
+      "net": 1899,
+      "pf": 1.6230314960629921,
+      "maxDrawdown": 1403.5
+     },
+     "all": {
+      "n": 48,
+      "net": 3277.5,
+      "maxDrawdown": 1403.5,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 1899
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=15;stopAtr=3;targetR=2;side=both;maxTrades=2",
+     "params": {
+      "n": 15,
+      "stopAtr": 3,
+      "targetR": 2,
+      "side": "both",
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 27,
+      "net": 1358,
+      "pf": 1.5692726891636974
+     },
+     "unseen": {
+      "n": 21,
+      "net": 1899,
+      "pf": 1.6230314960629921,
+      "maxDrawdown": 1403.5
+     },
+     "all": {
+      "n": 48,
+      "net": 3257,
+      "maxDrawdown": 1403.5,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 1899
+     },
+     "survivor": false
+    },
+    {
+     "key": "n=10;stopAtr=3;targetR=3;side=both;maxTrades=1",
+     "params": {
+      "n": 10,
+      "stopAtr": 3,
+      "targetR": 3,
+      "side": "both",
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 26,
+      "net": 1347,
+      "pf": 1.5816062176165804
+     },
+     "unseen": {
+      "n": 23,
+      "net": 1402.5,
+      "pf": 1.3892589508742714,
+      "maxDrawdown": 1503.5
+     },
+     "all": {
+      "n": 49,
+      "net": 2749.5,
+      "maxDrawdown": 1503.5,
+      "worstDay": -651.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 1402.5
+     },
+     "survivor": false
+    }
+   ],
+   "survivors": [],
+   "verdict": "Best on the tuning sessions: +$1,591 over 28 trades; on the 24 unseen sessions it made +$1,403 over 23 trades. PBO 47%. Under 30 unseen trades, so no variation can pass yet. It re-runs every night as candles arrive."
+  },
+  {
+   "id": "orb",
+   "name": "Opening range breakout",
+   "registry": "app-ny-open-breakout",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-19",
+    "sessions": 22,
+    "tuneSessions": 13,
+    "unseenSessions": 9,
+    "unseenFrom": "2026-11-09"
+   },
+   "variants": 324,
+   "withTrades": 324,
+   "unseenPositive": 281,
+   "blocks": 8,
+   "pbo": 0.2571428571428571,
+   "bestTuned": {
+    "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=1;side=both",
+    "params": {
+     "rangeMin": 5,
+     "cutoffMin": 60,
+     "stop": "range",
+     "targetR": 1,
+     "side": "both"
+    },
+    "tune": {
+     "n": 12,
+     "net": 1759,
+     "pf": 2.9522752497225304
+    },
+    "unseen": {
+     "n": 9,
+     "net": 752,
+     "pf": 1.6790067720090294,
+     "maxDrawdown": 599
+    },
+    "all": {
+     "n": 21,
+     "net": 2511,
+     "maxDrawdown": 599,
+     "worstDay": -431
+    },
+    "neighbours": {
+     "count": 5,
+     "medianUnseen": 752
+    },
+    "survivor": false
+   },
+   "top": [
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=1;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "range",
+      "targetR": 1,
+      "side": "both"
+     },
+     "tune": {
+      "n": 12,
+      "net": 1759,
+      "pf": 2.9522752497225304
+     },
+     "unseen": {
+      "n": 9,
+      "net": 752,
+      "pf": 1.6790067720090294,
+      "maxDrawdown": 599
+     },
+     "all": {
+      "n": 21,
+      "net": 2511,
+      "maxDrawdown": 599,
+      "worstDay": -431
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 752
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=120;stop=range;targetR=1;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 120,
+      "stop": "range",
+      "targetR": 1,
+      "side": "both"
+     },
+     "tune": {
+      "n": 12,
+      "net": 1759,
+      "pf": 2.9522752497225304
+     },
+     "unseen": {
+      "n": 9,
+      "net": 752,
+      "pf": 1.6790067720090294,
+      "maxDrawdown": 599
+     },
+     "all": {
+      "n": 21,
+      "net": 2511,
+      "maxDrawdown": 599,
+      "worstDay": -431
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 694.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=mid;targetR=1.5;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "mid",
+      "targetR": 1.5,
+      "side": "both"
+     },
+     "tune": {
+      "n": 12,
+      "net": 1390.5,
+      "pf": 2.593696275071633
+     },
+     "unseen": {
+      "n": 9,
+      "net": 678.5,
+      "pf": 1.7954279015240329,
+      "maxDrawdown": 668
+     },
+     "all": {
+      "n": 21,
+      "net": 2069,
+      "maxDrawdown": 668,
+      "worstDay": -311.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 929.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=120;stop=mid;targetR=1.5;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 120,
+      "stop": "mid",
+      "targetR": 1.5,
+      "side": "both"
+     },
+     "tune": {
+      "n": 12,
+      "net": 1390.5,
+      "pf": 2.593696275071633
+     },
+     "unseen": {
+      "n": 9,
+      "net": 678.5,
+      "pf": 1.7954279015240329,
+      "maxDrawdown": 668
+     },
+     "all": {
+      "n": 21,
+      "net": 2069,
+      "maxDrawdown": 668,
+      "worstDay": -311.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 702.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=180;stop=range;targetR=1;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 180,
+      "stop": "range",
+      "targetR": 1,
+      "side": "both"
+     },
+     "tune": {
+      "n": 13,
+      "net": 1308.5,
+      "pf": 1.9681834998150203
+     },
+     "unseen": {
+      "n": 9,
+      "net": 752,
+      "pf": 1.6790067720090294,
+      "maxDrawdown": 599
+     },
+     "all": {
+      "n": 22,
+      "net": 2060.5,
+      "maxDrawdown": 894.5,
+      "worstDay": -450.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 636.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=3;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "range",
+      "targetR": 3,
+      "side": "both"
+     },
+     "tune": {
+      "n": 12,
+      "net": 1204,
+      "pf": 1.6516914749661704
+     },
+     "unseen": {
+      "n": 9,
+      "net": 2595,
+      "pf": 2.8140510311080043,
+      "maxDrawdown": 602.5
+     },
+     "all": {
+      "n": 21,
+      "net": 3799,
+      "maxDrawdown": 1284,
+      "worstDay": -431
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 2190.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=120;stop=range;targetR=3;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 120,
+      "stop": "range",
+      "targetR": 3,
+      "side": "both"
+     },
+     "tune": {
+      "n": 12,
+      "net": 1204,
+      "pf": 1.6516914749661704
+     },
+     "unseen": {
+      "n": 9,
+      "net": 2595,
+      "pf": 2.8140510311080043,
+      "maxDrawdown": 602.5
+     },
+     "all": {
+      "n": 21,
+      "net": 3799,
+      "maxDrawdown": 1284,
+      "worstDay": -431
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 2183
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=180;stop=mid;targetR=1.5;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 180,
+      "stop": "mid",
+      "targetR": 1.5,
+      "side": "both"
+     },
+     "tune": {
+      "n": 13,
+      "net": 1138,
+      "pf": 2.0115555555555558
+     },
+     "unseen": {
+      "n": 9,
+      "net": 678.5,
+      "pf": 1.7954279015240329,
+      "maxDrawdown": 668
+     },
+     "all": {
+      "n": 22,
+      "net": 1816.5,
+      "maxDrawdown": 717,
+      "worstDay": -311.5
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 941.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=5;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "range",
+      "targetR": 5,
+      "side": "both"
+     },
+     "tune": {
+      "n": 12,
+      "net": 975.5,
+      "pf": 1.5280108254397835
+     },
+     "unseen": {
+      "n": 9,
+      "net": 2225.5,
+      "pf": 2.555749737853897,
+      "maxDrawdown": 629
+     },
+     "all": {
+      "n": 21,
+      "net": 3201,
+      "maxDrawdown": 1284,
+      "worstDay": -431
+     },
+     "neighbours": {
+      "count": 6,
+      "medianUnseen": 2299.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "rangeMin=5;cutoffMin=60;stop=range;targetR=10;side=both",
+     "params": {
+      "rangeMin": 5,
+      "cutoffMin": 60,
+      "stop": "range",
+      "targetR": 10,
+      "side": "both"
+     },
+     "tune": {
+      "n": 12,
+      "net": 975.5,
+      "pf": 1.5280108254397835
+     },
+     "unseen": {
+      "n": 9,
+      "net": 2225.5,
+      "pf": 2.555749737853897,
+      "maxDrawdown": 629
+     },
+     "all": {
+      "n": 21,
+      "net": 3201,
+      "maxDrawdown": 1284,
+      "worstDay": -431
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 2225.5
+     },
+     "survivor": false
+    }
+   ],
+   "survivors": [],
+   "verdict": "Best on the tuning sessions: +$1,759 over 12 trades; on the 9 unseen sessions it made +$752 over 9 trades. PBO 26%. Under 30 unseen trades, so no variation can pass yet. It re-runs every night as candles arrive."
+  },
+  {
+   "id": "vwap-fade",
+   "name": "VWAP band fade",
+   "registry": "botlab-10",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-19",
+    "sessions": 22,
+    "tuneSessions": 13,
+    "unseenSessions": 9,
+    "unseenFrom": "2026-11-09"
+   },
+   "variants": 432,
+   "withTrades": 432,
+   "unseenPositive": 164,
+   "blocks": 8,
+   "pbo": 0.4714285714285714,
+   "bestTuned": {
+    "key": "sd=2;stopBars=2;minRR=1.5;start=60;end=330;maxTrades=3",
+    "params": {
+     "sd": 2,
+     "stopBars": 2,
+     "minRR": 1.5,
+     "start": 60,
+     "end": 330,
+     "maxTrades": 3
+    },
+    "tune": {
+     "n": 20,
+     "net": 1396.5,
+     "pf": 2.9
+    },
+    "unseen": {
+     "n": 8,
+     "net": -53,
+     "pf": 0.94662638469285,
+     "maxDrawdown": 781
+    },
+    "all": {
+     "n": 28,
+     "net": 1343.5,
+     "maxDrawdown": 781,
+     "worstDay": -627.5
+    },
+    "neighbours": {
+     "count": 7,
+     "medianUnseen": 40
+    },
+    "survivor": false
+   },
+   "top": [
+    {
+     "key": "sd=2;stopBars=2;minRR=1.5;start=60;end=330;maxTrades=3",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 1.5,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 3
+     },
+     "tune": {
+      "n": 20,
+      "net": 1396.5,
+      "pf": 2.9
+     },
+     "unseen": {
+      "n": 8,
+      "net": -53,
+      "pf": 0.94662638469285,
+      "maxDrawdown": 781
+     },
+     "all": {
+      "n": 28,
+      "net": 1343.5,
+      "maxDrawdown": 781,
+      "worstDay": -627.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 40
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=2;minRR=0.5;start=30;end=330;maxTrades=2",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 0.5,
+      "start": 30,
+      "end": 330,
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 21,
+      "net": 1255.5,
+      "pf": 3.151670951156812
+     },
+     "unseen": {
+      "n": 14,
+      "net": 445.5,
+      "pf": 1.3870547350130322,
+      "maxDrawdown": 607
+     },
+     "all": {
+      "n": 35,
+      "net": 1701,
+      "maxDrawdown": 607,
+      "worstDay": -278
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": 426.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=2;minRR=0.5;start=30;end=330;maxTrades=3",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 0.5,
+      "start": 30,
+      "end": 330,
+      "maxTrades": 3
+     },
+     "tune": {
+      "n": 27,
+      "net": 1204,
+      "pf": 2.3862982153137593
+     },
+     "unseen": {
+      "n": 17,
+      "net": 466,
+      "pf": 1.3144399460188934,
+      "maxDrawdown": 627.5
+     },
+     "all": {
+      "n": 44,
+      "net": 1670,
+      "maxDrawdown": 627.5,
+      "worstDay": -520
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 381
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=3;minRR=0.5;start=30;end=330;maxTrades=2",
+     "params": {
+      "sd": 2,
+      "stopBars": 3,
+      "minRR": 0.5,
+      "start": 30,
+      "end": 330,
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 21,
+      "net": 1196.5,
+      "pf": 2.8622568093385214
+     },
+     "unseen": {
+      "n": 14,
+      "net": 445.5,
+      "pf": 1.3870547350130322,
+      "maxDrawdown": 607
+     },
+     "all": {
+      "n": 35,
+      "net": 1642,
+      "maxDrawdown": 607,
+      "worstDay": -278
+     },
+     "neighbours": {
+      "count": 9,
+      "medianUnseen": 445.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=5;minRR=0.5;start=30;end=330;maxTrades=2",
+     "params": {
+      "sd": 2,
+      "stopBars": 5,
+      "minRR": 0.5,
+      "start": 30,
+      "end": 330,
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 21,
+      "net": 1196.5,
+      "pf": 2.8622568093385214
+     },
+     "unseen": {
+      "n": 14,
+      "net": 445.5,
+      "pf": 1.3870547350130322,
+      "maxDrawdown": 607
+     },
+     "all": {
+      "n": 35,
+      "net": 1642,
+      "maxDrawdown": 607,
+      "worstDay": -278
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": 426.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=2;minRR=1;start=30;end=330;maxTrades=2",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 1,
+      "start": 30,
+      "end": 330,
+      "maxTrades": 2
+     },
+     "tune": {
+      "n": 20,
+      "net": 1196,
+      "pf": 3.2046082949308756
+     },
+     "unseen": {
+      "n": 12,
+      "net": -24,
+      "pf": 0.9821760118826588,
+      "maxDrawdown": 1076.5
+     },
+     "all": {
+      "n": 32,
+      "net": 1172,
+      "maxDrawdown": 1076.5,
+      "worstDay": -627.5
+     },
+     "neighbours": {
+      "count": 9,
+      "medianUnseen": -24
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=2;minRR=0.5;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 0.5,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 11,
+      "net": 1192,
+      "pf": 8.49685534591195
+     },
+     "unseen": {
+      "n": 7,
+      "net": 805,
+      "pf": 2.232771822358346,
+      "maxDrawdown": 322.5
+     },
+     "all": {
+      "n": 18,
+      "net": 1997,
+      "maxDrawdown": 322.5,
+      "worstDay": -322.5
+     },
+     "neighbours": {
+      "count": 7,
+      "medianUnseen": 293.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=2;minRR=1;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 2,
+      "minRR": 1,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 11,
+      "net": 1192,
+      "pf": 8.49685534591195
+     },
+     "unseen": {
+      "n": 5,
+      "net": 287,
+      "pf": 1.439509954058193,
+      "maxDrawdown": 476
+     },
+     "all": {
+      "n": 16,
+      "net": 1479,
+      "maxDrawdown": 476,
+      "worstDay": -322.5
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": 164
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=3;minRR=0.5;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 3,
+      "minRR": 0.5,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 11,
+      "net": 1192,
+      "pf": 8.49685534591195
+     },
+     "unseen": {
+      "n": 7,
+      "net": 805,
+      "pf": 2.232771822358346,
+      "maxDrawdown": 322.5
+     },
+     "all": {
+      "n": 18,
+      "net": 1997,
+      "maxDrawdown": 322.5,
+      "worstDay": -322.5
+     },
+     "neighbours": {
+      "count": 8,
+      "medianUnseen": 350.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "sd=2;stopBars=3;minRR=1;start=60;end=330;maxTrades=1",
+     "params": {
+      "sd": 2,
+      "stopBars": 3,
+      "minRR": 1,
+      "start": 60,
+      "end": 330,
+      "maxTrades": 1
+     },
+     "tune": {
+      "n": 11,
+      "net": 1192,
+      "pf": 8.49685534591195
+     },
+     "unseen": {
+      "n": 5,
+      "net": 287,
+      "pf": 1.439509954058193,
+      "maxDrawdown": 476
+     },
+     "all": {
+      "n": 16,
+      "net": 1479,
+      "maxDrawdown": 476,
+      "worstDay": -322.5
+     },
+     "neighbours": {
+      "count": 9,
+      "medianUnseen": 256
+     },
+     "survivor": false
+    }
+   ],
+   "survivors": [],
+   "verdict": "Best on the tuning sessions: +$1,397 over 20 trades; on the 9 unseen sessions it made -$53 over 8 trades. PBO 47%. Under 30 unseen trades, so no variation can pass yet. It re-runs every night as candles arrive."
+  },
+  {
+   "id": "noise",
+   "name": "Noise-area momentum",
+   "registry": "botlab-12",
+   "data": {
+    "file": "mnq_15m.csv",
+    "from": "2026-09-01",
+    "to": "2026-11-19",
+    "sessions": 58,
+    "tuneSessions": 34,
+    "unseenSessions": 24,
+    "unseenFrom": "2026-10-19"
+   },
+   "variants": 32,
+   "withTrades": 32,
+   "unseenPositive": 22,
+   "blocks": 8,
+   "pbo": 0.4,
+   "bestTuned": {
+    "key": "lookbackDays=7;volatilityMultiplier=0.8;checkEvery=30",
+    "params": {
+     "lookbackDays": 7,
+     "volatilityMultiplier": 0.8,
+     "checkEvery": 30
+    },
+    "tune": {
+     "n": 18,
+     "net": 2110.5,
+     "pf": 4.2645011600928076
+    },
+    "unseen": {
+     "n": 34,
+     "net": 350,
+     "pf": 1.0885403491019479,
+     "maxDrawdown": 1071.5
+    },
+    "all": {
+     "n": 52,
+     "net": 2460.5,
+     "maxDrawdown": 1071.5,
+     "worstDay": -703.5
+    },
+    "neighbours": {
+     "count": 3,
+     "medianUnseen": 165.5
+    },
+    "survivor": false
+   },
+   "top": [
+    {
+     "key": "lookbackDays=7;volatilityMultiplier=0.8;checkEvery=30",
+     "params": {
+      "lookbackDays": 7,
+      "volatilityMultiplier": 0.8,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 18,
+      "net": 2110.5,
+      "pf": 4.2645011600928076
+     },
+     "unseen": {
+      "n": 34,
+      "net": 350,
+      "pf": 1.0885403491019479,
+      "maxDrawdown": 1071.5
+     },
+     "all": {
+      "n": 52,
+      "net": 2460.5,
+      "maxDrawdown": 1071.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 3,
+      "medianUnseen": 165.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=7;volatilityMultiplier=1;checkEvery=30",
+     "params": {
+      "lookbackDays": 7,
+      "volatilityMultiplier": 1,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 18,
+      "net": 1906.5,
+      "pf": 3.4631782945736433
+     },
+     "unseen": {
+      "n": 25,
+      "net": 165.5,
+      "pf": 1.0536206058642474,
+      "maxDrawdown": 1131
+     },
+     "all": {
+      "n": 43,
+      "net": 2072,
+      "maxDrawdown": 1131,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 689.75
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=7;volatilityMultiplier=1.5;checkEvery=30",
+     "params": {
+      "lookbackDays": 7,
+      "volatilityMultiplier": 1.5,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 12,
+      "net": 1874.5,
+      "pf": 5.1425414364640885
+     },
+     "unseen": {
+      "n": 15,
+      "net": 1114.5,
+      "pf": 1.8049837486457205,
+      "maxDrawdown": 1280
+     },
+     "all": {
+      "n": 27,
+      "net": 2989,
+      "maxDrawdown": 1280,
+      "worstDay": -485.5
+     },
+     "neighbours": {
+      "count": 3,
+      "medianUnseen": 668
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=1;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 1,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 19,
+      "net": 1836,
+      "pf": 3.6398274622573688
+     },
+     "unseen": {
+      "n": 30,
+      "net": 1029.5,
+      "pf": 1.3623724040830694,
+      "maxDrawdown": 986
+     },
+     "all": {
+      "n": 49,
+      "net": 2865.5,
+      "maxDrawdown": 986,
+      "worstDay": -485.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 305.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=1.5;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 1.5,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 12,
+      "net": 1775,
+      "pf": 5.664914586070959
+     },
+     "unseen": {
+      "n": 12,
+      "net": 668,
+      "pf": 1.4664804469273742,
+      "maxDrawdown": 1180.5
+     },
+     "all": {
+      "n": 24,
+      "net": 2443,
+      "maxDrawdown": 1180.5,
+      "worstDay": -485.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 1141.25
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=1.2;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 1.2,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 18,
+      "net": 1747.5,
+      "pf": 3.5053763440860215
+     },
+     "unseen": {
+      "n": 18,
+      "net": 1168,
+      "pf": 1.6487086920299916,
+      "maxDrawdown": 842
+     },
+     "all": {
+      "n": 36,
+      "net": 2915.5,
+      "maxDrawdown": 842,
+      "worstDay": -485.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 668
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=7;volatilityMultiplier=1.2;checkEvery=30",
+     "params": {
+      "lookbackDays": 7,
+      "volatilityMultiplier": 1.2,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 16,
+      "net": 1686,
+      "pf": 3.376321353065539
+     },
+     "unseen": {
+      "n": 19,
+      "net": 1031,
+      "pf": 1.5199193141704488,
+      "maxDrawdown": 1015
+     },
+     "all": {
+      "n": 35,
+      "net": 2717,
+      "maxDrawdown": 1015,
+      "worstDay": -549
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 640
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=14;volatilityMultiplier=1;checkEvery=30",
+     "params": {
+      "lookbackDays": 14,
+      "volatilityMultiplier": 1,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 13,
+      "net": 1532,
+      "pf": 5.440579710144927
+     },
+     "unseen": {
+      "n": 32,
+      "net": 305.5,
+      "pf": 1.0783936361303568,
+      "maxDrawdown": 1088.5
+     },
+     "all": {
+      "n": 45,
+      "net": 1837.5,
+      "maxDrawdown": 1088.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 522
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=0.8;checkEvery=30",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 0.8,
+      "checkEvery": 30
+     },
+     "tune": {
+      "n": 20,
+      "net": 1347,
+      "pf": 1.9576964095271951
+     },
+     "unseen": {
+      "n": 33,
+      "net": 695,
+      "pf": 1.1804023361453602,
+      "maxDrawdown": 1088.5
+     },
+     "all": {
+      "n": 53,
+      "net": 2042,
+      "maxDrawdown": 1088.5,
+      "worstDay": -703.5
+     },
+     "neighbours": {
+      "count": 4,
+      "medianUnseen": 773.5
+     },
+     "survivor": false
+    },
+    {
+     "key": "lookbackDays=10;volatilityMultiplier=1.2;checkEvery=60",
+     "params": {
+      "lookbackDays": 10,
+      "volatilityMultiplier": 1.2,
+      "checkEvery": 60
+     },
+     "tune": {
+      "n": 10,
+      "net": 1208.5,
+      "pf": 2.5087390761548063
+     },
+     "unseen": {
+      "n": 15,
+      "net": -374.5,
+      "pf": 0.8247133161713082,
+      "maxDrawdown": 1505.5
+     },
+     "all": {
+      "n": 25,
+      "net": 834,
+      "maxDrawdown": 1505.5,
+      "worstDay": -711.5
+     },
+     "neighbours": {
+      "count": 5,
+      "medianUnseen": 109
+     },
+     "survivor": false
+    }
+   ],
+   "survivors": [],
+   "verdict": "Best on the tuning sessions: +$2,111 over 18 trades; on the 24 unseen sessions it made +$350 over 34 trades. PBO 40%. No variation passed every check."
+  },
+  {
+   "id": "gap-fade",
+   "name": "Gap fade",
+   "registry": "botlab-6",
+   "data": {
+    "file": "mnq_5m.csv",
+    "from": "2026-10-21",
+    "to": "2026-11-19",
+    "sessions": 22,
+    "tuneSessions": 13,
+    "unseenSessions": 9,
+    "unseenFrom": "2026-11-09"
+   },
+   "variants": 54,
+   "withTrades": 54,
+   "unseenPositive": 18,
+   "blocks": 8,
+   "pbo": 0.2857142857142857,
+   "bestTuned": null,
+   "top": [],
+   "survivors": [],
+   "verdict": "None of the 54 variations traded enough to rank. More candles needed."
+  }
+ ],
+ "readyForPaper": [],
+ "promoteAfter": 5
+}

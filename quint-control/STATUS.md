@@ -1,3 +1,15 @@
+# CURRENT BUILD GATE — HOLD
+
+The owner is waiting for Fable 5.2 to renew before building the Quint Control dashboard. **Do not start Phase 1 or any dashboard/engine implementation yet.** Fable renewal alone is not approval; wait for the owner's explicit green light.
+
+Until then, only read-only audits, research and documentation-only changes are permitted. Do not change trading/runtime code, NinjaTrader integration, Guardian, OrderRouter, copier, strategies, market-data adapters, protocol, authentication, live execution paths, Chart Wizard or Quint Brain. Do not use paid Fable/API calls for implementation.
+
+- Pre-build scope and architecture: `research/PRE-FABLE-READINESS.md`
+- Claude's full read-only audit prompt: `prompts/PRE-FABLE-REPOSITORY-AUDIT.md`
+- Next step while waiting: run the audit, review findings with the owner, then wait for explicit approval.
+
+---
+
 # Quint Control: build status
 
 **Read this first in every session, and update it before you finish.** If a session ends early (usage runs out, the chat closes), the next session picks up from here.
@@ -20,6 +32,7 @@
 
 1. The owner gets their Windows computer ready using `SETUP.md` (install NinjaTrader 8, turn on multi-provider mode, connect LucidDaily and check Sim101).
 2. Optional but recommended, before paying for Fable: the cheap one-week proof in `proof/README.md`.
+   Also optional: the bot lab in `botlab/README.md`, with 12 test bots for Strategy Analyzer and Sim101. Run all 12 at once with an optimisation over "Bot".
 3. Start phase 1: paste the master prompt and the phase 1 prompt from `FABLE-PROMPTS.md`.
 
 ## How to resume after an interruption
@@ -59,6 +72,7 @@ Windows computer · LucidDaily accounts through Tradovate · $0.50 a side MNQ co
 - `backtest/pillar_2r.js` and its results are untracked on a separate branch idea (5-pillar fixed-2R test); they are not part of Quint Control.
 - NinjaTrader's "CME US Index Futures RTH" template ends at 16:00 Chicago (17:00 New York), not 16:00 New York. Bots must work out New York time from each bar's time, as `proof/QuintNoiseMomentum.cs` does (NinjaTrader's time zone is `NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo`).
 - The proof strategy's class is `QuintNoiseMomentum`, and the owner copies it into `bin\Custom\Strategies` by hand. Give phase 3's Strategy Analyzer wrapper a different class name, or ask the owner to delete the proof file first, or NinjaTrader won't compile.
+- `botlab/QuintBotLab.cs` hasn't been compiled either (no compiler in the cloud). It holds the same rules as `botlab/botlab.js`; check they still match after any change (a test compares the bot names, candles and trade limits).
 - YouTube pages can't be read from the cloud workspace (rate limited). Ask the owner for titles, screenshots or transcripts.
 - Lucid's microscalping rule (help center, updated 26 Aug 2026): flagged when more than 50% of profits come from trades held 5 seconds or less. The guardian's 30-second minimum hold is stricter than this, on purpose.
 
@@ -98,10 +112,15 @@ Branch: `quint-control/strategy-lab-phase-3a`. This is a first vertical slice an
 | 2026-11-18 | Opus 5.5 | Owner decided one bot per account (no bots sharing an account); added to the plan, phase 2 prompt and scenarios, skill and protocol notes. |
 | 2026-11-18 | Opus 5.5 | Added rules for several bots on one account (replaced by one bot per account, the row above). |
 | 2026-11-18 | Opus 5.5 | Checked the LucidDaily numbers on Lucid's help center and updated the preset, its schema, the plan and 2 new tests (41 pass). Wrote the one-week proof (`proof/`): the NinjaScript strategy, its JavaScript version with 5 tests (46 tests now, three clean runs), the owner's steps and pass rules, and a first read on the saved candles (11 weeks: +$1,456 on 1 MNQ, but only +$31 in the second half; too short to judge; corrected after finding the CSV volume bug). Not tested: the C# (no compiler in the cloud), so the owner's F5 is its first compile. Looked at the Strat v60 dashboard the owner sent and added it to the plan's "left out" table. |
+| 2026-11-18 | Opus 5.5 | Bot lab (`botlab/`): 12 MNQ test bots with fixed rules from the owner's videos (Daxton's inverted fair value gap, the range-breakout bot, Strat v60), Phantom's entry styles (fades, failed breakouts, trend joins) and the plan's bots. Built as a JavaScript reference (10 new tests, 57 in all, three clean runs) and one NinjaScript strategy locked to Sim, Playback and Strategy Analyzer. Fixed a CSV bug: Windows line endings hid the volume column, so VWAP was wrong in the proof's first read (corrected in pull request #14). |
 
 | 2026-11-19 | ChatGPT | Researched public TradersPost workflows, NinjaTrader Strategy Analyzer/Playback, TradingView paper trading, CME MNQ specifications and a 2026 MNQ OHLCV falsification preprint. Added `research/STRATEGY-LAB.md`, linked it from `quint-control/README.md`, and added a summary to `PLAN.md`. Connected it to the existing balanced MNQ research programme and exploratory bot findings. The specification covers: plain-English bot creation, versioned deterministic strategy definitions, historical/replay/live-paper testing, immutable evidence and isolated paper execution. Design/research only; no trading code, website or live execution path changed. Next: after phase 1/2 foundation, implement Strategy Lab phases 3A–3E in order. |
 
 
+| 2026-11-19 | ChatGPT | Added `research/mnq/2026-11-19-vwap-first-pullback.md` on a separate research branch. Updated PLAN.md and the Phase 3 FABLE prompt to keep the exact crossover as baseline and define a separate VWAP first-pullback hypothesis. Evidence reviewed is QQQ/ETF-focused, not MNQ proof; no MNQ backtest has been run. Research only: no trading code, live engine or Guardian changed. |
+
 | 2026-11-20 | ChatGPT | Inspected the existing Quint repo and researched the requested shared private website, two-user access, individual Claude billing and NinjaTrader live market data. Added `research/SHARED-PLATFORM-AND-MARKET-DATA.md` and linked it from the Quint Control plan, README and root Claude instructions on a research branch. Key finding: the existing design is a local NinjaTrader 8 engine/dashboard and Phases 1–2 are not started. Proposed one shared web/control plane with isolated user workspaces, individual feeds/Claude keys and secure outbound engine tunnels. NinjaTrader's newer WebSocket Market Data API supports quotes/DOM/charts, but its September 2026 API agreement and CME terms create a written-approval gate before any feed relay or shared display. No trading code, Guardian, OrderRouter or live execution path changed. |
 
 | 2026-11-20 | ChatGPT | Researched autonomous bot uptime and website operation against the Quint plan, protocol and Fable prompts. Added `research/AUTONOMOUS-BOT-RUNTIME-AND-UPTIME.md` and linked it from root Claude instructions, README, PLAN and STATUS on a research branch. Requirements: deterministic event-driven bots inside each user's NinjaTrader Windows runtime; no Claude/browser dependency; per-user engine isolation; persistent lifecycle; broker-state reconciliation before live resume; bounded reconnects, external dead-man monitoring and soak/fault tests. Confirmed NinjaScript runs in NinjaTrader Desktop on Windows and strategies terminate on NinjaTrader shutdown; existing $30–$40 Windows-host estimate is per host, not both users. No trading code or live execution changed.
+
+| 2026-11-20 | ChatGPT | Researched MNQ contract-roll and continuous-series integrity using CME, Databento and QuantConnect documentation. Added the frozen roll-integrity sentinel, causal calendar/volume/OI mapping rules, data requirements and Fable prompt in `research/mnq/2026-11-20-contract-roll-integrity.md`; updated the research programme, PLAN and FABLE-PROMPTS on a branch stacked on the VWAP research branch. Specification only: no MNQ backtest was run and no live trading code changed. Opened draft stacked PR [#29](https://github.com/charlieaustin1107/Quint/pull/29), based on the VWAP research branch. |

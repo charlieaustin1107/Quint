@@ -1,0 +1,167 @@
+{
+  "about": "The owner's strategy: WYLD Will's Four Pillars, the master version. Quint HQ's Desk walks through this checklist before a trade and Ask Quint reads it. Rules are written as WYLD Will states them in his videos. Trading Mastery's six steps and Chart Wizard's 5 pillars are older codings of this same strategy, not separate ones. Not backtested as written yet; the status lives in registry.json (wyld-four-pillars). Nothing here is financial advice.",
+  "default": "wyld-four-pillars",
+  "playbooks": [
+    {
+      "id": "wyld-four-pillars",
+      "name": "WYLD Will Four Pillars",
+      "short": "Sweep → HTF level holds → PDR bias → 1m confirmation",
+      "status": "Your strategy · not yet backtested as written",
+      "sources": [
+        {
+          "name": "WYLD Will System — Trading Rulebook",
+          "url": "https://claude.ai/artifact/KF6hmvDJWm3cPFbgxi3CKy"
+        },
+        {
+          "name": "Four Pillars Trainer",
+          "url": "https://claude.ai/artifact/SuUYodEDjKUqrdTAMBFWF1"
+        }
+      ],
+      "codedVersions": [
+        {
+          "name": "TradingView indicator: Quint · WYLD Four Pillars",
+          "url": "https://github.com/charlieaustin1107/Quint/blob/lab/quint-lab/lab/pine/README.md",
+          "differs": "Follows these rules live with an alert at every step, and marks each step on the chart: the wick box of the candle that made the last push (its 50% and the close-beyond trigger), the level that held, the PDR box with its steps, entry and stop. Counts the prior day's and the overnight highs and lows as pools too (your rule). In your TradingView under My scripts (version 3.0). No order-block entry yet."
+        },
+        {
+          "name": "Trading Mastery's six steps",
+          "url": "https://claude.ai/artifact/4AhyMBBvRs9j4P3LKEmhnZ",
+          "differs": "Requires displacement, takes one pullback entry, adds a regime filter."
+        },
+        {
+          "name": "Chart Wizard's 5 pillars",
+          "url": "https://github.com/charlieaustin1107/Quint/blob/main/chart-wizard/src/pillars.js",
+          "differs": "Requires displacement and 1.5R of room; took 0 trades in 4 weeks."
+        }
+      ],
+      "philosophy": [
+        "Many cheap, tight-stop attempts and a few large winners, not a high win rate.",
+        "Bias is immediate: the next move between two levels. Daily and weekly bias are left out.",
+        "Order matters more than location: the pillars must happen in sequence."
+      ],
+      "window": {
+        "startNY": "09:30",
+        "hours": 3,
+        "note": "Only the first 2 to 3 hours after the New York open (14:30 UK). Nothing after."
+      },
+      "premarket": [
+        "Redraw higher-timeframe levels from scratch: monthly, then weekly, then daily. About 95% of the time you stop at the daily.",
+        "Only mark levels near price. Drop any lower-timeframe level that overlaps a higher one. When in doubt, leave it out.",
+        "On the 15m, mark the easiest equal highs and lows nearest price, plus the prior day's and the overnight highs and lows (your rule). Note whether either side is already swept.",
+        "Draw the PDRs (Point A to Point B, with 25 / 50 / 75 steps) and mark the liquidity targets.",
+        "Set today's loss limit, and check the red-folder news times."
+      ],
+      "checklist": [
+        {
+          "id": "sweep",
+          "name": "Liquidity sweep",
+          "check": "Price ran one of the pools you marked before the open: the 15m equal highs and lows, and (your rule, 20 Nov 2026) the prior day's high and low and the overnight high and low. A pool already run before 9:30 doesn't count, and neither does a quick run of random lows."
+        },
+        {
+          "id": "level",
+          "name": "HTF level holds",
+          "check": "After the sweep, price traded into a higher-timeframe level and is showing it holds, not just touching it."
+        },
+        {
+          "id": "pdr",
+          "name": "PDR bias",
+          "check": "Point A is the level that held, Point B the next HTF level. Holding sets the bias; above the 0.5 is stronger. Point B is the minimum target."
+        },
+        {
+          "id": "confirm",
+          "name": "1m confirmation (the entry)",
+          "check": "A held level breaks and retests, price can't get back below the swept lows, a wick holds and price closes beyond it, an order block, or an FVG traded into or inverted."
+        }
+      ],
+      "entries": [
+        {
+          "name": "HTF retest, wait",
+          "trigger": "Price trades back into the level",
+          "entry": "Next candle",
+          "stop": "Below the level's test"
+        },
+        {
+          "name": "HTF retest, intra-candle",
+          "trigger": "Price goes above the level, ticks back in and flips",
+          "entry": "At the tick",
+          "stop": "Below the wick low"
+        },
+        {
+          "name": "HTF retest, immediate",
+          "trigger": "Close beyond the level, next candle retests (strong trends only)",
+          "entry": "On the retest",
+          "stop": "Below the prior candle's low, or 1 tick beyond the level"
+        },
+        {
+          "name": "Wick at a level",
+          "trigger": "A wick prints at a level you expect to hold",
+          "entry": "50% of the wick",
+          "stop": "Below the wick low"
+        },
+        {
+          "name": "FVG wick-through",
+          "trigger": "A candle wicks through the FVG and closes back beyond it",
+          "entry": "Retest near the 50% or the edge",
+          "stop": "Below the wick-through candle"
+        },
+        {
+          "name": "FVG first touch",
+          "trigger": "Price reaches the FVG for the first time",
+          "entry": "Limit at the edge, 75% or 50%",
+          "stop": "Below candle 1 (safest), candle 2, or the FVG's wick"
+        },
+        {
+          "name": "IFVG first test",
+          "trigger": "Price returns to a freshly inverted FVG",
+          "entry": "Anywhere in the zone",
+          "stop": "Beyond the candle that flipped it"
+        },
+        {
+          "name": "Inversion wick",
+          "trigger": "Price closes beyond a small wick, flipping it",
+          "entry": "Wick edge, or 50% on the return",
+          "stop": "1 tick beyond the wick"
+        },
+        {
+          "name": "OB, tick into mean threshold",
+          "trigger": "Price ticks back into the mean threshold before the OB is gained",
+          "entry": "At the mean threshold",
+          "stop": "Below the OB"
+        },
+        {
+          "name": "OB retest after gain",
+          "trigger": "Price gains the OB, then comes back into it",
+          "entry": "On the return",
+          "stop": "Below the candle that tested the mean threshold"
+        },
+        {
+          "name": "OB with FVG creation",
+          "trigger": "You expect an FVG to form at the OB (most aggressive)",
+          "entry": "OB open or high",
+          "stop": "1 tick below the wick; out if no FVG forms"
+        }
+      ],
+      "management": [
+        "Stop: tight, beyond the confirmation wick (above the wick or OB high for a short).",
+        "Break-even: as fast as possible once the level holds, and take it when it comes.",
+        "Target 1: Point B, the PDR completion. Target 2: the opposing liquidity pool. Trail near liquidity.",
+        "While the PDR is active, each new confirmation is a fresh entry, until Point B is reached or the PDR breaks."
+      ],
+      "noTrade": [
+        "The marked 15m liquidity wasn't swept.",
+        "No HTF level involved (a rejection off a PDR level alone isn't a setup).",
+        "The next HTF level wasn't regained after the sweep.",
+        "A choppy day with no clean stage. Don't force it.",
+        "Shorting into support before the level has actually failed.",
+        "Outside the first 2 to 3 hours after the open.",
+        "The PDR is already fulfilled or broken."
+      ],
+      "cautions": [
+        "His figures (about 70% break-even, 20% wins, 10% losses, 60R a month) are his own claims, not verified results.",
+        "Lucid flags an account when over half its profit comes from trades held 5 seconds or less. Hold winners well past that.",
+        "He never sets size, risk per trade or a daily loss limit. Use the Desk's sizing: a full stop-out under a quarter of the room left.",
+        "Not backtestable yet: 'easiest equal highs and lows', the stop buffer and the break-even trigger aren't defined exactly (lab queue: wyld-exact-rules)."
+      ]
+    }
+  ]
+}

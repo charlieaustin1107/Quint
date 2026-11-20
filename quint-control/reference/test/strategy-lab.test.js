@@ -23,6 +23,7 @@ test('rejects unsafe DSL operators and missing stop',()=>{
  const d=createStrategyDraft({name:'Unsafe'},{now:NOW,id:'unsafe'}); d.entry.long={op:'eval',code:'process.exit()'};
  const r=validateStrategyDefinition(d); assert.equal(r.valid,false);
  assert.ok(r.errors.some(x=>x.includes('unsupported expression'))); assert.ok(r.warnings.some(x=>x.includes('No numeric initial stop')));
+ const extra=[]; validateExpression({op:'const',value:true,run:'arbitrary'},extra); assert.ok(extra.some(x=>x.includes('unexpected field')));
 });
 test('expression evaluator supports bounded arithmetic and comparisons',()=>{
  const e={op:'and',args:[

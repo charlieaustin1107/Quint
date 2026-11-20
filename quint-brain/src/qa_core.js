@@ -54,20 +54,22 @@ function qaInit() {
 function qaQuotaHit(e) {
   const s = typeof e === "string" ? e : String((e && (e.message || e.text || e.error)) || ""); if (!/quota|cooldown|cool(ing)? down|TOOL_QUOTA|too many (calls|requests)|usage limit/i.test(s)) return false;
   if (/daily|per day/i.test(s)) HS().tvOut = tvDay(); // the day's calls are gone (TradingView's own count, which includes calls this app never saw)
-  const m = /(\d+)[\s-]*min/i.exec(s); TVQ.until = Date.now() + (m ? +m[1] + 0.5 : 6) * 6e4; save(); qaPace(); setTimeout(() => { paintAll(); }, 0); setTimeout(() => { qaPace(); paintAll(); }, TVQ.until - Date.now() + 1500); return true;
+  const m = /(\d+)[\s-]*min/i.exec(s); TVQ.until = Date.now() + (m ? +m[1] + 0.5 : 6) * 6e4; HS().tvUntil = TVQ.until; save(); qaPace(); setTimeout(() => { paintAll(); }, 0); setTimeout(() => { qaPace(); paintAll(); }, TVQ.until - Date.now() + 1500); return true;
 }
 function qaGate(ns) { // the page's own wrapper; the connector namespace itself is never changed. Every TradingView call is counted against the day's allowance
-  return { callTool: (srv, tool, input, opt) => { if (srv !== TV_SERVER) return ns.callTool(srv, tool, input, opt); if (tvCooling()) return Promise.reject({ code: "cooldown", message: tvCoolMsg() });
-    tvCount(); const now = Date.now(); TVQ.hist.push(now); if (TVQ.hist.length > 200) TVQ.hist = TVQ.hist.filter(x => x > now - 9e5);
-    return ns.callTool(srv, tool, input, opt).then(r => { const p = r && r.payload; if ((typeof p === "string" && qaQuotaHit(p)) || (p && typeof p === "object" && p.success === false && qaQuotaHit(p.error || p.message))) throw { code: "cooldown", message: tvCoolMsg() }; return r; }, e => { if (qaQuotaHit(e)) throw { code: "cooldown", message: tvCoolMsg() }; throw e; }); } };
+  tvLogInit();
+  return { callTool: (srv, tool, input, opt) => { if (srv !== TV_SERVER) return ns.callTool(srv, tool, input, opt); if (tvCooling()) { tvLogAdd(tool, input, "blocked"); return Promise.reject({ code: "cooldown", message: tvCoolMsg() }); }
+    return tvSlot().then(ts => { const L = tvLogAdd(tool, input);
+    return ns.callTool(srv, tool, input, opt).then(r => { if (r && r.cache) { tvLogEnd(L, "saved"); tvUnslot(ts); } const p = r && r.payload; if ((typeof p === "string" && qaQuotaHit(p)) || (p && typeof p === "object" && p.success === false && qaQuotaHit(p.error || p.message))) { tvLogEnd(L, "refused"); throw { code: "cooldown", message: tvCoolMsg() }; } return r; }, e => { if (qaQuotaHit(e)) { tvLogEnd(L, "refused"); throw { code: "cooldown", message: tvCoolMsg() }; } tvLogEnd(L, "error"); throw e; }); }, e => { if (e && e.code === "cooldown") tvLogAdd(tool, input, "blocked"); throw e; }); } };
 }
 async function qaConnect() {
-  if (!HS().tvPlanSet && HS().tvPlan) { delete HS().tvPlan; save(); } // an earlier version guessed the plan from its own count: only the one you pick counts
+  if (!HS().tvPlanSet && HS().tvPlan) { delete HS().tvPlan; save(); }
+  if (+HS().tvUntil > Date.now()) TVQ.until = +HS().tvUntil; // a cooldown carries over a reload: calling during one only starts it again // an earlier version guessed the plan from its own count: only the one you pick counts
   // the first call is where Claude asks the user to allow TradingView here; the candles kept on this phone show straight away
   const m = dkM(), F = fdLoad(m.tv); if (F.m1) fdQuote(m.tv, F); MK.st = "ready"; paintAll();
   try { await dkFeed(m.tv, null, MK.tvLive ? 6e4 : 3e5); MK.why = null; }
   catch (e) { if (e && PAGE_CODES.has(e.code)) { MK.st = "err"; MK.why = e.code; paintAll(); return; } }
-  paintAll(); qaScan(true); qaCross(); dkGrade(false); qaPace();
+  paintAll(); qaScan(true); qaCross(!!tvBgEvery()); dkGrade(false); qaPace();
   document.addEventListener("visibilitychange", () => { if (!document.hidden) qaTick(); });
 }
 // TradingView counts calls per day, so Quint refreshes on his own only when your plan has calls to spare (every 2 minutes with the AI add-on,
@@ -83,7 +85,7 @@ async function qaTick() { // every 30 seconds: repaint and grade from what's on 
   if (document.hidden || MK.st !== "ready" || tickBusy) return; tickBusy = true; tickN++;
   try { const m = dkM(), open = mktStatus(m.cls).open, ev = tvBgEvery(), F = FD[m.tv];
     if (open && ev && !DK.busy && Date.now() - Math.max(QA.bgAt || 0, F ? F.at : 0) >= ev - 5e3) await qaRefresh(false);
-    if (ev && !DK.busy && tickN % 20 === 0) qaCross(); dkGrade(false); paintDeck(); paintHead();
+    if (ev && !DK.busy && tickN % 20 === 0) qaCross(true); else if (tickN % 4 === 0) qaCross(false); dkGrade(false); paintDeck(); paintHead();
   } finally { tickBusy = false; }
 }
 // the instruments work from the same candles Quint's brief uses, so asking him costs no extra TradingView calls
@@ -96,11 +98,11 @@ async function qaScan(full) {
   QA.B = { "1D": BD, "1h": B1, "15m": B15, "5m": B5 }; DK.lv = null; if (B15) dkSess(B15, B5, S);
   if (HC.tf === "1m") QA.B["1m"] = await get("1m", 120);
   if (!MK.q[m.k] && B5) MK.q[m.k] = { p: B5.c[B5.n - 1], ts: B5.t[B5.n - 1] * 1000 + 3e5, at: Date.now() };
-  dkEvents().then(() => { if (id === DK.scan) paintSide(); });
+  if (!DK.cal && HS().dkCal && HS().dkCal.list) DK.cal = HS().dkCal; if (tvBgEvery() || (DK.cal && Date.now() - DK.cal.at < 108e5)) dkEvents().then(() => { if (id === DK.scan) paintSide(); }); // fetched with your first question, then kept 3 hours
   paintAll();
 }
-async function qaCross() { // what the markets around Nasdaq are doing: the same single call Quint's brief uses, kept 15 minutes
-  try { const m = dkM(); await dkAround(m); const c = (HS().dkAr || {})[m.grp === "idx" ? "idx" : "other"], d = c && c.d; if (!d) return;
+async function qaCross(go) { // what the markets around Nasdaq are doing: the same single call Quint's brief uses, kept 15 minutes
+  try { const m = dkM(); if (go) await dkAround(m); const c = (HS().dkAr || {})[m.grp === "idx" ? "idx" : "other"], d = c && c.d; if (!d) return;
     const syms = ["CME_MINI:ES1!", "CBOT_MINI:YM1!", "CME_MINI:RTY1!", "CBOT:ZN1!", "TVC:DXY", "CBOE:VIX"].filter(s => d[s]);
     MK.x = { at: c.at, rows: syms.map(s => ({ s, p: d[s].close, ch: d[s].change })) }; if (QA.view === "matrix") paintSide(); } catch (e) {}
 }

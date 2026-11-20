@@ -11,6 +11,8 @@
  function validateExpr(node,depth=0,count={n:0}){
   count.n++; if(count.n>128||depth>12) throw Error('Expression is too large or deeply nested.');
   if(!node||typeof node!=='object'||Array.isArray(node)||!allowed.has(node.op)) throw Error('Unsupported expression node.');
+  const keys=node.op==='const'?['op','value']:node.op==='var'?['op','name']:(node.op==='and'||node.op==='or')?['op','args']:node.op==='not'?['op','arg']:['op','left','right'];
+  if(Object.keys(node).some(k=>!keys.includes(k))) throw Error('Unexpected field in expression.');
   if(node.op==='const'){if(!['number','string','boolean'].includes(typeof node.value)|| (typeof node.value==='number'&&!Number.isFinite(node.value))) throw Error('Invalid constant.');return;}
   if(node.op==='var'){if(typeof node.name!=='string'||!safeName.test(node.name)||['__proto__','prototype','constructor'].includes(node.name)) throw Error('Invalid market field name.');return;}
   if(node.op==='and'||node.op==='or'){if(!Array.isArray(node.args)||node.args.length<2||node.args.length>16)throw Error('and/or require 2–16 arguments.');node.args.forEach(x=>validateExpr(x,depth+1,count));return;}
@@ -30,7 +32,7 @@
    const p=document.createElement('p');p.textContent=(item.instrument||'MNQ')+' · '+(item.status||'draft')+' · '+new Date(item.createdAt||item.provenance?.createdAt||Date.now()).toLocaleString();
    info.append(h,p);
    const actions=document.createElement('div');actions.className='item-actions';
-   const exp=document.createElement('button');exp.textContent='Export JSON';exp.addEventListener('click',()=>download(item));
+   const exp=document.createElement('button');exp.textContent='Export JSON';exp.addEventListener('click',()=>download(item.definition||item));
    const del=document.createElement('button');del.textContent='Delete';del.addEventListener('click',()=>{write(read().filter(x=>x.id!==item.id));render()});
    actions.append(exp,del);card.append(info,actions);host.appendChild(card);
   });
