@@ -35,6 +35,11 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
+      - name: Install browser test dependency
+        run: |
+          cd lab
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
       - run: cd lab && npm test
       - run: cd lab && npm run test:3
 
