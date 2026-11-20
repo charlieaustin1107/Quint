@@ -358,3 +358,20 @@ Scope:
 
 Completion requires all cloud tests to pass three times. If CI is unavailable, say so; do not claim tests passed.
 ```
+
+
+### Research task: MNQ contract-roll and continuous-series integrity (20 Nov 2026)
+
+```text
+Implement the data-integrity audit in research/mnq/2026-11-20-contract-roll-integrity.md.
+
+First audit the existing MNQ data and produce the complete contract manifest. Do not start by writing a strategy or assuming the data is complete.
+
+Build causal calendar, prior-trade-date-volume and timestamped-published-OI mappings exactly as specified. The selected contract for a session must be reproducible using only information available before that session. Add tests that fail if same-day final volume, future OI or future roll information leaks into an earlier mapping.
+
+Use raw listed MNQ expiry prices for all entries, stops, targets and realised P&L. Never use back-adjusted continuous prices as fills. Compare the three mapping policies with the frozen 5-minute opening-range sentinel, no-trade baseline and matched random placebo, using the cost, sample, split, walk-forward and sensitivity rules in the note.
+
+If the required per-expiry history, quotes, volume or OI availability timestamps are missing, stop and report the exact data gap. Do not manufacture a backtest or silently forward-fill missing observations.
+
+This is research infrastructure only. Keep changes on a separate branch and update PLAN.md, FABLE-PROMPTS.md, the research programme and STATUS.md consistently. Do not change NinjaTrader live execution, Guardian, OrderRouter, kill switches, account settings or Go Live controls. Run relevant tests three times and report actual results. Do not merge main or claim strategy profitability.
+```
