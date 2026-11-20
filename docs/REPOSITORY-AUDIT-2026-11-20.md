@@ -40,6 +40,13 @@ The repository is structurally separated into five products and has a clear Quin
 
 These are review findings, not claims that the current suite fails. No strategy, backtest engine, candle data, broker, or runtime code was modified.
 
+## Apparent conflicts checked and resolved
+
+- **One bot per account vs multi-bot coordinator:** not a current contradiction. The settled safe baseline is one bot per account. The separate multi-bot coordinator document is explicitly a future capability proposal; one-bot enforcement remains until its coordination, backtest and release gates pass.
+- **$0.75 vs $0.50 MNQ commission:** not a single shared assumption. $0.75 belongs to the legacy Quint Brain exploratory runner; $0.50 is the current Quint Control/Lab modelling assumption. Both must remain labelled and actual account fees verified.
+- **Phone-first vs Windows:** the owner primarily uses an iPhone, but NinjaTrader setup and runtime acceptance require a Windows PC. Documentation should support phone-friendly UX without pretending Windows is unnecessary.
+- **Strategy Lab status:** the browser prototype is already on main; the integrated Claude interpreter, historical backtester, persistent storage and engine connection remain future work.
+
 ## Remaining validation work
 
 1. Let the new Quint Lab workflow run and fix any reproducible failures it exposes.
