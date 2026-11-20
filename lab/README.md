@@ -49,6 +49,7 @@ npm test           # the tests (npm run test:3 runs them three times)
 | `factory/` | The strategy factory: `families.js` (the grids), `engine.js` (unseen sessions, PBO, neighbours, the survivor rule), `run.js` |
 | `NIGHTLY.md` | The job the nightly session does at 22:15 UK |
 | `HQSYNC.md` | The 23:25 UK job: Trading Mastery's bot results, dream report and pinned rules into the hub, privately |
+| `research/CLAUDE-MEM-MEMORY-PATTERNS.md` | Selected Claude-Mem memory patterns worth adapting later; research only, not an installed dependency |
 
 ## The nightly loop
 `NIGHTLY.md` is the whole job: grow the candle store (1 TradingView call, plus 1 for the news calendar when it runs low), run the strategy factory, re-run the bots, extend the paper test, write the roundup, move one queued experiment forward, record it in the memory, save it to GitHub as a pull request on `lab/nightly`, refresh Quint HQ and send you a notification. On Fridays it also reviews the week and queues new experiments.
