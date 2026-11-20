@@ -44,6 +44,7 @@ This is a deliberately simple diagnostic strategy to expose contract-selection a
 - Enter at the first executable quote after the completed signal bar: buy at the ask, sell at the bid, plus adverse slippage. Never fill at the signal bar's close.
 - Long stop: one tick below the opening-range low. Short stop: one tick above the opening-range high. Skip if the entry is already through the stop or the stop distance is less than two ticks.
 - Target: fixed 2R from the actual entry fill to the initial stop distance. No scale-outs, breakeven changes or trailing.
+- Target execution: model it as a resting limit. Without MBO/queue data, count a fill only after a trade prints at least one tick through the target, then fill at the target price; do not assume a queue fill on a touch. MBO is needed only if Quint wants queue-position accuracy.
 - Exit on stop, target, or 15:55 New York time, whichever occurs first. If tick ordering is unavailable and OHLC suggests both stop and target were touched, assume the stop first.
 
 ### Regime and event labels
