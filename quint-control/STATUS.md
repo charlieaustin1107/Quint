@@ -6,7 +6,7 @@ Until that approval, permitted work is limited to read-only audits, research, te
 
 - Architecture and pre-build readiness: [PRE-FABLE-READINESS.md](research/PRE-FABLE-READINESS.md)
 - Read-only audit checklist: [PRE-FABLE-REPOSITORY-AUDIT.md](prompts/PRE-FABLE-REPOSITORY-AUDIT.md)
-- Repository map: [../../docs/REPOSITORY-GUIDE.md](../..//docs/REPOSITORY-GUIDE.md)
+- Repository map: [../../docs/REPOSITORY-GUIDE.md](../../docs/REPOSITORY-GUIDE.md)
 - Test matrix: [../../docs/TESTING-AND-VALIDATION.md](../../docs/TESTING-AND-VALIDATION.md)
 - Historical session notes: [SESSION-LOG.md](SESSION-LOG.md)
 
