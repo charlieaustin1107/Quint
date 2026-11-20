@@ -67,3 +67,5 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 - The rules, decisions and testing protocol are in the `quint-control` skill (`.claude/skills/quint-control/SKILL.md`). The phase prompts are in `quint-control/FABLE-PROMPTS.md`.
 - Nothing is done until it's tested: JavaScript reference and `node --test` in the cloud, golden files, the engine's self-tests inside NinjaTrader, Playwright for the website, and the owner's checklist. Run the suites three times before calling a phase done.
 - Run the Quint Control tests with `cd quint-control && npm test`.
+
+- For unattended bot runtime, lifecycle persistence, crash recovery, event-driven execution, monitoring and costs, read `quint-control/research/AUTONOMOUS-BOT-RUNTIME-AND-UPTIME.md`. Bots must not depend on Claude or an open browser; engine recovery reconciles broker state before live resume.
