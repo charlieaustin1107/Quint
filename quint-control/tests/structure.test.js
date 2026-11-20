@@ -37,11 +37,11 @@ test('the handover files are there: plan, prompts, status, setup, protocol', () 
     assert.ok(prompts.includes('### Phase ' + p + ':'), 'FABLE-PROMPTS.md is missing phase ' + p);
   }
   const status = read(ROOT, 'STATUS.md');
-  for (const p of ['| 0 |', '| 1 |', '| 2 |', '| 3 |', '| 4 |', '| 4b |', '| 5 |', '| 6 |', '| 7 |']) {
-    assert.ok(status.includes(p), 'STATUS.md is missing the row for phase ' + p);
+  for (const p of ['| Phase 0 — project foundation |', '| Phase 1 — engine and website shell |', '| Phase 2 — Guardian, OrderRouter, copier |', '| Phase 3 — strategy plug-ins and bots |', '| Phase 4 / 4b — validation, account setup, alerts |', '| Phase 5 — Quint assistant, journal and brain |', '| Phase 6 — release candidate / live readiness |', '| Phase 7 — extras |']) {
+    assert.ok(status.includes(p), 'STATUS.md is missing the current phase row ' + p);
   }
-  assert.ok(status.includes('## Next step'));
-  assert.ok(status.includes('## How to resume'));
+  assert.ok(status.includes('## Next actions'));
+  assert.ok(status.includes('## Resume protocol'));
   const setup = read(ROOT, 'SETUP.md');
   for (const s of ['Multi-provider', 'trader.tradovate.com', 'Simulation', 'Sim101', 'Install-Quint.ps1', 'F5']) {
     assert.ok(setup.includes(s), 'SETUP.md should mention ' + s);
