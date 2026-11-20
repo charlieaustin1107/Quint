@@ -1,0 +1,36 @@
+name: Quint Lab tests
+
+on:
+  push:
+    branches: [main, "lab/**"]
+    paths:
+      - "lab/**"
+      - ".github/workflows/quint-lab-tests.yml"
+  pull_request:
+    paths:
+      - "lab/**"
+      - ".github/workflows/quint-lab-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Install browser test dependency
+        run: |
+          cd lab
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run Quint Lab tests
+        run: |
+          cd lab
+          npm test
+          npm run test:3
