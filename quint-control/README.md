@@ -1,5 +1,12 @@
 # Quint Control
 
+**Current status: HOLD — awaiting Fable 5.2 renewal and the owner's explicit green light.** Do not begin dashboard or engine implementation yet.
+
+- Pre-Fable scope and architecture: `research/PRE-FABLE-READINESS.md`
+- Claude read-only audit prompt: `prompts/PRE-FABLE-REPOSITORY-AUDIT.md`
+
+---
+
 A NinjaTrader 8 trading engine with a black, futuristic dashboard website. It runs your bots, copies trades across all your prop accounts, enforces each firm's rules, and has Quint as a built-in helper.
 
 - **Start here:** `STATUS.md` (what's done and what's next)
