@@ -33,3 +33,8 @@ Playwright tests with mocked `window.claude` (never spend real calls). Run the l
 
 ## Publishing
 Publish the built `index.html` to the matching artifact after reading the live version first, so a newer version is never overwritten. Both artifacts are private to the owner.
+
+
+## Current Quint Brain visual direction (owner update, 20 Nov 2026)
+
+For **Quint Brain only**, read `docs/QUINT-NEURAL-TERMINAL-DESIGN.md` before any visual work. The owner has updated the direction to true-black with restrained turquoise/teal accents and a distinctive 3D computer containing Quint's neural core. This newer brief overrides the older "no blue" rule only where needed for turquoise/teal accents. Keep Chart Wizard unchanged and preserve all phone-first, accessibility, reduced-motion, build and testing rules above. Never hand-edit the generated Quint Brain `index.html`.
