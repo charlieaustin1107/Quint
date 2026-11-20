@@ -1,0 +1,1031 @@
+<title>Quint HQ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Martian+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a phone app (390px first): sticky clock header, five screens, a bottom tab bar; panels flow into two columns from 900px.
+   Obsidian & chrome (quint-design skill): true black, chrome silver, colour only for meaning (mint up, rose down, amber warning). */
+:root {
+  --bg: #000000; --s1: #060606; --s2: #0c0c0c; --s3: #151515; --s4: #1d1d1d;
+  --line: rgba(255,255,255,.09); --line2: rgba(255,255,255,.18); --hi: rgba(255,255,255,.06);
+  --fg: #f1f1f1; --mut: #a6a6a6; --dim: #6e6e6e;
+  --mint: #2fd9a8; --rose: #ff4f6e; --amber: #ffb547;
+  --chrome: linear-gradient(180deg, #ffffff 0%, #dcdcdc 34%, #8f8f8f 62%, #d4d4d4 100%);
+  --display: "Chakra Petch", "Avenir Next Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --tabbar: 64px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--body); -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 calc(var(--tabbar) + env(safe-area-inset-bottom, 0px) + 24px); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--fg); }
+.wrap { max-width: 1080px; margin: 0 auto; }
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; background: var(--bg); display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 10px; border-bottom: 1px solid var(--line); }
+.brand { font: 600 15px/1 var(--display); letter-spacing: .22em; text-transform: uppercase; white-space: nowrap; flex: none; background: var(--chrome); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.clock { display: flex; gap: 10px; align-items: center; min-width: 0; font: 400 11px/1.2 var(--mono); color: var(--mut); white-space: nowrap; }
+.clock b { color: var(--fg); font-weight: 500; }
+.screen { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; padding-top: 14px; }
+.panel { background: var(--s1); border: 1px solid var(--line); border-radius: 14px; box-shadow: inset 0 1px 0 var(--hi); padding: 16px; min-width: 0; }
+.label { font: 600 11px/1 var(--display); letter-spacing: .16em; text-transform: uppercase; color: var(--mut); margin: 0 0 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.label .r { letter-spacing: .04em; text-transform: none; font: 400 11px/1 var(--mono); color: var(--dim); }
+h2 { font: 600 19px/1.25 var(--display); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.small { font-size: 12px; color: var(--dim); }
+.mut { color: var(--mut); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.up { color: var(--mint); } .down { color: var(--rose); } .warn { color: var(--amber); }
+.hero { display: grid; justify-items: center; gap: 12px; text-align: center; padding-block: 20px 18px; }
+#core { width: 168px; height: 168px; max-width: 100%; display: block; }
+.headline { font: 600 20px/1.3 var(--display); max-width: 30ch; text-wrap: balance; }
+.btn { appearance: none; border: 0; border-radius: 999px; min-height: 48px; padding: 0 22px; font: 600 13px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; color: #000; background: var(--chrome); box-shadow: inset 0 1px 0 #fff; }
+.btn[aria-pressed="true"] { background: var(--s3); color: var(--fg); box-shadow: inset 0 0 0 1px var(--line2); }
+.btn.sm { min-height: 40px; padding: 0 16px; font-size: 12px; }
+.ghost { appearance: none; background: var(--s2); color: var(--fg); border: 1px solid var(--line); border-radius: 12px; min-height: 44px; min-width: 44px; padding: 0 14px; font: 500 14px/1 var(--body); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
+.ghost[aria-pressed="true"] { background: var(--chrome); color: #000; border-color: transparent; }
+.ghost.danger { color: var(--rose); }
+:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.row2 { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tile { background: var(--s2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-width: 0; }
+.tile b { display: block; font: 500 19px/1.2 var(--mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.tile span { display: block; font-size: 12px; color: var(--mut); margin-top: 4px; }
+.bar { height: 6px; background: var(--s3); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+.bar i { display: block; height: 100%; background: var(--chrome); border-radius: inherit; }
+.list { display: grid; gap: 8px; }
+.item { display: grid; gap: 4px; padding: 10px 12px; background: var(--s2); border-radius: 10px; min-width: 0; border: 1px solid transparent; }
+button.item { text-align: left; cursor: pointer; width: 100%; appearance: none; color: inherit; }
+.item .t { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.item .n { font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+.item .m { font: 400 12px/1.6 var(--mono); color: var(--mut); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.pill { flex: none; font: 600 10px/1 var(--display); letter-spacing: .1em; text-transform: uppercase; padding: 6px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--mut); white-space: nowrap; }
+.pill.good { color: var(--mint); border-color: rgba(47,217,168,.45); }
+.pill.warn { color: var(--amber); border-color: rgba(255,181,71,.45); }
+.pill.bad { color: var(--rose); border-color: rgba(255,79,110,.45); }
+.checks { display: grid; gap: 8px; }
+.check { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: start; text-align: left; appearance: none; width: 100%; background: var(--s2); border: 1px solid var(--line); border-radius: 12px; padding: 10px; cursor: pointer; color: inherit; }
+.check .box { width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--line2); display: grid; place-items: center; font: 600 13px/1 var(--display); color: var(--mut); }
+.check[aria-pressed="true"] { border-color: rgba(47,217,168,.5); }
+.check[aria-pressed="true"] .box { background: var(--mint); color: #000; border-color: transparent; }
+.check b { display: block; font-weight: 600; }
+.check span { display: block; font-size: 13px; color: var(--mut); margin-top: 2px; }
+.verdict { padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line2); font-weight: 500; }
+.verdict.good { border-color: rgba(47,217,168,.5); color: var(--mint); }
+.verdict.bad { border-color: rgba(255,79,110,.5); color: var(--rose); }
+.verdict.warn { border-color: rgba(255,181,71,.5); color: var(--amber); }
+.seg { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.seg::-webkit-scrollbar { display: none; }
+.seg button { flex: none; appearance: none; border: 1px solid var(--line); background: transparent; color: var(--mut); border-radius: 999px; min-height: 38px; padding: 0 14px; font: 500 13px var(--body); cursor: pointer; }
+.seg button[aria-selected="true"] { background: var(--chrome); color: #000; border-color: transparent; }
+form.grid, .formgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 12px; color: var(--mut); }
+input[type=text], input[type=number], input[type=date], select, textarea { width: 100%; min-height: 46px; border-radius: 12px; border: 1px solid var(--line); background: var(--s2); color: var(--fg); font-size: 16px; padding: 0 12px; }
+textarea { padding: 10px 12px; min-height: 80px; resize: vertical; }
+.out { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.chat { display: grid; gap: 10px; }
+.msg { padding: 10px 12px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.you { background: var(--s3); justify-self: end; max-width: 88%; }
+.msg.quint { background: var(--s2); border: 1px solid var(--line); }
+.msg.err { color: var(--amber); }
+.ask form { display: flex; gap: 8px; }
+.ask input { flex: 1; min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { appearance: none; border: 1px solid var(--line); background: transparent; color: var(--mut); border-radius: 999px; min-height: 36px; padding: 0 12px; font: 13px var(--body); cursor: pointer; }
+.lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lines li { padding: 10px 12px; border-radius: 10px; background: var(--s2); border: 1px solid transparent; color: var(--mut); }
+.lines li.on { color: var(--fg); border-color: var(--line2); }
+details.fold { background: var(--s2); border-radius: 10px; padding: 10px 12px; }
+details.fold + details.fold { margin-top: 8px; }
+details.fold summary { cursor: pointer; display: flex; justify-content: space-between; gap: 10px; align-items: center; list-style: none; min-height: 28px; font-weight: 500; }
+details.fold summary::-webkit-details-marker { display: none; }
+details.fold .body { margin-top: 8px; color: var(--mut); font-size: 14px; display: grid; gap: 6px; }
+ul.plain, ol.plain { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--mut); }
+.scroll { overflow-x: auto; }
+table.t { border-collapse: collapse; width: 100%; font-size: 13px; }
+table.t th, table.t td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.t th { font: 600 10px/1.2 var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+svg.spark { width: 100%; height: 34px; display: block; }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; background: rgba(0,0,0,.92); backdrop-filter: blur(10px); border-top: 1px solid var(--line);
+  padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+.tabbar .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.tabbar button { appearance: none; border: 0; background: transparent; color: var(--dim); min-height: 52px; border-radius: 12px; cursor: pointer; display: grid; place-items: center; gap: 2px; padding: 4px 0; font: 600 10px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; }
+.tabbar button svg { width: 22px; height: 22px; }
+.tabbar button[aria-current="page"] { color: var(--fg); background: var(--s2); }
+.sheet { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.7); display: grid; align-items: end; justify-items: center; padding-top: calc(env(safe-area-inset-top, 0px) + 40px); }
+.sheet .card { width: min(720px, 100%); max-height: 100%; overflow-y: auto; background: var(--s1); border: 1px solid var(--line2); border-bottom: 0; border-radius: 18px 18px 0 0; padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 14px; }
+.sheet .card .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--tabbar) + env(safe-area-inset-bottom, 0px) + 16px); z-index: 30; background: var(--s4); border: 1px solid var(--line2); border-radius: 999px; padding: 10px 16px; font-size: 14px; max-width: calc(100% - 32px); }
+@media (min-width: 900px) {
+  .screen { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  .wide { grid-column: 1 / -1; }
+  .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 360px) { form.grid, .formgrid, .out { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">Quint HQ</div>
+    <div class="clock" id="clock" aria-live="off"></div>
+  </header>
+
+  <!-- TODAY -->
+  <section class="screen" id="tab-today" data-tab="today" aria-label="Today">
+    <div class="panel hero wide">
+      <canvas id="core" width="336" height="336" aria-hidden="true"></canvas>
+      <p class="headline" id="headline"></p>
+      <button class="btn" id="play" type="button" aria-pressed="false">Play briefing</button>
+      <p class="small" id="voiceNote">Quint reads your briefing out loud.</p>
+    </div>
+    <div class="panel"><div class="label">Session <span class="r" id="sessR"></span></div><div id="session"></div></div>
+    <div class="panel"><div class="label">News <span class="r">Lucid blackout ±2 min</span></div><div id="news"></div></div>
+    <div class="panel wide"><div class="label">Money</div><div class="tiles" id="money"></div></div>
+    <div class="panel"><div class="label">Before the open <span class="r" id="preR"></span></div><div class="checks" id="premarket"></div></div>
+    <div class="panel"><div class="label">Last night</div><div class="list" id="lastNight"></div></div>
+    <div class="panel wide"><details class="fold"><summary>The lab's roundup <span class="pill" id="warnCount"></span></summary><div class="body"><ol class="lines" id="lines"></ol><ul class="plain" id="warnings"></ul></div></details></div>
+  </section>
+
+  <!-- ASK -->
+  <section class="screen ask" id="tab-ask" data-tab="ask" hidden aria-label="Ask Quint">
+    <div class="panel wide">
+      <div class="label">Ask Quint <span class="r" id="askState">offline</span></div>
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <div class="chips" id="quick" style="margin-top:12px"></div>
+      <form id="askForm" autocomplete="off" style="margin-top:12px">
+        <input id="q" name="q" type="text" placeholder="How much room do I have on my 50K?" enterkeyhint="send" aria-label="Your question for Quint">
+        <button class="ghost" id="mic" type="button" aria-label="Speak your question" aria-pressed="false" hidden><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg></button>
+        <button class="btn sm" type="submit">Ask</button>
+      </form>
+      <p class="small" id="askNote" style="margin-top:10px">On iPhone, tap the box and use the microphone on your keyboard to talk.</p>
+      <div class="row2" style="margin-top:10px"><button class="ghost" id="clearChat" type="button">Clear chat</button></div>
+    </div>
+  </section>
+
+  <!-- DESK -->
+  <section class="screen" id="tab-desk" data-tab="desk" hidden aria-label="Desk">
+    <div class="wide"><div class="seg" role="tablist" id="deskSeg"></div></div>
+    <div class="wide screen" id="deskBody" style="padding-top:0"></div>
+  </section>
+
+  <!-- LAB -->
+  <section class="screen" id="tab-lab" data-tab="lab" hidden aria-label="Lab">
+    <div class="wide"><div class="seg" role="tablist" id="labSeg"></div></div>
+    <div class="wide screen" id="labBody" style="padding-top:0"></div>
+  </section>
+
+  <!-- MORE -->
+  <section class="screen" id="tab-more" data-tab="more" hidden aria-label="More"></section>
+</div>
+
+<nav class="tabbar" aria-label="Screens"><div class="in" id="tabs"></div></nav>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="card" id="sheetCard"></div></div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script id="lab-data" type="application/json">/*LAB_DATA*/</script>
+<script>
+(function () {
+  'use strict';
+  const D = JSON.parse(document.getElementById('lab-data').textContent);
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- tiny helpers ----------
+  function h(tag, attrs, ...kids) {
+    const e = document.createElement(tag);
+    if (attrs) for (const [k, v] of Object.entries(attrs)) {
+      if (v === null || v === undefined || v === false) continue;
+      if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v;
+      else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v);
+    }
+    for (const k of kids.flat()) if (k !== null && k !== undefined && k !== false) e.append(k.nodeType ? k : String(k));
+    return e;
+  }
+  const clear = (el, ...kids) => { el.replaceChildren(...kids.flat().filter((x) => x !== null && x !== undefined && x !== false)); return el; };
+  const money = (x) => (x === null || x === undefined || !Number.isFinite(x) ? '—' : (x < 0 ? '-$' : '$') + Math.abs(Math.round(x)).toLocaleString('en-US'));
+  const signed = (x) => (x === null || x === undefined || !Number.isFinite(x) ? '—' : (x < 0 ? '-$' : '+$') + Math.abs(Math.round(x)).toLocaleString('en-US'));
+  const pct = (x) => (x === null || x === undefined || !Number.isFinite(x) ? 'n/a' : Math.round(x * 100) + '%');
+  const tone = (x) => (x > 0 ? 'up' : x < 0 ? 'down' : '');
+  const say = (x) => (x < 0 ? 'minus ' : '') + '$' + Math.abs(Math.round(x)).toLocaleString('en-US');
+  const LS = {
+    get(k, d) { try { const v = localStorage.getItem('hq.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('hq.' + k, JSON.stringify(v)); } catch (e) { /* storage off: fine */ } },
+  };
+  let toastT = 0;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2600); }
+
+  // ---------- time: UK and New York ----------
+  const fmtParts = (tz) => new Intl.DateTimeFormat('en-GB', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23' });
+  const NYF = fmtParts('America/New_York'), UKF = fmtParts('Europe/London');
+  const DOW = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  function parts(f, date) { const p = Object.fromEntries(f.formatToParts(date).map((x) => [x.type, x.value])); return { date: `${p.year}-${p.month}-${p.day}`, hh: p.hour, mm: p.minute, dow: DOW[p.weekday], min: Number(p.hour) * 60 + Number(p.minute) }; }
+  const ukTime = (date) => { const p = parts(UKF, date); return `${p.hh}:${p.mm}`; };
+  const dur = (m) => { m = Math.max(0, Math.round(m)); const hh = Math.floor(m / 60), mm = m % 60; return hh ? `${hh}h ${String(mm).padStart(2, '0')}m` : `${mm}m`; };
+  const todayUK = () => parts(UKF, new Date()).date;
+
+  function session(now) {
+    const ny = parts(NYF, now), W = Math.round((S.settings.windowHours || 3) * 60), open = 570, end = open + W;
+    const weekday = ny.dow >= 1 && ny.dow <= 5;
+    let daysAhead = 0;
+    if (!(weekday && ny.min < open)) daysAhead = ny.dow === 5 ? 3 : ny.dow === 6 ? 2 : 1;
+    const minsToOpen = daysAhead * 1440 - ny.min + open, nextOpen = new Date(now.getTime() + minsToOpen * 60000);
+    const o = { ny, inWindow: false, minsToOpen, nextOpenUK: ukTime(nextOpen), windowEndUK: ukTime(new Date(nextOpen.getTime() + W * 60000)), progress: 0 };
+    if (ny.dow === 6 || (ny.dow === 0 && ny.min < 1080) || (ny.dow === 5 && ny.min >= 1020)) return { ...o, state: 'weekend', title: 'Weekend', text: `Futures reopen Sunday evening. New York opens Monday at ${o.nextOpenUK} UK.` };
+    if (weekday && ny.min >= open && ny.min < end) {
+      const nowEnd = new Date(now.getTime() + (end - ny.min) * 60000);
+      return { ...o, state: 'window', inWindow: true, progress: (ny.min - open) / W, title: 'Your trading window', text: `${dur(end - ny.min)} left, until ${ukTime(nowEnd)} UK. Four Pillars only.` };
+    }
+    if (weekday && ny.min >= end && ny.min < 960) return { ...o, state: 'late', title: 'Window closed', text: `Your ${W / 60}-hour window is over. New York cash closes at ${ukTime(new Date(now.getTime() + (960 - ny.min) * 60000))} UK.` };
+    if (weekday && ny.min >= 1020 && ny.min < 1080) return { ...o, state: 'break', title: 'Daily break', text: 'CME futures are closed for an hour. They reopen at 18:00 New York.' };
+    return { ...o, state: 'pre', title: ny.min >= 960 ? 'After hours' : 'Pre-market', text: `New York opens in ${dur(minsToOpen)}, at ${o.nextOpenUK} UK. Mark your levels first.` };
+  }
+
+  function news(now) {
+    const ev = ((D.calendar && D.calendar.events) || []).map((e) => ({ ...e, at: new Date(e.t) })).filter((e) => !isNaN(e.at)).sort((a, b) => a.at - b.at);
+    const blackout = ev.find((e) => Math.abs(e.at - now) <= 2 * 60000);
+    const next = ev.find((e) => e.at - now > -2 * 60000);
+    return { blackout, next, loaded: !!(D.calendar && D.calendar.fetchedAt), fetchedAt: D.calendar && D.calendar.fetchedAt };
+  }
+
+  // ---------- storage: private by default; on this device when storage isn't available ----------
+  const Store = {
+    db: null, uid: null, mode: 'device',
+    async init() {
+      try {
+        const [db, user] = await Promise.all([claude.use('db'), claude.use('user')]);
+        if (db && user) { const id = await withTimeout(user.id(), 8000); if (id) { this.db = db; this.uid = id; this.mode = 'cloud'; } }
+      } catch (e) { /* stays on the device */ }
+    },
+    col(kind) { return kind === 'ideas' ? this.db.collection('ideas') : this.db.collection(`data/users/${this.uid}/desk/${kind}`); },
+    async list(kind) {
+      if (this.mode !== 'cloud') return LS.get('col.' + kind, []);
+      const snap = await withTimeout(this.col(kind).get(), 10000);
+      return snap.docs.map((d) => ({ ...d.data(), id: d.id }));
+    },
+    async save(kind, obj) {
+      const data = JSON.parse(JSON.stringify({ ...obj, id: undefined }));
+      if (this.mode !== 'cloud') {
+        const all = LS.get('col.' + kind, []), id = obj.id || Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const i = all.findIndex((x) => x.id === id);
+        if (i >= 0) all[i] = { ...data, id }; else all.push({ ...data, id });
+        LS.set('col.' + kind, all); return id;
+      }
+      if (obj.id) { await withTimeout(this.col(kind).doc(obj.id).set(data), 10000); return obj.id; }
+      const ref = await withTimeout(this.col(kind).add(data), 10000); return ref.id;
+    },
+    async remove(kind, id) {
+      if (this.mode !== 'cloud') { LS.set('col.' + kind, LS.get('col.' + kind, []).filter((x) => x.id !== id)); return; }
+      await withTimeout(this.col(kind).doc(id).delete(), 10000);
+    },
+    async getDoc(name, d) {
+      if (this.mode !== 'cloud') return LS.get('doc.' + name, d);
+      const s = await withTimeout(this.db.doc(`data/users/${this.uid}/${name}`).get(), 10000);
+      return s.exists ? { ...d, ...s.data() } : d;
+    },
+    async setDoc(name, v) {
+      if (this.mode !== 'cloud') { LS.set('doc.' + name, v); return; }
+      await withTimeout(this.db.doc(`data/users/${this.uid}/${name}`).set(JSON.parse(JSON.stringify(v))), 10000);
+    },
+    async feed() {
+      if (this.mode !== 'cloud') return null;
+      const s = await withTimeout(this.db.doc('feeds/tm').get(), 10000);
+      return s.exists ? s.data() : null;
+    },
+  };
+  function withTimeout(p, ms) { return Promise.race([p, new Promise((_, no) => setTimeout(() => no({ code: 'timeout', message: 'took too long' }), ms))]); }
+
+  // ---------- state ----------
+  const DEFAULTS = { windowHours: 3, riskShare: 0.25, voice: true, rate: 1.02, tvPlan: 10 };
+  const S = { settings: { ...DEFAULTS, ...LS.get('settings', {}) }, accounts: [], trades: [], ideas: [], day: { premarket: {}, pillars: {} }, feed: null, tab: 'today', desk: 'check', lab: 'factory' };
+
+  // ---------- prop maths (Lucid rules, every number editable) ----------
+  const RT_COST = 2; // per MNQ round trip: $0.50 a side commission plus 1 tick slippage each way
+  function acct(a) {
+    const start = +a.start || +a.size || 0, balance = +a.balance || start, high = Math.max(+a.eodHigh || start, start);
+    const floor = high >= +a.lockAt ? +a.lockFloor : high - (+a.maxLoss || 0);
+    const room = balance - floor, profit = balance - start;
+    const todayTrades = S.trades.filter((t) => t.account === a.id && t.date === todayUK());
+    const today = todayTrades.reduce((s, t) => s + (+t.pnl || 0), 0);
+    const dllLeft = a.dllOn ? (+a.dll || 0) + Math.min(0, today) : null;
+    const best = +a.bestDay || 0, share = profit > 0 && best > 0 ? best / profit : null;
+    let maxRisk = Math.max(0, room * (S.settings.riskShare || 0.25));
+    if (dllLeft !== null) maxRisk = Math.min(maxRisk, Math.max(0, dllLeft));
+    return { start, balance, high, floor, room, profit, today, dllLeft, share, consistencyOk: share === null || share <= (+a.consistency || 0.4),
+      toTarget: a.phase === 'funded' ? null : start + (+a.target || 0) - balance, progress: a.phase === 'funded' || !+a.target ? null : Math.max(0, Math.min(1, profit / +a.target)), maxRisk };
+  }
+  function sizeFor(a, stopPts) {
+    const m = acct(a), per = stopPts * 2 + RT_COST;
+    const contracts = stopPts > 0 ? Math.max(0, Math.min(+a.maxMicros || 40, Math.floor(m.maxRisk / per))) : 0;
+    return { contracts, risk: contracts * per, roomAfter: m.room - contracts * per, maxRisk: m.maxRisk, room: m.room };
+  }
+  function tightest() { return S.accounts.map((a) => ({ a, m: acct(a) })).sort((x, y) => x.m.room - y.m.room)[0] || null; }
+
+  // ---------- journal ----------
+  function weekStart(dateStr) { const d = new Date(dateStr + 'T12:00:00Z'), dow = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - dow); return d.toISOString().slice(0, 10); }
+  function jstats(list) {
+    const t = todayUK(), wk = weekStart(t), mo = t.slice(0, 7);
+    const sum = (xs) => xs.reduce((s, x) => s + (+x.pnl || 0), 0);
+    const wins = list.filter((x) => +x.pnl > 0), losses = list.filter((x) => +x.pnl < 0);
+    const by = {};
+    for (const x of list) { const k = x.setup || 'Other'; by[k] = by[k] || { n: 0, net: 0 }; by[k].n++; by[k].net += +x.pnl || 0; }
+    return { today: sum(list.filter((x) => x.date === t)), week: sum(list.filter((x) => x.date >= wk)), month: sum(list.filter((x) => (x.date || '').startsWith(mo))), all: sum(list), n: list.length,
+      winRate: list.length ? wins.length / list.length : null, avgWin: wins.length ? sum(wins) / wins.length : null, avgLoss: losses.length ? sum(losses) / losses.length : null, bySetup: by };
+  }
+
+  // ---------- Trading Mastery feed (synced nightly, private) ----------
+  function botsLive() {
+    const f = S.feed;
+    if (!f || !Array.isArray(f.bots)) return null;
+    let today = 0, week = 0, n = 0, seen = 0;
+    for (const b of f.bots) { const live = b.byType && b.byType.live; if (!live) continue; seen++; today += +((live.today && live.today.net) || 0); week += +((live.last5 && live.last5.net) || 0); n += +((live.today && live.today.n) || 0); }
+    return { bots: f.bots.length, liveBots: seen, today, week, n, at: f.at };
+  }
+
+  // ---------- the Quint core ----------
+  const cv = $('core'), cx = cv.getContext('2d');
+  const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let speaking = false, raf = 0;
+  const t0 = performance.now();
+  function drawCore(now) {
+    const W = cv.width, H = cv.height, r = W * 0.3, t = (now - t0) / 1000;
+    cx.clearRect(0, 0, W, H);
+    for (let i = 0; i < 3; i++) {
+      const rr = r * (1.22 + i * 0.16) * (speaking ? 1 + 0.03 * Math.sin(t * 3 + i) : 1);
+      cx.beginPath(); cx.ellipse(W / 2, H / 2, rr, rr * (0.32 + 0.08 * i), t * (0.25 + i * 0.1) + i, 0, Math.PI * 2);
+      cx.strokeStyle = `rgba(255,255,255,${speaking ? 0.26 - i * 0.06 : 0.14 - i * 0.035})`; cx.lineWidth = 1.5; cx.stroke();
+    }
+    const R = r * (speaking ? 1 + 0.035 * Math.sin(t * 7) : 1), g = cx.createRadialGradient(W / 2 - R * 0.38, H / 2 - R * 0.42, R * 0.05, W / 2, H / 2, R);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.18, '#e6e6e6'); g.addColorStop(0.5, '#7d7d7d'); g.addColorStop(0.82, '#1c1c1c'); g.addColorStop(1, '#050505');
+    cx.beginPath(); cx.arc(W / 2, H / 2, R, 0, Math.PI * 2); cx.fillStyle = g; cx.fill();
+    cx.save(); cx.beginPath(); cx.arc(W / 2, H / 2, R, 0, Math.PI * 2); cx.clip();
+    const y = H / 2 - R * 0.25 + Math.sin(t * 0.6) * R * 0.3, band = cx.createLinearGradient(0, y - R * 0.22, 0, y + R * 0.22);
+    band.addColorStop(0, 'rgba(255,255,255,0)'); band.addColorStop(0.5, 'rgba(255,255,255,0.12)'); band.addColorStop(1, 'rgba(255,255,255,0)');
+    cx.fillStyle = band; cx.fillRect(0, y - R * 0.22, W, R * 0.44); cx.restore();
+    cx.beginPath(); cx.arc(W / 2, H / 2, R, 0, Math.PI * 2); cx.strokeStyle = 'rgba(255,255,255,0.35)'; cx.lineWidth = 1; cx.stroke();
+  }
+  function loop(now) { drawCore(now); raf = requestAnimationFrame(loop); }
+  function startLoop() { if (!still && !raf && !document.hidden && S.tab === 'today') raf = requestAnimationFrame(loop); }
+  function stopLoop() { cancelAnimationFrame(raf); raf = 0; }
+
+  // ---------- voice ----------
+  let tts = null;
+  function setSpeaking(on) { speaking = on; const b = $('play'); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.textContent = on ? 'Stop' : 'Play briefing'; if (!on) markLine(-1); if (still) drawCore(performance.now()); }
+  function markLine(i) { [...$('lines').children].forEach((li, j) => li.classList.toggle('on', j === i)); }
+  function pickVoice() {
+    const vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [], gb = vs.filter((v) => /en[-_]GB/i.test(v.lang));
+    return gb.find((v) => /daniel|arthur|serena|kate|oliver/i.test(v.name)) || gb[0] || vs.find((v) => /^en/i.test(v.lang)) || null;
+  }
+  function speak(lines, onLine) {
+    if (!S.settings.voice) return Promise.resolve();
+    if (tts) { setSpeaking(true); return tts.speak(lines.map((text, id) => ({ text, id: String(id) }))).catch(() => {}).finally(() => setSpeaking(false)); }
+    if (!window.speechSynthesis) { $('voiceNote').textContent = 'This screen has no voice, so the briefing is written below.'; return Promise.resolve(); }
+    speechSynthesis.cancel();
+    const v = pickVoice();
+    setSpeaking(true);
+    return new Promise((done) => {
+      lines.forEach((text, i) => {
+        const u = new SpeechSynthesisUtterance(text);
+        if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'en-GB';
+        u.rate = S.settings.rate || 1;
+        u.onstart = () => onLine && onLine(i);
+        if (i === lines.length - 1) { u.onend = () => { setSpeaking(false); done(); }; u.onerror = u.onend; }
+        speechSynthesis.speak(u);
+      });
+    });
+  }
+  function stopSpeaking() { if (tts) { try { tts.stop(); } catch (e) { /* ignore */ } } if (window.speechSynthesis) speechSynthesis.cancel(); setSpeaking(false); }
+
+  // ---------- the briefing (built fresh every time) ----------
+  function briefing() {
+    const now = new Date(), uk = parts(UKF, now), s = session(now), n = news(now), lines = [];
+    const hello = uk.min < 720 ? 'Morning' : uk.min < 1080 ? 'Afternoon' : 'Evening';
+    lines.push(`${hello}. It's ${uk.hh}:${uk.mm} in the UK. ${s.title}: ${s.text}`);
+    if (n.blackout) lines.push(`News blackout now: ${n.blackout.title}. Stay flat.`);
+    else if (n.next) lines.push(`Next red-folder news: ${n.next.title} at ${ukTime(n.next.at)} UK, in ${dur((n.next.at - now) / 60000)}. Be flat from two minutes before to two minutes after.`);
+    else lines.push(n.loaded ? 'No red-folder news in the calendar for the coming days.' : 'The news calendar arrives with the nightly run, so check the economic calendar yourself today.');
+    const live = botsLive();
+    if (live && live.liveBots) lines.push(`Your NinjaTrader bots on live and prop accounts: ${say(live.today)} today from ${live.n} trades, and ${say(live.week)} over the last five sessions, from Trading Mastery.`);
+    else lines.push(live ? `Trading Mastery has ${live.bots} bots, none on a live or prop account.` : 'No bot is trading a live or prop account yet.');
+    const j = jstats(S.trades);
+    if (j.n) lines.push(`Your own trades: ${say(j.today)} today and ${say(j.week)} this week, ${j.n} logged in all.`);
+    const tg = tightest();
+    if (tg) { const sz = sizeFor(tg.a, 10); lines.push(`Tightest account: ${tg.a.name}, with ${say(tg.m.room)} of room before its max loss. A full stop-out should stay under ${say(tg.m.maxRisk)}: that's ${sz.contracts} MNQ on a 10-point stop.`); }
+    else lines.push('Add your prop accounts on the Desk, and I will watch your room before every trade.');
+    const fac = D.factory;
+    if (fac) {
+      const surv = fac.families.reduce((a, f) => a + ((f.survivors && f.survivors.length) || 0), 0), wy = fac.families.find((f) => f.id === 'wyld');
+      lines.push(`The strategy factory tested ${fac.variants.toLocaleString('en-US')} variations. ${surv ? `${surv} survived every check` : 'None survived every check'}${fac.readyForPaper.length ? `, and ${fac.readyForPaper.length} earned the paper test` : ''}.${D.anatomy ? ' ' + D.anatomy.lessons[0] : wy ? ' Your Four Pillars needs more five-minute history and one-minute candles before its real test.' : ''}`);
+    }
+    if (S.feed && S.feed.dream && S.feed.dream.top) lines.push(`Last night's Jarvis report: ${S.feed.dream.top}`);
+    const waiting = S.ideas.filter((i) => i.status === 'new').length, done = S.ideas.filter((i) => i.status === 'done' || i.status === 'rejected').length;
+    if (S.ideas.length) lines.push(`Ideas: ${waiting} waiting for the lab, ${done} tested.`);
+    if (s.state === 'pre') lines.push('Before the open: redraw your levels from the monthly down, mark the easiest fifteen-minute highs and lows, and draw your PDRs.');
+    if (s.state === 'window') lines.push('You are in your window. Sweep, level holds, PDR bias, then confirmation. In that order, or no trade.');
+    return lines;
+  }
+
+  // ---------- header clock ----------
+  function renderClock() {
+    const now = new Date(), uk = parts(UKF, now), ny = parts(NYF, now), s = session(now);
+    clear($('clock'), h('span', null, 'UK ', h('b', { text: `${uk.hh}:${uk.mm}` })), h('span', null, 'NY ', h('b', { text: `${ny.hh}:${ny.mm}` })), h('span', { class: 'pill ' + (s.inWindow ? 'good' : s.state === 'weekend' || s.state === 'break' ? '' : 'warn'), text: s.inWindow ? 'Window' : s.title }));
+  }
+
+  // ---------- TODAY ----------
+  function renderToday() {
+    const now = new Date(), s = session(now), n = news(now);
+    $('headline').textContent = D.roundup.headline;
+    clear($('session'), h('h2', { text: s.title }), h('p', { class: 'mut', style: 'margin-top:6px', text: s.text }),
+      s.inWindow ? h('div', { class: 'bar', 'aria-label': 'Window used' }, h('i', { style: `width:${Math.round(s.progress * 100)}%` })) : null,
+      h('p', { class: 'small', style: 'margin-top:8px', text: `Window: the first ${S.settings.windowHours} hours after the New York open (${s.nextOpenUK} to ${s.windowEndUK} UK).` }));
+    $('sessR').textContent = s.inWindow ? 'live' : '';
+    const nItems = [];
+    if (n.blackout) nItems.push(h('div', { class: 'verdict bad', text: `Blackout now: ${n.blackout.title}. Be flat.` }));
+    if (n.next) nItems.push(h('h2', { text: n.next.title }), h('p', { class: 'mut', style: 'margin-top:6px', text: `${ukTime(n.next.at)} UK (${n.next.at.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/London' })}), in ${dur((n.next.at - now) / 60000)}. Flat from ${ukTime(new Date(n.next.at - 120000))} to ${ukTime(new Date(+n.next.at + 120000))}.` }));
+    else nItems.push(h('p', { class: 'mut', text: n.loaded ? 'No high-impact US news in the calendar for the next few days.' : 'The news calendar arrives with the nightly run. Until then, check the economic calendar before you trade.' }));
+    nItems.push(h('p', { class: 'small', style: 'margin-top:8px', text: 'LucidDaily funded: trading a high-impact release is a hard breach. Lucid says flat 1 minute either side; Quint uses 2.' }));
+    clear($('news'), nItems);
+    const live = botsLive(), j = jstats(S.trades), tg = tightest();
+    const tiles = [
+      [live && live.liveBots ? signed(live.today) : '$0', live ? (live.liveBots ? `Bots live today · ${live.n} trades` : `Bots: ${live.bots} in Trading Mastery, none live`) : 'Bots on live accounts: none yet', live ? tone(live.today) : ''],
+      [j.n ? signed(j.week) : '$0', j.n ? `My trades this week · ${signed(j.today)} today` : 'My trades: log them on the Desk', tone(j.week)],
+      [D.roundup.paper.trades ? signed(D.roundup.paper.net) : '$0', `Paper test · ${D.roundup.paper.bots} bots · ${D.roundup.paper.trades} trades`, tone(D.roundup.paper.net)],
+      [tg ? money(tg.m.room) : '—', tg ? `Room left · ${tg.a.name}` : 'Prop room: add an account', tg && tg.m.room < 500 ? 'down' : ''],
+    ];
+    clear($('money'), tiles.map(([v, l, c]) => h('div', { class: 'tile' }, h('b', { class: c, text: v }), h('span', { text: l }))));
+    const pm = D.playbook.premarket;
+    $('preR').textContent = `${Object.values(S.day.premarket || {}).filter(Boolean).length} of ${pm.length}`;
+    clear($('premarket'), pm.map((text, i) => {
+      const on = !!(S.day.premarket || {})[i];
+      return h('button', { class: 'check', type: 'button', 'aria-pressed': on ? 'true' : 'false', onclick: () => toggleDay('premarket', i) }, h('div', { class: 'box', text: on ? '✓' : String(i + 1) }), h('div', null, h('span', { style: 'color:var(--fg);margin:0', text })));
+    }));
+    const ln = [];
+    const fac = D.factory;
+    if (fac) {
+      const surv = fac.families.reduce((a, f) => a + ((f.survivors && f.survivors.length) || 0), 0);
+      ln.push(h('button', { class: 'item', type: 'button', onclick: () => go('lab', 'factory') }, h('div', { class: 't' }, h('span', { class: 'n', text: 'Strategy factory' }), h('span', { class: 'pill ' + (surv ? 'good' : ''), text: `${surv} survivors` })), h('div', { class: 'm', text: `${fac.variants.toLocaleString('en-US')} variations · candles to ${fac.asOf}` })));
+    }
+    ln.push(h('button', { class: 'item', type: 'button', onclick: () => go('lab', 'bots') }, h('div', { class: 't' }, h('span', { class: 'n', text: 'Bot scoreboard' }), h('span', { class: 'pill', text: `${D.bots.length} bots` })), h('div', { class: 'm', text: D.bots[0] ? `Top: ${D.bots[0].name} ${signed(D.bots[0].net)} over ${D.bots[0].trades} trades` : 'No results yet' })));
+    if (S.feed && S.feed.dream) ln.push(h('button', { class: 'item', type: 'button', onclick: () => openFeed() }, h('div', { class: 't' }, h('span', { class: 'n', text: 'Jarvis dream report' }), h('span', { class: 'pill', text: S.feed.dream.date || '' })), h('div', { class: 'm', text: S.feed.dream.top || S.feed.dream.status || '' })));
+    else ln.push(h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: 'Jarvis dream report' }), h('span', { class: 'pill', text: 'after 23:25' })), h('div', { class: 'm', text: Store.mode === 'cloud' ? 'Arrives with tonight\'s HQ sync from Trading Mastery.' : 'Shows here when this page is open in Claude.' })));
+    const waiting = S.ideas.filter((i) => i.status === 'new').length;
+    ln.push(h('button', { class: 'item', type: 'button', onclick: () => go('lab', 'ideas') }, h('div', { class: 't' }, h('span', { class: 'n', text: 'Your ideas' }), h('span', { class: 'pill', text: `${waiting} waiting` })), h('div', { class: 'm', text: 'Speak an idea; the nightly run writes its rules, tests it and reports back.' })));
+    clear($('lastNight'), ln);
+    clear($('lines'), (S.lines || D.roundup.spoken).map((t) => h('li', { text: t })));
+    clear($('warnings'), (D.roundup.warnings || []).map((w) => h('li', { class: 'warn', text: w })));
+    $('warnCount').textContent = `${(D.roundup.warnings || []).length} warnings`;
+  }
+  async function toggleDay(part, i) {
+    S.day[part] = S.day[part] || {};
+    S.day[part][i] = !S.day[part][i];
+    render();
+    await saveDay();
+  }
+  async function saveDay() {
+    try { await Store.setDoc('day-' + todayUK(), S.day); } catch (e) { toast('Couldn\'t save the tick. It\'s kept on this screen.'); }
+  }
+  async function resetPillars() { S.day.pillars = {}; render(); await saveDay(); }
+
+  // ---------- DESK ----------
+  const DESK = [['check', 'Pre-trade check'], ['size', 'Size it'], ['accounts', 'Prop accounts'], ['journal', 'Journal']];
+  function renderDesk() {
+    clear($('deskSeg'), DESK.map(([id, label]) => h('button', { role: 'tab', type: 'button', 'aria-selected': S.desk === id ? 'true' : 'false', onclick: () => { S.desk = id; renderDesk(); } , text: label })));
+    const body = $('deskBody');
+    if (S.desk === 'check') return clear(body, deskCheck());
+    if (S.desk === 'size') return clear(body, deskSize());
+    if (S.desk === 'accounts') return clear(body, deskAccounts());
+    return clear(body, deskJournal());
+  }
+  function deskCheck() {
+    const now = new Date(), s = session(now), n = news(now), pb = D.playbook, done = pb.checklist.filter((c) => (S.day.pillars || {})[c.id]);
+    const tg = tightest();
+    let v;
+    if (n.blackout) v = ['bad', `No trade: news blackout (${n.blackout.title}).`];
+    else if (!s.inWindow) v = ['bad', `No trade: outside your window. ${s.text}`];
+    else if (tg && tg.m.room <= 0) v = ['bad', `No trade: ${tg.a.name} has no room left.`];
+    else if (done.length < pb.checklist.length) {
+      const missing = pb.checklist.find((c) => !(S.day.pillars || {})[c.id]);
+      v = ['warn', `Wait: ${missing.name} isn't confirmed yet. The pillars must happen in order.`];
+    } else v = ['good', 'All four pillars confirmed, inside your window, no news. Size it, then it\'s your call.'];
+    const order = pb.checklist.map((c, i) => {
+      const on = !!(S.day.pillars || {})[c.id];
+      return h('button', { class: 'check', type: 'button', 'aria-pressed': on ? 'true' : 'false', onclick: () => toggleDay('pillars', c.id) }, h('div', { class: 'box', text: on ? '✓' : String(i + 1) }), h('div', null, h('b', { text: c.name }), h('span', { text: c.check })));
+    });
+    return [
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, D.playbook.name, h('span', { class: 'r', text: pb.short })), h('div', { class: 'checks' }, order),
+        h('div', { class: 'row2', style: 'margin-top:10px' }, h('button', { class: 'ghost', type: 'button', onclick: resetPillars, text: 'Reset the pillars' }))),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Verdict' }), h('div', { class: 'verdict ' + v[0], text: v[1] }),
+        h('ul', { class: 'plain', style: 'margin-top:10px' }, h('li', { text: s.inWindow ? `Inside your window (${dur((1 - s.progress) * S.settings.windowHours * 60)} left).` : `Window: ${s.nextOpenUK} to ${s.windowEndUK} UK.` }),
+          h('li', { text: n.next ? `Next news: ${n.next.title}, ${ukTime(n.next.at)} UK.` : 'No news loaded for today.' }),
+          h('li', { text: tg ? `${tg.a.name}: ${money(tg.m.room)} of room, max risk ${money(tg.m.maxRisk)} a trade.` : 'Add a prop account to check your room.' }),
+          h('li', { text: 'Hold winners well past 5 seconds: Lucid flags accounts where most profit comes from trades that short.' }))),
+      h('div', { class: 'panel wide' }, h('div', { class: 'label', text: 'The rules' }),
+        fold('No-trade rules', pb.noTrade.map((x) => h('div', { text: '• ' + x }))),
+        fold('Entries (11 techniques)', h('div', { class: 'scroll' }, h('table', { class: 't' }, h('tr', null, ['Technique', 'Entry', 'Stop'].map((x) => h('th', { text: x }))), pb.entries.map((e) => h('tr', null, h('td', null, h('b', { text: e.name }), h('div', { class: 'small', text: e.trigger })), h('td', { text: e.entry }), h('td', { text: e.stop })))))),
+        fold('Stops, break-even and targets', pb.management.map((x) => h('div', { text: '• ' + x }))),
+        fold('Cautions', pb.cautions.map((x) => h('div', { text: '• ' + x }))),
+        fold('Sources and older versions', [...pb.sources.map((x) => h('a', { href: x.url, target: '_blank', rel: 'noopener', text: x.name })), ...(pb.codedVersions || []).map((x) => h('div', { text: `${x.name}: ${x.differs}` }))])),
+    ];
+  }
+  function fold(title, kids) { return h('details', { class: 'fold' }, h('summary', { text: title }), h('div', { class: 'body' }, kids)); }
+
+  function deskSize() {
+    const sel = h('select', { id: 'szAcct', 'aria-label': 'Account' }, S.accounts.length ? S.accounts.map((a) => h('option', { value: a.id, text: a.name })) : h('option', { value: '', text: 'No account yet: add one' }));
+    const f = (id, label, ph) => h('div', { class: 'field' }, h('label', { for: id, text: label }), h('input', { id, type: 'number', inputmode: 'decimal', step: '0.25', placeholder: ph }));
+    const out = h('div', { class: 'out', id: 'szOut' });
+    const side = h('select', { id: 'szSide', 'aria-label': 'Direction' }, h('option', { value: '1', text: 'Long' }), h('option', { value: '-1', text: 'Short' }));
+    function calc() {
+      const a = S.accounts.find((x) => x.id === $('szAcct').value), e = +$('szEntry').value, st = +$('szStop').value, tp = +$('szTarget').value, dir = +$('szSide').value;
+      const stopPts = e && st ? Math.abs(e - st) : 0, wrong = e && st && (dir > 0 ? st >= e : st <= e);
+      const r = tp && stopPts ? ((tp - e) * dir) / stopPts : null;
+      const cells = []; // [label, short value, colour]
+      if (wrong) cells.push(['The stop is on the wrong side of the entry', 'Check stop', 'down']);
+      cells.push([stopPts ? `Stop distance · $${(stopPts * 2).toFixed(0)} a contract` : 'Stop distance', stopPts ? `${stopPts} pts` : '—', '']);
+      cells.push([r !== null ? 'Reward to target' : 'Reward: add a target (Point B)', r !== null ? `${r.toFixed(1)}R` : '—', r !== null && r < 1 ? 'warn' : '']);
+      if (a && stopPts && !wrong) {
+        const z = sizeFor(a, stopPts);
+        cells.push(['Contracts', `${z.contracts} MNQ`, z.contracts ? 'up' : 'down'], ['Risk if stopped', money(z.risk), ''], ['Room after a stop-out', money(z.roomAfter), z.roomAfter < 500 ? 'down' : ''], [`Max risk allowed (${Math.round((S.settings.riskShare || 0.25) * 100)}% of room${a.dllOn ? ', daily limit' : ''})`, money(z.maxRisk), '']);
+      } else if (!a) cells.push(['Add an account on Prop accounts', 'No account', 'warn']);
+      clear(out, cells.map(([k, v, c]) => h('div', { class: 'tile' }, h('b', { class: c, text: v }), h('span', { text: k }))));
+    }
+    setTimeout(() => { ['szAcct', 'szEntry', 'szStop', 'szTarget', 'szSide'].forEach((id) => $(id) && $(id).addEventListener('input', calc)); calc(); }, 0);
+    return [h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Size the trade' }),
+      h('div', { class: 'formgrid' }, h('div', { class: 'field' }, h('label', { for: 'szAcct', text: 'Account' }), sel), h('div', { class: 'field' }, h('label', { for: 'szSide', text: 'Direction' }), side), f('szEntry', 'Entry', 'e.g. 27,312.25'), f('szStop', 'Stop (beyond the wick)', ''), h('div', { class: 'field full' }, h('label', { for: 'szTarget', text: 'Target (Point B)' }), h('input', { id: 'szTarget', type: 'number', inputmode: 'decimal', step: '0.25' })))),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Result' }), out, h('p', { class: 'small', style: 'margin-top:10px', text: 'MNQ is $2 a point. Each contract also costs about $2 a round trip (commission and a tick of slippage each way). The rule: a full stop-out stays under a quarter of the room left.' }))];
+  }
+
+  const PRESET = (size) => { const s = (D.firm && D.firm.sizes || []).find((x) => x.size === size) || {}; return { size, start: size, balance: size, eodHigh: size, target: s.target, maxLoss: s.maxLoss, lockAt: s.lockAt, lockFloor: s.lockFloor, dll: s.dailyLoss, maxMicros: s.maxMicros, consistency: 0.4, dllOn: false, phase: 'eval', firm: 'Lucid Trading', plan: 'LucidDaily', bestDay: 0 }; };
+  function deskAccounts() {
+    const cards = S.accounts.map((a) => {
+      const m = acct(a);
+      return h('button', { class: 'item', type: 'button', onclick: () => editAccount(a) },
+        h('div', { class: 't' }, h('span', { class: 'n', text: a.name }), h('span', { class: 'pill ' + (m.room <= 0 ? 'bad' : m.room < 500 ? 'warn' : 'good'), text: `${money(m.room)} room` })),
+        h('div', { class: 'm', text: `${a.plan || ''} ${money(+a.size)} ${a.phase === 'funded' ? 'funded' : 'evaluation'} · balance ${money(m.balance)} · floor ${money(m.floor)}` }),
+        m.progress !== null ? h('div', { class: 'm', text: `Target: ${money(m.toTarget)} to go (${pct(m.progress)}) · consistency ${m.share === null ? 'n/a' : pct(m.share)} of ${pct(+a.consistency || 0.4)} ${m.consistencyOk ? 'OK' : 'over'}` }) : null,
+        m.progress !== null ? h('div', { class: 'bar' }, h('i', { style: `width:${Math.round(m.progress * 100)}%` })) : null,
+        h('div', { class: 'm', text: `Max risk a trade ${money(m.maxRisk)}${a.dllOn ? ` · daily limit left ${money(m.dllLeft)}` : ''} · today ${signed(m.today)}` }));
+    });
+    return [h('div', { class: 'panel wide' }, h('div', { class: 'label' }, 'Prop accounts', h('span', { class: 'r', text: Store.mode === 'cloud' ? 'private to you' : 'saved on this device' })),
+      h('div', { class: 'list' }, cards.length ? cards : h('p', { class: 'mut', text: 'No accounts yet. Add your Lucid accounts and Quint watches the room before every trade.' })),
+      h('div', { class: 'row2', style: 'margin-top:12px' }, [25000, 50000, 100000, 150000].map((s) => h('button', { class: 'ghost', type: 'button', onclick: () => editAccount({ ...PRESET(s), name: `Lucid ${s / 1000}K` }), text: `+ Lucid ${s / 1000}K` }))),
+      h('p', { class: 'small', style: 'margin-top:10px' }, `Presets: LucidDaily, checked ${D.firm ? D.firm.lastChecked : ''}. Check your plan's own rules page: `, h('a', { href: D.links.lucidRules, target: '_blank', rel: 'noopener', text: 'Lucid help center' }), '.'))];
+  }
+  function editAccount(a) {
+    const isNew = !a.id, F = (k, label, type = 'number') => h('div', { class: 'field' }, h('label', { for: 'ac_' + k, text: label }), h('input', { id: 'ac_' + k, type, inputmode: type === 'number' ? 'decimal' : null, value: a[k] === undefined || a[k] === null ? '' : String(a[k]) }));
+    const phase = h('select', { id: 'ac_phase' }, h('option', { value: 'eval', text: 'Evaluation', selected: a.phase !== 'funded' }), h('option', { value: 'funded', text: 'Funded', selected: a.phase === 'funded' }));
+    const dll = h('select', { id: 'ac_dllOn' }, h('option', { value: 'off', text: 'Off', selected: !a.dllOn }), h('option', { value: 'on', text: 'On', selected: !!a.dllOn }));
+    sheet(isNew ? 'Add account' : a.name, [
+      h('div', { class: 'formgrid' }, h('div', { class: 'field full' }, h('label', { for: 'ac_name', text: 'Name' }), h('input', { id: 'ac_name', type: 'text', value: a.name || '' })),
+        F('balance', 'Balance now'), F('eodHigh', 'Highest end-of-day balance'), F('bestDay', 'Best single day so far'), h('div', { class: 'field' }, h('label', { for: 'ac_phase', text: 'Stage' }), phase),
+        F('start', 'Starting balance'), F('target', 'Profit target'), F('maxLoss', 'Max loss (trailing)'), F('lockAt', 'Floor locks once balance reaches'), F('lockFloor', 'Locked floor'),
+        h('div', { class: 'field' }, h('label', { for: 'ac_dllOn', text: 'Daily loss limit' }), dll), F('dll', 'Daily loss limit ($)'), F('consistency', 'Consistency cap (0.4 = 40%)'), F('maxMicros', 'Max MNQ')),
+      h('div', { class: 'row2' }, h('button', { class: 'btn sm', type: 'button', onclick: async () => {
+        const v = (k) => $('ac_' + k).value, num = (k) => (v(k) === '' ? null : Number(v(k)));
+        const next = { ...a, name: v('name') || 'Account', phase: v('phase'), dllOn: v('dllOn') === 'on' };
+        for (const k of ['balance', 'eodHigh', 'bestDay', 'start', 'target', 'maxLoss', 'lockAt', 'lockFloor', 'dll', 'consistency', 'maxMicros']) next[k] = num(k);
+        next.size = next.size || next.start; next.updatedAt = new Date().toISOString();
+        try { next.id = await Store.save('accounts', next); await reload('accounts'); closeSheet(); toast('Account saved'); } catch (e) { toast('Couldn\'t save: ' + (e.message || e.code || 'try again')); }
+      }, text: 'Save' }), !isNew ? h('button', { class: 'ghost danger', type: 'button', onclick: async () => { if (!confirmIn('Delete this account?')) return; await Store.remove('accounts', a.id); await reload('accounts'); closeSheet(); toast('Account deleted'); }, text: 'Delete' }) : null),
+      h('p', { class: 'small', text: 'Update the balance and the highest end-of-day balance after each session (until Quint Control connects your accounts). Every number is editable because plans differ.' }),
+    ]);
+  }
+  let confirmArm = 0;
+  function confirmIn(msg) { if (Date.now() - confirmArm < 4000) { confirmArm = 0; return true; } confirmArm = Date.now(); toast(msg + ' Tap again to confirm.'); return false; }
+
+  function deskJournal() {
+    const j = jstats(S.trades), list = [...S.trades].sort((a, b) => (b.date + (b.time || '')).localeCompare(a.date + (a.time || ''))).slice(0, 60);
+    const by = Object.entries(j.bySetup).sort((a, b) => b[1].net - a[1].net);
+    return [h('div', { class: 'panel' }, h('div', { class: 'label' }, 'My trades', h('span', { class: 'r', text: Store.mode === 'cloud' ? 'private to you' : 'saved on this device' })),
+        h('div', { class: 'tiles' }, [['Today', j.today], ['This week', j.week], ['This month', j.month], ['All time', j.all]].map(([k, v]) => h('div', { class: 'tile' }, h('b', { class: tone(v), text: signed(v) }), h('span', { text: k })))),
+        h('p', { class: 'small', style: 'margin-top:10px', text: j.n ? `${j.n} trades · ${pct(j.winRate)} winners · average win ${money(j.avgWin)} · average loss ${money(j.avgLoss)}` : 'No trades logged yet.' }),
+        by.length ? h('div', { class: 'list', style: 'margin-top:10px' }, by.map(([k, v]) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: k }), h('span', { class: 'num ' + tone(v.net), text: signed(v.net) })), h('div', { class: 'm', text: `${v.n} trades` })))) : null,
+        h('div', { class: 'row2', style: 'margin-top:12px' }, h('button', { class: 'btn sm', type: 'button', onclick: () => editTrade({}), text: 'Log a trade' }), h('button', { class: 'ghost', type: 'button', onclick: exportJournal, text: 'Export CSV' }))),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Recent' }), h('div', { class: 'list' }, list.length ? list.map((t) => h('button', { class: 'item', type: 'button', onclick: () => editTrade(t) },
+        h('div', { class: 't' }, h('span', { class: 'n', text: `${t.date} ${t.time || ''} · ${t.side === 'short' ? 'Short' : 'Long'} ${t.contracts || 1} MNQ` }), h('span', { class: 'num ' + tone(+t.pnl), text: signed(+t.pnl) })),
+        h('div', { class: 'm', text: `${t.setup || 'Other'}${t.account ? ' · ' + ((S.accounts.find((a) => a.id === t.account) || {}).name || '') : ''}${t.notes ? ' · ' + t.notes : ''}` }))) : h('p', { class: 'mut', text: 'Your logged trades show here.' })))];
+  }
+  function editTrade(t) {
+    const isNew = !t.id, d = { date: todayUK(), side: 'long', contracts: 1, setup: D.playbook.name, ...t };
+    const F = (k, label, type = 'number', step) => h('div', { class: 'field' }, h('label', { for: 'tr_' + k, text: label }), h('input', { id: 'tr_' + k, type, step, inputmode: type === 'number' ? 'decimal' : null, value: d[k] === undefined || d[k] === null ? '' : String(d[k]) }));
+    const acctSel = h('select', { id: 'tr_account' }, h('option', { value: '', text: 'No account' }), S.accounts.map((a) => h('option', { value: a.id, text: a.name, selected: d.account === a.id })));
+    const side = h('select', { id: 'tr_side' }, h('option', { value: 'long', text: 'Long', selected: d.side !== 'short' }), h('option', { value: 'short', text: 'Short', selected: d.side === 'short' }));
+    const setup = h('select', { id: 'tr_setup' }, [D.playbook.name, 'Other'].map((x) => h('option', { value: x, text: x, selected: d.setup === x })));
+    const auto = () => { const e = +$('tr_entry').value, x = +$('tr_exit').value, c = +$('tr_contracts').value || 1, dir = $('tr_side').value === 'short' ? -1 : 1; if (e && x) $('tr_pnl').value = ((x - e) * dir * 2 * c - 1 * c).toFixed(2); };
+    sheet(isNew ? 'Log a trade' : 'Edit trade', [
+      h('div', { class: 'formgrid' }, F('date', 'Date', 'date'), F('time', 'Time (UK)', 'text'), h('div', { class: 'field' }, h('label', { for: 'tr_side', text: 'Side' }), side), F('contracts', 'Contracts (MNQ)'),
+        F('entry', 'Entry', 'number', '0.25'), F('exit', 'Exit', 'number', '0.25'), F('pnl', 'P&L $ (fills from prices; edit to match your broker)', 'number', '0.01'),
+        h('div', { class: 'field' }, h('label', { for: 'tr_account', text: 'Account' }), acctSel), h('div', { class: 'field full' }, h('label', { for: 'tr_setup', text: 'Setup' }), setup),
+        h('div', { class: 'field full' }, h('label', { for: 'tr_notes', text: 'Notes (which pillar, which entry, how you felt)' }), h('textarea', { id: 'tr_notes' }, d.notes || ''))),
+      h('div', { class: 'row2' }, h('button', { class: 'btn sm', type: 'button', onclick: async () => {
+        const v = (k) => $('tr_' + k).value;
+        const next = { ...t, date: v('date') || todayUK(), time: v('time'), side: v('side'), contracts: Number(v('contracts')) || 1, entry: v('entry') === '' ? null : Number(v('entry')), exit: v('exit') === '' ? null : Number(v('exit')), pnl: Number(v('pnl')) || 0, account: v('account'), setup: v('setup'), notes: v('notes') };
+        try { await Store.save('trades', next); await reload('trades'); closeSheet(); toast('Trade logged'); } catch (e) { toast('Couldn\'t save: ' + (e.message || e.code || 'try again')); }
+      }, text: 'Save' }), !isNew ? h('button', { class: 'ghost danger', type: 'button', onclick: async () => { if (!confirmIn('Delete this trade?')) return; await Store.remove('trades', t.id); await reload('trades'); closeSheet(); toast('Trade deleted'); }, text: 'Delete' }) : null),
+    ]);
+    ['tr_entry', 'tr_exit', 'tr_contracts', 'tr_side'].forEach((id) => $(id).addEventListener('input', auto));
+  }
+  let downloads = null;
+  async function exportJournal() {
+    const rows = [['date', 'time', 'side', 'contracts', 'entry', 'exit', 'pnl', 'account', 'setup', 'notes'], ...S.trades.map((t) => [t.date, t.time, t.side, t.contracts, t.entry, t.exit, t.pnl, (S.accounts.find((a) => a.id === t.account) || {}).name || '', t.setup, (t.notes || '').replace(/[\r\n]+/g, ' ')])];
+    const csv = rows.map((r) => r.map((x) => { const s = x === null || x === undefined ? '' : String(x); return /[",]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(',')).join('\n') + '\n';
+    if (downloads) { try { await downloads.save({ filename: `quint-journal-${todayUK()}.csv`, data: csv }); toast('Journal saved'); return; } catch (e) { if (e && e.code === 'declined') return; } }
+    sheet('Your journal (CSV)', [h('p', { class: 'small', text: 'Saving files isn\'t available here, so copy the text below.' }), h('textarea', { style: 'min-height:200px', readonly: true }, csv)]);
+  }
+
+  // ---------- LAB ----------
+  const LAB = [['factory', 'Factory'], ['pillars', 'Pillars'], ['bots', 'Bots'], ['library', 'Library'], ['ideas', 'Ideas'], ['memory', 'Memory']];
+  function renderLab() {
+    clear($('labSeg'), LAB.map(([id, label]) => h('button', { role: 'tab', type: 'button', 'aria-selected': S.lab === id ? 'true' : 'false', onclick: () => { S.lab = id; renderLab(); }, text: label })));
+    const b = $('labBody');
+    if (S.lab === 'factory') return clear(b, labFactory());
+    if (S.lab === 'pillars') return clear(b, labPillars());
+    if (S.lab === 'bots') return clear(b, labBots());
+    if (S.lab === 'library') return clear(b, labLibrary());
+    if (S.lab === 'ideas') return clear(b, labIdeas());
+    return clear(b, labMemory());
+  }
+  function labFactory() {
+    const f = D.factory;
+    if (!f) return [h('div', { class: 'panel' }, h('p', { class: 'mut', text: 'The strategy factory hasn\'t run yet. It runs every night.' }))];
+    const surv = f.families.reduce((a, x) => a + ((x.survivors && x.survivors.length) || 0), 0);
+    const fams = f.families.filter((x) => !x.skipped).map((x) => h('button', { class: 'item', type: 'button', onclick: () => openFamily(x) },
+      h('div', { class: 't' }, h('span', { class: 'n', text: x.name }), h('span', { class: 'pill ' + (x.survivors.length ? 'good' : x.pbo !== null && x.pbo > 0.5 ? 'bad' : 'warn'), text: x.survivors.length ? `${x.survivors.length} survive` : x.pbo !== null && x.pbo > 0.5 ? 'luck' : 'none yet' })),
+      h('div', { class: 'm', text: `${x.variants.toLocaleString('en-US')} variations · PBO ${pct(x.pbo)} · ${x.unseenPositive} profitable unseen · ${x.data.unseenSessions} unseen sessions` })));
+    return [h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Strategy factory', h('span', { class: 'r', text: `candles to ${f.asOf}` })),
+        h('div', { class: 'tiles' }, h('div', { class: 'tile' }, h('b', { text: f.variants.toLocaleString('en-US') }), h('span', { text: 'variations tested' })), h('div', { class: 'tile' }, h('b', { class: surv ? 'up' : '', text: String(surv) }), h('span', { text: 'survived every check' })),
+          h('div', { class: 'tile' }, h('b', { text: String(f.readyForPaper.length) }), h('span', { text: `earned the paper test (${f.promoteAfter} nights in a row)` })), h('div', { class: 'tile' }, h('b', { text: `${f.seconds}s` }), h('span', { text: 'computing time' }))),
+        h('p', { class: 'small', style: 'margin-top:10px', text: `A variation survives only if, on sessions it never saw: ${f.rule.minUnseenTrades}+ trades, a profit, profit factor ${f.rule.minUnseenPF}+, still a profit at double costs; drawdown under $${f.rule.maxDrawdown.toLocaleString('en-US')}; its neighbours also profitable; and its family's overfitting chance (PBO) ${pct(f.rule.maxPBO)} or less.` })),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Families' }), h('div', { class: 'list' }, fams))];
+  }
+  // The sequence analyst: what each pillar of WYLD's strategy is worth (lab/brain/anatomy.js, every night).
+  function labPillars() {
+    const a = D.anatomy;
+    if (!a) return [h('div', { class: 'panel' }, h('p', { class: 'mut', text: 'The sequence analyst hasn\'t run yet. It runs every night after the factory.' }))];
+    const R = (x) => (x === null || x === undefined ? '—' : `${x >= 0 ? '+' : ''}${x.toFixed(2)}R`), cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+    const base = a.funnel.find((r) => r.id === 'base') || a.funnel[0], f = base.f;
+    const steps = [['① Sweeps in the window', f.sweeps], ['② An HTF level held', f.holds], ['③ PDR set', f.pdrs], ['④ Confirmations', f.confirmations], ['Entries', f.entries]];
+    const top = Math.max(1, ...steps.map((x) => x[1]));
+    const tone = (v) => (v === 'earns its place' ? 'good' : v === 'costs more than it adds' ? 'bad' : v === 'no clear difference yet' ? 'warn' : '');
+    const pm = a.study.postMortem;
+    return [
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Your four pillars, dissected', h('span', { class: 'r', text: `${a.sessions} sessions · ${a.candles}` })),
+        h('p', { class: 'small', text: `Every night Quint replays WYLD's rules exactly as your TradingView indicator reads them, takes one pillar away at a time, and tries each confirmation alone. Every average has a 95% range; under ${a.minTrades} trades nothing counts as a finding.` }),
+        h('div', { class: 'list', style: 'margin-top:10px' }, a.lessons.slice(0, 7).map((x) => h('div', { class: 'item' }, h('div', { style: 'font-size:14px;line-height:1.5', text: x }))))),
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Where setups die', h('span', { class: 'r', text: 'your indicator settings' })),
+        steps.map(([name, v]) => h('div', { style: 'margin-top:10px' }, h('div', { class: 'row2', style: 'justify-content:space-between' }, h('span', { text: name }), h('span', { class: 'num', text: String(v) })), h('div', { class: 'bar' }, h('i', { style: `width:${Math.round((100 * v) / top)}%` })))),
+        h('p', { class: 'small', style: 'margin-top:10px', text: `WYLD's own pools only (15m equal highs and lows): ${a.funnel[0].f.sweeps} sweeps in the window; ${a.funnel[0].f.takenOvernight} pools were already taken before 9:30.` })),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Each pillar: with it against without it' }),
+        h('div', { class: 'list' }, a.pillars.map((p) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: cap(p.name) }), h('span', { class: 'pill ' + tone(p.verdict), text: p.verdict === 'too few trades to judge' ? 'too few' : p.verdict })),
+          h('div', { class: 'm', text: `${p.withN} trades with it (${R(p.withAvgR)}) · ${p.withoutN} without (${R(p.withoutAvgR)})` }))))),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Each confirmation on its own' }),
+        h('div', { class: 'list' }, a.confirmations.map((c) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: cap(c.name) }), h('span', { class: 'pill ' + (c.enough ? (c.lo > 0 ? 'good' : c.hi < 0 ? 'bad' : 'warn') : ''), text: c.enough ? R(c.avgR) : `${c.n} trades` })),
+          h('div', { class: 'm', text: c.n ? `${R(c.avgR)} a trade · 95% range ${R(c.lo)} to ${R(c.hi)}` : 'No trades yet' }))))),
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Why trades won or lost', h('span', { class: 'r', text: `${a.study.n} trades` })),
+        h('div', { class: 'tiles' }, h('div', { class: 'tile' }, h('b', { text: `${pm.losersUp1R}/${pm.losers}` }), h('span', { text: 'losers that were +1R first' })), h('div', { class: 'tile' }, h('b', { text: `${pm.losersUpHalfR}/${pm.losers}` }), h('span', { text: 'losers that were +0.5R first' })),
+          h('div', { class: 'tile' }, h('b', { text: pm.winnersMedianMaeR === null ? '—' : `${pm.winnersMedianMaeR}R` }), h('span', { text: 'heat winners took first' })), h('div', { class: 'tile' }, h('b', { text: `${pm.winners}/${a.study.n}` }), h('span', { text: 'trades that won' }))),
+        h('p', { class: 'small', style: 'margin-top:10px', text: `How they ended: ${Object.entries(pm.exits).map(([k, v]) => `${k} ${v}`).join(', ') || 'no trades'}. From the run with the most trades: ${a.study.name.toLowerCase()}. A description until there are ${a.minTrades} trades.` })),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'What Quint wants to test next' }),
+        a.proposals.length ? h('div', { class: 'list' }, a.proposals.map((p) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: p.rules }), h('span', { class: 'pill', text: p.alreadyQueued ? 'queued' : 'proposed' })), h('div', { class: 'm', text: `${p.why} Pass mark: ${p.passMark}` }))))
+          : h('p', { class: 'mut', text: 'Nothing new tonight.' }),
+        h('p', { class: 'small', style: 'margin-top:10px', text: 'Proposals are written into the lab\'s queue with their pass mark before anything is tested, and tested only on sessions after that date. Nothing changes your rules by itself.' })),
+    ];
+  }
+  function openFamily(x) {
+    const row = (v, extra) => h('div', { class: 'item' }, h('div', { class: 'n', text: v.key.replace(/;/g, ' · ') }), h('div', { class: 'm', text: `tune ${signed(v.tune.net)} (${v.tune.n}) → unseen ${signed(v.unseen.net)} (${v.unseen.n})${extra || ''}` }));
+    sheet(x.name, [h('p', { class: 'mut', text: x.verdict }),
+      h('p', { class: 'small', text: `Sessions ${x.data.from} to ${x.data.to}: tuned on ${x.data.tuneSessions}, judged on ${x.data.unseenSessions} from ${x.data.unseenFrom}.` }),
+      x.survivors.length ? h('div', null, h('div', { class: 'label', text: 'Survivors' }), h('div', { class: 'list' }, x.survivors.map((s) => row(s, ` · Lucid 50K pass ${pct(s.pass)}, fail ${pct(s.fail)}`)))) : null,
+      x.top.length ? h('div', null, h('div', { class: 'label', text: 'Best on the tuning sessions' }), h('div', { class: 'list' }, x.top.map((v) => row(v, v.neighbours && v.neighbours.medianUnseen !== null ? ` · neighbours ${signed(v.neighbours.medianUnseen)}` : '')))) : null,
+      h('p', { class: 'small', text: 'Survivors still aren\'t proof: they need 5 nights in a row, then a paper test on new candles, then years of data, before anything is Approved. Only you take anything live.' })]);
+  }
+  function spark(values) {
+    const w = 300, hgt = 34, min = Math.min(0, ...values), max = Math.max(0, ...values), rng = max - min || 1;
+    const pts = values.map((v, i) => `${(i / Math.max(1, values.length - 1)) * w},${hgt - 3 - ((v - min) / rng) * (hgt - 6)}`).join(' ');
+    const zero = hgt - 3 - ((0 - min) / rng) * (hgt - 6), last = values[values.length - 1];
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', `0 0 ${w} ${hgt}`); s.setAttribute('preserveAspectRatio', 'none'); s.setAttribute('class', 'spark'); s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = `<line x1="0" x2="${w}" y1="${zero}" y2="${zero}" stroke="rgba(255,255,255,.12)" stroke-width="1"/><polyline points="${pts}" fill="none" stroke="${last >= 0 ? '#2fd9a8' : '#ff4f6e'}" stroke-width="1.6" vector-effect="non-scaling-stroke"/>`;
+    return s;
+  }
+  const gradeTone = (g) => (g === 'Candidate' || g === 'Promising' ? 'good' : g === 'Loses money' ? 'bad' : g === 'No trades' ? '' : 'warn');
+  function labBots() {
+    return [h('div', { class: 'panel wide' }, h('div', { class: 'label' }, 'Bot scoreboard', h('span', { class: 'r', text: '1 MNQ after costs' })),
+      h('div', { class: 'list' }, D.bots.map((b) => h('button', { class: 'item', type: 'button', onclick: () => openBot(b) },
+        h('div', { class: 't' }, h('span', { class: 'n', text: `${b.bot !== null ? b.bot + '. ' : ''}${b.name} · ${b.timeframe}` }), h('span', { class: 'pill ' + gradeTone(b.grade), text: b.grade })),
+        spark(b.curve),
+        h('div', { class: 'm', text: `${b.trades} trades · ${signed(b.net)} · later half ${signed(b.laterHalf)} · drawdown ${money(b.maxDrawdown)} · Lucid pass ${pct(b.pass)} / fail ${pct(b.fail)}${b.trades < 100 ? '*' : ''} · paper ${b.forward.trades} trades` })))),
+      h('p', { class: 'small', style: 'margin-top:10px', text: `* Under 100 trades: an anecdote. ${D.skipped.map((s) => `${s.name}: ${s.why}.`).join(' ')}` }))];
+  }
+  function openBot(b) {
+    const s = D.strategies.find((x) => x.id === b.id) || {};
+    sheet(b.name, [spark(b.curve), h('div', { class: 'out' }, [['Trades', b.trades], ['Net', signed(b.net)], ['Later half', signed(b.laterHalf)], ['Worst drawdown', money(b.maxDrawdown)], ['Worst day', signed(b.worstDay)], ['Win rate', pct(b.winRate)], ['Lucid 50K pass', pct(b.pass)], ['Lucid 50K fail', pct(b.fail)], ['Paper trades', b.forward.trades], ['Paper net', signed(b.forward.net)]].map(([k, v]) => h('div', { class: 'tile' }, h('b', { text: String(v) }), h('span', { text: k })))),
+      s.rules ? h('p', { class: 'mut', text: s.rules }) : null, s.verdict ? h('p', { text: s.verdict }) : null, s.source ? h('p', { class: 'small', text: 'Source: ' + s.source }) : null,
+      h('p', { class: 'small', text: `Data: ${b.data.file}, ${b.data.from} to ${b.data.to} (${b.data.sessions} sessions). Paper test since ${b.forward.since}.` })]);
+  }
+  function labLibrary() {
+    const groups = ['Scalping', 'Intraday', 'Swing', 'Position', 'Intraday and swing'];
+    const statusTone = (s) => (s === 'Approved' ? 'good' : s === 'Rejected' ? 'bad' : '');
+    const counts = {};
+    for (const s of D.strategies) counts[s.status] = (counts[s.status] || 0) + 1;
+    return [h('div', { class: 'panel wide' }, h('div', { class: 'label', text: 'Strategy library' }), h('div', { class: 'chips', style: 'margin-bottom:12px' }, Object.entries(counts).map(([k, v]) => h('span', { class: 'pill ' + statusTone(k), text: `${k} ${v}` }))),
+      groups.filter((g) => D.strategies.some((s) => s.horizon === g)).map((g) => h('div', { style: 'margin-bottom:14px' }, h('div', { class: 'label', text: g }), h('div', { class: 'list' }, D.strategies.filter((s) => s.horizon === g).map((s) => h('button', { class: 'item', type: 'button', onclick: () => openStrategy(s), style: s.id === 'wyld-four-pillars' ? 'border-color:var(--line2)' : null },
+        h('div', { class: 't' }, h('span', { class: 'n', text: s.name }), h('span', { class: 'pill ' + statusTone(s.status), text: s.status })), h('div', { class: 'm', text: s.timeframe }))))))) ];
+  }
+  function openStrategy(s) {
+    sheet(s.name, [h('div', { class: 'row2' }, h('span', { class: 'pill', text: s.status }), h('span', { class: 'small', text: `${s.horizon} · ${s.timeframe}` })), h('p', { text: s.verdict }), s.rules ? h('p', { class: 'mut', text: s.rules }) : null,
+      s.versions.length ? h('div', { class: 'list' }, s.versions.map((v) => h('div', { class: 'item' }, h('div', { class: 'n', text: v.name }), h('div', { class: 'm', text: `${v.where}. ${v.note}` })))) : null,
+      s.evidence.length ? h('div', null, h('div', { class: 'label', text: 'Evidence' }), h('div', { class: 'list' }, s.evidence.map((e) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: e.data }), e.net !== undefined ? h('span', { class: 'num ' + tone(e.net), text: signed(e.net) }) : null), h('div', { class: 'm', text: `${e.trades !== undefined ? e.trades + ' trades · ' : ''}${e.note || ''}` }))))) : null,
+      s.next ? h('p', { class: 'small', text: 'Next: ' + s.next }) : null, h('p', { class: 'small', text: 'Source: ' + s.source })]);
+  }
+  function labIdeas() {
+    const statusTone = (s) => (s === 'done' ? 'good' : s === 'rejected' ? 'bad' : s === 'new' ? 'warn' : '');
+    const kind = h('select', { id: 'idKind', 'aria-label': 'Kind of idea' }, h('option', { value: 'strategy', text: 'Strategy to test' }), h('option', { value: 'rule', text: 'Answer for my rules' }), h('option', { value: 'feature', text: 'Feature for HQ' }), h('option', { value: 'venture', text: 'Venture' }));
+    const list = [...S.ideas].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    return [h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Ideas inbox', h('span', { class: 'r', text: Store.mode === 'cloud' ? 'the nightly run reads these' : 'on this device only' })),
+        h('div', { class: 'field full' }, h('label', { for: 'idText', text: 'Your idea, in your words' }), h('textarea', { id: 'idText', placeholder: 'e.g. Test the Four Pillars only on the 15m equal lows from the London session' })),
+        h('div', { class: 'row2', style: 'margin-top:10px' }, kind, h('button', { class: 'btn sm', type: 'button', onclick: async () => { const text = $('idText').value.trim(); if (!text) return toast('Type or speak your idea first'); await addIdea(text, $('idKind').value); $('idText').value = ''; }, text: 'Add to the lab' })),
+        h('p', { class: 'small', style: 'margin-top:10px', text: 'Each night the lab writes the exact rules and pass mark before testing, tests it within budget, and reports back here. Answers to your rules (like what counts as the easiest equal highs and lows) help it code your Four Pillars exactly.' })),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Your ideas' }), h('div', { class: 'list' }, list.length ? list.map((i) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: i.text }), h('span', { class: 'pill ' + statusTone(i.status), text: i.status || 'new' })), h('div', { class: 'm', text: `${i.kind || 'strategy'} · ${(i.createdAt || '').slice(0, 10)}${i.note ? ' · ' + i.note : ''}${i.result ? ' · ' + i.result : ''}` }),
+        i.status === 'new' ? h('div', null, h('button', { class: 'ghost danger', type: 'button', onclick: async () => { if (!confirmIn('Remove this idea?')) return; await Store.remove('ideas', i.id); await reload('ideas'); }, text: 'Remove' })) : null)) : h('p', { class: 'mut', text: 'Nothing yet. Ideas you add here, or ask Quint to add, show up with their status.' })))];
+  }
+  async function addIdea(text, kind) {
+    const id = await Store.save('ideas', { text, kind: kind || 'strategy', status: 'new', createdAt: new Date().toISOString() });
+    await reload('ideas'); toast('Idea added to the lab'); return id;
+  }
+  let traderDev = null;
+  function labMemory() {
+    return [h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Lessons learned' }), h('ul', { class: 'plain' }, D.lessons.map((l) => h('li', null, h('b', { style: 'color:var(--fg);font-weight:500', text: l.date + ': ' }), l.lesson)))),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Experiment queue' }), h('ol', { class: 'plain' }, D.queue.map((q) => h('li', null, h('b', { style: 'color:var(--fg);font-weight:500', text: q.id + ': ' }), q.what.split('. ')[0] + '. ', h('span', { class: 'small', text: q.cost + (q.auto ? ' · automatic' : ' · needs you') }))))),
+      h('div', { class: 'panel wide' }, h('div', { class: 'label', text: 'TraderDev (live)' }), h('div', { id: 'tdOut' }, traderDev ? tdView(traderDev) : h('p', { class: 'mut', text: 'Signals in the last 24 hours, saved strategies and credits. Free: no TradingView calls.' })),
+        h('div', { class: 'row2', style: 'margin-top:10px' }, h('button', { class: 'ghost', type: 'button', onclick: loadTraderDev, text: traderDev ? 'Refresh' : 'Load TraderDev' })))];
+  }
+  function tdView(t) { return h('div', { class: 'out' }, [['Signals, 24h', t.signals], ['Failed sends', t.failed], ['Strategies', t.strategies], ['Deployed', t.deployed], ['Credits', t.credits]].map(([k, v]) => h('div', { class: 'tile' }, h('b', { text: v === null || v === undefined ? '—' : String(v) }), h('span', { text: k })))); }
+  async function loadTraderDev() {
+    clear($('tdOut'), h('p', { class: 'mut', text: 'Loading…' }));
+    try {
+      const [st, list, cr] = await Promise.all([mcpCall('trader-dev', 'get_signal_stats', {}), mcpCall('trader-dev', 'list_strategies', {}), mcpCall('trader-dev', 'get_credits', {})]);
+      const arr = Array.isArray(list) ? list : (list && (list.strategies || list.data)) || [];
+      traderDev = { signals: st && st.totalSignals, failed: st && st.failedDispatches, strategies: arr.length, deployed: arr.filter((x) => x.mode === 'deployed').length, credits: cr && cr.balance };
+      clear($('tdOut'), tdView(traderDev));
+    } catch (e) { clear($('tdOut'), h('p', { class: 'warn', text: mcpError(e, 'TraderDev') })); }
+  }
+
+  // ---------- connectors (on your tap only) ----------
+  let mcp = null;
+  async function mcpCall(server, tool, input) {
+    if (!mcp) throw { code: 'unavailable' };
+    const r = await mcp.callTool(server, tool, input, { cache: false });
+    return r.payload;
+  }
+  function mcpError(e, name) {
+    const c = e && e.code;
+    if (c === 'unavailable') return `${name} works when this page is open in Claude with the connector allowed.`;
+    if (c === 'needs_reauth' || c === 'server_not_connected') return `${name} needs reconnecting in your Claude settings.`;
+    if (c === 'not_granted' || c === 'consent_required' || c === 'approval_required') return `${name} needs your OK in this page's permissions.`;
+    if (c === 'blocked_by_policy' || c === 'not_in_manifest') return `${name} isn't available to this page.`;
+    if (c === 'rate_limited') return `${name} is busy. Try again in a minute.`;
+    return `${name} didn't answer: ${(e && e.message) || 'unknown error'}.`;
+  }
+
+  // ---------- MORE ----------
+  let jobs = null, mnq = LS.get('mnq', null);
+  function tvUsed() { const u = LS.get('tvUsed', { date: '', n: 0 }); return u.date === todayUK() ? u.n : 0; }
+  function renderMore() {
+    const plans = [[10, 'Essential (10 a day)'], [20, 'Plus (20)'], [50, 'Premium (50)'], [150, 'Ultimate (150)'], [500, 'AI add-on (500)']];
+    const planSel = h('select', { id: 'tvPlan', 'aria-label': 'TradingView plan', onchange: (e) => saveSettings({ tvPlan: Number(e.target.value) }) }, plans.map(([v, l]) => h('option', { value: String(v), text: l, selected: S.settings.tvPlan === v })));
+    const f = S.feed;
+    clear($('tab-more'),
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Nightly jobs', h('span', { class: 'r', text: 'in the cloud' })),
+        h('div', { class: 'list', id: 'jobsList' }, (jobs || D.jobs).map((j) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: j.name }), j.enabled !== undefined ? h('span', { class: 'pill ' + (j.enabled ? 'good' : 'warn'), text: j.enabled ? 'on' : 'paused' }) : h('span', { class: 'pill', text: j.when })),
+          h('div', { class: 'm', text: j.next ? `Next ${j.next}${j.last ? ' · last ' + j.last : ''}` : j.what }),
+          j.id && j.mine ? h('div', { class: 'row2' }, h('button', { class: 'ghost', type: 'button', onclick: () => runJob(j), text: 'Run now' }), h('button', { class: 'ghost', type: 'button', onclick: () => pauseJob(j), text: j.enabled ? 'Pause' : 'Resume' })) : null))),
+        h('div', { class: 'row2', style: 'margin-top:10px' }, h('button', { class: 'ghost', type: 'button', onclick: loadJobs, text: 'Check the jobs' }))),
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, 'MNQ now', h('span', { class: 'r', text: `HQ used ${tvUsed()} TradingView calls today` })),
+        h('div', { id: 'mnqOut' }, mnq ? mnqView(mnq) : h('p', { class: 'mut', text: 'Costs 1 TradingView call, from the same daily allowance as Trading Mastery and the nightly runs.' })),
+        h('div', { class: 'row2', style: 'margin-top:10px' }, h('button', { class: 'ghost', type: 'button', onclick: checkMnq, text: 'Check MNQ (1 call)' })),
+        h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { for: 'tvPlan', text: 'Your TradingView plan' }), planSel)),
+      h('div', { class: 'panel' }, h('div', { class: 'label' }, 'Trading Mastery sync', h('span', { class: 'r', text: f && f.at ? 'synced ' + String(f.at).slice(0, 16).replace('T', ' ') : 'not yet' })),
+        f ? h('div', { class: 'list' }, (f.bots || []).map((b) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: b.name }), h('span', { class: 'pill', text: b.status || '' })), h('div', { class: 'm', text: Object.entries(b.byType || {}).map(([k, v]) => `${k}: ${signed(+v.net)} over ${v.n} trades`).join(' · ') }))), f.dream ? h('button', { class: 'ghost', type: 'button', onclick: openFeed, text: 'Last night\'s Jarvis report' }) : null)
+          : h('p', { class: 'mut', text: Store.mode === 'cloud' ? 'Each weeknight at 23:25 UK, the HQ sync copies your NinjaTrader bot results, the Jarvis dream report and your pinned rules from Trading Mastery into this page, privately.' : 'Shows when this page is open in Claude.' })),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Your apps' }), h('div', { class: 'list' }, D.links.apps.map((a) => h('a', { class: 'item', href: a.url, target: '_blank', rel: 'noopener', style: 'text-decoration:none' }, h('div', { class: 'n', text: a.name }), h('div', { class: 'm', text: a.what })))),
+        h('div', { class: 'row2', style: 'margin-top:10px' }, h('a', { class: 'ghost', href: D.links.nightlyChanges, target: '_blank', rel: 'noopener', text: 'Tonight\'s changes' }), h('a', { class: 'ghost', href: D.links.labCode, target: '_blank', rel: 'noopener', text: 'Lab code' }), h('a', { class: 'ghost', href: D.links.repo, target: '_blank', rel: 'noopener', text: 'Quint repo' }))),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Roadmap' }), h('div', { class: 'list' }, D.roadmap.map((r) => h('div', { class: 'item' }, h('div', { class: 't' }, h('span', { class: 'n', text: r.stage }), h('span', { class: 'pill ' + (r.status === 'Done' ? 'good' : r.status === 'Next' ? 'warn' : ''), text: r.status })))))),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Ventures (coming later)' }), h('p', { class: 'mut', text: 'The same honest scoreboard for your future online businesses: numbers in, Quint reads them out, ideas tested before money goes in. Trading comes first.' }),
+        h('div', { class: 'row2', style: 'margin-top:10px' }, h('button', { class: 'ghost', type: 'button', onclick: () => { go('lab', 'ideas'); setTimeout(() => { if ($('idKind')) $('idKind').value = 'venture'; }, 0); }, text: 'Add a venture idea' }))),
+      h('div', { class: 'panel' }, h('div', { class: 'label', text: 'Settings' }),
+        h('div', { class: 'formgrid' },
+          h('div', { class: 'field' }, h('label', { for: 'setVoice', text: 'Quint speaks' }), h('select', { id: 'setVoice', onchange: (e) => saveSettings({ voice: e.target.value === 'on' }) }, h('option', { value: 'on', text: 'On', selected: S.settings.voice }), h('option', { value: 'off', text: 'Off', selected: !S.settings.voice }))),
+          h('div', { class: 'field' }, h('label', { for: 'setRate', text: 'Speaking speed' }), h('select', { id: 'setRate', onchange: (e) => saveSettings({ rate: Number(e.target.value) }) }, [[0.9, 'Calm'], [1.02, 'Normal'], [1.15, 'Quick']].map(([v, l]) => h('option', { value: String(v), text: l, selected: S.settings.rate === v })))),
+          h('div', { class: 'field' }, h('label', { for: 'setWin', text: 'Trading window' }), h('select', { id: 'setWin', onchange: (e) => saveSettings({ windowHours: Number(e.target.value) }) }, [[2, '2 hours'], [3, '3 hours']].map(([v, l]) => h('option', { value: String(v), text: l, selected: S.settings.windowHours === v })))),
+          h('div', { class: 'field' }, h('label', { for: 'setRisk', text: 'Max stop-out (share of room)' }), h('select', { id: 'setRisk', onchange: (e) => saveSettings({ riskShare: Number(e.target.value) }) }, [[0.1, '10%'], [0.2, '20%'], [0.25, '25% (default)']].map(([v, l]) => h('option', { value: String(v), text: l, selected: S.settings.riskShare === v }))))),
+        h('div', { class: 'row2', style: 'margin-top:12px' }, h('button', { class: 'ghost', type: 'button', onclick: exportJournal, text: 'Export journal' })),
+        h('p', { class: 'small', style: 'margin-top:10px', text: `Storage: ${Store.mode === 'cloud' ? 'private to you in Claude; your accounts, trades and settings never go to GitHub' : 'this device only'}. Research data comes from the Quint repo. Nothing here places orders or is financial advice.` })));
+  }
+  async function saveSettings(patch) {
+    S.settings = { ...S.settings, ...patch }; LS.set('settings', S.settings);
+    try { await Store.setDoc('settings', S.settings); } catch (e) { /* kept on this device */ }
+    render();
+  }
+  function mnqView(m) {
+    return h('div', null, h('div', { class: 'out' }, [['Last', m.last.toLocaleString('en-US', { minimumFractionDigits: 2 })], ['Change (window)', `${m.change >= 0 ? '+' : ''}${m.change.toFixed(2)} pts`], ['High', m.high.toLocaleString('en-US')], ['Low', m.low.toLocaleString('en-US')]].map(([k, v], i) => h('div', { class: 'tile' }, h('b', { class: i === 1 ? tone(m.change) : '', text: v }), h('span', { text: k })))),
+      spark(m.closes.map((c) => c - m.closes[0])), h('p', { class: 'small', text: `5-minute candles, checked at ${m.at} UK. It may be delayed if your CME data is delayed.` }));
+  }
+  function findBars(x, depth = 0) {
+    if (!x || depth > 4) return null;
+    if (Array.isArray(x) && x.length && x[0] && typeof x[0] === 'object' && 'c' in x[0] && 't' in x[0]) return x;
+    if (!Array.isArray(x) && typeof x === 'object') {
+      if (Array.isArray(x.t) && Array.isArray(x.c)) return x.t.map((t, i) => ({ t, o: x.o[i], h: x.h[i], l: x.l[i], c: x.c[i] }));
+      for (const v of Object.values(x)) { const r = findBars(v, depth + 1); if (r) return r; }
+    }
+    return null;
+  }
+  let mnqArm = 0;
+  async function checkMnq() {
+    if (Date.now() - mnqArm > 5000) { mnqArm = Date.now(); toast(`Uses 1 of your ${S.settings.tvPlan} TradingView calls today. Tap again to check.`); return; }
+    mnqArm = 0;
+    clear($('mnqOut'), h('p', { class: 'mut', text: 'Checking…' }));
+    try {
+      const p = await mcpCall('Trading View', 'mcp-tv-get-ohlcv', { symbol: 'CME_MINI:MNQ1!', interval: '5m', count: 100, format: 'rows' });
+      const u = LS.get('tvUsed', { date: '', n: 0 }); LS.set('tvUsed', { date: todayUK(), n: (u.date === todayUK() ? u.n : 0) + 1 });
+      const bars = findBars(p);
+      if (!bars || !bars.length) throw { code: 'shape', message: 'the answer had no candles I could read' };
+      const closes = bars.map((b) => +b.c);
+      mnq = { last: closes[closes.length - 1], change: closes[closes.length - 1] - (+bars[0].o || closes[0]), high: Math.max(...bars.map((b) => +b.h)), low: Math.min(...bars.map((b) => +b.l)), closes, at: ukTime(new Date()) };
+      LS.set('mnq', mnq); renderMore();
+    } catch (e) { clear($('mnqOut'), h('p', { class: 'warn', text: mcpError(e, 'TradingView') })); }
+  }
+  const JOBS = ['Quint Lab nightly run', 'Quint HQ sync', 'Jarvis nightly dream run'];
+  async function loadJobs() {
+    clear($('jobsList'), h('p', { class: 'mut', text: 'Checking…' }));
+    try {
+      const p = await mcpCall('Claude Code Remote', 'list_triggers', { limit: 50 });
+      const arr = (p && (p.data || p.triggers)) || (Array.isArray(p) ? p : []);
+      const fmt = (iso) => (iso ? new Date(iso).toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' }) : '');
+      jobs = JOBS.map((name) => { const t = arr.find((x) => x.name === name); return t ? { id: t.id, name, enabled: !!t.enabled, next: fmt(t.next_run_at), last: t.last_run ? fmt(t.last_run.fired_at) + ' ' + (t.last_run.status || '').toLowerCase() : (t.last_fired_at ? fmt(t.last_fired_at) : ''), mine: name !== 'Jarvis nightly dream run' } : { name, what: 'Not found', when: '' }; });
+      renderMore();
+    } catch (e) { jobs = null; renderMore(); toast(mcpError(e, 'Claude Code')); }
+  }
+  async function runJob(j) {
+    if (!confirmIn(`Run "${j.name}" now? It uses up to 2 TradingView calls and some Claude usage.`)) return;
+    try { await mcpCall('Claude Code Remote', 'fire_trigger', { trigger_id: j.id }); toast('Started. The results land on GitHub and here.'); } catch (e) { toast(mcpError(e, 'Claude Code')); }
+  }
+  async function pauseJob(j) {
+    try { await mcpCall('Claude Code Remote', 'update_trigger', { trigger_id: j.id, enabled: !j.enabled }); toast(j.enabled ? 'Paused' : 'Resumed'); await loadJobs(); } catch (e) { toast(mcpError(e, 'Claude Code')); }
+  }
+  function openFeed() {
+    const f = S.feed || {}, d = f.dream || {};
+    sheet('Jarvis dream report', [h('p', { class: 'small', text: `${d.date || ''} · from Trading Mastery, synced ${String(f.at || '').slice(0, 16).replace('T', ' ')}` }), d.status ? h('h2', { text: d.status }) : null, d.top ? h('p', { text: d.top }) : null,
+      ...[['Priorities', d.priorities], ['Health', d.health], ['Risk', d.risk], ['Learning', d.learning]].filter(([, v]) => v && v.length).map(([k, v]) => h('div', null, h('div', { class: 'label', text: k }), h('ul', { class: 'plain' }, v.map((x) => h('li', { text: x }))))),
+      f.rules && f.rules.length ? h('div', null, h('div', { class: 'label', text: 'Your pinned rules' }), h('ul', { class: 'plain' }, f.rules.map((r) => h('li', null, h('b', { style: 'color:var(--fg);font-weight:500', text: r.title + ': ' }), r.text)))) : null]);
+  }
+
+  // ---------- ASK (Jarvis) ----------
+  let sample = null, dict = null, listening = false, chat = LS.get('chat', []);
+  const RULES = 'You are Quint, a calm Jarvis for a UK trader who trades MNQ (Micro Nasdaq futures, $2 a point) from an iPhone and is working to pass and keep Lucid Trading prop accounts. Their strategy is WYLD Will\'s Four Pillars (sweep, HTF level holds, PDR bias, 1-minute confirmation), traded in the first 3 hours after the New York open (14:30 UK). Answer in plain British English, in 2 to 5 short sentences that read well aloud. Use the tools to look things up; never guess numbers. Say where a number comes from and when data is thin (under 100 trades is an anecdote). Never call a strategy profitable or proven, never tell the owner to take or skip a specific trade, and never place or suggest placing orders: only the owner decides. If they ask you to add or test an idea, use add_idea. Nothing is financial advice.';
+  function ctxLine() { const now = new Date(), s = session(now), uk = parts(UKF, now); return `Now: ${uk.date} ${uk.hh}:${uk.mm} UK. ${s.title}: ${s.text}`; }
+  const TOOLS = [
+    { name: 'get_overview', description: 'Today at a glance: session, next news, money (bots from Trading Mastery, the owner\'s own trades, the paper test), prop room, lab headline and warnings.',
+      execute: () => { const now = new Date(), n = news(now), tg = tightest(); return { session: session(now), nextNews: n.next ? { title: n.next.title, ukTime: ukTime(n.next.at) } : null, newsLoaded: n.loaded, bots: botsLive(), myTrades: jstats(S.trades), paper: D.roundup.paper, tightestAccount: tg ? { name: tg.a.name, room: tg.m.room, maxRisk: tg.m.maxRisk } : null, labHeadline: D.roundup.headline, warnings: D.roundup.warnings }; } },
+    { name: 'get_lab', description: 'The bot scoreboard (backtests on saved MNQ candles, 1 MNQ after costs), the strategy factory results (variations, survivors, PBO by family), and the sequence analyst: what each WYLD pillar is worth (the funnel, each pillar with and without, each confirmation alone, why trades won or lost, proposed experiments).',
+      execute: () => ({ bots: D.bots.map((b) => ({ name: b.name, trades: b.trades, net: Math.round(b.net), laterHalf: Math.round(b.laterHalf), maxDrawdown: Math.round(b.maxDrawdown), grade: b.grade, lucidPass: b.pass, lucidFail: b.fail, paperTrades: b.forward.trades, paperNet: Math.round(b.forward.net) })), factory: D.factory && { variants: D.factory.variants, asOf: D.factory.asOf, readyForPaper: D.factory.readyForPaper, families: D.factory.families.map((f) => ({ name: f.name, variants: f.variants, pbo: f.pbo, survivors: (f.survivors || []).length, verdict: f.verdict })) }, pillars: D.anatomy && { asOf: D.anatomy.asOf, candles: D.anatomy.candles, sessions: D.anatomy.sessions, lessons: D.anatomy.lessons, pillars: D.anatomy.pillars, confirmations: D.anatomy.confirmations, whyTradesWonOrLost: D.anatomy.study, proposals: D.anatomy.proposals } }) },
+    { name: 'find_strategy', description: 'Look up one strategy in Quint\'s memory by name or keyword: status, rules, verdict, evidence and next step.', inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'] },
+      execute: ({ query }) => { const q = String(query || '').toLowerCase(); const hits = D.strategies.filter((s) => (s.name + ' ' + s.id + ' ' + (s.rules || '')).toLowerCase().includes(q)).slice(0, 3); return hits.length ? hits : { none: 'No strategy matches. Try another word.' }; } },
+    { name: 'get_my_strategy', description: 'The owner\'s strategy, WYLD Will\'s Four Pillars: the checklist, pre-market routine, entries, stops and targets, no-trade rules and cautions.', execute: () => D.playbook },
+    { name: 'get_accounts', description: 'The owner\'s prop accounts: balance, floor, room left before the max loss, distance to target, consistency, daily loss limit left and max risk per trade.',
+      execute: () => S.accounts.length ? S.accounts.map((a) => { const m = acct(a); return { name: a.name, plan: a.plan, size: a.size, stage: a.phase, balance: m.balance, floor: m.floor, room: Math.round(m.room), toTarget: m.toTarget, consistencyShare: m.share, consistencyOk: m.consistencyOk, dailyLimitLeft: m.dllLeft, maxRiskPerTrade: Math.round(m.maxRisk), today: m.today }; }) : { none: 'No accounts added yet. They go on the Desk.' } },
+    { name: 'get_journal', description: 'The owner\'s logged trades: P&L today, this week, this month and all time, win rate, average win and loss, and results by setup.', execute: () => ({ ...jstats(S.trades), recent: [...S.trades].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10) }) },
+    { name: 'size_trade', description: 'How many MNQ a stop of a given number of points allows on an account, keeping a full stop-out under the owner\'s share of the room left (a quarter by default).', inputSchema: { type: 'object', properties: { stop_points: { type: 'number' }, account: { type: 'string', description: 'Account name; the tightest account if left out' } }, required: ['stop_points'] },
+      execute: ({ stop_points, account }) => { const a = (account && S.accounts.find((x) => x.name.toLowerCase().includes(String(account).toLowerCase()))) || (tightest() || {}).a; if (!a) return { none: 'No accounts added yet.' }; return { account: a.name, stopPoints: stop_points, ...sizeFor(a, +stop_points) }; } },
+    { name: 'get_trading_mastery', description: 'From Trading Mastery, synced nightly: last night\'s Jarvis dream report, the NinjaTrader bots\' results by account type (live, sim, playback, backtest), and the owner\'s pinned rules.', execute: () => S.feed || { none: 'Not synced yet. The HQ sync runs weeknights at 23:25 UK.' } },
+    { name: 'add_idea', description: 'Save an idea to the lab\'s inbox; the nightly run writes its exact rules, tests it and reports back. Use only when the owner asks to add, save or test an idea.', inputSchema: { type: 'object', properties: { text: { type: 'string' }, kind: { type: 'string', enum: ['strategy', 'rule', 'feature', 'venture'] } }, required: ['text'] },
+      execute: async ({ text, kind }) => { const id = await addIdea(String(text), kind); return { saved: true, id, where: Store.mode === 'cloud' ? 'the lab inbox (the nightly run reads it)' : 'this device only' }; } },
+  ];
+  function renderAsk() {
+    clear($('chat'), chat.length ? chat.map((m) => h('div', { class: 'msg ' + (m.who === 'you' ? 'you' : 'quint') + (m.err ? ' err' : ''), text: m.text })) : h('div', { class: 'msg quint', text: 'Ask me anything about your day, your accounts, your bots, the lab or your Four Pillars. I can also add an idea to the lab for you.' }));
+    $('askState').textContent = sample ? 'online' : 'offline';
+  }
+  async function ask(question) {
+    question = String(question || '').trim();
+    if (!question) return;
+    $('q').value = '';
+    chat.push({ who: 'you', text: question });
+    const pending = { who: 'quint', text: sample ? 'Thinking…' : '' };
+    chat.push(pending); renderAsk();
+    const node = $('chat').lastElementChild;
+    if (!sample) { pending.text = 'Asking Quint works when this page is open in Claude. Everything else here still works.'; pending.err = true; renderAsk(); return; }
+    const earlier = chat.slice(-12, -2).filter((m) => !m.err).map((m) => `${m.who === 'you' ? 'Owner' : 'Quint'}: ${m.text}`).join('\n');
+    const prompt = `${RULES}\n\n${ctxLine()}${earlier ? '\n\nCONVERSATION SO FAR:\n' + earlier : ''}\n\nOWNER: ${question}`;
+    try {
+      const r = await sample(prompt, { tools: TOOLS, onText: ({ text }) => { if (node) node.textContent = text; }, cache: false, modelTier: 'default' });
+      pending.text = r.text; renderAsk();
+      speak([r.text]);
+    } catch (e) {
+      pending.err = true;
+      pending.text = e && e.code === 'not_granted' ? 'Quint needs your OK to answer here. Allow it in this page\'s permissions.' : e && e.code === 'rate_limited' ? 'Quint is busy. Try again in a minute.' : 'Quint couldn\'t answer just now. Try again in a moment.';
+      renderAsk();
+    }
+    chat = chat.slice(-40); LS.set('chat', chat);
+  }
+  $('askForm').addEventListener('submit', (e) => { e.preventDefault(); ask($('q').value); });
+  $('clearChat').addEventListener('click', () => { chat = []; LS.set('chat', chat); renderAsk(); });
+  clear($('quick'), ['Brief me for today', 'How much room do I have?', 'How did my bots do?', 'What did the factory find?', 'What is each pillar worth?', 'Walk me through the four pillars', 'Add an idea to the lab'].map((q) => h('button', { class: 'chip', type: 'button', onclick: () => ask(q), text: q })));
+  $('mic').addEventListener('click', () => {
+    if (!dict) return;
+    if (listening) { dict.stop().catch(() => {}); return; }
+    $('q').value = '';
+    dict.start().catch((e) => { if (e && e.code === 'not_granted') $('mic').hidden = true; });
+  });
+
+  // ---------- sheets, tabs, routing ----------
+  let lastFocus = null;
+  function sheet(title, kids) {
+    lastFocus = document.activeElement;
+    clear($('sheetCard'), h('div', { class: 'head' }, h('h2', { id: 'sheetTitle', text: title }), h('button', { class: 'ghost', type: 'button', 'aria-label': 'Close', onclick: closeSheet, text: '✕' })), kids);
+    $('sheet').hidden = false;
+    const f = $('sheetCard').querySelector('input,select,textarea,button'); if (f) f.focus();
+  }
+  function closeSheet() { $('sheet').hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+  $('sheet').addEventListener('click', (e) => { if (e.target === $('sheet')) closeSheet(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('sheet').hidden) closeSheet(); });
+  const ICONS = {
+    today: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    ask: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+    desk: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V9M10 18V5M16 18v-6M22 18H2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    lab: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+    more: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/></svg>',
+  };
+  const TABS = [['today', 'Today'], ['ask', 'Ask'], ['desk', 'Desk'], ['lab', 'Lab'], ['more', 'More']];
+  clear($('tabs'), TABS.map(([id, label]) => { const b = h('button', { type: 'button', 'data-tab': id, onclick: () => go(id) }); b.innerHTML = ICONS[id]; b.append(h('span', { text: label })); return b; }));
+  function go(tab, sub) {
+    if (sub && tab === 'lab') S.lab = sub;
+    if (sub && tab === 'desk') S.desk = sub;
+    S.tab = tab;
+    if (location.hash !== '#' + tab) { try { history.replaceState(null, '', '#' + tab); } catch (e) { /* fine */ } }
+    render(); window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', () => { const t = location.hash.slice(1); if (TABS.some(([id]) => id === t) && t !== S.tab) go(t); });
+  function render() {
+    for (const [id] of TABS) { $('tab-' + id).hidden = id !== S.tab; }
+    for (const b of $('tabs').children) b.setAttribute('aria-current', b.dataset.tab === S.tab ? 'page' : 'false');
+    renderClock();
+    if (S.tab === 'today') { renderToday(); startLoop(); } else stopLoop();
+    if (S.tab === 'ask') renderAsk();
+    if (S.tab === 'desk') renderDesk();
+    if (S.tab === 'lab') renderLab();
+    if (S.tab === 'more') renderMore();
+  }
+  async function reload(kind) {
+    try { S[kind] = await Store.list(kind); } catch (e) { toast('Couldn\'t load your ' + kind + '. Showing what this screen has.'); }
+    render();
+  }
+
+  $('play').addEventListener('click', () => {
+    if (speaking) return stopSpeaking();
+    const lines = briefing();
+    S.lines = lines;
+    clear($('lines'), lines.map((t) => h('li', { text: t })));
+    const fold = $('lines').closest('details'); if (fold) fold.open = true;
+    speak(lines, markLine);
+  });
+
+  // ---------- start: draw first, then light features up as capabilities arrive ----------
+  const start = location.hash.slice(1);
+  if (TABS.some(([id]) => id === start)) S.tab = start;
+  drawCore(performance.now());
+  render();
+  setInterval(() => { renderClock(); if (S.tab === 'today' && !document.hidden) { const s = session(new Date()); $('sessR').textContent = s.inWindow ? 'live' : ''; } }, 30000);
+  document.addEventListener('visibilitychange', () => (document.hidden ? stopLoop() : startLoop()));
+  if (window.speechSynthesis && speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = () => {};
+  if (window.claude && typeof window.claude.use === 'function') {
+    (async () => {
+      await Store.init();
+      try {
+        const [acc, tr, id, st, day, feed] = await Promise.all([Store.list('accounts'), Store.list('trades'), Store.list('ideas'), Store.getDoc('settings', {}), Store.getDoc('day-' + todayUK(), { premarket: {}, pillars: {} }), Store.feed().catch(() => null)]);
+        S.accounts = acc; S.trades = tr; S.ideas = id; S.settings = { ...S.settings, ...st }; S.day = { premarket: {}, pillars: {}, ...day }; S.feed = feed;
+      } catch (e) { toast('Your saved data didn\'t load. Try reopening the page.'); }
+      render();
+    })();
+    claude.use('sample').then((s) => { sample = s; if (s) $('askNote').textContent = 'Quint looks things up in your accounts, journal, the lab and Trading Mastery. On iPhone, use your keyboard\'s microphone to talk.'; render(); }).catch(() => {});
+    claude.use('tts').then((t) => { if (!t) return; tts = t; $('voiceNote').textContent = 'Quint reads your briefing out loud in a Claude voice.'; t.onState(({ state }) => { if (state === 'idle') setSpeaking(false); }); if (t.onLine) t.onLine(({ id }) => markLine(Number(id))); }).catch(() => {});
+    claude.use('dictation').then((d) => {
+      if (!d) return;
+      dict = d; $('mic').hidden = false; $('askNote').textContent = 'Tap the microphone, ask, then tap it again.';
+      d.onPartial(({ text }) => { $('q').value = text; });
+      d.onFinal(({ text }) => { $('q').value = text; });
+      d.onState(({ state }) => { listening = state === 'listening'; $('mic').setAttribute('aria-pressed', listening ? 'true' : 'false'); if (!listening && $('q').value.trim()) ask($('q').value); });
+    }).catch(() => {});
+    claude.use('mcp').then((m) => { mcp = m; }).catch(() => {});
+    claude.use('downloads').then((d) => { downloads = d; }).catch(() => {});
+  } else {
+    // Outside Claude: everything still works, saved on this device.
+    S.accounts = LS.get('col.accounts', []); S.trades = LS.get('col.trades', []); S.ideas = LS.get('col.ideas', []); S.day = { premarket: {}, pillars: {}, ...LS.get('doc.day-' + todayUK(), {}) };
+    render();
+  }
+  window.__HQ = { S, acct, sizeFor, session, news, jstats, briefing, Store, TOOLS, findBars };
+})();
+</script>

@@ -1,0 +1,443 @@
+{
+ "date": "2026-11-20",
+ "dataTo": "2026-11-19",
+ "headline": "-$137 on paper from 10 forward trades",
+ "spoken": [
+  "Morning. Here's your Quint roundup for Friday 20 November.",
+  "Real money: no bot is trading a real or prop account yet, so nothing has been made or lost.",
+  "Paper forward test: nine bots, 10 trades since Wednesday 18 November, minus $137 on paper on one MNQ each.",
+  "Best backtest so far: the 20-candle breakout, $4,374 over 41 trades on one MNQ. That is too few trades to trust yet.",
+  "No strategy has earned approval yet. That needs years of data and a clean paper test.",
+  "Warning: four bots would likely fail a Lucid 50K before passing: New York open breakout, Opening candle direction (5-minute opening range), Last-30-minute momentum, Failed breakout.",
+  "Latest lesson: Replaying WYLD's rules exactly as the indicator reads them showed where setups die: the pools marked before the open were all run before 9:30, most sweeps found no higher-timeframe level holding nearby, and on 5-minute candles Point B came before any confirmation.",
+  "Next up: Grow the MNQ candle store every night with one TradingView call: the newest 1-minute candles (from 19 Nov 2026), merged into lab/data; the 5- and 15-minute candles are built from them after an exact match check against the stored ones (5-minute candles are fetched instead if they ever differ or leave a gap)."
+ ],
+ "realMoney": {
+  "liveBots": 0,
+  "note": "No bot trades a real or prop account yet. Live trading comes through Quint Control (NinjaTrader 8 on the owner's Windows computer), phases 1 to 3, and every bot needs the owner's confirm before it goes live."
+ },
+ "paper": {
+  "bots": 9,
+  "since": "2026-11-18",
+  "trades": 10,
+  "net": -137.5,
+  "byBot": [
+   {
+    "name": "20-candle breakout",
+    "trades": 1,
+    "net": 662.5
+   },
+   {
+    "name": "New York open breakout",
+    "trades": 1,
+    "net": 1079
+   },
+   {
+    "name": "Opening candle direction (5-minute opening range)",
+    "trades": 1,
+    "net": -331.5
+   },
+   {
+    "name": "Last-30-minute momentum",
+    "trades": 1,
+    "net": -105.5
+   },
+   {
+    "name": "Gap fade",
+    "trades": 0,
+    "net": 0
+   },
+   {
+    "name": "Inverted fair value gap",
+    "trades": 1,
+    "net": -264.5
+   },
+   {
+    "name": "VWAP band fade",
+    "trades": 2,
+    "net": -627.5
+   },
+   {
+    "name": "Failed breakout",
+    "trades": 2,
+    "net": -802.5
+   },
+   {
+    "name": "Noise-area momentum",
+    "trades": 1,
+    "net": 252.5
+   }
+  ]
+ },
+ "leaders": [
+  {
+   "name": "20-candle breakout",
+   "timeframe": "15m",
+   "trades": 41,
+   "net": 4373.5,
+   "laterHalf": 5461.5,
+   "maxDrawdown": 1720,
+   "pass": 0.7447,
+   "fail": 0.0601,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "Noise-area momentum",
+   "timeframe": "30m",
+   "trades": 44,
+   "net": 2571,
+   "laterHalf": 588,
+   "maxDrawdown": 1019,
+   "pass": 0.4565,
+   "fail": 0.1283,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "Opening candle direction (5-minute opening range)",
+   "timeframe": "5m",
+   "trades": 22,
+   "net": 1156,
+   "laterHalf": 2350,
+   "maxDrawdown": 1241.5,
+   "pass": 0.3245,
+   "fail": 0.5544,
+   "grade": "Too few trades"
+  }
+ ],
+ "scoreboard": [
+  {
+   "name": "20-candle breakout",
+   "bot": 3,
+   "timeframe": "15m",
+   "trades": 41,
+   "net": 4373.5,
+   "laterHalf": 5461.5,
+   "maxDrawdown": 1720,
+   "worstDay": -483.5,
+   "pass": 0.7447,
+   "fail": 0.0601,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "Noise-area momentum",
+   "bot": 12,
+   "timeframe": "30m",
+   "trades": 44,
+   "net": 2571,
+   "laterHalf": 588,
+   "maxDrawdown": 1019,
+   "worstDay": -517,
+   "pass": 0.4565,
+   "fail": 0.1283,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "Opening candle direction (5-minute opening range)",
+   "bot": 2,
+   "timeframe": "5m",
+   "trades": 22,
+   "net": 1156,
+   "laterHalf": 2350,
+   "maxDrawdown": 1241.5,
+   "worstDay": -390.5,
+   "pass": 0.3245,
+   "fail": 0.5544,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "VWAP band fade",
+   "bot": 10,
+   "timeframe": "5m",
+   "trades": 32,
+   "net": 1113,
+   "laterHalf": 632.5,
+   "maxDrawdown": 1076.5,
+   "worstDay": -627.5,
+   "pass": 0.5871,
+   "fail": 0.125,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "Inverted fair value gap",
+   "bot": 7,
+   "timeframe": "5m",
+   "trades": 14,
+   "net": 782.5,
+   "laterHalf": -648,
+   "maxDrawdown": 1029,
+   "worstDay": -264.5,
+   "pass": 0.3828,
+   "fail": 0.0696,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "New York open breakout",
+   "bot": 1,
+   "timeframe": "5m",
+   "trades": 21,
+   "net": 704,
+   "laterHalf": 2004.5,
+   "maxDrawdown": 2059,
+   "worstDay": -630.5,
+   "pass": 0.348,
+   "fail": 0.6319,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "Gap fade",
+   "bot": 6,
+   "timeframe": "5m",
+   "trades": 4,
+   "net": 528.5,
+   "laterHalf": 682.5,
+   "maxDrawdown": 154,
+   "worstDay": -93.5,
+   "pass": 0.043,
+   "fail": 0,
+   "grade": "Too few trades"
+  },
+  {
+   "name": "Last-30-minute momentum",
+   "bot": 4,
+   "timeframe": "5m",
+   "trades": 21,
+   "net": -1125,
+   "laterHalf": -882.5,
+   "maxDrawdown": 1325,
+   "worstDay": -286.5,
+   "pass": 0,
+   "fail": 0.9138,
+   "grade": "Loses money"
+  },
+  {
+   "name": "Failed breakout",
+   "bot": 11,
+   "timeframe": "5m",
+   "trades": 11,
+   "net": -1358.5,
+   "laterHalf": -1501.5,
+   "maxDrawdown": 1757.5,
+   "worstDay": -802.5,
+   "pass": 0,
+   "fail": 0.9181,
+   "grade": "Loses money"
+  }
+ ],
+ "warnings": [
+  "New York open breakout: 63% chance of failing a Lucid 50K first.",
+  "Opening candle direction (5-minute opening range): 55% chance of failing a Lucid 50K first.",
+  "Last-30-minute momentum: 91% chance of failing a Lucid 50K first.",
+  "Failed breakout: 92% chance of failing a Lucid 50K first.",
+  "Last-30-minute momentum is losing money on the saved candles.",
+  "Failed breakout is losing money on the saved candles."
+ ],
+ "strategies": [
+  {
+   "name": "Your strategy: WYLD Will Four Pillars",
+   "status": "Implemented",
+   "horizon": "Scalping",
+   "timeframe": "1m entries, 15m liquidity, monthly to daily levels",
+   "verdict": "Your main strategy, and WYLD Will's rules are the master. Not backtested as WYLD states it yet: a few rules aren't exact (the easiest equal highs and lows, the stop buffer, the break-even trigger, entries per PDR). The two coded versions in your apps are older and stricter than WYLD (Chart Wizard's took 0 trades in 4 weeks), so they should be brought in line with WYLD's rules. His results are his own claims."
+  },
+  {
+   "name": "20-candle breakout",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "15m",
+   "verdict": "Beat its costs on 11 weeks of MNQ, but lost money in the first half and made it all in the October to November sell-off, mostly on shorts. One day was 45% of the profit. Promising, not proven."
+  },
+  {
+   "name": "New York open breakout",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "15m",
+   "verdict": "Just over break-even, and only because of one big day. Without that day it lost money. The weakest case for staying in the app."
+  },
+  {
+   "name": "Opening candle direction (5-minute opening range)",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "5m",
+   "verdict": "First read only: 20 trades."
+  },
+  {
+   "name": "Last-30-minute momentum",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "5m",
+   "verdict": "Strong academic evidence over decades, but it lost on the 4 weeks we have. One trade a day, so it needs years to judge."
+  },
+  {
+   "name": "VWAP trend",
+   "status": "Implemented",
+   "horizon": "Intraday",
+   "timeframe": "1m",
+   "verdict": "Needs 1-minute candles, which the lab doesn't have. Trades often, so check Lucid's microscalping rule."
+  },
+  {
+   "name": "Gap fade",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "5m",
+   "verdict": "Lowest priority. Its published drawdown is bigger than a 50K's max loss."
+  },
+  {
+   "name": "Inverted fair value gap",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "5m",
+   "verdict": "First read only: 12 trades."
+  },
+  {
+   "name": "Range squeeze breakout",
+   "status": "Implemented",
+   "horizon": "Intraday",
+   "timeframe": "1m",
+   "verdict": "Needs 1-minute candles."
+  },
+  {
+   "name": "Trend-join scalper",
+   "status": "Implemented",
+   "horizon": "Scalping",
+   "timeframe": "1m",
+   "verdict": "Needs about 80% winners just to break even. Needs 1-minute candles."
+  },
+  {
+   "name": "VWAP band fade",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "5m",
+   "verdict": "Best-looking first read (30 trades), which is still an anecdote."
+  },
+  {
+   "name": "Failed breakout",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "5m",
+   "verdict": "Lost on the first read (9 trades)."
+  },
+  {
+   "name": "Noise-area momentum",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "30m checks",
+   "verdict": "The strongest outside evidence of anything here, and the only family the factory let through on its first night (6 survivors, PBO 29%). Still weeks of data, a falling market, and samples just over 30 trades. Drawdowns can last over a year."
+  },
+  {
+   "name": "RSI(2) all-weather (saved on TraderDev as '[retest] QQQ COMBO RSI2 all-weather 1h')",
+   "status": "Rejected",
+   "horizon": "Swing",
+   "timeframe": "1h",
+   "verdict": "Rejected as it stands: on real MNQ it lost money, its worst drawdown was 2.5 times Lucid's max loss, and it has no stop loss. The long side alone made a little, which is a new idea to test on untouched data, not a result."
+  },
+  {
+   "name": "Prop B: RSI(2) combo, Globex day, flat by 4pm New York (TraderDev)",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "1h",
+   "verdict": "Looks positive on the QQQ stand-in only. Its close cousin lost on real MNQ, so expect the same until it's tested there."
+  },
+  {
+   "name": "Prop A: EMA + ATR trailing stop, long only, Globex day, flat by 4pm New York (TraderDev)",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "1h",
+   "verdict": "Small edge on the stand-in. The plan's walk-forward evidence says ATR trailing trend lost on MNQ hourly (PF 0.49)."
+  },
+  {
+   "name": "Prop A and B, regular-hours-only versions on 5m and 15m (TraderDev, 3 strategies)",
+   "status": "Rejected",
+   "horizon": "Intraday",
+   "timeframe": "5m and 15m",
+   "verdict": "Rejected: during the hours that matter for a day trader these had no edge or lost, even on the flattering stand-in (RSI2 5m about $1 a trade over 217 trades; EMA-ATR 5m -$2,836; EMA-ATR 15m -$2,542; rough 1-MNQ figures)."
+  },
+  {
+   "name": "Prop B: RSI(2) combo, regular hours only, 15m (TraderDev)",
+   "status": "In-sample",
+   "horizon": "Intraday",
+   "timeframe": "15m",
+   "verdict": "The only regular-hours version that stayed positive on the stand-in, and only just. Unproven: its cousin lost on real MNQ."
+  },
+  {
+   "name": "Other TraderDev retests: Bollinger squeeze 15m, Bollinger mean-reversion long 15m, EMA ATR trail long 1h, pivot break + volume 1h, trend pullback EMA96/EMA50 15m",
+   "status": "In-sample",
+   "horizon": "Intraday and swing",
+   "timeframe": "15m and 1h",
+   "verdict": "All look positive once TraderDev's crypto fees are swapped for MNQ costs (rough: squeeze +$9,677, mean-reversion +$7,078, EMA ATR +$5,728, pivot +$2,707, trend pullback +$12,408), but only on the QQQ stand-in, whose overnight hours are thin. The plan's walk-forward test found EMA pullback and ATR trailing trend lost on real MNQ. Unproven."
+  },
+  {
+   "name": "Lucid MNQ sweep + volume (TraderDev)",
+   "status": "Rejected",
+   "horizon": "Intraday",
+   "timeframe": "5m",
+   "verdict": "Rejected for now: 16 trades in six months and about break-even before costs. Liquidity-grab signals also failed the 947-day MNQ study. Version 1 can't run on TraderDev (it uses strategy.closedtrades.profit)."
+  },
+  {
+   "name": "RSI(2) pullback, daily",
+   "status": "Idea",
+   "horizon": "Swing",
+   "timeframe": "1D",
+   "verdict": "Holds overnight, so only where the account allows it (research/prop-firms/OVERNIGHT-FUTURES.md)."
+  },
+  {
+   "name": "Long-term trend following",
+   "status": "Idea",
+   "horizon": "Position",
+   "timeframe": "1D to 1W",
+   "verdict": "Deep drawdowns that trailing-drawdown prop accounts punish. A personal-account idea for later."
+  }
+ ],
+ "statusCount": {
+  "Implemented": 4,
+  "In-sample": 13,
+  "Rejected": 3,
+  "Idea": 2
+ },
+ "lessons": [
+  {
+   "date": "2026-11-19",
+   "lesson": "Replaying WYLD's rules exactly as the indicator reads them showed where setups die: the pools marked before the open were all run before 9:30, most sweeps found no higher-timeframe level holding nearby, and on 5-minute candles Point B came before any confirmation. A pillar can only be judged with the data it was designed for: 1-minute candles for the confirmation, and an exact rule for which pools count."
+  },
+  {
+   "date": "2026-11-19",
+   "lesson": "Testing thousands of variations finds lucky winners easily: on the first night breakout and opening range scored PBO 60 to 67%, meaning their best variations were mostly luck. Only judge on unseen sessions, PBO, neighbours and the Lucid gate."
+  },
+  {
+   "date": "2026-11-19",
+   "lesson": "The owner's strategy is WYLD Will's Four Pillars, the master version. Trading Mastery's six steps and Chart Wizard's 5 pillars are older codings of it, not separate strategies. Keep one entry and one checklist."
+  }
+ ],
+ "next": [
+  {
+   "id": "grow-data",
+   "what": "Grow the MNQ candle store every night with one TradingView call: the newest 1-minute candles (from 19 Nov 2026), merged into lab/data; the 5- and 15-minute candles are built from them after an exact match check against the stored ones (5-minute candles are fetched instead if they ever differ or leave a gap). This feeds the paper forward test, the strategy factory and the sequence analyst.",
+   "cost": "1 TradingView call a night"
+  },
+  {
+   "id": "factory-nightly",
+   "what": "Run the strategy factory every night (lab/FACTORY.md): every variation of every family, judged on unseen sessions, PBO, neighbours, double costs and the Lucid gate. Variations that survive 5 nights in a row get a registry entry and a frozen paper forward test.",
+   "cost": "None (about a minute of computing)"
+  },
+  {
+   "id": "one-minute-data",
+   "what": "1-minute MNQ for WYLD's 1-minute confirmations. Collected every night from 19 Nov 2026 (TradingView keeps only a few thousand 1-minute candles, so the history grows a night at a time); the sequence analyst and the factory's wyld-1m family switch to it at 10 sessions. Still to get: older 1-minute history, from a NinjaTrader export on the owner's Windows computer or a data vendor file.",
+   "cost": "Owner's time or a data purchase"
+  }
+ ],
+ "data": {
+  "5m": {
+   "file": "mnq_5m.csv",
+   "from": "2026-10-21",
+   "to": "2026-11-19",
+   "candles": 5973,
+   "sessions": 22
+  },
+  "15m": {
+   "file": "mnq_15m.csv",
+   "from": "2026-08-31",
+   "to": "2026-11-19",
+   "candles": 5320,
+   "sessions": 58
+  }
+ }
+}

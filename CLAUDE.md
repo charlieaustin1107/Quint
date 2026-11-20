@@ -15,6 +15,7 @@ Read this first in every session. It says what this project is for and how to wo
 | `quint/` | **Quint**: the first standalone Quint app (no source here; superseded by Quint Brain) | Artifact `41275d03-b425-4aa9-95ef-f85de223da67` (public) |
 | `backtest/` | Code that backtests the strategies on real MNQ candles, outside the browser | Runs with `node` and `python3` |
 | `quint-control/` | **Quint Control**: the NinjaTrader 8 trading engine (bots, guardian, copier, Manual Copy), its local black dashboard website and the Quint assistant. Plan in `quint-control/PLAN.md`, progress in `quint-control/STATUS.md` | NinjaTrader 8 on the owner's Windows computer; tests run with `node` |
+| `lab/` | **Quint Lab**: Quint's research memory (`lab/brain/registry.json`), one scorecard for every bot, the Lucid 50K simulator, the paper forward test, the spoken roundup and the **Quint HQ** voice page (`lab/jarvis/`). The nightly job is `lab/NIGHTLY.md` | Runs with `node` in the cloud; Quint HQ is artifact `NF7M9VSX3YrsyUPWWL1uim` |
 
 Each app runs as a single self-contained `index.html`. The artifacts are where the apps actually run, because Quint's AI chat and the TradingView/market connectors work there without an API key. **This repo is the master copy.** Change it here, then publish the built `index.html` to the matching artifact.
 
@@ -62,6 +63,14 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 - Don't delete the 5-pillar strategy or Quint, and don't swap them for something else.
 - Before publishing, check the page still loads and works on a phone-sized screen.
 - Nothing here is financial advice. Chart Wizard, Quint Brain and Quint never place orders. **Only the Quint Engine (`quint-control/`) places orders, and every bot needs the owner's confirm before it trades a live account. Simulation first is recommended, not required.** The guardian's firm rules and kill switches can never be skipped.
+
+## Quint Lab
+- **The owner's strategy is WYLD Will's Four Pillars** (sweep → HTF level holds → PDR bias → 1m confirmation), the master version, in `lab/brain/playbooks.json` and the registry entry `wyld-four-pillars`. Trading Mastery's six steps and Chart Wizard's 5-pillar playbook are older codings of this one strategy, not separate strategies: bring them in line with WYLD's rules, and never remove them.
+- **Read `lab/brain/registry.json` before any strategy work, and update it after.** It's Quint's memory: every strategy tried, its status and evidence, the lessons, and the queue of pre-registered experiments. Add a dated entry to `lab/brain/journal.md` each session.
+- Run with `cd lab && npm run lab` (bots, the strategy factory, roundup, Quint HQ); test with `npm run test:3` (includes a Playwright phone test of Quint HQ). Quint HQ is built from `lab/jarvis/template.html` by `lab/jarvis/build.js`; never hand-edit its `index.html`. Master prompts: `lab/jarvis/VISION.md` (the hub) and `lab/FACTORY.md` (the strategy factory).
+- **The repo is public: never commit anything about the owner's money.** Prop accounts, the journal, bot P&L and Trading Mastery data live only in Quint HQ's private storage (`lab/HQSYNC.md`).
+- Write an idea's exact rules and pass mark into the queue **before** testing it. Never promote anything on TraderDev's QQQ stand-in alone, and never call a strategy profitable in the roundup.
+- TradingView budget for research: a few calls a session at most (the owner's plan has no Deep Backtesting). Set margin to 0 in Pine test scripts.
 
 ## Quint Control
 - Read `quint-control/STATUS.md` first: it says which phase is in progress and what to do next. Update it at the end of every session, and commit and push often so work survives a session ending early.
