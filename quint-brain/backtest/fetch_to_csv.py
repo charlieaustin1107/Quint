@@ -1,6 +1,6 @@
 """Merge a TradingView candle download (mcp-tv-get-ohlcv output, rows or columns) into a CSV.
 
-    python3 backtest/fetch_to_csv.py <download.json> backtest/data/mnq_15m.csv
+    python3 quint-brain/backtest/fetch_to_csv.py <download.json> quint-brain/backtest/data/mnq_15m.csv
 
 New candles are added, and candles already in the CSV are kept, so the history grows over time.
 If the same candle time appears twice, the newer download wins.

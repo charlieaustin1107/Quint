@@ -196,7 +196,7 @@ Read `CLAUDE.md`, `quint-control/CLAUDE.md` if present, this research programme 
 7. Evaluate chronologically with walk-forward and untouched holdout data; include cost stress, long/short, year/regime, best-day removal, parameter stability, ablations and confidence intervals.
 8. If results fail, document the negative result and why. Do not tune repeatedly against the holdout.
 9. Return: plain-English findings, metrics table, data limitations, changed files, test results, risks, and a small reviewable PR. Never merge to main or enable live trading.
-10. Save the next handoff note in `research/mnq/DAILY-LOG.md` and update the experiment registry only when evidence supports the change.
+10. Save the next handoff note in `quint-control/research/mnq/DAILY-LOG.md` and update the experiment registry only when evidence supports the change.
 
 ## Decision rule
 
