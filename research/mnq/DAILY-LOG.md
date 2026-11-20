@@ -14,3 +14,18 @@ See [the full research note](notes/2026-11-19-scalping-ofi-microprice.md). The l
 ## 2026-11-20 — Intraday
 
 See [the full research note](notes/2026-11-20-intraday-gap-midpoint.md). This is a narrowed, session-conditioned gap-midpoint hypothesis rather than a generic liquidity-sweep setup. A published 2026 NQ study motivates the question, but the MNQ OHLCV preprint supplies a material counterweight. No Quint backtest was run and no profitability claim is made.
+
+
+## 2026-11-20 — Repository-wide research review
+
+See [the consolidated research state](RESEARCH-STATE-2026-11-20.md) for programme decisions, prior findings, literature classifications, data status and next actions.
+
+Important context discovered in existing open PRs:
+- PR #20 already contains a VWAP First-Pullback experiment. Future VWAP pullback research must audit overlap with it rather than duplicate it.
+- PR #21 reports an initial one-minute MNQ candle sample of roughly 2,000 bars, 1,490 factory variations with none surviving all gates, and nine paper bots with 10 trades / -$137. These are PR-reported figures, not independently re-run or evidence of strategy failure/success.
+- PR #21 also reports a discrepancy between a TradingView five-minute feed and five-minute bars aggregated from one-minute data. Preserve provenance and investigate before mixing data sources.
+- The current one-minute sample is far too small for robust historical validation. Data acquisition and audit are immediate blockers.
+
+The published 2026 NQ gap-midpoint study is forecasting/descriptive evidence, not proof of an executable MNQ edge. The MNQ gap preprint is a preprint and reports that its tested OHLCV gap family did not pass all validation criteria. The New York Fed's 2026 overnight-drift result concerns a distinct 02:00–03:00 ET return pattern and is included as a warning about regime decay, not as direct evidence about gap-midpoint touch rates.
+
+No new backtest or paper-forward test was run during this repository review.
