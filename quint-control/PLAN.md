@@ -640,3 +640,16 @@ Implementation should be phased after the existing engine foundation: (3A) defin
 ## Strategy Lab implementation status (19 Nov 2026)
 
 The first Phase 3A vertical slice is on feature branch `quint-control/strategy-lab-phase-3a`: a pure-JavaScript MNQ Strategy Definition domain module, safe bounded expression evaluator, paper-scenario validator, JSON schemas, and a standalone browser prototype with local draft storage and JSON export. It is intentionally not wired to trading or market data. The website/engine phases 1 and 2 are still not started, so live feed, backtesting, Playback, paper fills and Claude natural-language interpretation remain follow-on work. Do not describe this prototype as live paper trading. See `reference/strategy-lab/README.md` and `web/strategy-lab/README.md`.
+
+
+## MNQ backtest integrity — contract mapping and rolls (20 Nov 2026)
+
+Every MNQ research run must identify the actual quarterly expiry contract used for each bar and fill. Preserve raw expiry prices, instrument IDs, contract definitions, mapping rule, decision timestamp and data-availability timestamp. A continuous symbol is a mapping convenience, not proof that the series is executable or free of look-ahead.
+
+- Do not choose a contract using the same trade date's final volume or OI that was not yet published.
+- For volume/OI mapping, apply the decision only at the next session after the observation is available.
+- Never calculate order prices, tick stops/targets or realised P&L from back-adjusted synthetic prices.
+- Include expired contracts and test roll-week versus non-roll results.
+- The frozen audit and sentinel experiment is `research/mnq/2026-11-20-contract-roll-integrity.md`. It is a data-integrity gate, not an approved strategy.
+
+The detailed experiment and the matching Fable task are in that research note and `FABLE-PROMPTS.md`. No live engine or Guardian changes are authorised by this work.
