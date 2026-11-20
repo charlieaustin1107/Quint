@@ -1,11 +1,11 @@
 // Backtest the strategies Chart Wizard teaches on real MNQ candles.
 //
-//   node backtest/run.js
+//   node quint-brain/backtest/run.js
 //
-// Reads  backtest/data/mnq_15m.csv, mnq_5m.csv, mnq_1d.csv   (columns: t,o,h,l,c,v; t = unix seconds UTC)
-// Writes backtest/results/summary.json and one trades CSV per strategy.
+// Reads  quint-brain/backtest/data/mnq_15m.csv, mnq_5m.csv, mnq_1d.csv   (columns: t,o,h,l,c,v; t = unix seconds UTC)
+// Writes quint-brain/backtest/results/summary.json and one trades CSV per strategy.
 //
-// The rules come from backtest/engine.js, which is Quint Brain's own code (see extract_engine.py).
+// The rules come from quint-brain/backtest/engine.js, which is Quint Brain's own code (see extract_engine.py).
 // Costs: $0.75 commission a side + 1 tick (0.25 pt = $0.50) slippage a side = $2.50 a round trip, 1 MNQ contract.
 
 const fs = require("fs");

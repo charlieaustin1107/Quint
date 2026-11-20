@@ -17,11 +17,11 @@ The target architecture is one deterministic strategy/risk core, fed by timestam
 
 A result is only as trustworthy as its weakest layer. Better charts, a larger trade count or a high profit factor cannot repair lookahead, incorrect fills, bad data, hidden parameter search or an invalid account assumption.
 
-**Current implementation status:** the Strategy Lab document describes the intended architecture, but the Quint Control historical runner, canonical event-based fill simulator, persistent experiment registry and evidence-report pipeline are not yet implemented. The older `backtest/` scripts test Chart Wizard / Quint Brain candle strategies; they are not the future Quint Control bot-validation engine.
+**Current implementation status:** the Strategy Lab document describes the intended architecture, but the Quint Control historical runner, canonical event-based fill simulator, persistent experiment registry and evidence-report pipeline are not yet implemented. The older `quint-brain/backtest/` scripts test Chart Wizard / Quint Brain candle strategies; they are not the future Quint Control bot-validation engine.
 
 ## 2. Audit of the current repository
 
-The current `backtest/README.md`, `run.js`, `engine.js`, `crosscheck.py` and `fetch_to_csv.py` provide a useful exploratory starting point, but they must not be described as institutional-grade or as proof that an automated bot is ready.
+The current `quint-brain/backtest/README.md`, `run.js`, `engine.js`, `crosscheck.py` and `fetch_to_csv.py` provide a useful exploratory starting point, but they must not be described as institutional-grade or as proof that an automated bot is ready.
 
 | Existing behaviour | Why it limits trust | Required correction |
 |---|---|---|
@@ -327,7 +327,7 @@ Do not attempt to build every chart and metric at once. Implement the trust foun
 
 > You are implementing the Quint Control Strategy Lab backtesting foundation. Read `quint-control/research/STRATEGY-LAB.md`, this document, `quint-control/PLAN.md`, `quint-control/STATUS.md`, the current Strategy Definition schema/domain module and all relevant tests before editing.
 >
-> Start with an audit, not a rewrite. Report what is implemented, missing, unsafe or duplicated. Distinguish Quint Control from the older Chart Wizard/Quint Brain `backtest/` scripts. Do not claim the Strategy Lab already has a working historical runner if it does not.
+> Start with an audit, not a rewrite. Report what is implemented, missing, unsafe or duplicated. Distinguish Quint Control from the older Chart Wizard/Quint Brain `quint-brain/backtest/` scripts. Do not claim the Strategy Lab already has a working historical runner if it does not.
 >
 > Propose a small, testable implementation plan in the order in section 11. First deliver the run manifest, immutable experiment registry, data audit and deterministic event/ledger contracts. Reuse the bounded Strategy Definition DSL; do not execute AI-generated source code or put an LLM in the signal/risk/execution loop.
 >

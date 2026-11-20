@@ -377,7 +377,7 @@
    "status": "Idea",
    "horizon": "Swing",
    "timeframe": "1D",
-   "verdict": "Holds overnight, so only where the account allows it (research/prop-firms/OVERNIGHT-FUTURES.md)."
+   "verdict": "Holds overnight, so only where the account allows it (quint-control/research/prop-firms/OVERNIGHT-FUTURES.md)."
   },
   {
    "name": "Long-term trend following",

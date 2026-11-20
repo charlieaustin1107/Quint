@@ -114,7 +114,7 @@ Audit the actual Quint MNQ files and build a contract manifest (expiry, symbol, 
 
 ## Ready-to-paste Claude Fable prompt
 
-Read `research/mnq/2026-11-20-contract-roll-integrity.md`, `research/mnq/STRATEGY-RESEARCH-PROGRAMME.md`, `quint-control/PLAN.md` and the existing backtest code/data before changing anything.
+Read `quint-control/research/mnq/2026-11-20-contract-roll-integrity.md`, `quint-control/research/mnq/STRATEGY-RESEARCH-PROGRAMME.md`, `quint-control/PLAN.md` and the existing backtest code/data before changing anything.
 
 Work only on a separate research branch. This is a data-integrity task, not a live strategy build.
 

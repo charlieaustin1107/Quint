@@ -4,7 +4,7 @@ engine.js is copied from the app. This file re-implements the 20-candle breakout
 and the New York open breakout from their written rules, from scratch, in Python.
 If both give the same trades, the backtest numbers can be trusted.
 
-    python3 backtest/crosscheck.py
+    python3 quint-brain/backtest/crosscheck.py
 """
 import csv
 import sys

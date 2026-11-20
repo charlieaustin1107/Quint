@@ -540,7 +540,7 @@ The firm rules and prices above come from the firms' own pages where possible, a
 - [Zarattini, Aziz & Barbon, Beat the Market](https://www.sfi.ch/de/publications/n-24-97-beat-the-market-an-effective-intraday-momentum-strategy-for-s-p500-etf-spy)
 - [Zarattini & Aziz, VWAP: The Holy Grail for Day Trading Systems](https://concretumgroup.com/volume-weighted-average-price-vwap-the-holy-grail-for-day-trading-systems/)
 - [Gao, Han, Li & Zhou, Market Intraday Momentum (Journal of Financial Economics, 2018)](https://econpapers.repec.org/RePEc:eee:jfinec:v:129:y:2018:i:2:p:394-414)
-- Your own backtests: `backtest/results/REPORT.md` on the `backtest-results` branch of your Quint repo, plus the 2R test run in this chat
+- Your own backtests: `quint-brain/backtest/results/REPORT.md` in your Quint repo, plus the 2R test run in this chat
 
 * [Claude API rate limits and spend limits](https://platform.claude.com/docs/en/api/rate-limits)
 * [Claude Haiku 5.5 pricing](https://apidog.com/blog/claude-haiku-5-5-pricing/) and [Claude Sonnet 5.5 pricing](https://apidog.com/blog/claude-sonnet-5-5-pricing/)

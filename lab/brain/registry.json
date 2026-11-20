@@ -1,6 +1,6 @@
 {
   "updated": "2026-11-19",
-  "about": "Quint's research memory: every strategy tried, its status, its evidence and the verdict, plus the lessons learned and the queue of next experiments. Every lab session reads this first and updates it last. Statuses follow research/mnq/STRATEGY-RESEARCH-PROGRAMME.md. Nothing here is financial advice.",
+  "about": "Quint's research memory: every strategy tried, its status, its evidence and the verdict, plus the lessons learned and the queue of next experiments. Every lab session reads this first and updates it last. Statuses follow quint-control/research/mnq/STRATEGY-RESEARCH-PROGRAMME.md. Nothing here is financial advice.",
   "statuses": [
     "Idea",
     "Specified",
@@ -54,7 +54,7 @@
       "evidence": [
         {
           "date": "2026-11-18",
-          "where": "backtest/results/REPORT.md and pillar_funnel.json (branch backtest-results)",
+          "where": "quint-brain/backtest/results/REPORT.md and pillar_funnel.json (from branch backtest-results)",
           "data": "MNQ 5m, 21 Oct to 17 Nov 2026",
           "trades": 0,
           "note": "Chart Wizard version. 478 candles at pillar 1, 382 swept, 250 CISD, 106 displaced, 6 confirmed pullbacks, 0 with 1.5R of room."
@@ -98,7 +98,7 @@
       "evidence": [
         {
           "date": "2026-11-18",
-          "where": "backtest/results/REPORT.md (branch backtest-results)",
+          "where": "quint-brain/backtest/results/REPORT.md (from branch backtest-results)",
           "data": "MNQ 15m, 1 Sep to 17 Nov 2026",
           "trades": 185,
           "net": 6401,
@@ -124,7 +124,7 @@
       "evidence": [
         {
           "date": "2026-11-18",
-          "where": "backtest/results/REPORT.md (branch backtest-results)",
+          "where": "quint-brain/backtest/results/REPORT.md (from branch backtest-results)",
           "data": "MNQ 15m, 1 Sep to 17 Nov 2026",
           "trades": 52,
           "net": 1529,
@@ -477,7 +477,7 @@
       "status": "Idea",
       "runner": null,
       "frozenAt": null,
-      "verdict": "Holds overnight, so only where the account allows it (research/prop-firms/OVERNIGHT-FUTURES.md).",
+      "verdict": "Holds overnight, so only where the account allows it (quint-control/research/prop-firms/OVERNIGHT-FUTURES.md).",
       "evidence": [],
       "next": "Daily data back to 2019 is already in lab/data, so this one can be tested without TradingView calls."
     },

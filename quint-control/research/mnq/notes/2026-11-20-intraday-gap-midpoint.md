@@ -101,7 +101,7 @@ These are explanatory variables, not permission to tune thresholds after observi
 
 ## Ready-to-paste Claude Code / Fable handoff
 
-Read `CLAUDE.md`, `backtest/README.md`, `research/mnq/STRATEGY-RESEARCH-PROGRAMME.md`, `research/mnq/DAILY-LOG.md`, `quint-control/research/STRATEGY-LAB.md`, and all existing gap, opening-range and liquidity-sweep reports before changing anything.
+Read `CLAUDE.md`, `quint-brain/backtest/README.md`, `quint-control/research/mnq/STRATEGY-RESEARCH-PROGRAMME.md`, `quint-control/research/mnq/DAILY-LOG.md`, `quint-control/research/STRATEGY-LAB.md`, and all existing gap, opening-range and liquidity-sweep reports before changing anything.
 
 Work only on a separate research branch and create a small reviewable PR. Never change `main`, merge a PR, modify live execution, Guardian, OrderRouter, account permissions or existing production strategy code.
 

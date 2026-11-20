@@ -2,7 +2,7 @@
 // The noise-area intraday momentum strategy (Zarattini, Aziz & Barbon, "Beat the Market", SSRN 4824172), the same rules as
 // QuintNoiseMomentum.cs, run on a CSV of MNQ candles. It's a first read before the real test in NinjaTrader's Strategy Analyzer.
 //
-//   node quint-control/proof/noise_momentum.js backtest/data/mnq_15m.csv
+//   node quint-control/proof/noise_momentum.js quint-brain/backtest/data/mnq_15m.csv
 //
 // The CSV has t (bar start, unix seconds UTC), o, h, l, c, v. Only New York regular hours are used (9:30 to 16:00).
 // The bars must divide 30 minutes evenly (1, 5, 15 or 30 minutes), so every HH:00 and HH:30 check lands on a bar close.

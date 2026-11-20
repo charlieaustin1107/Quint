@@ -4,7 +4,7 @@
 **Last reviewed:** 20 November 2026  
 **Scope:** MNQ/NQ strategy research, systematic futures methods, automated-bot architecture and validation
 
-This document is the durable synthesis layer for important findings. Dated experiments and unproven hypotheses belong in `research/mnq/notes/` and research PRs. Promote only reviewed, decision-useful findings here. This file is not evidence that any strategy is profitable or approved for live trading.
+This document is the durable synthesis layer for important findings. Dated experiments and unproven hypotheses belong in `quint-control/research/mnq/notes/` and research PRs. Promote only reviewed, decision-useful findings here. This file is not evidence that any strategy is profitable or approved for live trading.
 
 ## 1. Executive conclusions
 

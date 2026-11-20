@@ -67,7 +67,7 @@ ENGINEERING RULES (non-negotiable)
 
 TESTING: NOTHING IS DONE UNTIL IT IS TESTED
 This cloud workspace can't run NinjaTrader and may not be able to compile C#. So:
-a) Write a JavaScript reference of every piece of trading logic (signals, guardian, sizing, copier decisions, Monte Carlo) in quint-control/reference/ and test it here with node, on the real MNQ candles in backtest/data/.
+a) Write a JavaScript reference of every piece of trading logic (signals, guardian, sizing, copier decisions, Monte Carlo) in quint-control/reference/ and test it here with node, on the real MNQ candles in quint-brain/backtest/data/.
 b) Port the same logic to C# line for line. Generate golden test files (input candles or events in, expected decisions and trades out, as JSON) from the reference.
 c) Build a self-test runner into the engine (Settings, Run self-tests) that runs the C# logic against the golden files inside NinjaTrader, shows PASS or FAIL for each test and saves a report to Documents\NinjaTrader 8\quint\selftest.txt. I'll paste the report back.
 d) Test the website here with Playwright against a mock engine (quint-control/web/mock-engine.js) that speaks the same WebSocket protocol, at 1440x900 and 390x844. Zero console errors. Save screenshots and actually look at them.
@@ -179,14 +179,14 @@ Plug-in format:
 Bots (read the original papers, implement the rules exactly, and list every place you had to adapt them to MNQ futures):
 1. Noise-area momentum: Zarattini, Aziz & Barbon, "Beat the Market: An Effective Intraday Momentum Strategy for S&P500 ETF (SPY)" (SSRN 4824172). The noise area from the average move from the open at each time of day over the last 14 days, the paper's check times, its trailing stop and exit at the close, on the MNQ regular session.
 2. Last-30-minute momentum: Gao, Han, Li & Zhou (Journal of Financial Economics, 2018) and Baltussen, Da, Lammers & Martens (Journal of Financial Economics, 2021). Trade the direction of the move from the previous close to 30 minutes before each market's close, and exit at the close. MNQ first, then MES, MGC and MCL, each with its correct close time (verify them).
-3. Port my 5-pillar playbook (pbEval in chart-wizard/src/pillars.js), the 20-candle breakout and the New York open breakout from the repo exactly. They must give the same trades as backtest/ on the same candles.
+3. Port my 5-pillar playbook (pbEval in chart-wizard/src/pillars.js), the 20-candle breakout and the New York open breakout from the repo exactly. They must give the same trades as quint-brain/backtest/ on the same candles.
 4. Gap fade (Testing, lowest priority; the rules are fixed here before any results are seen). MNQ, 5-minute chart, New York regular session, one trade a day. The gap is the 9:30 New York open minus the previous day's 16:00 close; trade only gaps between 0.2% and 1.0% of price. Wait for the 9:30-9:35 candle to close back towards the gap (red after a gap up, green after a gap down), then enter at that close: short after a gap up, long after a gap down. Stop 1 tick beyond the day's high (short) or low (long) so far. Target: the previous day's 16:00 close; skip the trade if the target is less than 1x the stop away. Exit at 11:30 New York if neither is hit. No entries after 10:00 New York. Test it with and without skipping days that have a red-folder release before 10:00 New York, and report both versions. Evidence it must beat: a walk-forward test on 2 years of MNQ hourly data made profit factor 1.14 but had a $3,116 worst drawdown (https://dev.to/vikihermes/i-backtested-4-mnq-day-trading-strategies-walk-forward-heres-what-actually-survived-and-the-2h12), and a larger MNQ study found gap fills didn't beat costs (arXiv 2605.04004).
 
-5. **VWAP research experiment (Testing only; not one of the two evidence-backed bots).** Read `research/mnq/2026-11-19-vwap-first-pullback.md` as the source of truth. Keep the original paper-style VWAP crossover as a separate baseline, then implement VWAP First-Pullback Continuation v1 exactly as specified there. Do not tune the frozen primary rules or change its session, stop, target, news window or one-trade-per-session cap after seeing results. First audit available MNQ data, exact trade-volume VWAP availability, bid/ask/tick fill data, contract rolls and costs. Build and test the JavaScript reference first; do not create a production C# bot or touch the live engine. Use Lucid's $0.50 commission per side plus the plan's one tick adverse slippage each way, then stress two ticks each way. Compare with the exact VWAP crossover baseline and a matched random-entry placebo; run the specified walk-forward, untouched 2025–2026 holdout, sensitivity, regime and best-day checks. If the available history or trade count is insufficient, report that honestly and leave the experiment Testing. The note's rules and this prompt must stay in sync; any rule change requires a new experiment version and new evidence.
+5. **VWAP research experiment (Testing only; not one of the two evidence-backed bots).** Read `quint-control/research/mnq/2026-11-19-vwap-first-pullback.md` as the source of truth. Keep the original paper-style VWAP crossover as a separate baseline, then implement VWAP First-Pullback Continuation v1 exactly as specified there. Do not tune the frozen primary rules or change its session, stop, target, news window or one-trade-per-session cap after seeing results. First audit available MNQ data, exact trade-volume VWAP availability, bid/ask/tick fill data, contract rolls and costs. Build and test the JavaScript reference first; do not create a production C# bot or touch the live engine. Use Lucid's $0.50 commission per side plus the plan's one tick adverse slippage each way, then stress two ticks each way. Compare with the exact VWAP crossover baseline and a matched random-entry placebo; run the specified walk-forward, untouched 2025–2026 holdout, sensitivity, regime and best-day checks. If the available history or trade count is insufficient, report that honestly and leave the experiment Testing. The note's rules and this prompt must stay in sync; any rule change requires a new experiment version and new evidence.
 
 6. The bot lab's bots (quint-control/botlab/: botlab.js is the JavaScript reference, QuintBotLab.cs the owner's Strategy Analyzer version): the opening candle, VWAP trend, inverted fair value gap, range squeeze breakout, trend-join scalper, VWAP band fade and failed breakout, all Testing. Port each one as a plug-in with exactly the lab's rules, and generate their golden files from botlab.js. The lab's New York open breakout and 20-candle breakout are close versions only: the exact ports in item 3 replace them.
 
-Tests, three times: golden files from the JavaScript reference for every bot on the MNQ data in backtest/data, parity, look-ahead and settings-range tests, and self-tests for every bot.
+Tests, three times: golden files from the JavaScript reference for every bot on the MNQ data in quint-brain/backtest/data, parity, look-ahead and settings-range tests, and self-tests for every bot.
 My checklist: compile, run the self-tests, run each wrapper in Strategy Analyzer on MNQ for the longest period NinjaTrader gives me, and paste the summaries.
 Done when: parity passes, the Strategy Analyzer results are in the pull request, and the template lets me (or you) add a bot by copying one file.
 ```
@@ -347,7 +347,7 @@ Here's this week's journal export: [ATTACH CSV]
 ### Strategy Lab Phase 3A: definition foundation and local prototype
 
 ``` text
-Implement the Strategy Lab Phase 3A vertical slice in branch quint-control/strategy-lab-phase-3a. Read quint-control/research/STRATEGY-LAB.md and the existing research/mnq/STRATEGY-RESEARCH-PROGRAMME.md first.
+Implement the Strategy Lab Phase 3A vertical slice in branch quint-control/strategy-lab-phase-3a. Read quint-control/research/STRATEGY-LAB.md and the existing quint-control/research/mnq/STRATEGY-RESEARCH-PROGRAMME.md first.
 
 Scope:
 1. Keep strategy definitions independent from NinjaTrader and all broker APIs.
@@ -365,7 +365,7 @@ Completion requires all cloud tests to pass three times. If CI is unavailable, s
 ### Research task: MNQ contract-roll and continuous-series integrity (20 Nov 2026)
 
 ```text
-Implement the data-integrity audit in research/mnq/2026-11-20-contract-roll-integrity.md.
+Implement the data-integrity audit in quint-control/research/mnq/2026-11-20-contract-roll-integrity.md.
 
 First audit the existing MNQ data and produce the complete contract manifest. Do not start by writing a strategy or assuming the data is complete.
 

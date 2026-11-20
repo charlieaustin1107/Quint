@@ -103,7 +103,7 @@ Hard separation requirements:
 
 ## Backtest integrity standard
 
-The mandatory engineering and research controls are specified in [BACKTEST-INTEGRITY-STANDARD.md](BACKTEST-INTEGRITY-STANDARD.md). That standard is part of this Strategy Lab specification, not an optional future enhancement. It defines the data audit, event/fill model, experiment registry, chronological validation, selection-bias diagnostics, account-rule checks, tests and evidence-report UX. The older root-level `backtest/` scripts are exploratory Chart Wizard / Quint Brain tools and must not be treated as the Quint Control bot-validation engine.
+The mandatory engineering and research controls are specified in [BACKTEST-INTEGRITY-STANDARD.md](BACKTEST-INTEGRITY-STANDARD.md). That standard is part of this Strategy Lab specification, not an optional future enhancement. It defines the data audit, event/fill model, experiment registry, chronological validation, selection-bias diagnostics, account-rule checks, tests and evidence-report UX. The older `quint-brain/backtest/` scripts are exploratory Chart Wizard / Quint Brain tools and must not be treated as the Quint Control bot-validation engine.
 
 ## Validation and promotion gates
 

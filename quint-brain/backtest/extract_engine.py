@@ -3,18 +3,18 @@
 The strategy rules live inside quint-brain/index.html. Rather than rewrite them
 (and risk the backtest testing something slightly different from what the app
 teaches), this copies the exact functions, plus everything they depend on, into
-backtest/engine.js.
+quint-brain/backtest/engine.js.
 
 Run it again whenever the rules in Quint Brain change:
-    python3 backtest/extract_engine.py
+    python3 quint-brain/backtest/extract_engine.py
 """
 import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "quint-brain" / "index.html"
-OUT = ROOT / "backtest" / "engine.js"
+OUT = Path(__file__).resolve().parent / "engine.js"
 
 # The entry points the backtests call.
 WANT = ["blEval", "blStats", "orbEval", "pxSeries", "pxPois", "pxBacktest", "pbEval", "regime", "dkAgg", "dkClock", "fdSessKey", "etNow"]

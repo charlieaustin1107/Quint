@@ -9,7 +9,7 @@
 - Cont, Kukanov and Stoikov's peer-reviewed *Journal of Financial Econometrics* paper finds a short-horizon relationship between best-bid/ask order-flow imbalance and price changes, with impact related to market depth. Their empirical sample is 50 NYSE stocks, not MNQ, so this is a mechanism to test rather than proof of an MNQ edge.
 - Fung and Yu's peer-reviewed 2007 *Journal of Futures Markets* paper finds that cash-equity order imbalance affects index-futures price dynamics. It supports studying order imbalance around index futures, but it does not validate this exact MNQ own-book signal.
 - CME's MDP 3.0 documentation distinguishes aggregate Market-by-Price (MBP) books from individual-order Market-by-Order (MBO) feeds. CME also describes historical market-depth data with order-book, quote and time-and-sales information. This is the data class required; ordinary candles cannot reproduce the feature or credible fills.
-- **Critical repo finding:** `backtest/README.md` currently documents TradingView OHLCV candles (15m, 5m and daily) and no quote/order-book event history. The existing dataset cannot test this hypothesis. Do not substitute candles or synthetic order books.
+- **Critical repo finding:** `quint-brain/backtest/README.md` currently documents TradingView OHLCV candles (15m, 5m and daily) and no quote/order-book event history. The existing dataset cannot test this hypothesis. Do not substitute candles or synthetic order books.
 
 ## Exact hypothesis and rules to preregister
 
@@ -51,7 +51,7 @@ Generate a signal only at the close of a completed five-second bucket. Submit no
 
 ### Cost hurdle (repo assumption, not a verified broker tariff)
 
-The current `backtest/README.md` assumes $0.75 commission per side and one tick of slippage per side. MNQ is $2 per index point and one 0.25-point tick is $0.50.
+The current `quint-brain/backtest/README.md` assumes $0.75 commission per side and one tick of slippage per side. MNQ is $2 per index point and one 0.25-point tick is $0.50.
 
 Under that provisional assumption, round-trip commission + extra slippage is $2.50 before any additional exchange/clearing fees:
 - 12-tick target = $6.00 gross; approximately +$3.50 net.
@@ -96,7 +96,7 @@ No empirical result has been produced. The literature makes OFI a defensible mic
 
 ## Ready-to-paste Claude Code / Fable handoff
 
-Read `CLAUDE.md`, `backtest/README.md`, `quint-control/STATUS.md`, `research/mnq/STRATEGY-RESEARCH-PROGRAMME.md` and this note first. Work only on a new research branch; do not touch main, live execution, Guardian, OrderRouter, existing strategy rules or the website.
+Read `CLAUDE.md`, `quint-brain/backtest/README.md`, `quint-control/STATUS.md`, `quint-control/research/mnq/STRATEGY-RESEARCH-PROGRAMME.md` and this note first. Work only on a new research branch; do not touch main, live execution, Guardian, OrderRouter, existing strategy rules or the website.
 
 1. Inventory the repository for any tick, quote, depth or order-book datasets. Report exact files, date coverage, event granularity, timestamps, contract identifiers and missing fields. Do not infer that OHLCV candles contain order-book information.
 2. If no suitable MNQ event data exists, stop before backtesting. Produce a data acquisition checklist and a proposed canonical event schema for timestamp, sequence, contract, event type, bid/ask prices, bid/ask quantities, trade price/size, depth updates and recovery markers. Estimate storage/runtime from a small sample only if an actual sample exists.

@@ -114,7 +114,7 @@ AI may explain the decision or flag a possible issue, but it cannot invent discr
 
 - Prefer CME-quality tick/trade and bid/ask data for scalping; 1-minute or 5-minute bars are insufficient for fill-accurate scalping claims.
 - Record source, timezone, session template, DST handling, missing bars, contract month, roll dates and adjustment method.
-- **Contract-roll gate (20 Nov 2026):** preserve every raw MNQ expiry contract and its instrument ID; record the mapping decision and the exact information-availability timestamp; use only prior completed volume or actually published OI for dynamic rolls; never simulate fills or realised P&L on back-adjusted continuous prices. See `research/mnq/2026-11-20-contract-roll-integrity.md`.
+- **Contract-roll gate (20 Nov 2026):** preserve every raw MNQ expiry contract and its instrument ID; record the mapping decision and the exact information-availability timestamp; use only prior completed volume or actually published OI for dynamic rolls; never simulate fills or realised P&L on back-adjusted continuous prices. See `quint-control/research/mnq/2026-11-20-contract-roll-integrity.md`.
 - Use chronological train / validation / untouched test splits and expanding or rolling walk-forward tests. Never randomly shuffle time series.
 - Freeze hypotheses, parameter grids, filters and metrics before each experiment. Log every tested variant to expose multiple-testing risk.
 - Model commissions, exchange/clearing fees, spread, slippage, market impact, partial fills, rejected orders and stop gaps. Stress costs above the base estimate.
@@ -197,7 +197,7 @@ Read `CLAUDE.md`, `quint-control/CLAUDE.md` if present, this research programme 
 7. Evaluate chronologically with walk-forward and untouched holdout data; include cost stress, long/short, year/regime, best-day removal, parameter stability, ablations and confidence intervals.
 8. If results fail, document the negative result and why. Do not tune repeatedly against the holdout.
 9. Return: plain-English findings, metrics table, data limitations, changed files, test results, risks, and a small reviewable PR. Never merge to main or enable live trading.
-10. Save the next handoff note in `research/mnq/DAILY-LOG.md` and update the experiment registry only when evidence supports the change.
+10. Save the next handoff note in `quint-control/research/mnq/DAILY-LOG.md` and update the experiment registry only when evidence supports the change.
 
 ## Decision rule
 

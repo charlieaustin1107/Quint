@@ -8,7 +8,7 @@ The rules are fixed here, before any long backtest, so they can't be tuned to ma
 
 | # | Bot | Candles | The rule | Where it comes from |
 |---|---|---|---|---|
-| 1 | New York open breakout | 5-min | The 9:30–9:45 range; a close outside it until 11:30; stop on the other side; target 2R; once a day | Chart Wizard's strategy. A close version: the exact port, with the same trades as `backtest/`, comes in phase 3 |
+| 1 | New York open breakout | 5-min | The 9:30–9:45 range; a close outside it until 11:30; stop on the other side; target 2R; once a day | Chart Wizard's strategy. A close version: the exact port, with the same trades as `quint-brain/backtest/`, comes in phase 3 |
 | 2 | Opening candle direction | 5-min | Trade the direction of the 9:30–9:35 candle; stop at its other end; target 10R, or out at the close | The 5-minute opening range breakout paper (Zarattini, Barbon & Aziz) |
 | 3 | 20-candle breakout | 15-min | A close beyond the last 20 candles; stop 2 ATR; target 3× the stop; up to 2 a day | Chart Wizard's strategy. A close version: regular hours only and flat at 15:59, so no 40-candle time stop |
 | 4 | Last-30-minute momentum | 5-min | At 15:30, go with the move since yesterday's close; out at the close | The intraday momentum papers (Gao, Han, Li & Zhou; Baltussen, Da, Lammers & Martens) |

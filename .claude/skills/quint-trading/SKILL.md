@@ -1,9 +1,11 @@
 ---
 name: quint-trading
-description: How to research, backtest, judge and teach MNQ trading strategies for Chart Wizard and Quint, and how Quint's trade calls must behave. Use for anything about strategies, backtests, trade calls, position sizing, the 5-pillar playbook, Lucid Trading limits, TradingView call budgets or market data in this repo.
+description: How to research, backtest, judge and teach MNQ trading strategies for Chart Wizard and Quint Brain. It does not govern Quint Control's automated execution engine. Use for anything about strategies, backtests, trade calls, position sizing, the 5-pillar playbook, Lucid Trading limits, TradingView call budgets or market data in this repo.
 ---
 
 # Trading for Chart Wizard and Quint
+
+This skill applies only to Chart Wizard and Quint Brain learning/analysis. Automated bots, broker orders and Guardian rules belong to Quint Control; read `.claude/skills/quint-control/SKILL.md` for that product.
 
 The owner scalps and day-trades **MNQ** (Micro E-mini Nasdaq-100, `CME_MINI:MNQ1!`) from an iPhone and is working to pass a **Lucid Trading** funded account. Holding time: about 15 minutes to a couple of hours. Everything here is for learning and practice; the apps never place real orders and nothing is financial advice.
 
@@ -13,12 +15,12 @@ The owner scalps and day-trades **MNQ** (Micro E-mini Nasdaq-100, `CME_MINI:MNQ1
 - RTH: 09:30–16:00 New York. CME Globex: Sunday 18:00 to Friday 17:00 NY, daily break 17:00–18:00. The owner lives in the UK: give times in UK time and New York time.
 
 ## What earns a place in the app
-A strategy is taught only if it **beats its costs in a backtest on real MNQ data**. Evidence goes in `backtest/results/`. Report:
+A strategy is taught only if it **beats its costs in a backtest on real MNQ data**. Evidence goes in `quint-brain/backtest/results/`. Report:
 1. Whole period **and out of sample** (the later half). One good stretch isn't proof.
 2. Trades, win rate, profit factor, net $ on 1 MNQ after costs, average R.
 3. **Worst drawdown in dollars on 1 contract** — Lucid's limits matter more than profit.
 4. Longest losing streak and worst day, because a funded account dies on those.
-Never rewrite the strategy logic for a backtest: `backtest/extract_engine.py` copies Quint Brain's own functions, so the test runs exactly what the app teaches. Re-run the extractor after changing rules. See `backtest/README.md`.
+Never rewrite the strategy logic for a backtest: `quint-brain/backtest/extract_engine.py` copies Quint Brain's own functions, so the test runs exactly what the app teaches. Re-run the extractor after changing rules. See `quint-brain/backtest/README.md`.
 
 Good research habits: decide the rules before looking at results; keep parameter sweeps small and report every variant tried (not just the best); prefer simple rules that survive across years and across ES/NQ; treat anything with fewer than ~100 trades as anecdote; check the result isn't one news day.
 

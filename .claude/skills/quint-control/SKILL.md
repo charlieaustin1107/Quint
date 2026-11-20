@@ -52,7 +52,7 @@ Goal: beat Phantom Trader AI on every row of the plan's "Match Phantom, then bea
 10. Check every NinjaTrader API against the NinjaTrader 8 Help Guide; if unsure, say so and design a fallback.
 
 ## Testing: nothing is done until tested
-- JavaScript reference of all trading logic in `reference/`, tested with `node --test` on the real MNQ candles in `backtest/data/`.
+- JavaScript reference of all trading logic in `reference/`, tested with `node --test` on the real MNQ candles in `quint-brain/backtest/data/`.
 - C# ported line for line; golden files in `tests/golden/` generated from the reference.
 - Engine self-test runner (Settings > Run self-tests) runs the C# against the golden files inside NinjaTrader and writes `Documents\NinjaTrader 8\quint\selftest.txt`.
 - Website: Playwright against `web/mock-engine.js` at 1440x900 and 390x844, zero console errors, screenshots looked at.
