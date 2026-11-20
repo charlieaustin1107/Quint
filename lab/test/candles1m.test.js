@@ -54,6 +54,25 @@ test('rebuildFrom1m: a difference or a gap writes nothing', () => {
   assert.equal(fs.readFileSync(g.five, 'utf8'), before2);
 });
 
+test('from1m: a period the 1-minute candles start part-way through is left out', () => {
+  const one = minutes(T0 + 120, 13); // starts 2 minutes into a period
+  const five = c.from1m(one, 5);
+  assert.equal(five[0].t, T0 + 300, 'the part-period is skipped');
+  assert.equal(five.length, 2);
+});
+
+test('rebuildFrom1m: an old difference between the feeds doesn\'t block the nightly build', () => {
+  const one = minutes(T0, 60 * 4), truth = c.from1m(one, 5); // 4 hours, 48 five-minute candles
+  const stored = truth.slice(0, 40).map((b, i) => (i === 3 ? { ...b, c: b.c - 1.75 } : b)); // differs 3 hours before the end
+  const f = setup(one, stored);
+  const r = c.rebuildFrom1m(f.one, f.five, f.fifteen);
+  assert.equal(r.status, 'OK');
+  assert.equal(r.checked, 24, 'only the 2 hours before the newest stored candle are checked');
+  const out = c.read(f.five);
+  assert.equal(out.length, 48);
+  assert.equal(out[3].c, stored[3].c, 'stored candles are never rewritten from the other feed');
+});
+
 test('rebuildFrom1m: a stored candle saved while forming is replaced by the finished one', () => {
   const one = minutes(T0, 30), truth = c.from1m(one, 5);
   const forming = truth.slice(0, 3).map((b, i) => (i === 2 ? { ...b, h: b.h - 0.5, c: b.o } : b));

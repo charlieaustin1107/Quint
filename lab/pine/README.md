@@ -1,11 +1,11 @@
 # Quint · WYLD Four Pillars (TradingView indicator)
 
-Your strategy, WYLD Will's Four Pillars, as a live checklist on the chart. It tells you each step of the sequence as it happens, so you only act when all four pillars line up, in order, inside your window. It's saved in your TradingView account as **Quint · WYLD Four Pillars** (script `USER;30b790d0742346528a65e8c1d5e28d6e`, version 2.0). The code is `wyld_four_pillars.pine`. Signals only: it never places orders. Not financial advice.
+Your strategy, WYLD Will's Four Pillars, as a live checklist on the chart. It tells you each step of the sequence as it happens, so you only act when all four pillars line up, in order, inside your window. It's saved in your TradingView account as **Quint · WYLD Four Pillars** (script `USER;30b790d0742346528a65e8c1d5e28d6e`, version 3.0: TradingView numbers each save). The code is `wyld_four_pillars.pine`. Signals only: it never places orders. Not financial advice.
 
-## What it shows (version 2)
+## What it shows (version 3.0)
 Each step is marked on the chart as it happens, with its price:
 
-- **① Sweep:** a label under the candle that ran a pool of 15-minute equal highs or lows (over it for a short). Only pools that formed before the open count, and only a sweep inside your window starts a setup. A pool that was already run overnight is marked as taken, not as a 9:30 sweep.
+- **① Sweep:** a label under the candle that ran a liquidity pool (over it for a short). The pools are the 15-minute equal highs and lows, plus (your rule, on by default since 20 Nov 2026) the prior day's high and low and the overnight high and low. Only pools that formed before the open count, and only a sweep inside your window starts a setup. A pool that was already run overnight is marked as taken, not as a 9:30 sweep.
 - **The wick box** (amber): the wick of the candle that made the last push into the low (or high), drawn the moment it's swept. If price pushes deeper, the box moves to the new candle.
   - The dotted amber line is the wick's **50%**: WYLD's wick entry.
   - The dashed line is the **④ trigger**: the far end of that candle. A close beyond it is the internal confirmation, and its label gives both prices.
@@ -44,7 +44,7 @@ If your CME data on TradingView is delayed, alerts arrive about 10 minutes late.
 
 ## How it reads WYLD's rules
 It follows `lab/brain/playbooks.json`. Where his videos leave a rule open, the choice is a setting, with defaults sized for MNQ:
-- **Pools:** two or more 15-minute swing highs (or lows) within 8 ticks (2 points), from the last 3 days, formed before the open. Prior-day and overnight highs and lows can be added as pools, but WYLD doesn't count them, so they're off.
+- **Pools:** two or more 15-minute swing highs (or lows) within 8 ticks (2 points), from the last 3 days, formed before the open. Also, by your rule (on by default): the prior day's high and low, added when the session opens at 18:00 New York so a run overnight counts as taken, and the overnight high and low, added at 9:30. WYLD himself counts only the equal highs and lows; switch the two settings off to follow him exactly.
 - **Higher-timeframe levels:** monthly first, then weekly, then daily, dropping any lower one within 8 ticks of a higher one:
   - prior month, week and day highs and lows;
   - the weekly and daily opening gaps (NWOG and NDOG);

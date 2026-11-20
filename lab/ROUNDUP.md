@@ -1,8 +1,8 @@
-# Quint roundup: Thursday 19 November
+# Quint roundup: Friday 20 November
 
 **Nothing live yet. Paper forward test running.** · candles up to 2026-11-18
 
-- Evening. Here's your Quint roundup for Thursday 19 November.
+- Morning. Here's your Quint roundup for Friday 20 November.
 - Real money: no bot is trading a real or prop account yet, so nothing has been made or lost.
 - Paper forward test: nine bots are on paper since Wednesday 18 November. No trades yet, because no new candles have come in since their rules were fixed.
 - Best backtest so far: the 20-candle breakout, $3,711 over 40 trades on one MNQ. That is too few trades to trust yet.

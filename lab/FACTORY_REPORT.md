@@ -1,6 +1,6 @@
 # Strategy factory report
 
-Candles up to 2026-11-18. 1,490 variations tested in 32.7s. Every variation: 1 MNQ, $0.50 commission a side, 1 tick of slippage, the bot lab's fills.
+Candles up to 2026-11-18. 1,490 variations tested in 28.9s. Every variation: 1 MNQ, $0.50 commission a side, 1 tick of slippage, the bot lab's fills.
 
 **How a variation survives** (fixed before testing): on unseen sessions at least 30 trades, a profit, profit factor 1.2+, still a profit with $2.50 more costs a trade; worst drawdown under $2,000 and no day worse than -$1,200; its neighbouring variations also profitable unseen; and its family's chance of overfitting (PBO) 30% or less.
 

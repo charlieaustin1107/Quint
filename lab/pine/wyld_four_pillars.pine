@@ -1,13 +1,15 @@
 //@version=6
-// Quint · WYLD Four Pillars (v2)
+// Quint · WYLD Four Pillars (v2.1)
 // The owner's strategy (WYLD Will's Four Pillars) marked live on the chart, with an alert at every step:
-//   ① Liquidity sweep of a marked 15m pool (equal highs or lows formed before the open). A box marks the wick of the
-//     candle that made the last push, with its 50% (WYLD's wick entry) and the trigger line a close must beat.
+//   ① Liquidity sweep of a marked pool: 15m equal highs or lows formed before the open, plus (the owner's choice) the
+//     prior day's and the overnight highs and lows. A box marks the wick of the candle that made the last push, with
+//     its 50% (WYLD's wick entry) and the trigger line a close must beat.
 //   ② Price trades into a higher-timeframe level near the sweep and closes back on the right side: the level is drawn.
 //   ③ PDR bias: a box from Point A (the level that held) to Point B (the next HTF level), with 25 / 50 / 75 steps.
 //   ④ 1-minute confirmation = the entry: entry and stop lines, Target 1 Point B, Target 2 the opposing liquidity.
 // Then: +1R (WYLD moves to break-even), and the stage ends at Point B, on a close through Point A, or at the window's end.
-// Pools taken overnight are marked as taken; only a sweep inside the window starts a stage.
+// Pools taken overnight are marked as taken; only a sweep inside the window starts a stage. The prior day's high and
+// low join at the 18:00 New York session open, so a run overnight counts as already taken.
 // Only the first hours after the 9:30 New York open (14:30 UK). Built for MNQ on the 1-minute chart.
 // Quint's mechanical reading of WYLD's rules; where his videos leave a rule open, it's a setting.
 // Signals only: it never places orders. Not financial advice. Source: Quint repo, lab/pine/wyld_four_pillars.pine.
@@ -15,7 +17,7 @@ indicator("Quint · WYLD Four Pillars", shorttitle = "WYLD 4P", overlay = true, 
 
 // ───────── Settings ─────────
 const string G1 = "Session"
-const string G2 = "① Liquidity (15m equal highs and lows)"
+const string G2 = "① Liquidity pools"
 const string G3 = "② and ③ Higher-timeframe levels and the PDR"
 const string G4 = "④ Confirmation and the trade"
 const string G5 = "Display"
@@ -24,8 +26,8 @@ swingLen      = input.int(3, "15m swing strength (candles each side)", minval = 
 eqTicks       = input.int(8, "Equal highs/lows tolerance (ticks)", minval = 1, maxval = 80, group = G2, tooltip = "Two 15m swing highs (or lows) within this many ticks make a liquidity pool. 8 ticks = 2 MNQ points.")
 lookbackDays  = input.int(3, "Pools from the last N days", minval = 1, maxval = 10, group = G2)
 onlyPremarket = input.bool(true, "Only pools formed before the open (marked pre-market)", group = G2)
-usePdPools    = input.bool(false, "Also count prior day high/low as pools", group = G2, tooltip = "WYLD counts only the marked 15m equal highs and lows. Off follows him.")
-useOnPools    = input.bool(false, "Also count the overnight high/low as pools", group = G2)
+usePdPools    = input.bool(true, "Also count the prior day's high/low as pools", group = G2, tooltip = "Your choice, on since 20 Nov 2026 (WYLD himself counts only the 15m equal highs and lows). Added at the 18:00 New York session open, so a run overnight counts as already taken.")
+useOnPools    = input.bool(true, "Also count the overnight high/low as pools", group = G2, tooltip = "Your choice, on since 20 Nov 2026. The overnight session's high and low (18:00 to 9:30 New York), added at the 9:30 open.")
 useMonthly    = input.bool(true, "Monthly levels (prior month high/low)", group = G3)
 useWeekly     = input.bool(true, "Weekly levels (prior week high/low, NWOG, weekly FVG)", group = G3)
 useDaily      = input.bool(true, "Daily levels (prior day high/low, NDOG, daily FVG, wick 50%s)", group = G3)
@@ -152,9 +154,10 @@ var array<int>   poolD = array.new<int>()   // 1 = buy-side (equal highs), -1 = 
 var array<int>   poolT = array.new<int>()
 var array<bool>  poolSwept = array.new<bool>()
 var array<int>   poolN = array.new<int>()
+var array<string> poolK = array.new<string>() // EQH / EQL (15m equal highs or lows), PDH / PDL (prior day), ONH / ONL (overnight)
 lookMs = lookbackDays * 86400000
 
-addPool(float level, int dir, int t) =>
+addPool(float level, int dir, int t, string kind, int touches) =>
     bool merged = false
     int n = array.size(poolP)
     if n > 0
@@ -162,6 +165,8 @@ addPool(float level, int dir, int t) =>
             if array.get(poolD, i) == dir and not array.get(poolSwept, i) and math.abs(array.get(poolP, i) - level) <= eqTicks * syminfo.mintick
                 array.set(poolP, i, dir == 1 ? math.max(array.get(poolP, i), level) : math.min(array.get(poolP, i), level))
                 array.set(poolN, i, array.get(poolN, i) + 1)
+                if not str.contains(array.get(poolK, i), kind)
+                    array.set(poolK, i, array.get(poolK, i) + "/" + kind)
                 merged := true
                 break
     if not merged
@@ -169,13 +174,15 @@ addPool(float level, int dir, int t) =>
         array.push(poolD, dir)
         array.push(poolT, t)
         array.push(poolSwept, false)
-        array.push(poolN, 2)
+        array.push(poolN, touches)
+        array.push(poolK, kind)
         if array.size(poolP) > 60
             array.shift(poolP)
             array.shift(poolD)
             array.shift(poolT)
             array.shift(poolSwept)
             array.shift(poolN)
+            array.shift(poolK)
     merged
 
 addSwing(array<float> px, array<int> tx, float p, int t, int dir) =>
@@ -185,7 +192,7 @@ addSwing(array<float> px, array<int> tx, float p, int t, int dir) =>
         for i = n - 1 to stopAt
             float q = array.get(px, i)
             if math.abs(p - q) <= eqTicks * syminfo.mintick and t - array.get(tx, i) <= lookMs
-                addPool(dir == 1 ? math.max(p, q) : math.min(p, q), dir, t)
+                addPool(dir == 1 ? math.max(p, q) : math.min(p, q), dir, t, dir == 1 ? "EQH" : "EQL", 2)
                 break
     array.push(px, p)
     array.push(tx, t)
@@ -202,13 +209,15 @@ if not na(ph15) and (na(lastPhT) or ph15t != lastPhT)
 if not na(pl15) and (na(lastPlT) or pl15t != lastPlT)
     lastPlT := pl15t
     addSwing(swL, swLt, pl15, pl15t, -1)
-if newWindow
-    if usePdPools
-        addPool(pdl, -1, time - 60000)
-        addPool(pdh, 1, time - 60000)
-    if useOnPools
-        addPool(onL, -1, time - 60000)
-        addPool(onH, 1, time - 60000)
+// the prior day's high and low join when the session opens at 18:00, so a run overnight counts as already taken;
+// the overnight high and low join at 9:30, when they're known
+sessionOpen = isON and not isON[1]
+if sessionOpen and usePdPools and not na(pdh) and not na(pdl)
+    addPool(pdl, -1, time - 60000, "PDL", 1)
+    addPool(pdh, 1, time - 60000, "PDH", 1)
+if newWindow and useOnPools and not na(onH) and not na(onL)
+    addPool(onL, -1, time - 60000, "ONL", 1)
+    addPool(onH, 1, time - 60000, "ONH", 1)
 
 poolEligible(int i) =>
     int pt = array.get(poolT, i)
@@ -220,12 +229,16 @@ poolEligible(int i) =>
 // overnight is already taken by the open (WYLD: note whether either side has already been swept).
 var array<float> takenLo = array.new<float>()
 var array<int>   takenLoN = array.new<int>()
+var array<string> takenLoK = array.new<string>()
 var array<float> takenHi = array.new<float>()
 var array<int>   takenHiN = array.new<int>()
+var array<string> takenHiK = array.new<string>()
 array.clear(takenLo)
 array.clear(takenLoN)
+array.clear(takenLoK)
 array.clear(takenHi)
 array.clear(takenHiN)
+array.clear(takenHiK)
 int npl = array.size(poolP)
 if npl > 0
     for i = 0 to npl - 1
@@ -238,9 +251,11 @@ if npl > 0
                     if dr == -1
                         array.push(takenLo, p)
                         array.push(takenLoN, array.get(poolN, i))
+                        array.push(takenLoK, array.get(poolK, i))
                     else
                         array.push(takenHi, p)
                         array.push(takenHiN, array.get(poolN, i))
+                        array.push(takenHiK, array.get(poolK, i))
 
 // ───────── Higher-timeframe levels: monthly first, then weekly, then daily; a lower one that overlaps a higher one is dropped ─────────
 var array<float>  lvP = array.new<float>()
@@ -319,6 +334,7 @@ type Stage
     int    step = 0
     float  pool = na
     int    poolTouches = 0
+    string poolKind = ""
     float  extreme = na
     int    extremeBar = na
     float  wickEdge = na
@@ -388,6 +404,7 @@ method clearStage(Stage s) =>
     s.step := 0
     s.pool := na
     s.poolTouches := 0
+    s.poolKind := ""
     s.extreme := na
     s.extremeBar := na
     s.wickEdge := na
@@ -441,7 +458,7 @@ method markWick(Stage s) =>
             s.wickBox := box.new(bar_index, wTop, bar_index + 1, wBot, border_color = color.new(AMBER, 20), bgcolor = color.new(AMBER, 82), extend = extend.right)
             s.wickMid := line.new(bar_index, mid, bar_index + 1, mid, extend = extend.right, color = AMBER, style = line.style_dotted)
             s.trigLine := line.new(bar_index, trig, bar_index + 1, trig, extend = extend.right, color = color.new(CHROME, 25), style = line.style_dashed)
-            s.lb1 := label.new(bar_index, d == 1 ? low : high, "① sweep " + fmt(s.pool), color = CLEAR, textcolor = c, style = d == 1 ? label.style_label_up : label.style_label_down, size = size.small)
+            s.lb1 := label.new(bar_index, d == 1 ? low : high, "① sweep " + s.poolKind + " " + fmt(s.pool), color = CLEAR, textcolor = c, style = d == 1 ? label.style_label_up : label.style_label_down, size = size.small)
             s.lbTrig := label.new(bar_index, trig, "④ trigger: close " + (d == 1 ? "above " : "below ") + fmt(trig) + " · wick 50% " + fmt(mid), color = CLEAR, textcolor = color.new(CHROME, 20), style = label.style_label_left, size = size.tiny)
         else
             box.set_lefttop(s.wickBox, bar_index, wTop)
@@ -471,11 +488,14 @@ runStage(Stage s) =>
     if s.step == 0 and inWindow
         float best = na
         int bestN = 0
+        string bestK = ""
         array<float> tp = takenHi
         array<int> tn = takenHiN
+        array<string> tkk = takenHiK
         if d == 1
             tp := takenLo
             tn := takenLoN
+            tkk := takenLoK
         int n = array.size(tp)
         if n > 0
             for i = 0 to n - 1
@@ -483,10 +503,12 @@ runStage(Stage s) =>
                 if na(best) or (d == 1 ? p < best : p > best)
                     best := p
                     bestN := array.get(tn, i)
+                    bestK := array.get(tkk, i)
         if not na(best)
             s.step := 1
             s.pool := best
             s.poolTouches := bestN
+            s.poolKind := bestK
             s.extreme := d == 1 ? low : high
             s.extremeBar := bar_index
             s.wickEdge := d == 1 ? high : low
@@ -494,7 +516,7 @@ runStage(Stage s) =>
             s.sweepTime := time
             s.markWick()
             e1 := true
-            msg := join(msg, "① SWEEP (" + side + " stage): " + (d == 1 ? "sell-side equal lows " : "buy-side equal highs ") + fmt(best) + " taken. Wick box drawn. Now wait for an HTF level to hold.")
+            msg := join(msg, "① SWEEP (" + side + " stage): " + (d == 1 ? "sell-side " : "buy-side ") + "liquidity " + bestK + " " + fmt(best) + " taken. Wick box drawn. Now wait for an HTF level to hold.")
     // ② a higher-timeframe level near the sweep holds
     if s.step == 1
         if bar_index > s.extremeBar and (d == 1 ? low < s.extreme : high > s.extreme)
@@ -549,7 +571,7 @@ runStage(Stage s) =>
                 if array.get(poolD, i) == d and not array.get(poolSwept, i) and (d == 1 ? p > s.pointA + minPdrTicks * syminfo.mintick : p < s.pointA - minPdrTicks * syminfo.mintick)
                     if na(B)
                         B := p
-                        bN := d == 1 ? "Equal highs" : "Equal lows"
+                        bN := array.get(poolK, i)
                     else if (d == 1 ? p > B : p < B) and (na(T2) or (d == 1 ? p < T2 : p > T2))
                         T2 := p
         if na(B)
@@ -694,18 +716,21 @@ if barstate.islast
                 int dr = array.get(poolD, i)
                 color pc = dr == 1 ? color.new(ROSE, 20) : color.new(MINT, 20)
                 array.push(drawnLines, line.new(bar_index - 25, p, bar_index, p, extend = extend.right, color = pc, style = line.style_dashed))
-                array.push(drawnLabels, label.new(bar_index + 3, p, (dr == 1 ? "EQH" : "EQL") + " ×" + str.tostring(array.get(poolN, i)) + "  " + fmt(p), style = label.style_none, textcolor = pc, size = size.tiny, textalign = text.align_left))
+                int tn = array.get(poolN, i)
+                array.push(drawnLabels, label.new(bar_index + 3, p, array.get(poolK, i) + (tn >= 2 ? " ×" + str.tostring(tn) : "") + "  " + fmt(p), style = label.style_none, textcolor = pc, size = size.tiny, textalign = text.align_left))
 
 // ───────── The confluence box (small by default) ─────────
 nearestPool(int dir) =>
     float best = na
+    string kind = ""
     int n = array.size(poolP)
     if n > 0
         for i = 0 to n - 1
             float p = array.get(poolP, i)
             if array.get(poolD, i) == dir and not array.get(poolSwept, i) and poolEligible(i) and (dir == 1 ? p > close : p < close) and (na(best) or math.abs(p - close) < math.abs(best - close))
                 best := p
-    best
+                kind := array.get(poolK, i)
+    na(best) ? (dir == 1 ? "↑ —" : "↓ —") : (dir == 1 ? "↑ " : "↓ ") + kind + " " + fmt(best)
 
 trendTxt(int t) => t == 1 ? "▲ Bull" : t == -1 ? "▼ Bear" : "■ Range"
 trendCol(int t) => t == 1 ? MINT : t == -1 ? ROSE : AMBER
@@ -742,7 +767,7 @@ if barstate.islast and boxStyle != "Off"
         cell(conf, 0, 0, "WYLD 4P", CHROME)
         cell(conf, 1, 0, status, sCol)
         cell(conf, 0, 1, mark(st.step >= 1) + "①", st.step >= 1 ? MINT : DIM)
-        cell(conf, 1, 1, st.step >= 1 ? (d == 1 ? "EQL " : "EQH ") + fmt(st.pool) : "EQH " + fmt(nearestPool(1)) + " · EQL " + fmt(nearestPool(-1)), st.step >= 1 ? CHROME : DIM)
+        cell(conf, 1, 1, st.step >= 1 ? st.poolKind + " " + fmt(st.pool) : nearestPool(1) + " · " + nearestPool(-1), st.step >= 1 ? CHROME : DIM)
         cell(conf, 0, 2, mark(st.step >= 2) + "②", st.step >= 2 ? MINT : DIM)
         cell(conf, 1, 2, st.step >= 2 ? st.aName + " " + fmt(st.pointA) : "—", st.step >= 2 ? CHROME : DIM)
         cell(conf, 0, 3, mark(st.step >= 3) + "③", st.step >= 3 ? MINT : DIM)
@@ -757,7 +782,7 @@ if barstate.islast and boxStyle != "Off"
         cell(conf, 0, 1, "Window", DIM)
         cell(conf, 1, 1, inWindow ? str.tostring(math.floor(left / 60)) + "h " + str.tostring(left % 60) + "m left" : "First " + str.tostring(winHours) + "h after 9:30 NY (14:30 UK)", inWindow ? MINT : DIM)
         cell(conf, 0, 2, mark(st.step >= 1) + "① Sweep", st.step >= 1 ? MINT : DIM)
-        cell(conf, 1, 2, st.step >= 1 ? (d == 1 ? "Equal lows " : "Equal highs ") + fmt(st.pool) + " taken (" + str.tostring(st.poolTouches) + " touches)" : "Pools: EQH " + fmt(nearestPool(1)) + " · EQL " + fmt(nearestPool(-1)), st.step >= 1 ? CHROME : DIM)
+        cell(conf, 1, 2, st.step >= 1 ? st.poolKind + " " + fmt(st.pool) + " taken" + (st.poolTouches >= 2 ? " (" + str.tostring(st.poolTouches) + " touches)" : "") : "Pools: " + nearestPool(1) + " · " + nearestPool(-1), st.step >= 1 ? CHROME : DIM)
         cell(conf, 0, 3, mark(st.step >= 2) + "② HTF level holds", st.step >= 2 ? MINT : DIM)
         cell(conf, 1, 3, st.step >= 2 ? st.aName + " " + fmt(st.pointA) : "Waiting", st.step >= 2 ? CHROME : DIM)
         cell(conf, 0, 4, mark(st.step >= 3) + "③ PDR bias", st.step >= 3 ? MINT : DIM)
