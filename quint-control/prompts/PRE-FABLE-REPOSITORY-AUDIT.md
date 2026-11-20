@@ -112,7 +112,7 @@ Assess how the existing Strategy Lab could support:
 
 ### 10. Documentation contradictions and decisions
 Explicitly investigate:
-- Root CLAUDE.md currently states $0.75 MNQ commission per side; Quint Control STATUS.md and skill state $0.50 per side. Do not choose one without evidence. Recommend per-account cost profiles and identify what must be confirmed.
+- Verify that cost assumptions remain product-scoped: legacy Quint Brain backtests use $0.75 MNQ commission per side; Quint Control and Quint Lab currently model $0.50 per side. Do not call this a direct contradiction. Confirm actual account fees before live configuration and recommend versioned per-account profiles.
 - Any mismatch between build status, branch status, prototype status and actual code.
 - Any statements that describe planned functionality as if it were implemented.
 - Any assumptions requiring owner, broker, prop-firm, NinjaTrader or exchange confirmation.
