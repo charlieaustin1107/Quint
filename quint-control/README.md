@@ -13,6 +13,7 @@ A NinjaTrader 8 trading engine with a black, futuristic dashboard website. It ru
 - **The plan:** `PLAN.md` (a copy of the plan doc)
 - **Strategy Lab research:** `research/STRATEGY-LAB.md` (product specification)
 - **Shared website / live data research:** `research/SHARED-PLATFORM-AND-MARKET-DATA.md` (two-user hosting, per-user data and Claude billing, NinjaTrader API and licensing gates)
+- **Backtest integrity standard:** `research/BACKTEST-INTEGRITY-STANDARD.md` (data quality, fill realism, validation, anti-overfitting and report requirements)
 - **Strategy Lab prototype:** `web/strategy-lab/index.html` (local draft and manual paper-scenario UI)
 - **Strategy Lab domain:** `reference/strategy-lab/README.md` (versioned definitions, validation and safe expression DSL)
 - **Prompts for every build phase:** `FABLE-PROMPTS.md`
