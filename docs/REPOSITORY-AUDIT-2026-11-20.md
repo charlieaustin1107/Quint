@@ -31,6 +31,15 @@ The repository is structurally separated into five products and has a clear Quin
 - Chart Wizard and Quint Brain are separate learning/analysis apps. Their backtest harness is not the future Quint Control bot-validation engine.
 - Quint Lab is research/paper tooling and never places broker orders.
 
+## Code-level review findings — static inspection, not yet patched
+
+1. **Monte Carlo wording/method mismatch (`lab/lib/prop.js`, `oneRun`).** The comments say daily results are replayed in a random order, but each simulated day independently samples `daily[Math.floor(rand() * daily.length)]`. This is bootstrap resampling *with replacement*, not a shuffle/permutation: some sessions repeat and others are omitted. That can change pass/fail probabilities and does not preserve serial dependence. Decide explicitly whether the intended method is permutation, bootstrap, or block bootstrap; label the output and add deterministic tests before comparing strategies. I did not silently change the statistical method.
+2. **Candle validation is incomplete (`lab/lib/candles.js`).** `merge()` rejects non-finite timestamps/OHLC fields but does not validate timestamp positivity/integer-ness, OHLC ordering (`high >= open/close/low`, `low <= open/close/high`), positive prices, or finite/non-negative volume. `read()` accepts CSV rows without validation. A malformed candle can therefore enter a research run and distort range, VWAP or strategy results. Add a shared validator and reject/count bad rows before relying on results.
+3. **Lucid simulator is not a full intraday account emulator (`lab/lib/prop.js`).** It models end-of-day equity/trailing-floor updates, not intraday trailing drawdown, intra-session breaches, fill sequencing or every account-specific rule. The source comment already discloses part of this limitation; the UI/report must not present its probability as a real prop-firm pass probability.
+4. **Validation coverage has been overstated in places.** `lab/test/hub.e2e.test.js` conditionally skips both browser tests when Node Playwright is missing. The new CI workflow now installs Node Playwright and Chromium so those tests are intended to execute rather than silently skip. The run must still be inspected for actual pass/skip counts.
+
+These are review findings, not claims that the current suite fails. No strategy, backtest engine, candle data, broker, or runtime code was modified.
+
 ## Remaining validation work
 
 1. Let the new Quint Lab workflow run and fix any reproducible failures it exposes.
