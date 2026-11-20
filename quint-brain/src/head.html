@@ -340,6 +340,16 @@ html, body, #app { background: #000 !important; }
 .toast { background: rgba(10,10,10,.96) !important; border-color: rgba(255,255,255,.2) !important; }
 .vmbar { background: #080808 !important; border-color: rgba(255,255,255,.16) !important; color: #e8e8e8 !important; }
 ::selection { background: rgba(255,255,255,.3); }
+
+/* ---------- TradingView call log ---------- */
+ul.tvlog { list-style: none; margin: 6px 0 0; padding: 0; max-height: 46vh; overflow-y: auto; border: 1px solid rgba(255,255,255,.09); border-radius: 8px; }
+ul.tvlog li.tvlh { position: sticky; top: 0; padding: 6px 10px; background: #0b0b0b; font: 600 11px/1.2 var(--f-display); letter-spacing: .08em; text-transform: uppercase; color: #8a8a8a; border-bottom: 1px solid rgba(255,255,255,.07); }
+ul.tvlog li.tvl { display: flex; gap: 10px; align-items: baseline; padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,.05); }
+ul.tvlog .tvt { flex: none; min-width: 44px; white-space: nowrap; font-size: 12px; color: #bdbdbd; }
+ul.tvlog .tvw { min-width: 0; display: flex; flex-direction: column; } ul.tvlog .tvw b { font-size: 13px; font-weight: 600; color: #f2f2f2; } ul.tvlog .tvw small { font-size: 11.5px; color: #8a8a8a; }
+ul.tvlog li.saved .tvw b, ul.tvlog li.blocked .tvw b, ul.tvlog li.refused .tvw b { color: #8a8a8a; font-weight: 500; }
+ul.tvlog li.refused small, ul.tvlog li.error small { color: #ffb547; }
+details.tvlogd summary { cursor: pointer; } details.tvlogd[open] summary { margin-bottom: 4px; }
 </style>
 </head>
 <body>

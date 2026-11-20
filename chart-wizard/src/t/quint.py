@@ -14,7 +14,7 @@ MOCK = MOCK.replace(a, "const answer = (tool, input) => { if (/^mcp-tv-/.test(to
 b = 'const full = /LEAN: </.test(window.__samplePrompt)'
 assert b in MOCK
 MOCK = MOCK.replace(b, '''window.__sampleLog = (window.__sampleLog || []).concat([{ tier: opts.modelTier, model: opts.model, img: (opts.images || []).length, len: window.__samplePrompt.length }]); const full = /JSON only/.test(window.__samplePrompt) && window.__planOrb ? '{"families":["orb"],"dir":"both","seeds":[{"f":"orb","or":15,"cut":120,"mid":0,"tgt":2,"dir":"both"}],"note":"The opening range breakout."}' : /JSON only/.test(window.__samplePrompt) ? '{"families":["pullback","sweep"],"dir":"both","seeds":[{"f":"pullback","fast":20,"slow":50,"stop":1.5,"tgt":2,"hold":20,"dir":"both"}],"note":"Pullbacks to the 20 EMA in the direction of the trend."}' : /PRICE: 27354/.test(window.__samplePrompt) ? "LEAN: BUY for MNQ · confidence low\\n### What I can see\\nMNQ 1m, last 28346.75, long 1 from 28394.25.\\n### The plan\\nHold above 28327.\\nPRICE: 28346.75 MNQ" : /LEAN: </.test(window.__samplePrompt)''')
-TV = r"""
+TV = r"""window.__tvFast = window.__tvFast !== false; 
 (() => {
   let seed = 7; const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
   const MIN = { "1m": 60, "5m": 300, "15m": 900, "1h": 3600, "1D": 86400 };
