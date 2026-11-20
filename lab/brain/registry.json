@@ -547,6 +547,15 @@
       "auto": false
     },
     {
+      "id": "wyld-hold-60",
+      "what": "Pre-registered 19 Nov 2026 from the sequence analyst, before any result: WYLD Four Pillars as the indicator reads it, with one change. Let a level hold within 60 minutes of the sweep (holdMinutes 60) instead of 30. Why: 22 of 28 sweeps died at ②. Test only on sessions after 2026-11-19. A proposal never changes the rule by itself.",
+      "passMark": "On sessions after 2026-11-19 only: 30+ trades, average R not worse than as written, and more setups reaching ③.",
+      "cost": "None (saved candles)",
+      "added": "2026-11-19",
+      "source": "lab/results/anatomy.json proposals",
+      "auto": false
+    },
+    {
       "id": "wyld-exact-rules",
       "what": "Write WYLD Will's Four Pillars as exact rules a computer can test, following his videos: what counts as the easiest equal highs and lows on the 15m, how a level shows it holds, the stop buffer in ticks, the break-even trigger, and the cap on entries per PDR. You answer the gaps in Quint HQ or in chat. Then the Trading Mastery and Chart Wizard versions get lined up with these rules. Nothing is backtested until the rules are fixed. Answered so far: which pools count (20 Nov 2026, your rule: the 15m equal highs and lows plus the prior day's and the overnight highs and lows). Still open: how close two swings must be to count as equal, how a level shows it holds, the stop buffer, the break-even trigger and the cap on entries per PDR.",
       "cost": "None",

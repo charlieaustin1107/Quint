@@ -91,5 +91,98 @@
     "hi": -1.01
    }
   }
+ },
+ {
+  "asOf": "2026-11-19",
+  "sessions": 22,
+  "candles": "5-minute",
+  "base": {
+   "sweeps": 23,
+   "sweepKinds": {
+    "ONH": 11,
+    "ONL": 11,
+    "PDH": 1
+   },
+   "takenOvernight": 74,
+   "holds": 4,
+   "noHold": 19,
+   "pdrs": 4,
+   "noPointB": 0,
+   "confirmations": 0,
+   "skippedInTrade": 0,
+   "lowRoom": 0,
+   "entries": 0,
+   "completeB": 2,
+   "broken": 2,
+   "expired": 0
+  },
+  "runs": {
+   "asWritten": {
+    "n": 0,
+    "avgR": null,
+    "lo": null,
+    "hi": null
+   },
+   "base": {
+    "n": 0,
+    "avgR": null,
+    "lo": null,
+    "hi": null
+   },
+   "noSweep": {
+    "n": 16,
+    "avgR": -0.67,
+    "lo": -1.02,
+    "hi": -0.26
+   },
+   "noLevel": {
+    "n": 3,
+    "avgR": 3.46,
+    "lo": 1.7,
+    "hi": 5.8
+   },
+   "noPdr": {
+    "n": 3,
+    "avgR": -1.01,
+    "lo": -1.02,
+    "hi": -1
+   },
+   "noWindow": {
+    "n": 0,
+    "avgR": null,
+    "lo": null,
+    "hi": null
+   },
+   "only-wick": {
+    "n": 7,
+    "avgR": -0.52,
+    "lo": -1.02,
+    "hi": 0.12
+   },
+   "only-retest": {
+    "n": 13,
+    "avgR": -0.86,
+    "lo": -1.03,
+    "hi": -0.53
+   },
+   "only-break": {
+    "n": 3,
+    "avgR": -0.03,
+    "lo": -1.01,
+    "hi": 0.81
+   },
+   "only-ifvg": {
+    "n": 5,
+    "avgR": -0.81,
+    "lo": -1.08,
+    "hi": -0.34
+   },
+   "only-fvgRetest": {
+    "n": 7,
+    "avgR": -1.02,
+    "lo": -1.04,
+    "hi": -1.01
+   }
+  }
  }
 ]
