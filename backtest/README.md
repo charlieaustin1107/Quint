@@ -26,3 +26,8 @@ python3 backtest/crosscheck.py  # re-does the two simple strategies from scratch
 
 ## Refreshing the data
 TradingView's data connector gives a few thousand intraday candles per symbol: about 4 months of 15-minute candles and about 6 weeks of 5-minute candles. Ask Claude to "refresh the MNQ backtest data and re-run the backtests". It'll pull new candles, add them to the CSVs (keeping the older ones, so the history grows over time) and open a pull request with the new results.
+
+
+## Important limitation — exploratory only
+
+These scripts are the legacy Chart Wizard / Quint Brain candle backtests, not the Quint Control Strategy Lab's future automated-bot validation engine. Their fixed cost assumption and trade-count half split are not sufficient for a trusted out-of-sample claim: the split is by trade count rather than a locked chronological date range. OHLC bars cannot establish bid/ask fills, queue position or every intrabar stop/target sequence. The Python cross-check is useful for checking selected strategy calculations, but it does not independently validate the data feed or execution realism. Treat existing outputs as exploratory until re-run through a versioned, audited, event-aware pipeline. See `quint-control/research/BACKTEST-INTEGRITY-STANDARD.md` for the target standard.
