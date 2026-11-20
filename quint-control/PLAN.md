@@ -638,3 +638,24 @@ Implementation should be phased after the existing engine foundation: (3A) defin
 ## Strategy Lab implementation status (19 Nov 2026)
 
 The first Phase 3A vertical slice is on feature branch `quint-control/strategy-lab-phase-3a`: a pure-JavaScript MNQ Strategy Definition domain module, safe bounded expression evaluator, paper-scenario validator, JSON schemas, and a standalone browser prototype with local draft storage and JSON export. It is intentionally not wired to trading or market data. The website/engine phases 1 and 2 are still not started, so live feed, backtesting, Playback, paper fills and Claude natural-language interpretation remain follow-on work. Do not describe this prototype as live paper trading. See `reference/strategy-lab/README.md` and `web/strategy-lab/README.md`.
+
+
+---
+
+## Shared private Quint website and individual market-data connections
+
+**Research note (20 Nov 2026):** see [Shared platform and market-data research](research/SHARED-PLATFORM-AND-MARKET-DATA.md) before Phase 1 is started.
+
+The owner wants one private Quint website that both the owner and one invited friend can access. Share the web deployment, common API/control plane, database, static assets, monitoring and deployment costs once. Each person must have a separate authenticated workspace and must not see the other's broker accounts, orders, bots, settings, journal, private AI chat or secrets. GitHub contributor access does not itself create a runtime Quint account.
+
+**Individual billing and feeds are mandatory:** each person uses their own Claude API key and pays their own AI usage; each person connects their own NinjaTrader/broker account and their own permitted market-data entitlement. Never use one person's retail feed to rebroadcast live quotes, DOM, charts or derived real-time data to the other. The website and common infrastructure may be shared; user market data, execution engines and trading accounts remain isolated.
+
+The existing NinjaTrader 8 add-on remains the execution/risk engine. For a remote website, add a secure outbound authenticated TLS WebSocket from each local Quint Engine to the shared service; do not expose the current localhost server to the public internet. Bind each tunnel to one tenant and one engine identity. The local Guardian and OrderRouter remain authoritative; cloud commands cannot bypass them. If unattended 24/7 trading is required, each user needs an always-on Windows/NinjaTrader runtime unless a supported isolated multi-user host is confirmed.
+
+NinjaTrader's newer WebSocket Market Data API documents real-time quotes, DOM, histograms and chart events. Treat it as a possible separate adapter, not as automatically included in a standard desktop subscription. Its September 2026 API agreement and CME's June 2026 market-data terms impose material restrictions on transfer/redistribution and non-display use. Obtain written approval from NinjaTrader and any required exchange before implementing a central relay, shared stream or automated use. The safe initial proof is the existing per-user NinjaTrader Desktop feed routed only to that user's authenticated dashboard, subject to vendor confirmation.
+
+TradingView Plus remains a manual charting tool, not Quint's automated data backbone. No timed polling or extraction/rebroadcast of a personal TradingView subscription.
+
+Shared hosting cost estimates remain provisional. The earlier £15–£70/month shared-infrastructure allowance excludes licensed data and per-user always-on Windows runtimes; the existing $30–$40/month Windows-host estimate assumed one engine host and must not be treated as a two-user quote. Price per-user Claude, market data and Windows runtime separately.
+
+**Implementation gate:** revise Phase 1 architecture and protocol first; prove one user's secure outbound stream, then prove a second independent user's tenant isolation. Do not start public live-data sharing until the licensing questions in the research note are answered in writing. No trading code or existing Guardian/OrderRouter behaviour is changed by this research decision.
