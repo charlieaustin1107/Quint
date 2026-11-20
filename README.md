@@ -22,9 +22,11 @@ This repository contains separate products. Keep their code, tests, research and
 ## Start here
 
 1. Read `CLAUDE.md` for repository rules and product boundaries.
-2. For automated bots/site work, read `quint-control/README.md`, `quint-control/STATUS.md`, `quint-control/PLAN.md` and `quint-control/research/AUTOMATED-TRADING-KNOWLEDGE-BASE.md`.
-3. For Chart Wizard, read `chart-wizard/README.md`.
-4. For Quint Brain, read `quint-brain/README.md`.
-5. For Quint Lab and Quint HQ, read `lab/README.md`.
+2. Read [the repository guide](docs/REPOSITORY-GUIDE.md) for the product map and source-of-truth rules.
+3. Read [the testing and validation matrix](docs/TESTING-AND-VALIDATION.md) before running checks.
+4. For automated bots/site work, read `quint-control/README.md`, `quint-control/STATUS.md`, `quint-control/PLAN.md` and `quint-control/research/AUTOMATED-TRADING-KNOWLEDGE-BASE.md`.
+5. For Chart Wizard, read `chart-wizard/README.md`.
+6. For Quint Brain, read `quint-brain/README.md`.
+7. For Quint Lab and Quint HQ, read `lab/README.md`.
 
 Do not move code between products just to share a concept. Prefer explicit, tested interfaces. Keep credentials and account secrets out of Git.

@@ -11,7 +11,7 @@ The owner scalps and day-trades **MNQ** (Micro E-mini Nasdaq-100, `CME_MINI:MNQ1
 
 ## Contract facts (never guess these)
 - MNQ: **$2 a point**, tick 0.25 = **$0.50**. NQ: $20 a point.
-- Costs in every backtest and every sizing number: **$0.75 commission a side + 1 tick slippage a side** = $2.50 a round trip per MNQ.
+- Legacy Quint Brain backtest assumption: **$0.75 commission per side + 1 tick slippage per side** = $2.50 round trip per MNQ. This skill covers Chart Wizard/Quint Brain only; it is not the Quint Control/Lab fee model and is not a universal broker tariff. Use the owning product's declared cost profile and verify actual account fees.
 - RTH: 09:30–16:00 New York. CME Globex: Sunday 18:00 to Friday 17:00 NY, daily break 17:00–18:00. The owner lives in the UK: give times in UK time and New York time.
 
 ## What earns a place in the app

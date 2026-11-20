@@ -4,6 +4,7 @@ Read this first in every session, then read the README for the specific product 
 
 ## Start here
 1. Read `quint-control/STATUS.md` for the current phase and next task.
+2. Use `docs/REPOSITORY-GUIDE.md` for the product map and `docs/TESTING-AND-VALIDATION.md` for the test matrix.
 2. Read `.claude/skills/quint-control/SKILL.md` when working in Quint Control.
 3. Read only the relevant specification or phase prompt linked below. Do not load every research file by default.
 4. Before finishing, update STATUS with completed work, tests, blockers and the exact next step.
@@ -22,7 +23,7 @@ Read this first in every session, then read the README for the specific product 
 ## Who this is for
 - The owner trades **MNQ (Micro Nasdaq futures, `CME_MINI:MNQ1!`)** and is working to **pass a Lucid Trading funded account**.
 - They trade **scalps to day trades**: roughly 15 minutes to a couple of hours.
-- They work **only from an iPhone**. There's no computer. Every screen has to work well on a phone, and every explanation should be in plain English.
+- They primarily use an **iPhone** for day-to-day work. A Windows PC is required for NinjaTrader setup and platform checks; do not assume it is configured or available until confirmed. Keep screens phone-friendly and explanations in plain English.
 
 ## What's in the repo
 | Folder | What it is | Where it runs |
@@ -81,7 +82,7 @@ Never put Quint Control bot-engine code inside Chart Wizard or Quint Brain. Neve
 ## Backtesting
 - Read `quint-brain/backtest/README.md` for how to run it.
 - The strategy logic is **not rewritten**. `quint-brain/backtest/extract_engine.py` copies Quint Brain's own functions into `quint-brain/backtest/engine.js`, so the backtest tests exactly what the app teaches. After changing the rules in Quint Brain, re-run the extractor.
-- Costs are always included: **$0.75 commission a side plus 1 tick of slippage a side**. MNQ is $2 a point and a tick is 0.25.
+- Costs are always included, but assumptions are product-scoped: the legacy `quint-brain/backtest/` reports use $0.75 commission per side plus 1 tick of slippage per side; Quint Control and Quint Lab currently model $0.50 commission per side plus 1 tick each way. These are research assumptions, not universal broker tariffs; verify and version account-specific costs.
 - Always report the result **out of sample** as well as over the whole period. One good stretch isn't proof.
 - The legacy `quint-brain/backtest/` trade-count half split is not out-of-sample. Its fixed $2.50 round-trip assumption is not a universal account cost. Treat its outputs as exploratory.
 - Lucid's limits matter more than profit: report the worst drawdown in dollars on 1 contract.

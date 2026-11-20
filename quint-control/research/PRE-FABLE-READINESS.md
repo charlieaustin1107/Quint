@@ -37,11 +37,18 @@ If a discovered issue appears to create immediate security or live-trading dange
 ## Current project facts to preserve
 - Chart Wizard and Quint Brain are existing learning/analysis apps. They do not place orders.
 - Quint Control is the planned NinjaTrader 8 execution engine and dashboard; its Phase 1 and Phase 2 remain not started in STATUS.md.
-- The Strategy Lab Phase 3A branch is a local prototype only. It is not connected to the engine, market data, historical backtesting, live paper fills or live orders.
+- The Strategy Lab Phase 3A prototype is present on `main` as a local browser prototype. It is not connected to the engine, market data, historical backtesting, live paper fills or live orders.
 - The five-pillar playbook is the owner's strategy and must be preserved.
 - All live order paths must remain behind the deterministic Guardian and single OrderRouter. AI must never bypass them.
 - Claude/Fable is an optional research, explanation and authoring layer. It must never be a runtime dependency for managing an open trade.
 - The owner is waiting for Fable 5.2 renewal before dashboard implementation. Do not assume a renewal date or model availability.
+
+## Cost assumptions — product scope, not a single unresolved contradiction
+
+The repository uses different historical assumptions in different products:
+- Legacy Quint Brain candle-backtest reports: $0.75 MNQ commission per side plus one tick of slippage per side. Preserve this when reproducing those historical reports.
+- Quint Control and Quint Lab: currently model $0.50 MNQ commission per side plus one tick of slippage per side, reflecting the current Lucid-oriented assumption in their plans and skills.
+- Neither value is a universal broker tariff. Before a live account is configured, verify its actual commission schedule and store it in a versioned per-account cost profile. Do not rewrite old results by silently changing their assumptions.
 
 ## Architecture improvements to design, not implement yet
 
