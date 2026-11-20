@@ -35,3 +35,10 @@ No new backtest or paper-forward test was run during this repository review.
 ## 2026-11-20 — Swing
 
 See [the full swing research note](notes/2026-11-20-swing-55d-donchian.md). The candidate is a 55/20-day Donchian breakout with a 2 × ATR(20) initial stop, benchmarked against a fixed 20/10-day variant and risk-matched long-only baselines. Academic evidence is mixed and the exact MNQ setup remains untested. LucidFlex's official rules require positions flat by 4:45 PM ET and prohibit overnight holding on simulated accounts, so this exact multi-day strategy is not eligible for LucidFlex evaluation/funded-sim use. A flat-by-close adaptation would be a separate hypothesis. No backtest was run.
+
+
+## 2026-11-20 — Contract-roll and continuous-series integrity
+
+| Date | Experiment | Finding | Status |
+|---|---|---|---|
+| 2026-11-20 | [Contract-roll and continuous-series integrity](2026-11-20-contract-roll-integrity.md) | CME quarterlies expire on the third Friday; CME/Databento/QuantConnect document materially different continuous-series and mapping behaviours. Require timestamped prior-day volume/OI, raw expiry prices for fills, and an explicit mapping audit. | Specification only; no MNQ backtest result |

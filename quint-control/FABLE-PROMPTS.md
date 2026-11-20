@@ -182,6 +182,8 @@ Bots (read the original papers, implement the rules exactly, and list every plac
 3. Port my 5-pillar playbook (pbEval in chart-wizard/src/pillars.js), the 20-candle breakout and the New York open breakout from the repo exactly. They must give the same trades as backtest/ on the same candles.
 4. Gap fade (Testing, lowest priority; the rules are fixed here before any results are seen). MNQ, 5-minute chart, New York regular session, one trade a day. The gap is the 9:30 New York open minus the previous day's 16:00 close; trade only gaps between 0.2% and 1.0% of price. Wait for the 9:30-9:35 candle to close back towards the gap (red after a gap up, green after a gap down), then enter at that close: short after a gap up, long after a gap down. Stop 1 tick beyond the day's high (short) or low (long) so far. Target: the previous day's 16:00 close; skip the trade if the target is less than 1x the stop away. Exit at 11:30 New York if neither is hit. No entries after 10:00 New York. Test it with and without skipping days that have a red-folder release before 10:00 New York, and report both versions. Evidence it must beat: a walk-forward test on 2 years of MNQ hourly data made profit factor 1.14 but had a $3,116 worst drawdown (https://dev.to/vikihermes/i-backtested-4-mnq-day-trading-strategies-walk-forward-heres-what-actually-survived-and-the-2h12), and a larger MNQ study found gap fills didn't beat costs (arXiv 2605.04004).
 
+5. **VWAP research experiment (Testing only; not one of the two evidence-backed bots).** Read `research/mnq/2026-11-19-vwap-first-pullback.md` as the source of truth. Keep the original paper-style VWAP crossover as a separate baseline, then implement VWAP First-Pullback Continuation v1 exactly as specified there. Do not tune the frozen primary rules or change its session, stop, target, news window or one-trade-per-session cap after seeing results. First audit available MNQ data, exact trade-volume VWAP availability, bid/ask/tick fill data, contract rolls and costs. Build and test the JavaScript reference first; do not create a production C# bot or touch the live engine. Use Lucid's $0.50 commission per side plus the plan's one tick adverse slippage each way, then stress two ticks each way. Compare with the exact VWAP crossover baseline and a matched random-entry placebo; run the specified walk-forward, untouched 2025–2026 holdout, sensitivity, regime and best-day checks. If the available history or trade count is insufficient, report that honestly and leave the experiment Testing. The note's rules and this prompt must stay in sync; any rule change requires a new experiment version and new evidence.
+
 Tests, three times: golden files from the JavaScript reference for every bot on the MNQ data in backtest/data, parity, look-ahead and settings-range tests, and self-tests for every bot.
 My checklist: compile, run the self-tests, run each wrapper in Strategy Analyzer on MNQ for the longest period NinjaTrader gives me, and paste the summaries.
 Done when: parity passes, the Strategy Analyzer results are in the pull request, and the template lets me (or you) add a bot by copying one file.
@@ -355,4 +357,21 @@ Scope:
 7. Update STATUS.md and report exact tests. Keep the branch reviewable; do not merge main.
 
 Completion requires all cloud tests to pass three times. If CI is unavailable, say so; do not claim tests passed.
+```
+
+
+### Research task: MNQ contract-roll and continuous-series integrity (20 Nov 2026)
+
+```text
+Implement the data-integrity audit in research/mnq/2026-11-20-contract-roll-integrity.md.
+
+First audit the existing MNQ data and produce the complete contract manifest. Do not start by writing a strategy or assuming the data is complete.
+
+Build causal calendar, prior-trade-date-volume and timestamped-published-OI mappings exactly as specified. The selected contract for a session must be reproducible using only information available before that session. Add tests that fail if same-day final volume, future OI or future roll information leaks into an earlier mapping.
+
+Use raw listed MNQ expiry prices for all entries, stops, targets and realised P&L. Never use back-adjusted continuous prices as fills. Compare the three mapping policies with the frozen 5-minute opening-range sentinel, no-trade baseline and matched random placebo, using the cost, sample, split, walk-forward and sensitivity rules in the note.
+
+If the required per-expiry history, quotes, volume or OI availability timestamps are missing, stop and report the exact data gap. Do not manufacture a backtest or silently forward-fill missing observations.
+
+This is research infrastructure only. Keep changes on a separate branch and update PLAN.md, FABLE-PROMPTS.md, the research programme and STATUS.md consistently. Do not change NinjaTrader live execution, Guardian, OrderRouter, kill switches, account settings or Go Live controls. Run relevant tests three times and report actual results. Do not merge main or claim strategy profitability.
 ```
