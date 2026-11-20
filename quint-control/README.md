@@ -4,6 +4,8 @@
 
 - Pre-Fable scope and architecture: `research/PRE-FABLE-READINESS.md`
 - Claude read-only audit prompt: `prompts/PRE-FABLE-REPOSITORY-AUDIT.md`
+- Firecrawl research-ingestion integration: `research/integrations/FIRECRAWL-RESEARCH-INGESTION.md`
+- OpenMausBot-inspired development-agent workflow: `research/integrations/OPENMAUSBOT-DEV-AGENTS.md`
 
 ---
 
@@ -24,28 +26,3 @@ A NinjaTrader 8 trading engine with a black, futuristic dashboard website. It ru
 - **How the engine and website talk:** `protocol.md`
 
 ## Folders
-
-| Folder | What goes in it |
-|---|---|
-| `core/` | The trading logic in plain C# (no NinjaTrader code), so it can be tested |
-| `engine/` | The NinjaTrader add-on: adapters, the local web server and the self-test runner |
-| `strategies/` | One file per bot, plus `_Template.cs` |
-| `reference/` | A JavaScript copy of the trading logic, tested with `node`, which produces the golden test files |
-| `web/` | The dashboard website, its mock engine and its Playwright tests |
-| `tests/golden/` | Golden files: inputs in, expected decisions out, used by both the reference and the engine's self-tests |
-| `help/` | One help entry per screen, button and setting, for the Quint assistant |
-| `install/` | `Install-Quint.ps1` and `Uninstall-Quint.ps1` |
-| `firms/` | Prop firm rule presets as JSON |
-| `protocol/` | JSON schemas and example messages for the engine-to-website protocol |
-| `research/` | Automated-trading research, evidence and Claude implementation knowledge |
-
-## Tests
-
-```
-cd quint-control
-npm test
-```
-
-Nothing here is financial advice. Only the Quint Engine places orders, and only after your confirm.
-
-- **Autonomous bot uptime research:** `research/AUTONOMOUS-BOT-RUNTIME-AND-UPTIME.md` (event-driven runtime, website controls, recovery, monitoring and costs)
