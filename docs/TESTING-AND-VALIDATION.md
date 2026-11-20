@@ -35,7 +35,7 @@ npm test
 npm run test:3
 ```
 
-The Lab suite covers scorecards, Lucid simulation, candle ingestion/aggregation, factory results, paper-forward chronology, registry/roundup behaviour and Quint HQ HTML safety. The workflow added in this branch runs both commands on relevant pushes and pull requests.
+The Lab suite covers scorecards, Lucid simulation, candle ingestion/aggregation, factory results, paper-forward chronology, registry/roundup behaviour and Quint HQ HTML safety. The browser end-to-end test is skipped when Node Playwright is absent, so CI explicitly installs Playwright and Chromium before running the suite. The workflow added in this branch runs both commands on relevant pushes and pull requests.
 
 ## Chart Wizard
 
