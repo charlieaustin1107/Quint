@@ -15,6 +15,7 @@ A NinjaTrader 8 trading engine with a black, futuristic dashboard website. It ru
 - **Shared website / live data research:** `research/SHARED-PLATFORM-AND-MARKET-DATA.md` (two-user hosting, per-user data and Claude billing, NinjaTrader API and licensing gates)
 - **Backtest integrity standard:** `research/BACKTEST-INTEGRITY-STANDARD.md` (data quality, fill realism, validation, anti-overfitting and report requirements)
 - **External tools research:** `research/EXTERNAL-TOOLS-FIRECRAWL-OPENMAUSBOT.md` (Firecrawl research ingestion and OpenMausBot-style multi-agent development; documentation only)
+- **Stitch Skills adoption:** `research/integrations/STITCH-SKILLS-ADOPTION.md` (selected Google Stitch design-to-frontend skills; documentation only)
 - **Permanent bot/strategy knowledge:** `research/AUTOMATED-TRADING-KNOWLEDGE-BASE.md`
 - **MNQ research programme:** `research/mnq/`
 - **Prop-firm overnight research:** `research/prop-firms/OVERNIGHT-FUTURES.md`
