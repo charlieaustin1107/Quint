@@ -659,3 +659,18 @@ TradingView Plus remains a manual charting tool, not Quint's automated data back
 Shared hosting cost estimates remain provisional. The earlier £15–£70/month shared-infrastructure allowance excludes licensed data and per-user always-on Windows runtimes; the existing $30–$40/month Windows-host estimate assumed one engine host and must not be treated as a two-user quote. Price per-user Claude, market data and Windows runtime separately.
 
 **Implementation gate:** revise Phase 1 architecture and protocol first; prove one user's secure outbound stream, then prove a second independent user's tenant isolation. Do not start public live-data sharing until the licensing questions in the research note are answered in writing. No trading code or existing Guardian/OrderRouter behaviour is changed by this research decision.
+
+
+---
+
+## Autonomous bot runtime, uptime and website operation
+
+**Research note (20 Nov 2026):** see [Autonomous bot runtime and uptime](research/AUTONOMOUS-BOT-RUNTIME-AND-UPTIME.md) before implementing unattended operation or remote controls.
+
+Deterministic bots run inside each user's NinjaTrader 8 Quint Engine. They never require Claude, an open website or an AI agent to remain active. The website is the remote control/monitoring surface, not the execution host. Claude is used only on explicit assistant tasks; no per-tick, per-candle, heartbeat or chart-render API calls.
+
+Distinguish website availability, engine availability, market availability and bot availability. NinjaScript runs inside NinjaTrader 8 Desktop on Windows; NinjaTrader strategies terminate when NinjaTrader shuts down. Unattended operation therefore requires each user's own awake Windows PC or isolated Windows VPS/VM. One shared website does not remove the per-user engine-host requirement. The existing $30–$40/month Windows host estimate assumed one engine host; a friend needing independent cloud uptime may require another. Local PCs avoid rental cost but are not 24/7 if asleep or powered off.
+
+The website sends authenticated tenant-scoped commands through each engine's outbound secure tunnel. Each engine persists bot config/version/state and revalidates every command through the local Guardian. On process restart, enter Recovery/Needs Reconciliation, fetch actual broker positions/orders/fills, verify protective stops and risk limits, and only then permit explicit safe resume. Never blindly restore live Running state or resend non-idempotent order commands after a timeout.
+
+Run bots event-driven from NinjaTrader market events, using OnBarClose or tick/price-change evaluation only as each strategy requires. Use bounded queues, non-blocking handlers, freshness/lag checks and deterministic local logic. The engine continues if the browser closes or Claude is unavailable; it cannot continue if its Windows runtime is down. Add bounded reconnects, external dead-man monitoring, Telegram alerts, durable journals, 5-session soak tests and fault injection. Healthchecks.io currently lists 20 checks at $0/month on Hobbyist; $5 Supporter has the same count. See the research note for lifecycle, recovery and acceptance criteria. No AI or per-bot SaaS charge is needed for deterministic execution; Windows hosting and market data are separate per-user costs.
