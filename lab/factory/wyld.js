@@ -2,8 +2,9 @@
 // WYLD Will's Four Pillars, the same rules as the TradingView indicator (lab/pine/wyld_four_pillars.pine), replayed
 // candle by candle on stored MNQ candles so the lab can test, dissect and learn from exactly what the indicator alerts.
 //
-//   ① Sweep: price trades through a pool of 15m equal highs or lows that formed before the open. Pools are marked as
-//      taken at any hour; only a sweep inside the window starts a stage (a pool taken overnight doesn't count).
+//   ① Sweep: price trades through a pool that formed before the open: 15m equal highs or lows, plus (the owner's
+//      choice, on by default) the prior day's high and low (from the 18:00 session open) and the overnight high and low
+//      (from 9:30). Pools are marked as taken at any hour; only a sweep inside the window starts a stage.
 //   ② HTF level holds: within the hold time, a candle trades into a monthly, weekly or daily level near the sweep and
 //      closes back on the right side. That level is Point A.
 //   ③ PDR bias: Point B is the next HTF level beyond Point A (or the next pool); Target 2 the opposing liquidity.
@@ -19,7 +20,7 @@
 const { nyTime } = require('../../quint-control/proof/noise_momentum');
 
 const DEFAULTS = {
-  windowHours: 3, swingLen: 3, eqTicks: 8, lookbackDays: 3, onlyPremarket: true, usePdPools: false, useOnPools: false,
+  windowHours: 3, swingLen: 3, eqTicks: 8, lookbackDays: 3, onlyPremarket: true, usePdPools: true, useOnPools: true, // the owner's choice, 20 Nov 2026
   useMonthly: true, useWeekly: true, useDaily: true, overlapTicks: 8, reachTicks: 60, tolTicks: 4, minPdrTicks: 40, breakTicks: 8,
   holdMinutes: 30, confirm: 'any', sbLen: 5, fvgLookMinutes: 20, stopBufTicks: 2, minR: 1, maxEntries: 3, reentryMinutes: 5,
   be: 'none', skip: null, noWindow: false,
@@ -111,19 +112,20 @@ function run(bars, b15, daily, opt = {}) {
   const holdBars = Math.max(1, Math.ceil(p.holdMinutes / tf)), reentryBars = Math.max(1, Math.ceil(p.reentryMinutes / tf)), fvgLook = Math.max(1, Math.ceil(p.fvgLookMinutes / tf));
   const levels = cached(daily, 'lv' + [p.overlapTicks, p.useMonthly, p.useWeekly, p.useDaily, p.tick].join(), () => levelsByDay(daily, p));
   const events = cached(b15, 'sw' + p.swingLen, () => swingEvents(b15, p.swingLen));
-  const funnel = { sweeps: 0, takenOvernight: 0, holds: 0, noHold: 0, pdrs: 0, noPointB: 0, confirmations: 0, skippedInTrade: 0, lowRoom: 0, entries: 0, completeB: 0, broken: 0, expired: 0 };
+  const funnel = { sweeps: 0, sweepKinds: {}, takenOvernight: 0, holds: 0, noHold: 0, pdrs: 0, noPointB: 0, confirmations: 0, skippedInTrade: 0, lowRoom: 0, entries: 0, completeB: 0, broken: 0, expired: 0 };
   const swings = { 1: [], [-1]: [] }, pools = [];
-  const addPool = (level, dir, t) => {
+  // kind: EQH / EQL (15m equal highs or lows), PDH / PDL (prior day), ONH / ONL (overnight), as the indicator labels them
+  const addPool = (level, dir, t, kind, touches) => {
     const hit = pools.find((x) => x.dir === dir && !x.swept && Math.abs(x.p - level) <= p.eqTicks * tk);
-    if (hit) { hit.p = dir === 1 ? Math.max(hit.p, level) : Math.min(hit.p, level); hit.n++; return; }
-    pools.push({ p: level, dir, t, swept: false, n: 2 });
+    if (hit) { hit.p = dir === 1 ? Math.max(hit.p, level) : Math.min(hit.p, level); hit.n++; if (!hit.kind.includes(kind)) hit.kind += '/' + kind; return; }
+    pools.push({ p: level, dir, t, swept: false, n: touches, kind });
     if (pools.length > 60) pools.shift();
   };
   const addSwing = (e) => {
     const list = swings[e.dir];
     for (let i = list.length - 1; i >= Math.max(0, list.length - 12); i--) {
       const q = list[i];
-      if (Math.abs(e.price - q.price) <= p.eqTicks * tk && e.time - q.time <= lookS) { addPool(e.dir === 1 ? Math.max(e.price, q.price) : Math.min(e.price, q.price), e.dir, e.time); break; }
+      if (Math.abs(e.price - q.price) <= p.eqTicks * tk && e.time - q.time <= lookS) { addPool(e.dir === 1 ? Math.max(e.price, q.price) : Math.min(e.price, q.price), e.dir, e.time, e.dir === 1 ? 'EQH' : 'EQL', 2); break; }
     }
     list.push(e);
     if (list.length > 40) list.shift();
@@ -147,12 +149,13 @@ function run(bars, b15, daily, opt = {}) {
     const td = tradeDate(b.t), L = levels.get(td), lv = L ? L.levels : [];
     // the indicator learns of new 15m swings as each 15m candle completes
     while (ei < events.length && events[ei].at <= b.t) addSwing(events[ei++]);
+    const isON = min >= 1080 || min < 570;
     if (inWindow && !wasIn) {
       winStart = b.t;
-      if (p.usePdPools && L) { addPool(L.pdl, -1, b.t - 60); addPool(L.pdh, 1, b.t - 60); }
-      if (p.useOnPools && onH !== null) { addPool(onL, -1, b.t - 60); addPool(onH, 1, b.t - 60); }
+      if (p.useOnPools && onH !== null) { addPool(onL, -1, b.t - 60, 'ONL', 1); addPool(onH, 1, b.t - 60, 'ONH', 1); } // known at 9:30
     }
-    const isON = min >= 1080 || min < 570;
+    // the prior day's high and low join when the session opens at 18:00, so a run overnight counts as already taken
+    if (isON && !wasON && p.usePdPools && L) { addPool(L.pdl, -1, b.t - 60, 'PDL', 1); addPool(L.pdh, 1, b.t - 60, 'PDH', 1); }
     if (isON && !wasON) { onH = b.h; onL = b.l; } else if (isON) { onH = Math.max(onH, b.h); onL = Math.min(onL, b.l); }
     wasON = isON;
     // fill an order from the last candle, then the stop and target inside this candle (the stop first)
@@ -197,10 +200,11 @@ function run(bars, b15, daily, opt = {}) {
       if (s.step === 0 && inWindow) {
         let start = null;
         if (p.skip === 'sweep') { const near = lv.filter((x) => (d === 1 ? b.l <= x.p + tol && b.l > x.p - p.reachTicks * tk : b.h >= x.p - tol && b.h < x.p + p.reachTicks * tk)); if (near.length) start = { p: d === 1 ? Math.max(...near.map((x) => x.p)) : Math.min(...near.map((x) => x.p)), n: 0, kind: 'HTF level' }; }
-        else if (taken[d].length) { const q = taken[d].reduce((a, x) => (d === 1 ? (x.p < a.p ? x : a) : (x.p > a.p ? x : a))); start = { p: q.p, n: q.n, kind: d === 1 ? 'EQL' : 'EQH' }; }
+        else if (taken[d].length) { const q = taken[d].reduce((a, x) => (d === 1 ? (x.p < a.p ? x : a) : (x.p > a.p ? x : a))); start = { p: q.p, n: q.n, kind: q.kind }; }
         if (start) {
           Object.assign(s, { step: 1, pool: start.p, poolN: start.n, poolKind: start.kind, extreme: d === 1 ? b.l : b.h, extremeI: i, wickEdge: d === 1 ? b.h : b.l, sweepI: i, sweepMin: min, entries: 0, lastEntryI: null, usedWick: false, usedBreak: false });
           funnel.sweeps++;
+          funnel.sweepKinds[start.kind] = (funnel.sweepKinds[start.kind] || 0) + 1;
         }
       }
       // ② an HTF level near the sweep holds (with skip 'level', a close back beyond the swept pool)
@@ -222,7 +226,7 @@ function run(bars, b15, daily, opt = {}) {
           for (const x of lv) if ((d === 1 ? x.p > s.A + p.minPdrTicks * tk : x.p < s.A - p.minPdrTicks * tk) && (B === null || (d === 1 ? x.p < B : x.p > B))) { B = x.p; bName = x.name; }
           for (const q of pools) {
             if (q.dir !== d || q.swept || !(d === 1 ? q.p > s.A + p.minPdrTicks * tk : q.p < s.A - p.minPdrTicks * tk)) continue;
-            if (B === null) { B = q.p; bName = d === 1 ? 'Equal highs' : 'Equal lows'; } else if ((d === 1 ? q.p > B : q.p < B) && (T2 === null || (d === 1 ? q.p < T2 : q.p > T2))) T2 = q.p;
+            if (B === null) { B = q.p; bName = q.kind; } else if ((d === 1 ? q.p > B : q.p < B) && (T2 === null || (d === 1 ? q.p < T2 : q.p > T2))) T2 = q.p;
           }
           if (B === null) { funnel.noPointB++; st[d] = mk(d); continue; }
         }

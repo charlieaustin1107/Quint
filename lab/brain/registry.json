@@ -37,7 +37,7 @@
         {
           "name": "TradingView indicator: Quint · WYLD Four Pillars",
           "where": "Your TradingView (My scripts); code in lab/pine/wyld_four_pillars.pine",
-          "note": "Version 2.0: live step-by-step alerts with each step marked on the chart (the wick box of the last push with its 50% and close-beyond trigger, the level that held, the PDR box, entry and stop, how each setup ended), a small confluence box (Detailed in settings) and a regime table for every timeframe. Pools run overnight no longer count as a 9:30 sweep. Signals only; a mechanical reading of the rules with the open choices as settings."
+          "note": "Version 3.0 (TradingView's count of saves): live step-by-step alerts with each step marked on the chart (the wick box of the last push with its 50% and close-beyond trigger, the level that held, the PDR box, entry and stop, how each setup ended), a small confluence box (Detailed in settings) and a regime table for every timeframe. Counts the prior day's and the overnight highs and lows as pools too (your choice); a pool run overnight never counts as a 9:30 sweep. Signals only; a mechanical reading of the rules with the open choices as settings."
         },
         {
           "name": "Older coding: six steps",
@@ -72,10 +72,16 @@
           "where": "lab/ANATOMY.md and lab/FACTORY_REPORT.md (sequence analyst and factory family wyld, both running the indicator's exact rules from lab/factory/wyld.js)",
           "data": "MNQ 5m, 21 Oct to 18 Nov 2026 (20 sessions), 15m and daily levels",
           "trades": 0,
-          "note": "As written, no setup started: all 50 pools marked before the open had been run before 9:30. With prior-day and overnight highs/lows as pools: 25 sweeps, 6 held a level, 6 PDRs, 0 confirmations (Point B reached 4 times and the PDR broke twice before a 5-minute confirmation formed). Without the sweep: 16 trades, average -0.67R (95% range -1.02 to -0.26), too few to be a finding. The factory's 48 exact-rule variations: none traded enough to rank. Needs 1-minute candles and an exact pool rule before a verdict."
+          "note": "As written, no setup started: all 50 pools marked before the open had been run before 9:30. With prior-day and overnight highs/lows as pools: 25 sweeps, 6 held a level, 6 PDRs, 0 confirmations (Point B reached 4 times and the PDR broke twice before a 5-minute confirmation formed). Without the sweep: 16 trades, average -0.67R (95% range -1.02 to -0.26), too few to be a finding. The factory's 48 exact-rule variations: none traded enough to rank. Needs 1-minute candles and an exact pool rule before a verdict. Corrected 20 Nov 2026: 5 of those 25 sweeps were prior-day levels already run overnight, counted at 9:30 by mistake. With that fixed: 20 sweeps, 4 held a level, 4 PDRs, 0 confirmations."
         }
       ],
-      "next": "1-minute candles (queue one-minute-data), then the exact pool rule (wyld-exact-rules). The sequence analyst re-runs every night and says when each pillar has 30 trades to judge."
+      "next": "1-minute candles (queue one-minute-data), then the exact pool rule (wyld-exact-rules). The sequence analyst re-runs every night and says when each pillar has 30 trades to judge.",
+      "notes": [
+        {
+          "date": "2026-11-20",
+          "note": "Your rule: count both. Besides the 15m equal highs and lows, the prior day's high and low and the overnight high and low count as liquidity pools for the sweep (WYLD himself counts only the equal highs and lows). A pool run before 9:30 is already taken. The indicator (version 3.0), its backtest copy and the analyst use this by default; the analyst still reports WYLD's own pools separately."
+        }
+      ]
     },
     {
       "id": "app-20-candle-breakout",
@@ -551,7 +557,7 @@
     },
     {
       "id": "wyld-exact-rules",
-      "what": "Write WYLD Will's Four Pillars as exact rules a computer can test, following his videos: what counts as the easiest equal highs and lows on the 15m, how a level shows it holds, the stop buffer in ticks, the break-even trigger, and the cap on entries per PDR. You answer the gaps in Quint HQ or in chat. Then the Trading Mastery and Chart Wizard versions get lined up with these rules. Nothing is backtested until the rules are fixed.",
+      "what": "Write WYLD Will's Four Pillars as exact rules a computer can test, following his videos: what counts as the easiest equal highs and lows on the 15m, how a level shows it holds, the stop buffer in ticks, the break-even trigger, and the cap on entries per PDR. You answer the gaps in Quint HQ or in chat. Then the Trading Mastery and Chart Wizard versions get lined up with these rules. Nothing is backtested until the rules are fixed. Answered so far: which pools count (20 Nov 2026, your rule: the 15m equal highs and lows plus the prior day's and the overnight highs and lows). Still open: how close two swings must be to count as equal, how a level shows it holds, the stop buffer, the break-even trigger and the cap on entries per PDR.",
       "cost": "None",
       "auto": false
     }

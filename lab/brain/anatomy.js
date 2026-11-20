@@ -28,11 +28,12 @@ const { basic } = require('../lib/score');
 const MIN_TRADES = 30; // below this, counts only: no verdicts
 const REPS = 10000;
 const SEED = 20261119;
-const WIDER = { usePdPools: true, useOnPools: true }; // the indicator's setting that also counts prior-day and overnight highs and lows
+const WYLD_ONLY = { usePdPools: false, useOnPools: false }; // WYLD's own pools: the 15m equal highs and lows only
+const WIDER = { usePdPools: true, useOnPools: true }; // the owner's indicator settings (20 Nov 2026): prior-day and overnight highs and lows count too
 
 const RUNS = [
-  { id: 'asWritten', name: 'As written (his 15m equal highs and lows only)', opt: {} },
-  { id: 'base', name: 'With prior-day and overnight highs/lows as pools too', opt: { ...WIDER } },
+  { id: 'asWritten', name: 'WYLD\'s own pools only (15m equal highs and lows)', opt: { ...WYLD_ONLY } },
+  { id: 'base', name: 'Your settings (prior-day and overnight highs/lows count too)', opt: { ...WIDER } },
   { id: 'noSweep', name: 'Without ① the sweep (price simply trades into a level)', opt: { ...WIDER, skip: 'sweep' }, without: 'sweep' },
   { id: 'noLevel', name: 'Without ② the HTF level (a close back beyond the swept pool)', opt: { ...WIDER, skip: 'level' }, without: 'level' },
   { id: 'noPdr', name: 'Without ③ the PDR (a fixed 2R target)', opt: { ...WIDER, skip: 'pdr' }, without: 'pdr' },
@@ -100,6 +101,7 @@ function summarise(trades) {
 }
 
 const BUCKETS = {
+  pool: (t) => t.tag.poolKind,
   confirm: (t) => t.tag.confirm,
   side: (t) => t.tag.side,
   level: (t) => ({ 0: 'swept pool', 1: 'daily', 2: 'weekly', 3: 'monthly' })[t.tag.levelRank] || 'other',
@@ -164,10 +166,11 @@ const range = (lo, hi) => (lo === null ? '' : ` (95% range ${sR(lo)} to ${sR(hi)
 
 function lessons(a) {
   const L = [], w = a.runs.asWritten, b = a.runs.base, f = b.funnel;
-  if (w.funnel.sweeps === 0) L.push(`As written, no setup started: all ${w.funnel.takenOvernight} pools marked before the open had already been run before 9:30, so there was nothing left to sweep in the window.`);
-  else L.push(`As written: ${w.funnel.sweeps} sweeps in the window, ${w.n} trades.`);
+  if (w.funnel.sweeps === 0) L.push(`With WYLD's own pools only (15m equal highs and lows), no setup started: all ${w.funnel.takenOvernight} pools marked before the open had already been run before 9:30, so there was nothing left to sweep in the window.`);
+  else L.push(`With WYLD's own pools only (15m equal highs and lows): ${w.funnel.sweeps} sweeps in the window, ${w.n} trades.`);
   if (f.sweeps) {
-    L.push(`With prior-day and overnight highs and lows as pools too: ${f.sweeps} sweeps → ${f.holds} held a level (${pct(f.holds, f.sweeps)}) → ${f.pdrs} PDRs → ${f.confirmations} confirmations → ${f.entries} entries.`);
+    L.push(`With your settings (prior-day and overnight highs and lows count too): ${f.sweeps} sweeps → ${f.holds} held a level (${pct(f.holds, f.sweeps)}) → ${f.pdrs} PDRs → ${f.confirmations} confirmations → ${f.entries} entries.`);
+    L.push(`Which pools were swept: ${Object.entries(f.sweepKinds || {}).sort((x, y) => y[1] - x[1]).map(([k, v]) => `${k} ${v}`).join(', ')} (EQH/EQL: 15m equal highs/lows, PDH/PDL: prior day, ONH/ONL: overnight).`);
     if (f.noHold >= f.sweeps / 2) L.push(`Most sweeps die at ②: ${f.noHold} of ${f.sweeps} had no higher-timeframe level hold nearby in time. Pillar ② is the main filter.`);
     if (f.pdrs && f.confirmations === 0 && f.completeB + f.broken >= f.pdrs / 2) L.push(`Every PDR ended before a ${a.candles} confirmation formed (Point B reached ${f.completeB}, broken ${f.broken}). WYLD confirms on the 1-minute chart; this needs 1-minute candles to judge.`);
   }

@@ -21,7 +21,7 @@
         {
           "name": "TradingView indicator: Quint · WYLD Four Pillars",
           "url": "https://github.com/charlieaustin1107/Quint/blob/lab/quint-lab/lab/pine/README.md",
-          "differs": "Follows these rules live with an alert at every step, and marks each step on the chart: the wick box of the candle that made the last push (its 50% and the close-beyond trigger), the level that held, the PDR box with its steps, entry and stop. In your TradingView under My scripts (version 2.0). No order-block entry yet."
+          "differs": "Follows these rules live with an alert at every step, and marks each step on the chart: the wick box of the candle that made the last push (its 50% and the close-beyond trigger), the level that held, the PDR box with its steps, entry and stop. Counts the prior day's and the overnight highs and lows as pools too (your rule). In your TradingView under My scripts (version 3.0). No order-block entry yet."
         },
         {
           "name": "Trading Mastery's six steps",
@@ -47,7 +47,7 @@
       "premarket": [
         "Redraw higher-timeframe levels from scratch: monthly, then weekly, then daily. About 95% of the time you stop at the daily.",
         "Only mark levels near price. Drop any lower-timeframe level that overlaps a higher one. When in doubt, leave it out.",
-        "On the 15m, mark the easiest equal highs and lows nearest price. Note whether either side is already swept.",
+        "On the 15m, mark the easiest equal highs and lows nearest price, plus the prior day's and the overnight highs and lows (your rule). Note whether either side is already swept.",
         "Draw the PDRs (Point A to Point B, with 25 / 50 / 75 steps) and mark the liquidity targets.",
         "Set today's loss limit, and check the red-folder news times."
       ],
@@ -55,7 +55,7 @@
         {
           "id": "sweep",
           "name": "Liquidity sweep",
-          "check": "Price ran one of the 15m pools you marked before the open. A quick run of random lows doesn't count."
+          "check": "Price ran one of the pools you marked before the open: the 15m equal highs and lows, and (your rule, 20 Nov 2026) the prior day's high and low and the overnight high and low. A pool already run before 9:30 doesn't count, and neither does a quick run of random lows."
         },
         {
           "id": "level",

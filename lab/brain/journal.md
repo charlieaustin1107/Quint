@@ -2,6 +2,23 @@
 
 Newest first. Every lab session adds an entry: what ran, what was learned, what changed, and the TradingView calls used.
 
+## 2026-11-20: count both
+
+**What happened**
+- **Your rule: count both.** As well as the 15m equal highs and lows, the indicator now counts the prior day's high and low and the overnight high and low as liquidity pools, on by default. WYLD himself counts only the equal highs and lows.
+  - Each pool is labelled on the chart, in the box and in the alerts: EQH/EQL, PDH/PDL or ONH/ONL.
+  - Saved in TradingView as version 3.0 (TradingView counts every save).
+  - Recorded as your rule in the registry and the playbook. The analyst still reports WYLD's own pools separately.
+- **Fixed in the indicator and its backtest copy:** the prior day's high and low joined the pools at 9:30, so one that price had already run overnight counted as a fresh sweep. They now join at the 18:00 session open. On 21 Oct–18 Nov that means 20 sweeps, not 25. Yesterday's evidence is corrected in the registry.
+- **What gets swept, with your settings:** overnight highs 10, overnight lows 9, prior-day high 1, 15m equal highs/lows 0 (those had all been run before the open). The analyst reports this split every night now.
+- **Fixes from last night's nightly report:**
+  - The first-read test is pinned to the candles it was written on (to 17 Nov), so the growing store can't break it. That failure is why Quint HQ wasn't refreshed.
+  - The 1-minute → 5-minute check looks only at the 2 hours where the two stores meet. Without that, last night's single 1.75-point difference between TradingView's two feeds (19 Nov 13:25 UTC) would block it every night.
+  - A 1-minute download that starts part-way through a 5-minute period no longer makes a part-candle.
+- **The lab pull request** was merged into `bot-lab` at 18:58 on 19 Nov. Everything after it (indicator versions 1 to 3, the analyst, 1-minute candles, this) is on `lab/quint-lab`, not yet in a pull request.
+
+**Calls used:** TradingView 1 (saving the indicator).
+
 ## 2026-11-19 (nightly run, 22:15 UK)
 
 **What ran**

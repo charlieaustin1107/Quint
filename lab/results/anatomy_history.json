@@ -4,17 +4,22 @@
   "sessions": 20,
   "candles": "5-minute",
   "base": {
-   "sweeps": 25,
-   "takenOvernight": 61,
-   "holds": 6,
-   "noHold": 19,
-   "pdrs": 6,
+   "sweeps": 20,
+   "sweepKinds": {
+    "ONH": 10,
+    "ONL": 9,
+    "PDH": 1
+   },
+   "takenOvernight": 71,
+   "holds": 4,
+   "noHold": 16,
+   "pdrs": 4,
    "noPointB": 0,
    "confirmations": 0,
    "skippedInTrade": 0,
    "lowRoom": 0,
    "entries": 0,
-   "completeB": 4,
+   "completeB": 2,
    "broken": 2,
    "expired": 0
   },
@@ -44,10 +49,10 @@
     "hi": 2.87
    },
    "noPdr": {
-    "n": 5,
-    "avgR": -0.41,
-    "lo": -1.01,
-    "hi": 0.78
+    "n": 3,
+    "avgR": -1.01,
+    "lo": -1.02,
+    "hi": -1
    },
    "noWindow": {
     "n": 0,
@@ -92,17 +97,22 @@
   "sessions": 22,
   "candles": "5-minute",
   "base": {
-   "sweeps": 28,
-   "takenOvernight": 65,
-   "holds": 6,
-   "noHold": 22,
-   "pdrs": 6,
+   "sweeps": 23,
+   "sweepKinds": {
+    "ONH": 11,
+    "ONL": 11,
+    "PDH": 1
+   },
+   "takenOvernight": 74,
+   "holds": 4,
+   "noHold": 19,
+   "pdrs": 4,
    "noPointB": 0,
    "confirmations": 0,
    "skippedInTrade": 0,
    "lowRoom": 0,
    "entries": 0,
-   "completeB": 4,
+   "completeB": 2,
    "broken": 2,
    "expired": 0
   },
@@ -127,15 +137,15 @@
    },
    "noLevel": {
     "n": 3,
-    "avgR": 3.64,
+    "avgR": 3.46,
     "lo": 1.7,
-    "hi": 6.35
+    "hi": 5.8
    },
    "noPdr": {
-    "n": 5,
-    "avgR": -0.41,
-    "lo": -1.01,
-    "hi": 0.78
+    "n": 3,
+    "avgR": -1.01,
+    "lo": -1.02,
+    "hi": -1
    },
    "noWindow": {
     "n": 0,

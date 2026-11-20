@@ -92,7 +92,11 @@ test('candles: merges TradingView rows and columns, drops duplicates, newest cop
 });
 
 test('lab run: matches the bot lab first read in quint-control/botlab/README.md', () => {
-  const data = lab.loadData();
+  // The first read used candles up to 17 Nov 2026. The store grows every night, so check on those candles only.
+  const { sessions } = require('../../quint-control/proof/noise_momentum');
+  const CUT = Date.UTC(2026, 10, 18) / 1000;
+  const upTo = (d) => { const bars = d.bars.filter((b) => b.t < CUT); return { ...d, bars, span: candles.span(bars), days: sessions(bars).days.map((x) => x.day) }; };
+  const data = Object.fromEntries(Object.entries(lab.loadData()).map(([k, d]) => [k, upTo(d)]));
   const registry = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'brain', 'registry.json'), 'utf8'));
   const entry = (n) => registry.strategies.find((s) => s.runner === `botlab:${n}`);
   const r3 = lab.runOne(entry(3), data); // 20-candle breakout on the 15-minute file

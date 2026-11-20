@@ -73,9 +73,10 @@ function rebuild15(file5, file15) {
 }
 
 // 1-minute to longer candles. A minute with no trades has no candle, so a period counts if it has any 1-minute candles,
-// except the newest one while it may still be forming (its last minute hasn't been reached yet).
+// except the newest one while it may still be forming (its last minute hasn't been reached yet), and the oldest one if
+// the 1-minute candles start part-way through it.
 function from1m(bars, minutes = 5) {
-  const size = minutes * 60, groups = new Map(), lastT = bars.length ? bars[bars.length - 1].t : 0;
+  const size = minutes * 60, groups = new Map(), lastT = bars.length ? bars[bars.length - 1].t : 0, firstT = bars.length ? bars[0].t : 0;
   for (const b of bars) {
     const k = Math.floor(b.t / size) * size;
     if (!groups.has(k)) groups.set(k, []);
@@ -83,7 +84,7 @@ function from1m(bars, minutes = 5) {
   }
   const out = [];
   for (const [t, g] of [...groups.entries()].sort((a, b) => a[0] - b[0])) {
-    if (lastT < t + size - 60) continue;
+    if (lastT < t + size - 60 || t < firstT) continue;
     g.sort((a, b) => a.t - b.t);
     out.push({ t, o: g[0].o, h: Math.max(...g.map((b) => b.h)), l: Math.min(...g.map((b) => b.l)), c: g[g.length - 1].c, v: g.reduce((a, b) => a + (b.v || 0), 0) });
   }
@@ -91,9 +92,12 @@ function from1m(bars, minutes = 5) {
 }
 
 // Build the 5-minute store forward from the 1-minute store, so one TradingView call (1-minute candles) feeds every
-// timeframe. Before writing, the built candles are checked against the stored 5-minute candles where they overlap (the
-// newest stored one is left out: it may have been saved while still forming). Any difference, or a gap between the
-// stored 5-minute candles and the first built one, and nothing is written: the nightly job fetches 5-minute candles.
+// timeframe. Before writing, the built candles are checked against the stored 5-minute candles in the 2 hours before
+// the newest one, where the two meet (the newest is left out: it may have been saved while still forming; older
+// candles are left out so a single old difference between TradingView's two feeds can't block every night). Any
+// difference there, or a gap between the stored 5-minute candles and the first built one, and nothing is written: the
+// nightly job fetches 5-minute candles instead.
+const CHECK_SECONDS = 2 * 3600;
 function rebuildFrom1m(file1, file5, file15) {
   const one = read(file1), five = read(file5), built = from1m(one, 5);
   if (!built.length) return { status: 'EMPTY', added: 0, checked: 0, mismatched: 0 };
@@ -102,7 +106,7 @@ function rebuildFrom1m(file1, file5, file15) {
   const diffs = [];
   for (const b of built) {
     const s = stored.get(b.t);
-    if (!s || b.t === last5) continue;
+    if (!s || b.t === last5 || b.t < last5 - CHECK_SECONDS) continue;
     checked++;
     if (s.o !== b.o || s.h !== b.h || s.l !== b.l || s.c !== b.c) { mismatched++; if (diffs.length < 3) diffs.push({ t: b.t, stored: [s.o, s.h, s.l, s.c], built: [b.o, b.h, b.l, b.c] }); }
   }
