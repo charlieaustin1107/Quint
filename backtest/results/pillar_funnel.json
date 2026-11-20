@@ -1,0 +1,59 @@
+{
+  "from": "2026-10-21T06:15:00.000Z",
+  "to": "2026-11-18T00:20:00.000Z",
+  "pointsOfInterest": 597,
+  "funnel": {
+    "nySessionCandles": 1460,
+    "location": 478,
+    "plusSweep": 382,
+    "plusCISD": 250,
+    "plusDisplacement": 106,
+    "plusPullbackConfirmed": 6,
+    "plusRiskInRange": 4,
+    "plusRoomFor1_5R": 0
+  },
+  "nearMisses": [
+    {
+      "time": "2026-10-22T15:30:00.000Z",
+      "side": "short",
+      "zone": "order block",
+      "riskInATR": 5.81,
+      "rewardToRisk": -0.49
+    },
+    {
+      "time": "2026-10-22T15:40:00.000Z",
+      "side": "short",
+      "zone": "fair value gap",
+      "riskInATR": 5.92,
+      "rewardToRisk": -0.5
+    },
+    {
+      "time": "2026-10-26T13:55:00.000Z",
+      "side": "short",
+      "zone": "order block",
+      "riskInATR": 2.83,
+      "rewardToRisk": 0.9
+    },
+    {
+      "time": "2026-11-10T15:25:00.000Z",
+      "side": "long",
+      "zone": "fair value gap",
+      "riskInATR": 3.96,
+      "rewardToRisk": 0.14
+    },
+    {
+      "time": "2026-11-10T15:30:00.000Z",
+      "side": "long",
+      "zone": "fair value gap",
+      "riskInATR": 4.48,
+      "rewardToRisk": 0
+    },
+    {
+      "time": "2026-11-16T16:10:00.000Z",
+      "side": "short",
+      "zone": "fair value gap",
+      "riskInATR": 3.32,
+      "rewardToRisk": -0.05
+    }
+  ]
+}
