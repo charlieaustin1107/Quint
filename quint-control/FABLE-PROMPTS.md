@@ -1,20 +1,20 @@
 # Fable prompts
 
-Paste these into Fable to build Quint Control. Each session does one phase, and no phase counts as done until its tests pass three times in a row.
+Use these prompts to build Quint Control one phase at a time. A phase is complete only when its required tests pass three consecutive times and the owner's checklist is satisfied.
 
-**How to use them:**
+## Efficient session workflow
+1. Start a fresh Claude Code/Fable session for each unrelated task. The repository's root `CLAUDE.md` is loaded automatically.
+2. For Quint Control, read `quint-control/STATUS.md` and invoke/read the `quint-control` skill. Do not paste the full master prompt again if the skill is already active.
+3. Paste only the prompt for the current phase below. Open `PLAN.md` or research specifications only when that phase needs them.
+4. Ask for a short plan and the files to be changed before work spanning more than a few files.
+5. Run the relevant tests; for a completed phase, run the required suites three times. Report exact results and anything not tested.
+6. Update `STATUS.md` with progress and the next action. Do not merge a pull request until the tests and owner's checklist pass.
 
-1.  Start every new Fable session by pasting the **master prompt** below. From phase 0 onwards it's also saved in your repo as a skill, so Fable loads it automatically, but pasting it is a safe habit.
+The master prompt below is a reference for onboarding or when the skill is unavailable. It is not a routine per-session paste.
 
-2.  Then paste the prompt for the phase you're on. Do the phases in order.
+Optional: enabling package installs in Claude's network settings may allow cloud compilation of .NET code. It is not required; NinjaTrader-specific checks still need the Windows/NinjaTrader environment.
 
-3.  When Fable asks you to test something in NinjaTrader, follow its numbered steps and paste back the self-test report or any error message exactly as shown.
-
-4.  Merge a pull request only when Fable's report says every test passed and your own checklist for that phase passed.
-
-Optional: turning on package installs in your Claude network settings would let Fable install .NET and compile the C# code in the cloud too. It isn't required, because the engine tests itself inside NinjaTrader.
-
-## Master prompt (paste first in every session)
+## Master prompt (reference copy)
 
 ``` text
 You are building Quint Control for me. Read this whole message before doing anything.
