@@ -42,7 +42,7 @@ At each month-end, after the final MNQ reference price is available:
 
 Use the 2026 paper's method as the research template, with a causal Quint adaptation:
 
-1. Inputs: 12-month averages of Shiller CAPE, Shiller dividend yield and the US term spread. Prefer the paper's exact term-spread definition (long-term government bond yield less annualised risk-free rate) if the underlying data are licensed. Otherwise use FRED T10Y3M (10-year minus 3-month Treasury) and label it a proxy, not an exact replication.
+1. Inputs: 12-month averages of Shiller CAPE, Shiller dividend yield and the US term spread. At decision time, use only the most recent observation whose publication timestamp is no later than the signal timestamp; never use an unpublished current-month value, interpolate or backfill. Prefer the paper's exact term-spread definition (long-term government bond yield less annualised risk-free rate) if the underlying data are licensed. Otherwise use FRED T10Y3M (10-year minus 3-month Treasury) and label it a proxy, not an exact replication.
 2. For each input, scale its 12-month average to [-1,+1] using the trailing 120 monthly observations' min/max, including the current observation only after it is published. Formula: (z=2(x-\min)/(\max-\min)-1). If the range is zero or data are missing, the filter is unavailable and the strategy must not silently assume “mid-regime”.
 3. Calculate two 10-year boundary scores: (B_{CAPE}=z_{term}^2+z_{CAPE}^2) and (B_{Div}=z_{term}^2+z_{dividend}^2). Define (B_{10}) as their average. Its theoretical range is 0–2.
 4. Primary boundary flag: (B_{10,t}) is at or above the 90th percentile of the **previous 60 completed monthly B10 observations**, excluding the current month. This rolling threshold is a causal Quint adaptation of the paper's top-decile boundary classification, not the paper's exact full-sample cutoff.
@@ -78,13 +78,14 @@ For MNQ, CME specifies $2 per index point and a 0.25-point outright tick worth $
 
 ## Validation plan
 
-1. **NQ proxy, long history:** use 1999–2008 as the 10-year macro-normalisation warm-up; development 2009–2014; validation 2015–2021; untouched holdout 2022–October 2026. Confirm complete actual-expiry coverage before fixing these dates. NQ results are proxy evidence only.
+1. **NQ proxy, long history:** use 1999–2013 as warm-up for the 10-year macro normalisation and the prior-60-month boundary threshold; development 2014–2017; validation 2018–2020; untouched holdout January 2021–October 2026 (about 70 monthly decisions). Confirm complete actual-expiry coverage before fixing these dates. NQ results are proxy evidence only.
 2. **MNQ native:** development 2019–2021; validation 2022–2023; untouched holdout 2024–October 2026. This holdout contains only about 34 monthly decisions and is likely underpowered; if it fails the pre-registered sample gate, report **inconclusive**, not a pass. Do not borrow NQ trades to inflate MNQ sample size.
 3. Freeze the signal, boundary formula, thresholds, roll mapping, cost profile and stop/target overlay before opening either holdout. Use expanding chronological walk-forward windows; no random shuffling. Purge overlapping holding-period observations where applicable.
 4. Compare: unfiltered 12-month TSMOM; boundary-filtered TSMOM; the same two with the bracket overlay; long-only buy-and-hold; flat/cash; and a pre-registered reverse-signal placebo.
 5. Report net returns, annualised return, Sharpe/Sortino, maximum and mark-to-market drawdown, Calmar, worst month, recovery time, exposure, turnover, MAE/MFE, stop-gap loss, roll costs and margin usage. Break out long vs short, high vs low volatility, boundary vs mid-regime, calendar year and roll/non-roll periods.
 6. Test nearby lookbacks (6, 9 and 12 months; 12 is primary), a 3-month holding-period sensitivity, and the pre-registered boundary sensitivities above. Show every attempted variant. Use dependence-aware block-bootstrap confidence intervals; PBO/Deflated Sharpe are secondary diagnostics, not substitutes for the holdout.
 7. Reconcile historical, Playback and live-paper decisions through the same deterministic signal/risk core. Record feed, quote age, latency, missed fills, partial fills, order rejections and broker position reconciliation.
+8. **Minimum evidence gate:** require at least 60 untouched monthly decisions and at least 20 long and 20 short decisions in the holdout, with complete quote/roll-cost coverage. If NQ or MNQ cannot meet this, report that series as underpowered/inconclusive. The proposed MNQ-native holdout has only about 34 decisions and cannot independently pass this gate.
 
 ## Failure criteria
 
