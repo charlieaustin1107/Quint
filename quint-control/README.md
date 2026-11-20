@@ -35,3 +35,5 @@ npm test
 ```
 
 Nothing here is financial advice. Only the Quint Engine places orders, and only after your confirm.
+
+- **Autonomous bot uptime research:** `research/AUTONOMOUS-BOT-RUNTIME-AND-UPTIME.md` (event-driven runtime, website controls, recovery, monitoring and costs)
