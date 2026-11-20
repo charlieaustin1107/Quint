@@ -31,6 +31,9 @@ function validateExpression(node, errors, path='$', depth=0, count={value:0}) {
   if (count.value > MAX_NODES) { errors.push(path+': expression exceeds '+MAX_NODES+' nodes'); return; }
   if (depth > MAX_DEPTH) { errors.push(path+': expression exceeds maximum depth '+MAX_DEPTH); return; }
   if (!obj(node) || typeof node.op !== 'string' || !OPS.has(node.op)) { errors.push(path+': unsupported expression node'); return; }
+  const allowedKeys = node.op === 'const' ? ['op','value'] : node.op === 'var' ? ['op','name']
+    : (node.op === 'and' || node.op === 'or') ? ['op','args'] : node.op === 'not' ? ['op','arg'] : ['op','left','right'];
+  for (const key of Object.keys(node)) if (!allowedKeys.includes(key)) errors.push(path+': unexpected field "'+key+'"');
   const child = (v,s) => validateExpression(v,errors,path+s,depth+1,count);
   if (node.op === 'const') {
     if (!(typeof node.value === 'boolean' || finite(node.value) || typeof node.value === 'string')) errors.push(path+': invalid constant');
@@ -146,6 +149,7 @@ function validatePaperScenario(s) {
   if(s.schemaVersion!==1) errors.push('schemaVersion: expected 1');
   if(typeof s.scenarioId!=='string'||!s.scenarioId.trim()) errors.push('scenarioId: required');
   if(s.mode!=='paper') errors.push('mode: must be paper');
+  if(!['draft','armed','expired','cancelled'].includes(s.status)) errors.push('status: unsupported');
   if(s.instrument!=='MNQ') errors.push('instrument: this phase supports MNQ only');
   if(!['long','short'].includes(s.side)) errors.push('side: must be long or short');
   if(!obj(s.trigger)) errors.push('trigger: a deterministic expression is required');
