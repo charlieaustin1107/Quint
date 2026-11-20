@@ -63,6 +63,7 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 
 ## Quint Control
 - Read `quint-control/STATUS.md` first: it says which phase is in progress and what to do next. Update it at the end of every session, and commit and push often so work survives a session ending early.
+- Before Phase 1 implementation, read `quint-control/research/SHARED-PLATFORM-AND-MARKET-DATA.md`. It records the proposed two-user hosted architecture, individual feeds/Claude billing, NinjaTrader API research and licensing gates. Do not implement shared/rebroadcast market data without written vendor/exchange approval.
 - The rules, decisions and testing protocol are in the `quint-control` skill (`.claude/skills/quint-control/SKILL.md`). The phase prompts are in `quint-control/FABLE-PROMPTS.md`.
 - Nothing is done until it's tested: JavaScript reference and `node --test` in the cloud, golden files, the engine's self-tests inside NinjaTrader, Playwright for the website, and the owner's checklist. Run the suites three times before calling a phase done.
 - Run the Quint Control tests with `cd quint-control && npm test`.
