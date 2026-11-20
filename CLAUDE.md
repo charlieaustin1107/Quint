@@ -1,71 +1,50 @@
-# Quint & Chart Wizard: rulebook for Claude
+# Quint — Claude working instructions
 
-Read this first in every session. It says what this project is for and how to work on it.
+## Start here
+1. Read `quint-control/STATUS.md` for the current phase and next task.
+2. Read `.claude/skills/quint-control/SKILL.md` when working in Quint Control.
+3. Read only the relevant specification or phase prompt linked below. Do not load every research file by default.
+4. Before finishing, update STATUS with completed work, tests, blockers and the exact next step.
 
-## Who this is for
-- The owner trades **MNQ (Micro Nasdaq futures, `CME_MINI:MNQ1!`)** and is working to **pass a Lucid Trading funded account**.
-- They trade **scalps to day trades**: roughly 15 minutes to a couple of hours.
-- They work **only from an iPhone**. There's no computer. Every screen has to work well on a phone, and every explanation should be in plain English.
+## Product map
+- `chart-wizard/`: learning game and practice simulator. Source is in `chart-wizard/src/`; build it, never hand-edit its generated HTML.
+- `quint-brain/`: standalone Quint analysis app. Reuses selected Chart Wizard source; follow its build instructions below.
+- `quint-control/`: NinjaTrader 8 engine, bots, Guardian, copier, local dashboard and assistant. This is the automated trading product.
+- `backtest/`: legacy exploratory candle backtests for Chart Wizard/Quint Brain. Not the future Quint Control bot-validation engine.
+- `quint/`: superseded standalone app; do not treat it as the active source.
+This repository is the source of truth. Do not publish an artifact unless the user explicitly asks.
 
-## What's in the repo
-| Folder | What it is | Where it runs |
-|---|---|---|
-| `chart-wizard/` | **Chart Wizard**: the chart-reading game and learning simulator, with Quint built in as the coach. Source in `chart-wizard/src/`, tests in `chart-wizard/src/t/` | Artifact `76065a1d-9c56-4fd6-9cfd-7f1297225a0e` |
-| `quint-brain/` | **Quint Brain**: Quint's own app: the 3D brain, live market read, matrix, 5-pillar check, record and alerts. Source and tests in `quint-brain/src/` | Artifact `cd485103-4fb2-4d50-8aeb-2237b4ef142f` |
-| `quint/` | **Quint**: the first standalone Quint app (no source here; superseded by Quint Brain) | Artifact `41275d03-b425-4aa9-95ef-f85de223da67` (public) |
-| `backtest/` | Code that backtests the strategies on real MNQ candles, outside the browser | Runs with `node` and `python3` |
-| `quint-control/` | **Quint Control**: the NinjaTrader 8 trading engine (bots, guardian, copier, Manual Copy), its local black dashboard website and the Quint assistant. Plan in `quint-control/PLAN.md`, progress in `quint-control/STATUS.md` | NinjaTrader 8 on the owner's Windows computer; tests run with `node` |
+## Non-negotiable product and safety rules
+- Explain work in plain English. Give exact numbered Windows steps when the owner must use the computer. Show times in UK and New York time.
+- Quint must support research across scalping, intraday, swing and longer-term strategies. Do not assume one horizon is the only priority.
+- Never claim a strategy is profitable without robust, net-of-cost, chronological out-of-sample evidence. Log failed experiments; do not hide trial count or cherry-pick results.
+- AI may research, interpret strategy ideas and explain results. It must not make tick-by-tick execution or risk decisions.
+- All orders must pass through the existing Guardian and single OrderRouter. Preserve kill switches, firm rules, account separation and explicit per-account live authorisation. Never bypass safety controls.
+- Simulation/paper and live must be technically separated. Never put credentials, API keys or account secrets in Git.
+- Do not modify live execution, Guardian, OrderRouter, account permissions or merge to `main` unless the user explicitly authorises that specific change.
+- One focused, reviewable pull request per task. Prefer documentation/research branches for research. Do not merge PRs on the user's behalf.
 
-Each app runs as a single self-contained `index.html`. The artifacts are where the apps actually run, because Quint's AI chat and the TradingView/market connectors work there without an API key. **This repo is the master copy.** Change it here, then publish the built `index.html` to the matching artifact.
+## Research and backtesting
+- Strategy Lab specification: `quint-control/research/STRATEGY-LAB.md`.
+- Mandatory integrity requirements: `quint-control/research/BACKTEST-INTEGRITY-STANDARD.md`.
+- Detailed architecture: `quint-control/PLAN.md`; build prompts: `quint-control/FABLE-PROMPTS.md`.
+- For every strategy hypothesis record exact rules, data needs, costs/fill assumptions, validation plan, failure criteria and sources.
+- Use immutable run manifests, audited data, deterministic event/ledger logic, realistic execution costs, chronological walk-forward and an untouched locked holdout. OHLC-only results must be labelled approximate; handle ambiguous stop/target bars adversely.
+- MNQ reference: $2 per index point; 0.25-point tick = $0.50. Load instrument and account costs from versioned metadata; never assume one fee schedule applies to every account.
+- The legacy `backtest/` trade-count half split is not out-of-sample. Its fixed $2.50 round-trip assumption is not a universal account cost. Treat its outputs as exploratory.
+- Do not silently rewrite historical results. Re-run under a versioned engine and label old outputs accurately.
 
-**Chart Wizard and Quint Brain are built from source: never hand-edit their `index.html`.** Edit the files in `src/`, rebuild, test, then publish. A build from unchanged source reproduces the published `index.html` byte for byte.
+## Build and test commands
+- Chart Wizard: `cd chart-wizard/src && python3 build.py && python3 build.py --prod`.
+- Quint Brain (after changing shared Chart Wizard functions): `cd quint-brain/src && python3 extract.py "$(cat roots.txt)" "$(cat mine.txt)" && python3 patch.py && python3 build.py && python3 build.py --prod`.
+- Quint Control: `cd quint-control && npm test`.
+- Run the relevant tests before proposing a change. Do not claim tests passed unless they were actually run; state any unavailable environment or manual NinjaTrader checks.
 
-## Building and testing
-- **Chart Wizard:** `cd chart-wizard/src && python3 build.py && python3 build.py --prod`. The plain build makes `test.html` (with the `window.__T` test hooks); `--prod` writes `chart-wizard/index.html` without them. The script order is in `build.py`; the game's built-in market data is `data3.json`.
-- **Quint Brain** reuses Chart Wizard's own functions (Quint's brief, rules, tools, the feed, the 5-pillar engine) instead of copies, so **rebuild it after changing Chart Wizard's `dock.js`, `live.js`, `quint.js`, `qlab.js` or `pillars.js`**: `cd quint-brain/src && python3 extract.py "$(cat roots.txt)" "$(cat mine.txt)" && python3 patch.py && python3 build.py && python3 build.py --prod`. `extract.py` copies every function `roots.txt` needs out of `chart-wizard/src` into `brain.js`; `patch.py` adapts them; `qa_core.js`, `qa_ui.js` and `qa_brainviz.js` are Quint Brain's own code.
-- **Tests** (need `pip install playwright` and `playwright install chromium` if Chrome isn't installed) are Playwright scripts with a mocked `window.claude` (fake TradingView, FMP and Claude replies), so they never spend real calls. Run them from anywhere, e.g. `python3 chart-wizard/src/t/dock.py m`, `python3 chart-wizard/src/t/feed.py`, `python3 quint-brain/src/t_qa.py`. The shared mocks live in `chart-wizard/src/t/dock.py`, `quint.py` and `news.py`. Before publishing run at least: `dock.py m`, `feed.py`, `prac_offline.py`, `t6.py`, `coach_prod2.py`, `prod_quint.py`, `hud.py`, `voice.py`, `draw.py`, `talk.py`, `fx.py` (Chart Wizard) and `t_qa.py`, `t_brain.py`, `t_daily.py`, `t_prod.py`, `t_voice.py`, `t_talk.py`, `t_fx.py` (Quint Brain). Check `errs` is empty and look at the phone-size screenshots they save in `/tmp`.
+## TradingView data limits
+TradingView calls are account-wide and plan-limited. Never add timer polling. Reuse cached candles and request only missing/new data. Practice mode must not call TradingView. If the feed is unavailable, report the age/source of cached data rather than inventing prices.
 
-## Publishing
-- Publish the built `index.html` with the artifact tools: read the artifact's current version first and pass it as `base_version`, so a newer version is never overwritten. Both artifacts are private to the owner.
-- The `quint/` artifact is public and can't be republished from a chat.
-
-## TradingView's daily call limit (most important technical rule)
-- TradingView's connector allows a fixed number of calls **per day** for the whole account (both apps and every Claude chat): 10 Essential, 20 Plus, 50 Premium, 150 Ultimate, or 500 a day and 50 a minute with TradingView's AI add-on. Polling burned through it in an afternoon, so:
-- **Never poll TradingView on a timer** except through `tvBgEvery()` (it only allows background refreshes on Ultimate or the AI add-on). The owner picks their plan in Settings; never guess it.
-- **The feed** (`dkFeed` in `dock.js`): ~17 days of 5-minute candles and the daily candles are fetched once a day and saved on the phone; after that a refresh asks only for the newest 1-minute candles and rebuilds every timeframe from them. A Quint answer should cost about one call.
-- **Practice never calls TradingView** (`pracBars` in `quint.js`): it uses the saved real candles, or built-in practice candles made from a year of real Nasdaq, S&P 500, gold and oil days.
-- When TradingView refuses, Quint still answers, from saved candles (saying how old they are) or from a chart screenshot the owner sends.
-- Quint's answers use the owner's Claude usage through the artifact (Fable for calls, Opus for simple questions).
-
-## Product rules (from the owner)
-1. **Keep Chart Wizard simple.** Teach only the best 2–3 backtested strategies plus the owner's own **5-pillar playbook**. Quint is the powerhouse.
-2. Here are the strategies taught right now (in `BEST` in `chart-wizard/index.html`):
-   - **20-candle breakout**: 15-minute chart, stop 2 ATR, target 3× the stop, close after 40 candles.
-   - **New York open breakout**: the first 15 minutes from 9:30 New York, one trade a day, entries until 11:30, stop on the other side of the range, target 2R.
-   - **5-pillar playbook (the owner's own; never remove it)**: Location → Liquidity sweep → CISD → Displacement → Execution, on the 5-minute chart, in the New York session.
-3. A strategy only earns a place in the app if it **beats its costs in a backtest on real MNQ data**. Put the evidence in `backtest/results/`.
-4. Use as much **real** MNQ history as possible, including news and how it moved price. Back what's taught with credited sources.
-5. Quint is modelled on **LuxAlgo Quant 2.0**: automatic strategy backtesting against goals. Quint's chat should look futuristic and be very clever.
-
-## Backtesting
-- Read `backtest/README.md` for how to run it.
-- The strategy logic is **not rewritten**. `backtest/extract_engine.py` copies Quint Brain's own functions into `backtest/engine.js`, so the backtest tests exactly what the app teaches. After changing the rules in Quint Brain, re-run the extractor.
-- Costs are always included: **$0.75 commission a side plus 1 tick of slippage a side**. MNQ is $2 a point and a tick is 0.25.
-- The current legacy runner's firstHalf/secondHalf fields split the trade list by trade count; they are **not** a valid chronological out-of-sample test. Do not describe them as OOS. Use fixed chronological date boundaries and a locked final holdout in new research.
-- The legacy runner's $2.50 round-trip cost assumption is specific to that script and is not automatically the correct Quint Control account cost profile. Quint Control must use a versioned, verified account-specific cost schedule.
-- Candle OHLC fills are approximate. If stop and target can both be touched within one bar, use adverse ordering or mark the outcome ambiguous; never assume a favourable sequence.
-- Follow `quint-control/research/BACKTEST-INTEGRITY-STANDARD.md` for the target data, fill, validation, overfitting and reporting requirements. The old `backtest/` harness is exploratory, not the Quint Control bot-validation engine.
-- Lucid's limits matter more than profit: report mark-to-market drawdown, intratrade heat and account-rule breaches, not just closed-trade P&L.
-
-## How to work
-- **One focused change per pull request.** Explain what changed in plain English, as if to a trader rather than a programmer.
-- Don't add API keys, passwords or account numbers to the repo.
-- Don't delete the 5-pillar strategy or Quint, and don't swap them for something else.
-- Before publishing, check the page still loads and works on a phone-sized screen.
-- Nothing here is financial advice. Chart Wizard, Quint Brain and Quint never place orders. **Only the Quint Engine (`quint-control/`) places orders, and every bot needs the owner's confirm before it trades a live account. Simulation first is recommended, not required.** The guardian's firm rules and kill switches can never be skipped.
-
-## Quint Control
-- Read `quint-control/STATUS.md` first: it says which phase is in progress and what to do next. Update it at the end of every session, and commit and push often so work survives a session ending early.
-- The rules, decisions and testing protocol are in the `quint-control` skill (`.claude/skills/quint-control/SKILL.md`). The phase prompts are in `quint-control/FABLE-PROMPTS.md`. The Strategy Lab's backtest integrity requirements are in `quint-control/research/BACKTEST-INTEGRITY-STANDARD.md`.
-- Nothing is done until it's tested: JavaScript reference and `node --test` in the cloud, golden files, the engine's self-tests inside NinjaTrader, Playwright for the website, and the owner's checklist. Run the suites three times before calling a phase done.
-- Run the Quint Control tests with `cd quint-control && npm test`.
+## Chart Wizard product constraints
+- Keep the learning experience simple: teach only the strongest 2–3 evidenced strategies plus the owner's 5-pillar playbook.
+- Never remove the 5-pillar sequence: Location → Liquidity sweep → CISD → Displacement → Execution.
+- A strategy belongs in the teaching app only after it beats realistic costs on real MNQ data. Store evidence under `backtest/results/`.
+- Chart Wizard and Quint Brain are analysis/practice tools. Only Quint Control's engine can place orders, through Guardian and explicit live authorisation.
