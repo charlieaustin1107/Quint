@@ -9,7 +9,16 @@ The scheduled message just says: "Nightly run: follow `lab/NIGHTLY.md`." Everyth
 - **TraderDev:** at most 20 credits a night. **Claude:** keep the run lean; don't paste big files into the conversation.
 
 ## Steps
-1. **Get the code.** `cd` into the Quint checkout. `git fetch origin main lab/quint-lab lab/nightly` (a missing branch is fine). The **base branch** is `main` if `origin/main` has `lab/NIGHTLY.md`, otherwise `lab/quint-lab`. Work on `lab/nightly`: check it out and rebase it onto the base if it exists, otherwise create it from the base. Never push to `main` or `lab/quint-lab`.
+1. **Get the code.** `cd` into the Quint checkout. `git fetch origin main lab/quint-lab lab/nightly` (a missing branch is fine). The **base branch** is `main` if `origin/main` has `lab/NIGHTLY.md`, otherwise `lab/quint-lab`. Work on `lab/nightly`:
+   - If it exists, check it out and **merge** the base into it: `git merge origin/<base>`. Never rebase it or force-push it, so its history and its pull request stay intact.
+   - If it doesn't exist, create it from the base.
+   - If the merge stops on conflicts:
+     - `lab/brain/journal.md`: keep every entry, newest first.
+     - `lab/brain/registry.json`: keep both sides' changes.
+     - Generated files (`lab/ANATOMY.md`, `lab/FACTORY_REPORT.md`, `lab/ROUNDUP.md`, `lab/SCOREBOARD.md`, `lab/roundup.json`, `lab/results/*.json`, `lab/jarvis/index.html`): take either side, because step 6 rebuilds them.
+     - Never drop candles in `lab/data/`: 1-minute candles can't be fetched again.
+
+   Never push to `main` or `lab/quint-lab`.
 2. **Read** `CLAUDE.md`, `lab/FACTORY.md`, `lab/brain/registry.json` and the newest entries of `lab/brain/journal.md`.
 3. **Candles (TradingView call 1: 1-minute candles, which feed every timeframe).** TradingView keeps only a few thousand 1-minute candles, so the lab collects them night by night; WYLD confirms on the 1-minute chart, and the sequence analyst switches to them at 10 sessions.
    - `date_from`: if `lab/data/mnq_1m.csv` exists, its newest candle: `date -u -d @$(tail -1 lab/data/mnq_1m.csv | cut -d, -f1) +%FT%TZ`. Otherwise one hour before the newest 5-minute candle: `date -u -d @$(( $(tail -1 lab/data/mnq_5m.csv | cut -d, -f1) - 3600 )) +%FT%TZ`.
