@@ -33,7 +33,7 @@ This is distinct from the existing 55-session Donchian breakout: it uses a 12-mo
 At each month-end, after the final MNQ reference price is available:
 
 - Calculate the cumulative return across the previous 12 completed calendar months from the causal contract return chain: (R_{12,t}=\prod_{k=0}^{11}(1+r_{t-k})-1).
-- Primary signal: long if (R_{12,t}>0); short if (R_{12,t}<0); flat if exactly zero or any required month is missing.
+- Primary signal: long if (R_{12,t}>0); short if (R_{12,t}<0); flat if exactly zero. If any required month is missing, mark the signal unavailable, block new/reversal orders, and retain the last broker-confirmed position only under existing hard risk controls; never convert missing data into a flat signal.
 - Hold the target for one calendar month, until the next scheduled month-end rebalance. If the signal reverses, close and reverse. If it is unchanged, maintain the direction.
 - Submit the entry/rebalance at the first valid two-sided MNQ quote at or after 18:05 ET on the next Globex session after the month-end signal. Buy at ask / sell at bid, then apply the configured adverse slippage. Require a non-crossed quote no older than one second and a spread no wider than two MNQ ticks. If no valid quote appears within 30 minutes, record a missed rebalance and remain in the prior safe position state; do not invent a fill.
 - No discretionary entry, news filter, intraday confirmation or AI override.
