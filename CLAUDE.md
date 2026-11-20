@@ -69,3 +69,12 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 - Run the Quint Control tests with `cd quint-control && npm test`.
 
 - For unattended bot runtime, lifecycle persistence, crash recovery, event-driven execution, monitoring and costs, read `quint-control/research/AUTONOMOUS-BOT-RUNTIME-AND-UPTIME.md`. Bots must not depend on Claude or an open browser; engine recovery reconciles broker state before live resume.
+
+
+## Pre-Fable hold and audit boundary (owner instruction, 20 Nov 2026)
+- Quint Control build work is **ON HOLD** while the owner waits for Fable 5.2 to renew. Fable renewal alone is not permission to start; the owner must explicitly give the green light.
+- Until then, only read-only audits, research, documentation, and separately approved documentation-only changes are allowed. Do not start Phase 1, build or scaffold the dashboard, or consume paid Fable/API usage for implementation.
+- Do not change Quint Control runtime/trading code, NinjaTrader integration, Guardian, OrderRouter, copier, bot execution, strategies, market-data adapters, protocol, authentication, or live paths during this hold.
+- Do not modify Chart Wizard or Quint Brain source, generated HTML, or published artifacts as part of pre-Fable readiness.
+- Use `quint-control/research/PRE-FABLE-READINESS.md` for the exact scope and architecture recommendations. Use `quint-control/prompts/PRE-FABLE-REPOSITORY-AUDIT.md` for the read-only audit prompt.
+- The owner wants the audit first, then review and approval. Preserve the existing five-pillar playbook and all deterministic Guardian/kill-switch invariants.

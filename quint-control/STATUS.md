@@ -1,3 +1,15 @@
+# CURRENT BUILD GATE — HOLD
+
+The owner is waiting for Fable 5.2 to renew before building the Quint Control dashboard. **Do not start Phase 1 or any dashboard/engine implementation yet.** Fable renewal alone is not approval; wait for the owner's explicit green light.
+
+Until then, only read-only audits, research and documentation-only changes are permitted. Do not change trading/runtime code, NinjaTrader integration, Guardian, OrderRouter, copier, strategies, market-data adapters, protocol, authentication, live execution paths, Chart Wizard or Quint Brain. Do not use paid Fable/API calls for implementation.
+
+- Pre-build scope and architecture: `research/PRE-FABLE-READINESS.md`
+- Claude's full read-only audit prompt: `prompts/PRE-FABLE-REPOSITORY-AUDIT.md`
+- Next step while waiting: run the audit, review findings with the owner, then wait for explicit approval.
+
+---
+
 # Quint Control: build status
 
 **Read this first in every session, and update it before you finish.** If a session ends early (usage runs out, the chat closes), the next session picks up from here.
