@@ -11,6 +11,10 @@ This file records cross-cutting decisions and clarifies conflicts between older 
 - Chart Wizard remains a separate product. Only selected distilled knowledge may inform Quint.
 - Quint Brain's backtest harness is not the Quint Control execution engine.
 
+## Owner access versus runtime environment
+
+The owner currently accesses ChatGPT and GitHub from an iPhone and needs phone-friendly explanations, reviews and previews. Quint Control's intended execution host is Windows with NinjaTrader 8. Do not assume the owner currently has that machine configured or can run desktop steps from the phone. Keep the product mobile-readable, but do not mistake the iPhone interface for the NinjaTrader execution host.
+
 ## Execution safety — invariant
 
 Every broker order must pass Guardian and the one OrderRouter. No AI, website, copier, bot, cloud service or specialist component can bypass them. Missing, stale, malformed, contradictory or unreconciled state fails closed. The broker account is authoritative for actual positions and orders.
