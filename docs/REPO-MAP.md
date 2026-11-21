@@ -47,3 +47,5 @@ A task-oriented index. Prefer this over loading the whole repository.
 4. Drafts, mockups, prototypes, screenshots and beta-only work belong under root `drafts/`; do not import them into production build inputs.
 5. Do not duplicate full documents to create shorter copies. Create a concise index or decision summary and link to the canonical source.
 6. Before moving or deleting anything, inspect imports, scripts, tests, workflows and Git history. Prefer leaving legacy source in place with a clear label until a separate migration is approved.
+
+| Source-code readiness audit | `quint-control/research/SOURCE-CODE-AUDIT-2026-11-21.md` |
