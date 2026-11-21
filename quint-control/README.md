@@ -4,6 +4,8 @@
 
 - Pre-Fable scope and architecture: `research/PRE-FABLE-READINESS.md`
 - Claude read-only audit prompt: `prompts/PRE-FABLE-REPOSITORY-AUDIT.md`
+- Firecrawl research-ingestion integration: `research/integrations/FIRECRAWL-RESEARCH-INGESTION.md`
+- OpenMausBot-inspired development-agent workflow: `research/integrations/OPENMAUSBOT-DEV-AGENTS.md`
 
 ---
 
