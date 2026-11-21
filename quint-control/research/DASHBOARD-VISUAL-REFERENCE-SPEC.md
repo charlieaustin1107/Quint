@@ -21,6 +21,40 @@ The reference's defining characteristics:
 
 The image is a design reference, not a source of real prices, performance, account balances, win rates or proof of trading edge. All figures shown in the reference are illustrative. The implementation must never ship those numbers as if they were live or verified.
 
+## 1A. Interchangeable visual themes and dashboard layouts
+
+The owner explicitly requests five selectable dashboard appearances. The uploaded purple Command Centre remains the primary reference. Add a premium gold variant as a distinct fifth option.
+
+### Theme catalogue
+
+1. **Quint Command (default):** faithful extension of the uploaded reference; obsidian/navy base, electric-violet borders and glow, cyan information accents, green positive states.
+2. **Quint Gold Command:** same overall composition, density and command-centre character as Quint Command, but with a premium black/charcoal and metallic-gold palette. Use restrained champagne-gold for primary actions, selected navigation, key borders and chart emphasis; warm muted gold for secondary accents; keep positive green, negative red and warning amber semantically distinct. Do not make every element gold, use bright yellow as a substitute for gold, or reduce contrast. Gold must communicate brand hierarchy, never trade outcome or risk status.
+3. **Institutional:** deep navy/graphite, low-glow, chart-first, high legibility and restrained cyan/blue accents.
+4. **Neural:** dark indigo/black with restrained violet/cyan energy, with Quint Brain and research context visually prominent.
+5. **Minimal:** charcoal/black, reduced ornament, compact typography and strong chart/data hierarchy.
+
+The owner may switch themes without losing page, filters, selected account, panel arrangement or saved layout. Theme and layout are independent settings. Theme selection must be instant, reversible and persistent per user/workspace after authentication/persistence is implemented. In a local-only prototype, persistence may use browser storage but must contain no secrets or account credentials.
+
+### Layout presets (separate from theme)
+
+Provide at least:
+- **Command Centre:** broad overview, market chart, account overview, bot status and alerts.
+- **Trading Desk:** larger chart, position/order/fill monitor and Guardian/risk area.
+- **Research Desk:** Strategy Lab, research queue, evidence and comparison views.
+- **Account Monitor:** account table, evaluation/funded progress, drawdown buffers and copier health.
+
+Allow panels to be shown/hidden, reordered and resized within defined responsive constraints. Provide reset-to-preset and save-as-personal-layout actions. Persist each user's layouts separately. Do not make arbitrary drag-and-drop the only way to use the interface: provide accessible move/reorder controls and clear save/cancel feedback. On narrow screens, use a deliberate stacked/mobile arrangement rather than attempting desktop-style free positioning.
+
+### Theme design acceptance
+
+- All five themes use the same component tokens and semantic status colours.
+- Gold theme is visibly premium and distinct from purple while retaining the same Quint brand structure and chart density.
+- Text, chart labels, borders, focus rings and controls pass contrast checks in every theme.
+- Theme switching does not change trading data, account state, mode, risk settings or strategy configuration.
+- Theme switching never triggers engine commands.
+- Every theme supports loading, demo, empty, stale, disconnected and error states.
+- Test theme and layout persistence, reset, mobile navigation and keyboard operation.
+
 ## 2. Non-negotiable product and engineering boundaries
 
 1. Quint is the main operator and platform. Quint's assistant is an analysis/orchestration interface; bots remain individually named, selectable and independently evidenced strategies.
