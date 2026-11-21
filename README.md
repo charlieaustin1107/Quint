@@ -2,6 +2,8 @@
 
 This repository contains separate products. Keep their code, tests, research and release workflows inside their own folders.
 
+**For AI-assisted work, start with [FABLE-START-HERE.md](FABLE-START-HERE.md).** It summarises Quint's roles, non-negotiable safety rules, the current build gate and the minimum reading path. Use [docs/REPO-MAP.md](docs/REPO-MAP.md) to find the canonical file for a task, and [docs/QUINT-DECISION-REGISTER.md](docs/QUINT-DECISION-REGISTER.md) to resolve cross-project decisions.
+
 | Product | Folder | Purpose | Places broker orders? |
 |---|---|---|---|
 | **Quint Control** | `quint-control/` | Automated trading platform: NinjaTrader engine, bots, Guardian, order router, Strategy Lab and dashboard website | **Yes**, only through its protected engine and explicit live authorisation |
@@ -21,13 +23,15 @@ This repository contains separate products. Keep their code, tests, research and
 - Quint Brain source/tests: `quint-brain/src/`
 - Chart Wizard/Quint Brain strategy backtest harness: `quint-brain/backtest/`. This is not the automated Quint Control execution engine.
 - Global Claude instructions: `CLAUDE.md`; then read the relevant product README and `quint-control/STATUS.md`.
+- Drafts, beta UI and experimental assets: `drafts/` (never imported into production builds).
 
 ## Start here
 
 1. Read `CLAUDE.md` for repository rules and product boundaries.
-2. For automated bots/site work, read `quint-control/README.md`, `quint-control/STATUS.md`, `quint-control/PLAN.md` and `quint-control/research/AUTOMATED-TRADING-KNOWLEDGE-BASE.md`.
-3. For Quint's proposed component integration, read `docs/QUINT-ARCHITECTURE-SUGGESTIONS.md` and `docs/QUINT-SHARED-INTELLIGENCE-CONTRACT.md`. Chart Wizard remains separate; read its condensed knowledge reference only when relevant.
-4. For Quint Brain, read `quint-brain/README.md`.
-5. For Quint Lab and Quint HQ, read `lab/README.md`.
+2. Read `FABLE-START-HERE.md` for the concise handoff and current guardrails.
+3. For automated bots/site work, read `quint-control/README.md`, `quint-control/STATUS.md`, `quint-control/PLAN.md` and only the relevant research file identified in `docs/REPO-MAP.md`.
+4. For Quint's proposed component integration, read `docs/QUINT-ARCHITECTURE-SUGGESTIONS.md` and `docs/QUINT-SHARED-INTELLIGENCE-CONTRACT.md`. Chart Wizard remains separate; read its condensed knowledge reference only when relevant.
+5. For Quint Brain, read `quint-brain/README.md`.
+6. For Quint Lab and Quint HQ, read `lab/README.md`.
 
 Do not move code between products just to share a concept. Prefer explicit, tested interfaces. Keep credentials and account secrets out of Git.
