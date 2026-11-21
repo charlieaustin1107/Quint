@@ -30,14 +30,15 @@ Until then, only read-only audits, research and documentation-only changes are p
 
 ## Next step
 
-1. The owner gets their Windows computer ready using `SETUP.md` (install NinjaTrader 8, turn on multi-provider mode, connect LucidDaily and check Sim101).
-2. Optional but recommended, before paying for Fable: the cheap one-week proof in `proof/README.md`.
-   Also optional: the bot lab in `botlab/README.md`, with 12 test bots for Strategy Analyzer and Sim101. Run all 12 at once with an optimisation over "Bot".
-3. Start phase 1: paste the master prompt and the phase 1 prompt from `FABLE-PROMPTS.md`.
+1. Review `research/SOURCE-CODE-AUDIT-2026-11-21.md` with the owner.
+2. Resolve the documented preparation issues in an authorised documentation/maintenance phase, especially the installer empty-source replacement defect and current-main CI verification.
+3. **Stop and wait.** Do not start Phase 1 until Fable 5.2 has renewed AND the owner explicitly gives the green light.
+
+The audit was static. No trading/runtime code was changed, no C# compile was claimed, and no broker was connected. The Windows/NinjaTrader setup and Phase 1 instructions below remain future steps, not the current next action.
 
 ## How to resume after an interruption
 
-1. Read this file, then `PLAN.md` and the `quint-control` skill.
+1. Read `../FABLE-START-HERE.md`, then this file and the `quint-control` skill.
 2. Check which branch has the latest work: `git branch -r` and the open pull requests.
 3. Run `cd quint-control && npm test` and confirm everything still passes before changing anything.
 4. Carry on from the first unticked item in the phase checklist below.
