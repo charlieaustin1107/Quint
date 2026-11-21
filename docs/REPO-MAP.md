@@ -36,7 +36,7 @@ A task-oriented index. Prefer this over loading the whole repository.
 - Quint Control's engine/website source and tests live under `quint-control/`; check the current folder README and build scripts before assuming an implementation exists.
 - Protocol schemas and examples under `quint-control/protocol/` are contracts; validate changes against the tests.
 - `quint-control/web/strategy-lab/index.html` is a standalone local prototype, not a production dashboard module.
-- `quint-control/design-reference/` on the isolated beta branch is design-only. It is not production source.
+- `drafts/quint-control/beta-dashboard-mockup/` is the quarantined visual beta. The historical source branch `design/quint-beta-dashboard-reference` is preserved; neither is production source.
 - `lab/` stores research and paper-test artefacts. A scorecard or paper result is not a live trading record.
 
 ## Keep the tree understandable
