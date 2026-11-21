@@ -51,3 +51,4 @@ npm test
 Run tests only when safe and within the active authorisation gate. Never claim tests passed unless they were actually run. NinjaTrader-specific behaviour still requires the Windows/NinjaTrader environment.
 
 Only the Quint Engine places broker orders, and only after Guardian checks and the required authorisation.
+- [Source-code audit (21 Nov 2026)](research/SOURCE-CODE-AUDIT-2026-11-21.md) — implementation reality, defects, test evidence and recommended order.
