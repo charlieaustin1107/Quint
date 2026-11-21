@@ -103,3 +103,7 @@ Do not merge speculative proposals into settled runtime requirements without own
 ## 8. Current next step
 
 While HOLD remains active: perform the read-only repository audit in `quint-control/prompts/PRE-FABLE-REPOSITORY-AUDIT.md`. Report evidence, exact paths, test results, unresolved decisions and a prioritised plan. Then stop and wait for the owner's explicit build clearance.
+
+## 9. Latest source-code audit
+
+Read `quint-control/research/SOURCE-CODE-AUDIT-2026-11-21.md` before proposing implementation. It records the actual implementation boundary, installer defect, CI uncertainty, testing gaps and prioritised build order. It is a static audit, not permission to build or trade.
