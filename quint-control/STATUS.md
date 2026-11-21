@@ -30,11 +30,11 @@ Until then, only read-only audits, research and documentation-only changes are p
 
 ## Next step
 
-1. Run the read-only repository audit in `prompts/PRE-FABLE-REPOSITORY-AUDIT.md`.
-2. Record evidence-backed findings, test results, blockers and any contradictions; make documentation-only corrections where authorised.
-3. Review the audit with the owner and **stop**. Do not start Phase 1 until Fable 5.2 has renewed AND the owner explicitly gives the green light.
+1. Review `research/SOURCE-CODE-AUDIT-2026-11-21.md` with the owner.
+2. Resolve the documented preparation issues in an authorised documentation/maintenance phase, especially the installer empty-source replacement defect and current-main CI verification.
+3. **Stop and wait.** Do not start Phase 1 until Fable 5.2 has renewed AND the owner explicitly gives the green light.
 
-The Windows/NinjaTrader setup and Phase 1 instructions below remain future preparation steps, not the current next action.
+The audit was static. No trading/runtime code was changed, no C# compile was claimed, and no broker was connected. The Windows/NinjaTrader setup and Phase 1 instructions below remain future steps, not the current next action.
 
 ## How to resume after an interruption
 
