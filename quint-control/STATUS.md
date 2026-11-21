@@ -129,3 +129,16 @@ Branch: `quint-control/strategy-lab-phase-3a`. This is a first vertical slice an
 | 2026-11-21 | ChatGPT | Added `research/DASHBOARD-VISUAL-REFERENCE-SPEC.md` from the owner's uploaded visual reference. Documentation-only: defines the Quint Control website shell and Command Centre, Live Trading, Copy Trader, Strategy Lab, Backtesting, Forward Testing, Prop Firm Simulator, Quint Brain, Reports, Settings and alerts; preserves engine/Guardian boundaries, tenant/data isolation, demo-data labelling, responsive requirements and post-approval acceptance criteria. No dashboard, engine, trading/runtime code or live execution path changed. Build remains HOLD pending Fable 5.2 renewal and explicit clearance. |
 
 | 2026-11-21 | ChatGPT | Expanded `research/DASHBOARD-VISUAL-REFERENCE-SPEC.md` with five independent themes (Quint Command, new Quint Gold Command, Institutional, Neural, Minimal), four independent layout presets, theme/layout persistence and accessibility/contrast acceptance checks. Updated issue #39 with the owner's request for an interactive, responsive beta and retained the existing HOLD: Fable 5.2 renewal plus explicit clearance are still required before implementation. Documentation-only; no website or trading/runtime code changed. |
+
+
+## Isolated dashboard visual prototype (design-only branch)
+
+- Branch: `design/quint-beta-dashboard-reference`
+- Folder: `quint-control/design-reference/beta-dashboard-mockup/`
+- Entry point: `index.html`
+- Handoff: `CLAUDE-HANDOFF.md`
+- Purpose: simple, self-contained, interactive and responsive visual mockup for Claude/Fable to inspect as a reference when the real dashboard build is authorised.
+- Includes five visual themes (Quint Command, Quint Gold Command, Institutional, Neural, Minimal) and four layout presets (Command Centre, Trading Desk, Research Desk, Account Monitor).
+- Contains fabricated demo values only; no market, broker, engine, Guardian, OrderRouter, copier, AI or account connections.
+- This branch is intentionally separate from `main`. Do not merge the mockup into production runtime without owner review.
+- This prototype does not waive the HOLD gate, Fable 5.2 renewal requirement or the owner's separate implementation approval.
