@@ -19,4 +19,4 @@ This folder is the quarantine area for work that is not production-ready.
 5. Promotion requires a separate reviewed change into the correct product source folder, with tests and owner approval.
 6. Preserve historical betas when useful; mark them superseded rather than silently treating them as current.
 
-The existing Quint Control beta dashboard was created on the isolated branch `design/quint-beta-dashboard-reference` under `quint-control/design-reference/beta-dashboard-mockup/`. It has not been moved or merged by this documentation-only cleanup. Future beta work should use `drafts/quint-control/` on an isolated branch.
+The existing Quint Control beta dashboard is now copied into `drafts/quint-control/beta-dashboard-mockup/` on this preparation branch, including its HTML, README and Fable handoff. The original isolated branch `design/quint-beta-dashboard-reference` is preserved unchanged as a historical source. The beta remains presentation-only and must never be imported into the production website build.
