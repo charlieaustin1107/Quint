@@ -151,6 +151,17 @@ Purpose: observe and control the currently authorised engine and account without
 - All consequential actions require clear confirmation and an audit event.
 - If the engine is disconnected, show last known state as stale and disable actions that cannot be safely confirmed.
 
+### Account mode and multi-bot policy (applies across Dashboard, Live Trading, Copy Trader and Account Monitor)
+
+The UI must distinguish three separate concepts:
+- **One bot copied to multiple accounts:** one strategy signal distributed by the copier, with independent account-level Guardian checks and execution outcomes.
+- **Multiple bots on one account:** a future coordinated portfolio mode, not the same thing as copying.
+- **Manual Copy:** a separate user-driven mode; automated bots remain off for that account.
+
+Current release baseline is **one automated bot per account**. The dashboard must show that assignment clearly and must not permit a second bot to be enabled on the same account. The future **Multi-bot Portfolio** capability may be shown as Planned / Locked only. It becomes selectable only after the Portfolio Manager, broker-reconciled net-position ledger, per-bot virtual allocations, deterministic conflict arbitration, atomic combined Guardian risk checks, protective-order ownership, portfolio-level backtesting, practice-account forward testing, fault/recovery tests and explicit owner approval have all passed.
+
+When that future mode is eventually enabled, show the account's single broker net position separately from each bot's virtual allocation. Show combined account risk and account P&L separately from bot-attributed P&L. Never sum independent backtests or virtual allocations and present them as actual account performance. Opposing same-account proposals must be blocked/deferred by the coordinator by default; no accidental netting, reversal or bot exit may affect another bot's allocation. The single Guardian veto and single OrderRouter remain mandatory.
+
 ### C. Copy Trader
 
 Purpose: configure and monitor leader/follower copying with per-account isolation.
