@@ -95,6 +95,9 @@ Branch: `quint-control/strategy-lab-phase-3a`. This is a first vertical slice an
 
 ## Session log
 
+| 2026-11-21 | ChatGPT | Resolved the apparent multi-bot policy conflict in documentation: one bot per account remains the enforced current baseline; multi-bot portfolio mode is a future locked capability requiring the account Portfolio Manager, virtual allocations, atomic Guardian risk, conflict arbitration, portfolio backtests/forward tests, recovery tests and explicit approval. Updated the multi-bot coordination research and dashboard visual spec on branch `research/resolve-multibot-dashboard-policy`. Documentation-only; HOLD unchanged; no runtime or trading code changed. |
+
+
 | 2026-11-19 | ChatGPT | Owner requested Discord and/or Telegram alerts linked to the Quint website for detected setups, entries/fills, stop/target updates and completed trade results. Added provider-neutral notification design, event lifecycle, website deep links, delivery reliability and security requirements to PLAN.md on main. |
 
 | 2026-11-19 | ChatGPT | Owner specified that Quint is the platform/brain and AI chat assistant only; all trading strategies must appear as separately named, selectable bots in a dedicated library grouped by horizon, with honest implementation/evidence statuses. Added menu and naming requirements to PLAN.md on main. |
