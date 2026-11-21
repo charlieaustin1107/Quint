@@ -1,4 +1,4 @@
-# Quint & Chart Wizard: rulebook for Claude
+# Quint: rulebook for Claude
 
 Read this first in every session, then read the README for the specific product being changed. It says what this project is for and how to work on it. This repository contains separate products with distinct responsibilities.
 
@@ -14,7 +14,9 @@ Read this first in every session, then read the README for the specific product 
 |---|---|
 | Automated bots, Quint website, engine or Guardian | `quint-control/README.md`, `quint-control/STATUS.md`, `quint-control/PLAN.md` |
 | Bot strategy research | `quint-control/research/AUTOMATED-TRADING-KNOWLEDGE-BASE.md` |
-| Chart Wizard | `chart-wizard/README.md` |
+| Chart-reading knowledge for Quint | `docs/CHART-WIZARD-CORE-KNOWLEDGE.md` |
+| Quint component integration proposal | `docs/QUINT-ARCHITECTURE-SUGGESTIONS.md`, `docs/QUINT-SHARED-INTELLIGENCE-CONTRACT.md` |
+| Chart Wizard standalone project | `chart-wizard/README.md` |
 | Quint Brain | `quint-brain/README.md` |
 | Quint Brain backtests | `quint-brain/backtest/README.md` |
 | Quint Lab and Quint HQ | `lab/README.md` |
@@ -41,7 +43,7 @@ Each app runs as a single self-contained `index.html`. The artifacts are where t
 ## Product boundaries
 
 - **Quint Control (`quint-control/`)** is the automated trading platform. It owns the NinjaTrader 8 engine, bots, Guardian, single OrderRouter, account rules, Strategy Lab, dashboard website and automated-trading research.
-- **Chart Wizard (`chart-wizard/`)** is a chart-reading and learning simulator. It does not place broker orders.
+- **Chart Wizard (`chart-wizard/`)** is a separate chart-reading and learning simulator. It is not part of the Quint website or runtime. Quint may use selected chart-reading knowledge distilled into `docs/CHART-WIZARD-CORE-KNOWLEDGE.md`; do not embed its game, UI, branding or coaching app in Quint.
 - **Quint Brain (`quint-brain/`)** is a market-analysis/learning app. It does not place broker orders. Its strategy backtest harness lives in `quint-brain/backtest/`.
 - **Quint legacy (`quint/`)** is retained for reference; do not assume it is the current implementation.
 
@@ -69,7 +71,7 @@ Never put Quint Control bot-engine code inside Chart Wizard or Quint Brain. Neve
 - Quint's answers use the owner's Claude usage through the artifact (Fable for calls, Opus for simple questions).
 
 ## Product rules (from the owner)
-1. **Keep Chart Wizard simple.** Teach only the best 2–3 backtested strategies plus the owner's own **5-pillar playbook**. Quint is the powerhouse.
+1. **Quint is the main operator and powerhouse.** Chart Wizard remains a separate project and is not part of the Quint website. Distil only valuable chart-reading knowledge and validated rules from it; do not embed its UI, game or coaching application.
 2. Here are the strategies taught right now (in `BEST` in `chart-wizard/index.html`):
    - **20-candle breakout**: 15-minute chart, stop 2 ATR, target 3× the stop, close after 40 candles.
    - **New York open breakout**: the first 15 minutes from 9:30 New York, one trade a day, entries until 11:30, stop on the other side of the range, target 2R.
