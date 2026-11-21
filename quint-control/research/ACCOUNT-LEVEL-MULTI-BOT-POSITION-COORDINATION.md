@@ -17,6 +17,26 @@ NinjaTrader strategies can maintain virtual strategy positions that are independ
 
 **Decision:** retain the current one-bot-per-account behaviour as the safe baseline until the account-level coordinator is designed, implemented and tested. Multi-bot-per-account is a target capability, not a claim about current functionality.
 
+## Policy resolution — authoritative interpretation
+
+There is no change to the current execution permission. The repository contains two different time horizons, which must not be conflated:
+
+| Mode | Meaning | Status |
+|---|---|---|
+| Single-bot account mode | Exactly one automated strategy bot may be assigned to an account at a time. The copier may distribute that bot's eligible signal to separately risk-checked follower accounts. | **Current enforced baseline** |
+| Multi-bot portfolio mode | Multiple separately named strategy bots may propose trades for the same account/instrument, but only through the account-level Portfolio Manager described below. | **Future target; disabled until every release gate passes** |
+| Manual Copy mode | User-originated/manual copy workflow with automated bots disabled for the relevant account, as specified by the current operating rules. | Separate mode; never simultaneous with bots |
+
+The root quint-control/STATUS.md is authoritative for what is currently implemented/allowed. This research document defines the future target architecture; it does not override the current one-bot-per-account decision, authorise implementation, or enable multi-bot execution.
+
+**Product requirement:** Quint should be designed to support multi-bot portfolios eventually. Do not permanently constrain the product model to one bot per account. Equally, do not present multi-bot as available until the coordinator, shared ledger, atomic risk checks, portfolio backtests, forward tests, recovery tests and explicit owner approval are complete.
+
+Until then, the UI must:
+- Show one active bot assignment per account in the current mode.
+- Present multi-bot portfolio mode as **Planned / Locked**, with the release gates visible; do not show an enabled toggle.
+- Never imply that two bot P&Ls can be added together to predict account performance.
+- Keep copy-trading follower accounts distinct from multiple bots sharing one account.
+
 ## Required architecture
 
 All bot signals for an account/instrument must pass through one account-level Portfolio Manager / Position Coordinator before Guardian and the single OrderRouter:
