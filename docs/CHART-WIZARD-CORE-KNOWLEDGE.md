@@ -1,6 +1,6 @@
 # Chart Wizard — condensed chart-analysis knowledge for Quint
 
-**Purpose:** preserve the useful chart-reading, setup-recognition and coaching logic from Chart Wizard in a concise reference that Quint Brain, Quint Lab and Quint Control can use consistently.
+**Purpose:** distil selected, valuable chart-reading and setup-recognition knowledge from the separate Chart Wizard project into a concise reference Quint can use. Chart Wizard is not part of the Quint website and is not a Quint runtime dependency.
 
 This is a knowledge specification, not an execution module. It does not authorise a strategy, create a trading signal by itself, or place orders.
 
@@ -65,7 +65,8 @@ These are the current teaching definitions, **not a claim that they are profitab
 
 | Component | Owns | Must not own |
 |---|---|---|
-| Chart Wizard | Learning exercises, chart-reading practice, coaching and the condensed playbook knowledge | Broker access, live orders, authoritative bot approval |
+| Quint (operator) | Orchestration, final analysis, user communication and decision coordination | Bypassing Control risk gates or inventing evidence |
+| Chart Wizard (separate project) | Source of selected chart-reading knowledge for distillation | Quint website module, runtime dependency, broker access or execution authority |
 | Quint Brain | Market analysis, live chart context, five-pillar checks and learning views | Broker execution |
 | Quint Lab | Research memory, strategy hypotheses, experiment queue, backtests, scorecards and paper forward evidence | Live broker orders |
 | Quint Control | Bot runtime, account-specific risk controls, Guardian, order routing, copier and explicitly authorised execution | Rewriting research evidence or treating an unvalidated setup as approved |
@@ -73,7 +74,7 @@ These are the current teaching definitions, **not a claim that they are profitab
 
 ### Required hand-off
 
-Chart analysis should produce a structured, timestamped assessment (instrument, session, timeframe, regime, levels/zones, pillar states, setup, entry trigger, invalidation, target, risk/reward, evidence references, confidence/uncertainty and expiry).
+Quint Brain should provide Quint with a structured, timestamped chart assessment (instrument, session, timeframe, regime, levels/zones, pillar states, setup, entry trigger, invalidation, target, risk/reward, evidence references, confidence/uncertainty and expiry).
 
 Quint Lab evaluates the strategy and stores the evidence. Quint Brain presents the analysis. Quint Control independently validates account rules, bot permissions, risk limits and execution conditions before any order can be sent. A chart assessment is never an instruction to bypass Guardian or account protections.
 
@@ -87,4 +88,4 @@ Quint Lab evaluates the strategy and stores the evidence. Quint Brain presents t
 
 ## 8. Integration principle
 
-Reuse the existing Chart Wizard/Quint Brain source functions where appropriate and expose stable, tested interfaces. Do not copy large UI/game files into Quint Control, duplicate strategy rules in multiple places, or merge chart interpretation with order execution. Keep one canonical strategy definition and attach versioned evidence to it.
+Quint may reuse carefully selected, reviewed chart-analysis rules and knowledge distilled from Chart Wizard. Do not embed Chart Wizard's game, UI, branding, coaching application or full source in the Quint website, and do not make Quint depend on its runtime. Keep one canonical strategy definition and attach versioned evidence to it.
